@@ -1,0 +1,103 @@
+# 微信小程序
+
+## 目录
+
+1. [支持webP的WebAssembly方案](#支持webP的WebAssembly方案)
+   - [WebAssembly工作流程](#WebAssembly工作流程)
+   - [浏览器环境支持webP](#浏览器环境支持webP)
+   - [微信小程序环境支持webP](#微信小程序环境支持webP)
+   - [写在最后](#写在最后)
+   - [参考资料](#参考资料)
+
+## 支持webP的WebAssembly方案
+
+WebAssembly是由 Google、Microsoft、Mozilla、Apple 等几家大公司合作发起的一个关于面向 Web 的通用二进制和文本格式的项目。
+
+实践检验真理，让我们一起动手将 WebAssembly 应用在微信小程序场景中，让微信小程序环境支持解码 webP 格式（不了解或没听过 webP 的各位同仁，请先移步到 “探究 WebP 的一些事儿”——https://aotu.io/notes/2016/06/23/explore-something-of-webp/index.html）。
+
+### WebAssembly工作流程
+
+C/C++/Rust/Java 等高级语言开发的代码或功能库 -> Emscripten 编译 -> wasm 文件 -> 结合 WebAssembly JS API -> 浏览器环境中运行，如下图所示：
+
+![x](./Resource/3.png)
+
+简单来说，编译前端 LLVM / Emscripten 流程可以获得 wasm 文件和胶水 js。然后，通过胶水 js 来加载 wasm 并转为 arrayBuffer 格式。紧接着进行编译和实例化后，即可用 JavaScript 与 WebAssembly 通信。
+
+![x](./Resource/4.png)
+
+详细过程以及每个过程调用的 API 如下图所示：
+
+![x](./Resource/5.png)
+
+### 浏览器环境支持webP
+
+了解完 WebAssembly 的工作流程后，是不是还不清楚要从哪开始搞起？你可以去 github 官网上看一下 libwebp 开源项目（https://github.com/webmproject/libwebp/blob/master/README.webp_js），Google 已经完全支持把 libwebp 源码编译为 wasm 和 asm.js 两个版本了。针对不支持 WebAssembly 的系统或不兼容 WebAssembly 的浏览器，可以在损失一点性能的情况下降级为使用 asm.js。具体编译步骤如下图所示：
+
+![x](./Resource/1.jpg)
+
+待编译完之后，我们便可获得 wasm 文件和胶水 JS。然后，我们可用“python -m SimpleHTTPServer 8080”启动一个本地服务，在浏览器地址栏输入 http://localhost:8080 后就能看到 webP 解码后的图片。
+
+![x](./Resource/2.jpg)
+
+最后，让我们来总结下整个流程。
+
+（1）用 LLVM / Emscripten / CMake 工具对 libwebp 解码库进行编译，获得 wasm 文件和胶水 JS。
+
+（2）胶水 JS 申请内存，对 wasm 文件进行编译、加载和实例化后，导出 Module 对象。
+
+（3）利用 Module 对象上的 WebpToSDL 方法对 webP 进行解码，并转成 Canvas 在浏览器渲染显示出来，呈现最终的图片。
+
+![x](./Resource/6.png)
+
+## 微信小程序环境支持webP
+
+微信小程序在 Android / iOS 上用于执行脚本以及渲染组件的环境都不尽相同。在 Android 上，微信小程序逻辑层的 JavaScript 代码运行在 V8 中，视图层是由自研 XWeb 引擎基于 Mobile Chrome 67 内核来渲染，天然支持 webP 格式；在 iOS 上，微信小程序逻辑层的 JavaScript 代码运行在 JavaScriptCore 中，视图层是由 WKWebView 来渲染，宿主 Safari 浏览器内核不支持 webP 格式。通过第 3 节内容，我们知道浏览器环境已经能够支持 webP 了，那直接把之前编译好的 wasm 文件和胶水 JS 扔进微信小程序的运行环境，然后跑起来不就搞定了？Too young too simple!浏览器环境支持 webP 的思路是 libwebp 解码 webP -> jpg / png / gif 的 canvas 图片渲染显示，这已经改变了原来 image 组件的结构。
+
+![x](./Resource/7.png)
+
+而微信小程序提供给开发者的组件不允许去改变它原来的结构，因此换种思路是 libwebp 解码 webP -> jpg / png / gif 的 rgb data -> jpg / png / gif base64 -> 回传给 JS 并赋值给 image src 进行渲染显示。
+
+![x](./Resource/8.png)
+
+下面我罗列下从 libwebp 编译 wasm 文件和胶水 JS 开始，直到在微信小程序环境跑通为止，整个过程中遇到的一些坑点和优化点：
+
+（1）编译 CMakeLists.txt 时需加上“-O3”选项，大大提升编译速度。
+
+（2）编译 CMakeLists.txt 时需加上“-s USE_PTHREADS=0”选项，因为 iOS Safari 浏览器不兼容 ShareArrayBuffer 共享缓冲区。
+
+（3）编译 CMakeLists.txt 时需加上“-s ALLOW_MEMORY_GROWTH=1”选项，目的是为了解决解码超大分辨率的 webP 图片时出现的 OOM 问题。
+
+（4）由于微信小程序环境的兼容性问题，去除胶水 JS 代码中 libwebp 编译时加上的 SDL 相关代码，能节省 100KB 左右的空间。
+
+（5）去除胶水 JS 中 ENVIRONMENT_IS_NODE / ENVIRONMENT_IS_SHELL 相关的代码，因为微信小程序环境并未使用到。
+
+（6）由于 iOS Safari 浏览器的兼容性问题，将胶水 JS 中流式编译和实例化的方法去掉，替换成非流式编译和实例化的方法。
+
+（7）由于 WebAssembly 还没有和 `<script type='module'>` 或 ES6 的 import 语句集成，因此将 wasm 文件先转成 base64 字符串。等胶水 JS 运行加载逻辑时，再将 base64 转成 ArrayBuffer 并编译和实例化后导出 Module 对象，节省从服务器下载 wasm 文件的时间。
+
+（8）编译 CMakeLists.txt 时需加上“-s USE_LIBPNG=1”选项编译 libpng.a 库，然后将 webP 解码获得的 rgb 数据，通过 png 解码库转成 png 内存数据，紧接着转成 base64 回传给 JS，最后赋值给 image src 进行渲染显示。难点是 rgb 转成 png 内存数据这一步出了点问题，但是 wasm 无法调试代码，只能通过搭建 libpng 的 VS 工程进行断点调试，最终定位到是 rgb 转 png data 时传入的 data_size 为 0 导致。
+
+（9）胶水 JS 里的 new WebAssembly.Memory 代码在微信小程序环境运行时，会报“refused to create a webassembly object without 'unsafe-eval'”的错误，必须在 page-frame.html 里的 CSP 设置里加上 unsafe-eval 才能解决。
+
+踩了这么多坑之后，终于能在微信小程序环境里支持 webP 了。实测 WebAssembly 在解码不同格式不同分辨率的 webP 时，性能都完胜 JavaScript。
+
+![x](./Resource/9.png)
+
+### 写在最后
+
+虽然 WebAssembly 的解码性能比 JavaScript 快不少，但遇到超大分辨率（如 1920 x 1080 等）的 webP 时，却远远落后于客户端的解码性能。综合对比各种方案的性能和兼容性之后，我们还是采用了基于 iOS 客户端自定义协议 webphttps 的方案，大致步骤如下：
+
+（1）首先，微信小程序基础库判断开发者在 image 组件使用的是 webP 格式时，则在 image src 里加上 webp 头部如 webphttps://example.png。
+
+（2）然后，客户端通过 NSURLProtocol 协议挟持 webphttps 的请求，并下载相应的 webP 数据进行解码。
+
+（3）最后，再把解码后的 image 数据回吐给浏览器进行渲染显示。到最后，我们完成了微信小程序环境支持 webP 的方案落地。
+
+### 参考资料
+
+1. webassembly 介绍: https://cunzaizhuyi.github.io/webassembly/
+2. 加载和运行 WebAssembly 代码: https://developer.mozilla.org/zh-CN/docs/WebAssembly/Loading_and_running
+3. WebAssembly 在企业邮箱中的一次实践 : http://km.oa.com/group/27917/articles/show/325675?kmref=search&from_page=1&no=4
+4. Download and install — Emscripten 1.38.38 documentation: https://emscripten.org/docs/getting_started/downloads.html
+5. 探究 WebP 的一些事儿: https://aotu.io/notes/2016/06/23/explore-something-of-webp/index.html
+6. libwebp 开源项目: https://github.com/webmproject/libwebp/blob/master/README.webp_js
