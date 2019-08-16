@@ -2,7 +2,7 @@
 
 ## 目录
 
-1. [怎样开发可靠的软件？](#怎样开发可靠的软件？)
+1. [怎样开发可靠的软件](#怎样开发可靠的软件)
 2. [ESLint配置](#ESLint配置)
 3. [复杂度](#复杂度)
 4. [不变性](#不变性)
@@ -15,7 +15,7 @@
 
 ***软件开发者首要的责任应该是降低代码的复杂度***
 
-## 怎样开发可靠的软件？
+## 怎样开发可靠的软件
 
 - 尽量节约内存
 - 充分利用工具，尤其是 [ESLint](https://eslint.org/)
@@ -174,7 +174,7 @@ OOP 说全局状态是万恶之源。但讽刺的是 OOP 程序基本上就是�
 
 JavaScript 中的 OOP 尤其糟糕，因为这种语言缺少静态类型检查、泛型和接口等。JavaScript 中的 this 关键字相当不可靠。
 
-如果我们的目标是编写可靠的软件，那么我们应该努力降低复杂度，理想情况下应该避免使用 OOP。如果你有兴趣了解更多信息，请务必阅读另一篇文 “OOP，万亿美元的灾难”: https://medium.com/@ilyasz/object-oriented-programming-the-trillion-dollar-disaster-%EF%B8%8F-92a4b666c7c7
+如果我们的目标是编写可靠的软件，那么我们应该努力降低复杂度，理想情况下应该避免使用 OOP。如果你有兴趣了解更多信息，请务必阅读另一篇文[“OOP，万亿美元的灾难”](https://medium.com/@ilyasz/object-oriented-programming-the-trillion-dollar-disaster-%EF%B8%8F-92a4b666c7c7)
 
 this 关键字的行为总是飘忽不定。它很挑剔，在不同的环境中可能搞出来完全不同的东西。它的行为甚至取决于谁调用了一个给定的函数。使用 this 关键字经常会导致细小而奇怪的错误，很难调试。
 
@@ -195,7 +195,7 @@ rules:
 
 典型的声明式语言有 SQL 和 HTML。甚至包括 React 中的 JSX！
 
-在声明式 JavaScript 中使用实验性流水线运算符（https://github.com/tc39/proposal-pipeline-operator）
+在声明式 JavaScript 中使用[实验性流水线运算符](https://github.com/tc39/proposal-pipeline-operator)
 
 编写声明式代码时应优先使用表达式而非语句。表达式始终返回一个值，而语句是用来执行操作的，不返回任何结果。这在函数式编程中也称为“副作用”。顺便说一句，前面讨论的状态突变也是副作用。
 
