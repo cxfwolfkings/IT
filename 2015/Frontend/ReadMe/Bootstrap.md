@@ -370,7 +370,7 @@ Boostrap 缩略图的默认设计仅需最少的标签就能展示带链接的�
         <h3>Thumbnail label</h3>
         <p>...</p>
         <p>
-          <a href="#" class="btn btn-primary" role="button">Button</a> 
+          <a href="#" class="btn btn-primary" role="button">Button</a>
           <a href="#" class="btn btn-default" role="button">Button</a>
         </p>
       </div>

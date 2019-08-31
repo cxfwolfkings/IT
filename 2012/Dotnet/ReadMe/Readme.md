@@ -18,6 +18,7 @@
 5. dotnet core
    - [ABP](./6.md)
 6. [附录](#附录)
+   - [Debug远程访问](#Debug远程访问)
 
 ## Microsoft技术栈
 
@@ -210,3 +211,56 @@ Microsoft 推荐使用所有的.NET 本地、Web 和通信框架，浏览器端�
 ![x](./Resource/12.png)
 
 ## 附录
+
+### Debug远程访问
+
+1. 打开并编辑解决方案目录（不是工程目录）下的文件： `\.vs\config\applicationhost.config`
+
+   增加行：`<binding protocol="http" bindingInformation="*:PORT:IP_ADDR" />`
+
+   示例：
+
+   ```xml
+   <sites>
+      <site name="WebSite1" id="1" serverAutoStart="true">
+        <application path="/">
+          <virtualDirectory path="/" physicalPath="%IIS_SITES_HOME%\WebSite1" />
+        </application>
+        <bindings>
+          <binding protocol="http" bindingInformation=":8080:localhost" />
+        </bindings>
+      </site>
+      <site name="LeadChina.Laboratory.Api" id="2">
+        <application path="/" applicationPool="LeadChina.Laboratory.Api AppPool">
+          <virtualDirectory path="/" physicalPath="E:\Laboratory\LeadChina.Laboratory.Api" />
+        </application>
+        <bindings>
+          <binding protocol="http" bindingInformation="*:51742:localhost" />
+            <!-- 远程访问 -->
+            <binding protocol="http" bindingInformation="*:51742:192.168.133.129" />
+        </bindings>
+      </site>
+      <siteDefaults>
+        <logFile logFormat="W3C" directory="%IIS_USER_HOME%\Logs" />
+        <traceFailedRequestsLogging directory="%IIS_USER_HOME%\TraceLogFiles" enabled="true" maxLogFileSizeKB="1024" />
+      </siteDefaults>
+      <applicationDefaults applicationPool="Clr4IntegratedAppPool" />
+      <virtualDirectoryDefaults allowSubDirConfig="true" />
+    </sites>
+   ```
+
+2. 管理员权限运行CMD，输入
+
+   ```cmd
+   netsh http add urlacl url=http://IP_ADDR:PORT/ user=everyone
+   netsh http add urlacl url=http://localhost:PORT/ user=everyone
+   ```
+
+   注意：不要忘记将 localhost 加进 urlacl 否则原有的 localhost 会发生 ERROR_CONNECTION_REFUSED 错误
+
+   回车，看到 URL reservation successfully added
+
+3. 确认防火墙打开
+4. 以管理员权限运行 VS2017，Ctrl+F5 运行之
+
+### 远程Debug
