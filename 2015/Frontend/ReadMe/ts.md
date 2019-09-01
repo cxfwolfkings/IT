@@ -6,6 +6,8 @@
    - [安装TypeScript](#安装TypeScript)
    - [构建你的第一个TypeScript文件](#构建你的第一个TypeScript文件)
 2. [简介](#简介)
+   - [什么是TypeScript](#什么是TypeScript)
+   - [TypeScript安装](#TypeScript安装)
 
 ## 5分钟上手TypeScript
 
