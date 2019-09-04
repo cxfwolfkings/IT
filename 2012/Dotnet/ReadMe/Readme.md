@@ -21,6 +21,7 @@
    - [ABP](./6.md)
 6. [附录](#附录)
    - [Debug远程访问](#Debug远程访问)
+   - [Ioc](./Ioc.md)
 
 ## Microsoft技术栈
 
