@@ -22,6 +22,7 @@
 6. [附录](#附录)
    - [Debug远程访问](#Debug远程访问)
    - [Ioc](./Ioc.md)
+   - [ORM](./Orm.md)
 
 ## Microsoft技术栈
 

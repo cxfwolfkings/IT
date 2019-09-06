@@ -8,6 +8,8 @@
 2. [简介](#简介)
    - [什么是TypeScript](#什么是TypeScript)
    - [TypeScript安装](#TypeScript安装)
+   - [HelloWorld](#HelloWorld)
+   - [类型批注](#类型批注)
 
 ## 5分钟上手TypeScript
 
@@ -219,3 +221,68 @@
    一旦编译成功，就会在相同目录下生成一个同名 js 文件，你也可以通过命令参数来修改默认的输出名称。
 
    默认情况下编译器以ECMAScript 3（ES3）为目标但ES5也是受支持的一个选项。TypeScript增加了对为即将到来的ECMAScript 6标准所建议的特性的支持。
+
+### HelloWorld
+
+- 首先，我们创建一个 index.html 文件：
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+   <title>Learning TypeScript</title>
+  </head>
+  <body>
+    <script src="hello.js"></script>
+  </body>
+  </html>
+  ```
+
+  创建 hello.ts 文件， *.ts 是 TypeScript 文件的后缀，向 hello.ts 文件添加如下代码：
+
+  ```js
+  alert('hello world in TypeScript!');
+  ```
+
+  接下来，我们打开命令行，使用 tsc 命令编译 hello.ts 文件：
+
+  `tsc hello.ts`
+
+  在相同目录下就会生成一个 hello.js 文件，然后打开 index.html 输出结果如下：
+
+  ![x](./Resource/21.png)
+
+### 类型批注
+
+- TypeScript 通过类型批注提供静态类型以在编译时启动类型检查。这是可选的，而且可以被忽略而使用 JavaScript 常规的动态类型。
+
+  ```ts
+  function Add(left: number, right: number): number {
+    return left + right;
+  }
+  ```
+
+  对于基本类型的批注是number, bool和string。而弱或动态类型的结构则是any类型。
+
+  类型批注可以被导出到一个单独的声明文件以让使用类型的已被编译为JavaScript的TypeScript脚本的类型信息可用。批注可以为一个现有的JavaScript库声明，就像已经为Node.js和jQuery所做的那样。
+
+  当类型没有给出时，TypeScript编译器利用类型推断以推断类型。如果由于缺乏声明，没有类型可以被推断出，那么它就会默认为是动态的any类型。
+
+  实例
+
+  接下来我们在 TypeScript 文件 type.ts 中创建一个简单的 area() 函数：
+
+  ```ts
+  function area(shape: string, width: number, height: number) {
+    var area = width * height;
+    return "I'm a " + shape + " with an area of " + area + " cm squared.";
+  }
+  document.body.innerHTML = area("rectangle", 30, 15);
+  ```
+
+  接下来，修改 index.html 的 js 文件为 type.js 然后编译 TypeScript 文件： tsc type.ts。
+
+  浏览器刷新 index.html 文件，输出结果如下:
+
+  ![x](./Resource/22.png)

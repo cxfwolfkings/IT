@@ -3,7 +3,13 @@
 ## 目录
 
 1. [简介](#简介)
+   - [设计模式](#设计模式)
+   - [实现初探](#实现初探)
+   - [优缺点](#优缺点)
 2. [示例](#示例)
+   - [Unity](#Unity)
+   - [Autofac](#Autofac)
+   - [Ninject](#Ninject)
 
 ## 简介
 
@@ -498,3 +504,367 @@
   Unity的app.config节点配置
 
   上面所说的三种注入方式，包括单例创建都是在代码中去配置的，当然只是演示用，这种配置都会产生耦合度，比如添加一个属性注入或是方法注入都要去属性或是方法前加[Dependency]和[InjectionMethod]标记，我们想要的依赖注入应该是去配置文件中配置，当系统发生变化，我们不应去修改代码，而是在配置文件中修改，这才是真正使用依赖注入解决耦合度所达到的效果
+
+### Autofac
+
+- Autofac是一款IOC框架，比较于其他的IOC框架，它很轻量级，性能上非常高。
+
+  [官方网站](http://autofac.org/)
+
+  [源码下载地址](https://github.com/autofac/Autofac)
+
+#### 基本
+
+- 方法1：
+
+  ```C#
+  var builder = new ContainerBuilder();
+  builder.RegisterType<TestService>();
+  builder.RegisterType<TestDao>().As<ITestDao>();
+  return builder.Build();
+  ```
+
+  为了统一管理 IoC 相关的代码，并避免在底层类库中到处引用 Autofac 这个第三方组件，定义了一个专门用于管理需要依赖注入的接口与实现类的空接口 IDependency：
+
+  ```C#
+  /// <summary>
+  /// 依赖注入接口，表示该接口的实现类将自动注册到IoC容器中
+  /// </summary>
+  public interface IDependency
+  {
+
+  }
+  ```
+
+  这个接口没有任何方法，不会对系统的业务逻辑造成污染，所有需要进行依赖注入的接口，都要继承这个空接口，例如：
+
+  业务单元操作接口：
+
+  ```C#
+  /// <summary>
+  /// 业务单元操作接口
+  /// </summary>
+  public interface IUnitOfWork : IDependency
+  {
+      ...
+  }
+  ```
+
+  Autofac 是支持批量子类注册的，有了 IDependency 这个基接口，我们只需要 Global 中很简单的几行代码，就可以完成整个系统的依赖注入匹配：
+
+  ```C#
+  ContainerBuilder builder = new ContainerBuilder();
+  builder.RegisterGeneric(typeof(Repository<,>)).As(typeof(IRepository<,>));
+  Type baseType = typeof(IDependency);
+  // 获取所有相关类库的程序集
+  Assembly[] assemblies = ...
+  // InstancePerLifetimeScope 保证对象生命周期基于请求
+  builder.RegisterAssemblyTypes(assemblies)
+      .Where(type => baseType.IsAssignableFrom(type) && !type.IsAbstract)
+      .AsImplementedInterfaces().InstancePerLifetimeScope();
+  IContainer container = builder.Build();
+  DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+  ```
+
+  如此，只有站点主类库需要引用 Autofac，而不是到处都存在着注入的相关代码，大大降低了系统的复杂度。
+
+  实例
+
+1. InstancePerDependency
+
+   对每一个依赖或每一次调用创建一个新的唯一的实例。这也是默认的创建实例的方式。官方文档解释：
+
+   Configure the component so that every dependent component or call to Resolve() gets a new, unique instance (default.)
+
+2. InstancePerLifetimeScope
+
+   在一个生命周期域中，每一个依赖或调用创建一个单一的共享的实例，且每一个不同的生命周期域，实例是唯一的，不共享的。官方文档解释：
+
+   Configure the component so that every dependent component or call to Resolve() within a single ILifetimeScope gets the same, shared instance. Dependent components in different lifetime scopes will get different instances.
+
+3. InstancePerMatchingLifetimeScope
+
+   在一个做标识的生命周期域中，每一个依赖或调用创建一个单一的共享的实例。打了标识了的生命周期域中的子标识域中可以共享父级域中的实例。若在整个继承层次中没有找到打标识的生命周期域，则会抛出异常：DependencyResolutionException。官方文档解释：
+
+   Configure the component so that every dependent component or call to Resolve() within a ILifetimeScope tagged with any of the provided tags value gets the same, shared instance. Dependent components in lifetime scopes that are children of the tagged scope will share the parent's instance. If no appropriately tagged scope can be found in the hierarchy an DependencyResolutionException is thrown.
+
+4. InstancePerOwned
+
+   在一个生命周期域中所拥有的实例创建的生命周期中，每一个依赖组件或调用Resolve()方法创建一个单一的共享的实例，并且子生命周期域共享父生命周期域中的实例。若在继承层级中没有发现合适的拥有子实例的生命周期域，则抛出异常：DependencyResolutionException。官方文档解释：
+
+   Configure the component so that every dependent component or call to Resolve() within a ILifetimeScope created by an owned instance gets the same, shared instance. Dependent components in lifetime scopes that are children of the owned instance scope will share the parent's instance. If no appropriate owned instance scope can be found in the hierarchy an DependencyResolutionException is thrown.
+
+5. SingleInstance
+
+   每一次依赖组件或调用Resolve()方法都会得到一个相同的共享的实例。其实就是单例模式。官方文档解释：
+
+   Configure the component so that every dependent component or call to Resolve() gets the same, shared instance.
+
+6. InstancePerHttpRequest
+
+   在一次Http请求上下文中，共享一个组件实例。仅适用于asp.net mvc开发。毫无疑问，微软最青睐的IoC容器不是spring.net、unity而是Autofac，因为他的高效，因为他的简洁，所以微软主导的orchard项目用的也是它，下面用一个简单的实例来说明一个Autofac的用法，主要使用Autofac.dll，Autofac.Configuration.dll。
+
+   ```C#
+   /// <summary>
+   /// DB Operate Interface
+   /// </summary>
+   public interface IRepository
+   {
+       void Get();
+   }
+
+   /// <summary>
+   /// 对SQL数据源操作
+   /// </summary>
+   public class SqlRepository : IRepository
+   {
+       #region IRepository 成员
+       public void Get()
+       {
+           Console.WriteLine("sql数据源");
+       }
+       #endregion
+   }
+
+   /// <summary>
+   /// 对redis数据源操作
+   /// </summary>
+   public class RedisRepository : IRepository
+   {
+       #region IRepository 成员
+       public void Get()
+       {
+           Console.WriteLine("Redis数据源");
+       }
+       #endregion
+   }
+
+   /// <summary>
+   /// 数据源基类
+   /// </summary>
+   public class DBBase
+   {
+       public DBBase(IRepository iRepository)
+       {
+           _iRepository = iRepository;
+       }
+       public IRepository _iRepository;
+       public void Search(string commandText)
+       {
+           _iRepository.Get();
+       }
+   }
+   ```
+
+   现在去调用它吧：
+
+   ```C#
+   // 直接指定实例类型
+   var builder = new ContainerBuilder();
+   builder.RegisterType<DBBase>();
+   builder.RegisterType<SqlRepository>().As<IRepository>();
+   using (var container = builder.Build())
+   {
+       var manager = container.Resolve<DBBase>();
+       manager.Search("SELECT * FORM USER");
+   }
+   ```
+
+   这里通过 ContainerBuilder 的方法 RegisterType() 对 DBBase 类型进行注册，注册的类型在后面相应得到的 Container(容器) 中可以 Resolve 得到类型实例。
+
+   `builder.RegisterType<SqlRepository>().As<IRepository>();` 通过 AS 可以让 DBBase 类中通过构造函数依赖注入类型相应的接口。
+
+   Build()方法生成一个对应的 Container(容器) 实例，这样，就可以通过 Resolve 解析到注册的类型实例。
+
+   显然以上的程序中，SqlRepository 或者 RedisRepository 已经暴露于客户程序中了，现在将该类型选择通过文件配置进行读取。
+
+   Autofac 自带了一个 Autofac.Configuration.dll 非常方便地对类型进行配置，避免了程序的重新编译。
+
+   修改App.config：
+
+   ```xml
+   <configuration>
+     <configSections>
+       <section name="autofac" type="Autofac.Configuration.SectionHandler, Autofac.Configuration"/>
+     </configSections>
+     <autofac defaultAssembly="AutofacDemo">
+       <components>
+         <component type="AutofacDemo.SqlRepository, AutofacDemo" service="AutofacDemo.IRepository"/>
+       </components>
+     </autofac>
+   </configuration>
+   ```
+
+   通过Autofac.Configuration.SectionHandler配置节点对组件进行处理。对应的客户端程序改为：
+
+   ```C#
+   // 通过配置文件实现对象的创建
+   var builder2 = new ContainerBuilder();
+   builder2.RegisterType<DBBase>();
+   builder2.RegisterModule(new ConfigurationSettingsReader("autofac"));
+   using (var container = builder2.Build())
+   {
+       var manager = container.Resolve<DBBase>();
+       manager.Search("SELECT * FORM USER");
+   }
+   ```
+
+   另外还有一种方式，通过Register方法进行注册：
+
+   ```C#
+   // 通过配置文件，配合 Register 方法来创建对象
+   var builder3 = new ContainerBuilder();
+   builder3.RegisterModule(new ConfigurationSettingsReader("autofac"));
+   builder3.Register(c => new DBBase(c.Resolve<IRepository>()));
+   using (var container = builder3.Build())
+   {
+       var manager = container.Resolve<DBBase>();
+       manager.Search("SELECT * FORM USER");
+   }
+   ```
+
+   现在通过一个用户类来控制操作权限，比如增删改的权限，创建一个用户类：
+
+   ```C#
+   /// <summary>
+   /// Id Identity Interface
+   /// </summary>
+   public interface Identity
+   {
+       int Id { get; set; }
+   }
+
+   public class User : Identity
+   {
+       public int Id { get; set; }
+       public string Name { get; set; }
+   }
+   ```
+
+   修改DBBase.cs代码：
+
+   ```C#
+   /// <summary>
+   /// 数据源基类
+   /// </summary>
+   public class DBBase
+   {
+       public IRepository _iRepository;
+       public User _user;
+
+       public DBBase(IRepository iRepository) : this(iRepository, null)
+       {
+           _iRepository = iRepository;
+       }
+
+       public DBBase(IRepository iRepository, User user)
+       {
+           _iRepository = iRepository;
+           _user = user;
+       }
+
+       /// <summary>
+       /// Check Authority
+       /// </summary>
+       /// <returns></returns>
+       public bool IsAuthority()
+       {
+           bool result = _user != null && _user.Id == 1 && _user.Name == "Colin" ? true : false;
+           if (!result)
+               Console.WriteLine("Not authority!");
+           return result;
+       }
+
+       public void Search(string commandText)
+       {
+           if (IsAuthority())
+               _iRepository.Get();
+       }
+   }
+   ```
+
+   在构造函数中增加了一个参数User，而Search增加了权限判断。
+
+   修改客户端程序：
+
+   ```C#
+   User user = new User { Id = 1, Name = "Colin" };
+   var builder3 = new ContainerBuilder();
+   builder3.RegisterModule(new ConfigurationSettingsReader("autofac"));
+   builder3.RegisterInstance(user).As<User>();
+   builder3.Register(c => new DBBase(c.Resolve<IRepository>(), c.Resolve<User>()));
+   using (var container = builder3.Build())
+   {
+       var manager = container.Resolve<DBBase>();
+       manager.Search("SELECT * FORM USER");
+   }
+   ```
+
+   `builder3.RegisterInstance(user).As<User>();` 注册User实例。
+
+   `builder3.Register(c => new DBBase(c.Resolve<IRepository>(), c.Resolve<User>()));` 通过Lampda表达式注册DBBase实例。
+
+### Ninject
+
+- 安装
+
+  ```xml
+  <packages>
+    <package id="Ninject" version="3.2.0.0" targetFramework="net45" />
+    <package id="Ninject.Extensions.Conventions" version="3.2.0.0" targetFramework="net45" />
+    <package id="Ninject.MVC5" version="3.2.1.0" targetFramework="net45" />
+    <package id="Ninject.Web.Common" version="3.2.3.0" targetFramework="net45" />
+    <package id="Ninject.Web.Common.WebHost" version="3.2.0.0" targetFramework="net45" />
+  </packages>
+  ```
+
+  在Global.asax.cs中注册IOC
+
+  ```C#
+  protected void Application_Start()
+  {
+      ......
+      // 注册IOC容器
+      RegisterServices(kernel);
+  }
+
+  StandardKernel kernel = new StandardKernel();
+
+  /// <summary>
+  /// 注册IOC
+  /// </summary>
+  /// <param name="kernel"></param>
+  private static void RegisterServices(IKernel kernel)
+  {
+      kernel.Bind(typeof(IDataContextFactory<WechatFoundationEntities>))
+          .To(typeof(DefaultDataContextFactory<WechatFoundationEntities>))
+          .InRequestScope();
+      kernel.Bind<IUnitOfWork>().To<UnitOfWork<WechatFoundationEntities>>()
+          .InRequestScope();
+      // 注册数据持久层
+      kernel.Bind(x => x.From("Roche.China.WechatFoundation.Data")
+          .SelectAllClasses()
+          .BindAllInterfaces());
+      // 注册业务逻辑层
+      kernel.Bind(x => x.From("Roche.China.WechatFoundation.BusinessLogic")
+          .SelectAllClasses()
+          .BindAllInterfaces());
+      // Using Cache
+      kernel.Bind<IDynaCacheService>().To<MemoryCacheService>().InSingletonScope();
+  }
+  ```
+
+  属性注入
+
+  ```C#
+  public class PortalController : BaseController
+  {
+      [Inject]
+      public ILogger Logger { get; set; }
+
+      [Inject]
+      public IGroupLogic WePactGroupService { get; set; }
+
+      ......
+  }
+  ```
