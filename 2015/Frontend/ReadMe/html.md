@@ -18,6 +18,18 @@
    - [布局](#布局)
    - [响应式&nbsp;Web&nbsp;设计](#响应式&nbsp;Web&nbsp;设计)
    - [框架](#框架)
+   - [内联框架](#内联框架)
+   - [背景](#背景)
+   - [脚本](#脚本)
+   - [头部元素](#头部元素)
+   - [字符实体](#字符实体)
+   - [URL](#URL)
+   - [URL编码](#URL编码)
+   - [颜色](#颜色)
+   - [文档类型](#文档类型)
+   - [XHTML](#XHTML)
+   - [表单](#表单)
+   - [表单元素](#表单元素)
 2. [图形](#图形)
    - [Canvas](#Canvas)
    - [SVG](#SVG)
@@ -66,48 +78,48 @@ style 属性的作用：提供了一种改变所有 HTML 元素的样式的通�
 
 **文本格式化标签：**
 
-标签|描述
--|-
-`<b>`|定义粗体文本。
-`<big>`|定义大号字。
-`<em>`|定义着重文字。
-`<i>`|定义斜体字。
-`<small>`|定义小号字。
-`<strong>`|定义加重语气。
-`<sub>`|定义下标字。
-`<sup>`|定义上标字。
-`<ins>`|定义插入字。
-`<del>`|定义删除字。
-`<s>`|不赞成使用。使用 `<del>` 代替。
-`<strike>`|不赞成使用。使用 `<del>` 代替。
-`<u>`|不赞成使用。使用样式（style）代替。
+| 标签       | 描述                                |
+| ---------- | ----------------------------------- |
+| `<b>`      | 定义粗体文本。                      |
+| `<big>`    | 定义大号字。                        |
+| `<em>`     | 定义着重文字。                      |
+| `<i>`      | 定义斜体字。                        |
+| `<small>`  | 定义小号字。                        |
+| `<strong>` | 定义加重语气。                      |
+| `<sub>`    | 定义下标字。                        |
+| `<sup>`    | 定义上标字。                        |
+| `<ins>`    | 定义插入字。                        |
+| `<del>`    | 定义删除字。                        |
+| `<s>`      | 不赞成使用。使用 `<del>` 代替。     |
+| `<strike>` | 不赞成使用。使用 `<del>` 代替。     |
+| `<u>`      | 不赞成使用。使用样式（style）代替。 |
 
 **“计算机输出”标签：**
 
-标签|描述
--|-
-`<code>`|定义计算机代码。
-`<kbd>`|定义键盘码。
-`<samp>`|定义计算机代码样本。
-`<tt>`|定义打字机代码。
-`<var>`|定义变量。
-`<pre>`|定义预格式文本。
-`<listing>`|不赞成使用。使用 `<pre>` 代替。
-`<plaintext>`|不赞成使用。使用 `<pre>` 代替。
-`<xmp>`|不赞成使用。使用 `<pre>` 代替。
+| 标签          | 描述                            |
+| ------------- | ------------------------------- |
+| `<code>`      | 定义计算机代码。                |
+| `<kbd>`       | 定义键盘码。                    |
+| `<samp>`      | 定义计算机代码样本。            |
+| `<tt>`        | 定义打字机代码。                |
+| `<var>`       | 定义变量。                      |
+| `<pre>`       | 定义预格式文本。                |
+| `<listing>`   | 不赞成使用。使用 `<pre>` 代替。 |
+| `<plaintext>` | 不赞成使用。使用 `<pre>` 代替。 |
+| `<xmp>`       | 不赞成使用。使用 `<pre>` 代替。 |
 
 **引用、引用和术语定义：**
 
-标签|描述
--|-
-`<abbr>`|定义缩写。
-`<acronym>`|定义首字母缩写。
-`<address>`|定义地址。
-`<bdo>`|定义文字方向。
-`<blockquote>`|定义长的引用。
-`<q>`|定义短的引用语。
-`<cite>`|定义引用、引证。
-`<dfn>`|定义一个定义项目。
+| 标签           | 描述               |
+| -------------- | ------------------ |
+| `<abbr>`       | 定义缩写。         |
+| `<acronym>`    | 定义首字母缩写。   |
+| `<address>`    | 定义地址。         |
+| `<bdo>`        | 定义文字方向。     |
+| `<blockquote>` | 定义长的引用。     |
+| `<q>`          | 定义短的引用语。   |
+| `<cite>`       | 定义引用、引证。   |
+| `<dfn>`        | 定义一个定义项目。 |
 
 `<q>` 元素定义短的引用。浏览器通常会为 `<q>` 元素包围引号
 
@@ -262,16 +274,16 @@ HTML `<span>` 元素是行内元素，能够用作文本的容器。设置 `<spa
 ### 布局
 
 `<div>` 元素常用作布局工具，因为能够轻松地通过 CSS 对其进行定位。
-HTML5|语义元素
--|-
-header|定义文档或节的页眉
-nav|定义导航链接的容器
-section|定义文档中的节
-article|定义独立的自包含文章
-aside|定义内容之外的内容（比如侧栏）
-footer|定义文档或节的页脚
-details|定义额外的细节
-summary|定义 details 元素的标题
+| HTML5   | 语义元素                       |
+| ------- | ------------------------------ |
+| header  | 定义文档或节的页眉             |
+| nav     | 定义导航链接的容器             |
+| section | 定义文档中的节                 |
+| article | 定义独立的自包含文章           |
+| aside   | 定义内容之外的内容（比如侧栏） |
+| footer  | 定义文档或节的页脚             |
+| details | 定义额外的细节                 |
+| summary | 定义 details 元素的标题        |
 
 `<table>` 元素不是作为布局工具而设计的。`<table>` 元素的作用是显示表格化的数据。使用 `<table>` 元素能够取得布局效果，因为能够通过 CSS 设置表格元素的样式
 
@@ -311,6 +323,597 @@ Frame 标签定义了放置在每个框架中的 HTML 文档。
 为不支持框架的浏览器添加`<noframes>`标签。
 
 重要提示：不能将`<body></body>`标签与`<frameset></frameset>`标签同时使用！不过，假如你添加包含一段文本的`<noframes>`标签，就必须将这段文字嵌套于`<body></body>`标签内。
+
+![x](./Resource/29.png)
+
+代码：a.html页面用于保护其它页面
+
+```html
+<frameset cols="30%,*">
+  <frame name="frame1" src="b.html" noresize frameborder="0"/>
+  <frame name="frame2" src="c.html" frameborder="0"/>
+</frameset>
+```
+
+☞ 该页面不能有body
+
+b.html
+
+```html
+<body bgcolor="pink">
+  <!--target表示我们点击后，目标指向谁-->
+  <a href="zjl.html" target="frame2">周杰伦</a><br/>
+  <a href="qq.html" target="frame2">齐秦</a><br/>
+</body>
+```
+
+☞ target 属性值有四个
+
+- _blank : 表示打开一个全新的页面
+- _self: 替换本页面
+- _top:
+- _parent:
+- 还有一个就是在target值中直接写对应的那个frame的名字。
+
+c.html:
+
+```html
+<body bgcolor="silver">
+  歌词大全
+</body>
+```
+
+### 内联框架
+
+iframe 用于在网页内显示网页。
+
+`<iframe src="URL"></iframe>`
+
+URL 指向隔离页面的位置。
+
+height 和 width 属性用于规定 iframe 的高度和宽度。属性值的默认单位是像素，但也可以用百分比来设定（比如 "80%"）。
+
+frameborder 属性规定是否显示 iframe 周围的边框。设置属性值为 "0" 就可以移除边框。
+
+iframe 可用作链接的目标（target）。链接的 target 属性必须引用 iframe 的 name 属性。
+
+### 背景
+
+好的背景使站点看上去特别棒。
+
+`<body>` 拥有两个配置背景的标签。背景可以是颜色或者图像。
+
+背景颜色（Bgcolor）
+
+背景颜色属性将背景设置为某种颜色。属性值可以是十六进制数、RGB 值或颜色名。
+
+背景（Background）
+
+背景属性将背景设置为图像。属性值为图像的URL。如果图像尺寸小于浏览器窗口，那么图像将在整个浏览器窗口进行复制。
+
+`<body>` 标签中的背景颜色（bgcolor）、背景（background）和文本（text）属性在最新的 HTML 标准（HTML4 和 XHTML）中已被废弃。W3C 在他们的推荐标准中已删除这些属性。
+
+应该使用层叠样式表（CSS）来定义 HTML 元素的布局和显示属性。
+
+### 脚本
+
+JavaScript 使 HTML 页面具有更强的动态和交互性。。
+
+`<script>` 标签用于定义客户端脚本，比如 JavaScript。script 元素既可包含脚本语句，也可通过 src 属性指向外部脚本文件。必需的 type 属性规定脚本的 MIME 类型。JavaScript 最常用于图片操作、表单验证以及内容动态更新。
+
+`<noscript>` 标签提供无法使用脚本时的替代内容，比方在浏览器禁用脚本时，或浏览器不支持客户端脚本时。noscript 元素可包含普通 HTML 页面的 body 元素中能够找到的所有元素。只有在浏览器不支持脚本或者禁用脚本时，才会显示 noscript 元素中的内容：
+
+如果浏览器压根没法识别 `<script>` 标签，那么 `<script>` 标签所包含的内容将以文本方式显示在页面上。为了避免这种情况发生，你应该将脚本隐藏在注释标签当中。那些老的浏览器（无法识别 `<script>` 标签的浏览器）将忽略这些注释，所以不会将标签的内容显示到页面上。而那些新的浏览器将读懂这些脚本并执行它们，即使代码被嵌套在注释标签内。
+
+### 头部元素
+
+`<head>` 元素是所有头部元素的容器。`<head>` 内的元素可包含脚本，指示浏览器在何处可以找到样式表，提供元信息，等等。
+
+以下标签都可以添加到 head 部分：`<title>、<base>、<link>、<meta>、<script>` 以及 `<style>`。
+
+`<title>` 标签定义文档的标题。
+
+title 元素在所有 HTML/XHTML 文档中都是必需的。
+
+title 元素能够：
+
+- 定义浏览器工具栏中的标题
+- 提供页面被添加到收藏夹时显示的标题
+- 显示在搜索引擎结果中的页面标题
+
+`<base>` 标签为页面上的所有链接规定默认地址或默认目标（target）
+
+`<link>` 标签定义文档与外部资源之间的关系。`<link>` 标签最常用于连接样式表
+
+`<style>` 标签用于为 HTML 文档定义样式信息。您可以在 style 元素内规定 HTML 元素在浏览器中呈现的样式
+
+元数据（metadata）是关于数据的信息。`<meta>` 标签提供关于 HTML 文档的元数据。元数据不会显示在页面上，但是对于机器是可读的。典型的情况是，meta 元素被用于规定页面的描述、关键词、文档的作者、最后修改时间以及其他元数据。`<meta>` 标签始终位于 head 元素中。元数据可用于浏览器（如何显示内容或重新加载页面），搜索引擎（关键词），或其他 web 服务。
+
+一些搜索引擎会利用 meta 元素的 name 和 content 属性来索引您的页面。
+
+`<script>` 标签用于定义客户端脚本，比如 JavaScript。
+
+### 字符实体
+
+HTML 中有用的字符实体
+
+注释：实体名称对大小写敏感！
+
+| 显示结果 | 描述              | 实体名称   | 实体编号            |
+| -------- | ----------------- | ---------- | ------------------- |
+| ''       | 空格              | `&nbsp;`   | `&#160;`            |
+| <        | 小于号            | `&lt;`     | `&#60;`             |
+| >        | 大于号            | `&gt;`     | `&#62;`             |
+| &        | 和号              | `&amp;`    | `&#38;`             |
+| "        | 引号              | `&quot;`   | `&#34;`             |
+| '        | 撇号              | `&apos;`   | （IE不支持）`&#39;` |
+| ￠        | 分（cent）        | `&cent;`   | `&#162;`            |
+| £        | 镑（pound）       | `&pound;`  | `&#163;`            |
+| ¥        | 元（yen）         | `&yen;`    | `&#165;`            |
+| €        | 欧元（euro）      | `&euro;`   | `&#8364;`           |
+| §        | 小节              | `&sect;`   | `&#167;`            |
+| ©        | 版权（copyright） | `&copy;`   | `&#169;`            |
+| ®        | 注册商标          | `&reg;`    | `&#174;`            |
+| ™        | 商标              | `&trade;`  | `&#8482;`           |
+| ×        | 乘号              | `&times;`  | `&#215;`            |
+| ÷        | 除号              | `&divide;` | `&#247;`            |
+
+### URL
+
+URL 也被称为网址。
+
+URL 可以由单词组成，比如 `w3school.com.cn`，或者是因特网协议（IP）地址：192.168.1.253。大多数人在网上冲浪时，会键入网址的域名，因为名称比数字容易记忆。
+
+URL - Uniform Resource Locator
+
+当您点击 HTML 页面中的某个链接时，对应的 `<a>` 标签指向万维网上的一个地址。统一资源定位器（URL）用于定位万维网上的文档（或其他数据）。
+
+网址，比如 `http://www.w3school.com.cn/html/index.asp`，遵守以下的语法规则：
+
+scheme://host.domain:port/path/filename
+
+解释：
+
+- scheme - 定义因特网服务的类型。最常见的类型是 http
+- host - 定义域主机（http 的默认主机是 www）
+- domain - 定义因特网域名，比如 w3school.com.cn
+- :port - 定义主机上的端口号（http 的默认端口号是 80）
+- path - 定义服务器上的路径（如果省略，则文档必须位于网站的根目录中）。
+- filename - 定义文档/资源的名称
+
+编者注：URL 的英文全称是 Uniform Resource Locator，中文也译为“统一资源定位符”。
+
+以下是其中一些最流行的 scheme：
+
+| Scheme | 访问               | 用于...                               |
+| ------ | ------------------ | ------------------------------------- |
+| http   | 超文本传输协议     | 以 `http://` 开头的普通网页。不加密。 |
+| https  | 安全超文本传输协议 | 安全网页。加密所有信息交换。          |
+| ftp    | 文件传输协议       | 用于将文件下载或上传至网站。          |
+| file   |                    | 您计算机上的文件。                    |
+
+### URL编码
+
+URL 只能使用 ASCII 字符集来通过因特网进行发送。
+
+由于 URL 常常会包含 ASCII 集合之外的字符，URL 必须转换为有效的 ASCII 格式。
+
+URL 编码使用 "%" 其后跟随两位的十六进制数来替换非 ASCII 字符。
+
+URL 不能包含空格。URL 编码通常使用 + 来替换空格。
+
+Web Server
+
+如果希望向世界发布您的网站，那么您必须把它存放在 web 服务器上。
+
+### 颜色
+
+颜色由红色、绿色、蓝色混合而成。
+
+颜色值
+
+颜色由一个十六进制符号来定义，这个符号由红色、绿色和蓝色的值组成（RGB）。
+
+每种颜色的最小值是0（十六进制：#00）。最大值是255（十六进制：#FF）。
+
+颜色名
+
+仅有 16 种颜色名被 W3C 的 HTML 4.0 标准支持，它们是：aqua、black、blue、fuchsia、gray、green、lime、maroon、navy、olive、purple、red、silver、teal、white、yellow。
+
+如果使用其它颜色的话，就应该使用十六进制的颜色值。
+
+### 文档类型
+
+<!DOCTYPE> 声明帮助浏览器正确地显示网页。
+
+Web 世界中存在许多不同的文档。只有了解文档的类型，浏览器才能正确地显示文档。
+
+HTML 也有多个不同的版本，只有完全明白页面中使用的确切 HTML 版本，浏览器才能完全正确地显示出 HTML 页面。这就是 <!DOCTYPE> 的用处。
+
+<!DOCTYPE> 不是 HTML 标签。它为浏览器提供一项信息（声明），即 HTML 是用什么版本编写的。
+
+常用的声明
+
+- HTML5
+
+  `<!DOCTYPE html>`
+
+- HTML 4.01
+
+  `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">`
+
+- XHTML 1.0
+
+  `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">`
+
+### XHTML
+
+XHTML 是以 XML 格式编写的 HTML。
+
+什么是 XHTML？
+
+- XHTML 指的是可扩展超文本标记语言
+- XHTML 与 HTML 4.01 几乎是相同的
+- XHTML 是更严格更纯净的 HTML 版本
+- XHTML 是以 XML 应用的方式定义的 HTML
+- XHTML 是 2001 年 1 月发布的 W3C 推荐标准
+- XHTML 得到所有主流浏览器的支持
+
+为什么使用 XHTML？
+
+因特网上的很多页面包含了“糟糕”的 HTML。
+
+XML 是一种必须正确标记且格式良好的标记语言。
+
+今日的科技界存在一些不同的浏览器技术。其中一些在计算机上运行，而另一些可能在移动电话或其他小型设备上运行。小型设备往往缺乏解释“糟糕”的标记语言的资源和能力。
+
+所以 - 通过结合 XML 和 HTML 的长处，开发出了 XHTML。XHTML 是作为 XML 被重新设计的 HTML。
+
+与 HTML 相比最重要的区别：
+
+文档结构
+
+- XHTML DOCTYPE 是强制性的
+- `<html>` 中的 XML namespace 属性是强制性的
+- `<html>、<head>、<title>` 以及 `<body>` 也是强制性的
+
+元素语法
+
+- XHTML 元素必须正确嵌套
+- XHTML 元素必须始终关闭
+- XHTML 元素必须小写
+- XHTML 文档必须有一个根元素
+
+属性语法
+
+- XHTML 属性必须使用小写
+- XHTML 属性值必须用引号包围
+- XHTML 属性最小化也是禁止的
+
+XHTML 文档必须进行 XHTML 文档类型声明（XHTML DOCTYPE declaration）。
+
+`<html>、<head>、<title>` 以及 `<body>` 元素也必须存在，并且必须使用 `<html>` 中的 xmlns 属性为文档规定 xml 命名空间。
+
+### 表单
+
+HTML 表单用于搜集不同类型的用户输入。
+
+表单元素指的是不同类型的 input 元素、复选框、单选按钮、提交按钮等等。
+
+`<input>` 元素是最重要的表单元素。
+
+`<input>` 元素有很多形态，根据不同的 type 属性。
+
+| 类型   | 描述                                               |
+| ------ | -------------------------------------------------- |
+| text   | 定义常规文本（单行）输入。                         |
+| radio  | 定义单选按钮输入（选择多个选择之一，name属性分组） |
+| submit | 定义提交按钮（提交表单）                           |
+
+表单处理程序在表单的 action 属性中指定
+
+如果省略 action 属性，则 action 会被设置为当前页面
+
+method 属性规定在提交表单时所用的 HTTP 方法（GET 或 POST）
+
+如果要正确地被提交，每个输入字段必须设置一个 name 属性
+
+下面是 `<form>` 属性的列表：
+
+| 属性           | 描述                                                       |
+| -------------- | ---------------------------------------------------------- |
+| accept-charset | 规定在被提交表单中使用的字符集（默认：页面字符集）。       |
+| action         | 规定向何处提交表单的地址（URL）（提交页面）。              |
+| autocomplet    | 规定浏览器应该自动完成表单（默认：开启）。                 |
+| enctype        | 规定被提交数据的编码（默认：url-encoded）。                |
+| method         | 规定在提交表单时所用的 HTTP 方法（默认：GET）。            |
+| name           | 规定识别表单的名称（对于 DOM 使用：document.forms.name）。 |
+| novalidate     | 规定浏览器不验证表单。                                     |
+| target         | 规定 action 属性中地址的目标（默认：_self）。              |
+
+### 表单元素
+
+`<input>` 元素
+
+最重要的表单元素是 `<input>` 元素。
+
+`<input>` 元素根据不同的 type 属性，可以变化为多种形态。
+
+`<select>` 元素（下拉列表）
+
+`<select>` 元素定义下拉列表
+
+`<option>` 元素定义待选择的选项。
+
+列表通常会把首个选项显示为被选选项。
+
+您能够通过添加 selected 属性来定义预定义选项。
+
+`<textarea>` 元素
+
+`<textarea>` 元素定义多行输入字段（文本域）
+
+`<button>` 元素
+
+`<button>` 元素定义可点击的按钮
+
+HTML5 表单元素
+
+HTML5 增加了如下表单元素：
+
+- `<datalist>`
+- `<keygen>`
+- `<output>`
+
+注释：默认地，浏览器不会显示未知元素。新元素不会破坏您的页面。
+
+HTML5 `<datalist>` 元素
+
+`<datalist>` 元素为 `<input>` 元素规定预定义选项列表。
+
+用户会在他们输入数据时看到预定义选项的下拉列表。
+
+`<input>` 元素的 list 属性必须引用 `<datalist>` 元素的 id 属性。
+
+输入类型
+
+输入类型：text
+
+`<input type="text">` 定义供文本输入的单行输入字段
+
+输入类型：password
+
+`<input type="password">` 定义密码字段
+
+password 字段中的字符会被做掩码处理（显示为星号或实心圆）。
+
+输入类型：submit
+
+`<input type="submit">` 定义提交表单数据至表单处理程序的按钮。
+
+表单处理程序（form-handler）通常是包含处理输入数据的脚本的服务器页面。
+
+在表单的 action 属性中规定表单处理程序（form-handler）
+
+如果您省略了提交按钮的 value 属性，那么该按钮将获得默认文本
+
+Input Type: radio
+
+`<input type="radio">` 定义单选按钮。
+
+Radio buttons let a user select ONLY ONE of a limited number of choices
+
+Input Type: checkbox
+
+`<input type="checkbox">` 定义复选框。
+
+复选框允许用户在有限数量的选项中选择零个或多个选项。
+
+Input Type: button
+
+`<input type="button>` 定义按钮。
+
+HTML5 输入类型
+
+HTML5 增加了多个新的输入类型：
+
+- color
+- date
+- datetime
+- datetime-local
+- email
+- month
+- number
+- range
+- search
+- tel
+- time
+- url
+- week
+
+注释：老式 web 浏览器不支持的输入类型，会被视为输入类型 text。
+
+输入类型：number
+`<input type="number">` 用于应该包含数字值的输入字段。
+
+您能够对数字做出限制。根据浏览器支持，限制可应用到输入字段。
+
+这里列出了一些常用的输入限制（其中一些是 HTML5 中新增的）：
+
+| 属性      | 描述                               |
+| --------- | ---------------------------------- |
+| disabled  | 规定输入字段应该被禁用。           |
+| max       | 规定输入字段的最大值。             |
+| maxlength | 规定输入字段的最大字符数。         |
+| min       | 规定输入字段的最小值。             |
+| pattern   | 规定通过其检查输入值的正则表达式。 |
+| readonly  | 规定输入字段为只读（无法修改）。   |
+| required  | 规定输入字段是必需的（必需填写）。 |
+| size      | 规定输入字段的宽度（以字符计）。   |
+| step      | 规定输入字段的合法数字间隔。       |
+| value     | 规定输入字段的默认值。             |
+
+输入类型：date
+
+`<input type="date">` 用于应该包含日期的输入字段。根据浏览器支持，日期选择器会出现输入字段中。
+
+输入类型：color
+
+`<input type="color">` 用于应该包含颜色的输入字段。根据浏览器支持，颜色选择器会出现输入字段中。
+
+输入类型：range
+
+`<input type="range">` 用于应该包含一定范围内的值的输入字段。根据浏览器支持，输入字段能够显示为滑块控件。
+
+输入类型：month
+
+`<input type="month">` 允许用户选择月份和年份。根据浏览器支持，日期选择器会出现输入字段中。
+
+输入类型：week
+
+`<input type="week">` 允许用户选择周和年。根据浏览器支持，日期选择器会出现输入字段中。
+
+输入类型：time
+
+`<input type="time">` 允许用户选择时间（无时区）。根据浏览器支持，时间选择器会出现输入字段中。
+
+输入类型：datetime
+
+`<input type="datetime">` 允许用户选择日期和时间（有时区）。根据浏览器支持，日期选择器会出现输入字段中。
+
+输入类型：datetime-local
+
+`<input type="datetime-local">` 允许用户选择日期和时间（无时区）。根据浏览器支持，日期选择器会出现输入字段中。
+
+输入类型：email
+
+`<input type="email">` 用于应该包含电子邮件地址的输入字段。根据浏览器支持，能够在被提交时自动对电子邮件地址进行验证。某些智能手机会识别 email 类型，并在键盘增加 ".com" 以匹配电子邮件输入。
+
+输入类型：search
+`<input type="search">` 用于搜索字段（搜索字段的表现类似常规文本字段）。
+
+输入类型：tel
+
+`<input type="tel">` 用于应该包含电话号码的输入字段。目前只有 Safari 8 支持 tel 类型。
+
+输入类型：url
+
+`<input type="url">` 用于应该包含 URL 地址的输入字段。根据浏览器支持，在提交时能够自动验证 url 字段。某些智能手机识别 url 类型，并向键盘添加 ".com" 以匹配 url 输入。
+
+输入属性
+
+value 属性
+
+value 属性规定输入字段的初始值
+
+readonly 属性
+
+readonly 属性规定输入字段为只读（不能修改）。readonly 属性不需要值。它等同于 readonly="readonly"。
+
+disabled 属性
+
+disabled 属性规定输入字段是禁用的。被禁用的元素是不可用和不可点击的。被禁用的元素不会被提交。
+
+size 属性
+
+size 属性规定输入字段的尺寸（以字符计）
+
+maxlength 属性
+
+maxlength 属性规定输入字段允许的最大长度。如设置 maxlength 属性，则输入控件不会接受超过所允许数的字符。
+
+该属性不会提供任何反馈。如果需要提醒用户，则必须编写 JavaScript 代码。
+
+注释：输入限制并非万无一失。JavaScript 提供了很多方法来增加非法输入。如需安全地限制输入，则接受者（服务器）必须同时对限制进行检查。
+
+HTML5 属性
+
+HTML5 为 `<input>` 增加了如下属性：
+
+- autocomplete
+- autofocus
+- form
+- formaction
+- formenctype
+- formmethod
+- formnovalidate
+- formtarget
+- height 和 width
+- list
+- min 和 max
+- multiple
+- pattern (regexp)
+- placeholder
+- required
+- step
+
+并为 `<form>` 增加如需属性：
+•	autocomplete
+•	novalidate
+autocomplete 属性
+autocomplete 属性规定表单或输入字段是否应该自动完成。
+当自动完成开启，浏览器会基于用户之前的输入值自动填写值。
+提示：您可以把表单的 autocomplete 设置为 on，同时把特定的输入字段设置为 off，反之亦然。
+autocomplete 属性适用于 <form> 以及如下 <input> 类型：text、search、url、tel、email、password、datepickers、range 以及 color。
+在某些浏览器中，您也许需要手动启用自动完成功能。
+novalidate 属性
+novalidate 属性属于 <form> 属性。如果设置，则 novalidate 规定在提交表单时不对表单数据进行验证。
+autofocus 属性
+autofocus 属性是布尔属性。如果设置，则规定当页面加载时 <input> 元素应该自动获得焦点。
+form 属性
+form 属性规定 <input> 元素所属的一个或多个表单。
+提示：如需引用一个以上的表单，请使用空格分隔的表单 id 列表。
+formaction 属性
+formaction 属性规定当提交表单时处理该输入控件的文件的 URL。
+formaction 属性覆盖 <form> 元素的 action 属性。
+formaction 属性适用于 type="submit" 以及 type="image"。
+formenctype 属性
+formenctype 属性规定当把表单数据（form-data）提交至服务器时如何对其进行编码（仅针对 method="post" 的表单）。
+formenctype 属性覆盖 <form> 元素的 enctype 属性。
+formenctype 属性适用于 type="submit" 以及 type="image"。
+formmethod 属性
+formmethod 属性定义用以向 action URL 发送表单数据（form-data）的 HTTP 方法。
+formmethod 属性覆盖 <form> 元素的 method 属性。
+formmethod 属性适用于 type="submit" 以及 type="image"。
+formnovalidate 属性
+novalidate 属性是布尔属性。
+如果设置，则规定在提交表单时不对 <input> 元素进行验证。
+formnovalidate 属性覆盖 <form> 元素的 novalidate 属性。
+formnovalidate 属性可用于 type="submit"。
+formtarget 属性
+formtarget 属性规定的名称或关键词指示提交表单后在何处显示接收到的响应。
+formtarget 属性会覆盖 <form> 元素的 target 属性。
+formtarget 属性可与 type="submit" 和 type="image" 使用。
+height 和 width 属性
+height 和 width 属性规定 <input> 元素的高度和宽度。
+height 和 width 属性仅用于 <input type="image">。
+注释：请始终规定图像的尺寸。如果浏览器不清楚图像尺寸，则页面会在图像加载时闪烁。
+list 属性
+list 属性引用的 <datalist> 元素中包含了 <input> 元素的预定义选项。
+min 和 max 属性
+min 和 max 属性规定 <input> 元素的最小值和最大值。
+min 和 max 属性适用于如需输入类型：number、range、date、datetime、datetime-local、month、time 以及 week。
+multiple 属性
+multiple 属性是布尔属性。
+如果设置，则规定允许用户在 <input> 元素中输入一个以上的值。
+multiple 属性适用于以下输入类型：email 和 file。
+pattern 属性
+pattern 属性规定用于检查 <input> 元素值的正则表达式。
+pattern 属性适用于以下输入类型：text、search、url、tel、email、and password。
+提示：请使用全局的 title 属性对模式进行描述以帮助用户。
+placeholder 属性
+placeholder 属性规定用以描述输入字段预期值的提示（样本值或有关格式的简短描述）。
+该提示会在用户输入值之前显示在输入字段中。
+placeholder 属性适用于以下输入类型：text、search、url、tel、email 以及 password。
+required 属性
+required 属性是布尔属性。
+如果设置，则规定在提交表单之前必须填写输入字段。
+required 属性适用于以下输入类型：text、search、url、tel、email、password、date pickers、number、checkbox、radio、and file.
+step 属性
+step 属性规定 <input> 元素的合法数字间隔。
+示例：如果 step="3"，则合法数字应该是 -3、0、3、6、等等。
+提示：step 属性可与 max 以及 min 属性一同使用，来创建合法值的范围。
+step 属性适用于以下输入类型：number、range、date、datetime、datetime-local、month、time 以及 week。
 
 ## 图形
 
