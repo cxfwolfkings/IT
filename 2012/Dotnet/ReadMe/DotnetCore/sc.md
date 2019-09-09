@@ -3,7 +3,15 @@
 ## 目录
 
 1. [mvc](#mvc)
-2. [前端](../../../../2015/Frontend/ReadMe/vue_2.md)
+   - [过滤器](#过滤器)
+   - [登录](#登录)
+   - [公用方法](#公用方法)
+2. [MemoryCache](#MemoryCache)
+   - [本机缓存](#本机缓存)
+   - [分布式缓存](#分布式缓存)
+     - [Redis](#Redis)
+       - [StackExchange.Redis](#StackExchange.Redis)
+3. [前端](../../../../2015/Frontend/ReadMe/vue_2.md)
 
 ## mvc
 
@@ -300,8 +308,288 @@ public ActionResult AddAssetModel([FromForm]AssetModelInputDto input)
 ### 公用方法
 
 ```C#
+/// <summary>
+/// 判断是否Ajax请求，jQuery有效，
+/// Vue、Angular等要手动在请求头中添加标识
+/// </summary>
+/// <param name="context"></param>
+/// <returns></returns>
 public static bool IsAjax(HttpContext context)
 {
     return context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
 }
 ```
+
+## MemoryCache
+
+### 本机缓存
+
+本机缓存是比较基本的数据缓存方式，将数据存在Web Application的內存中。
+
+如果是单一站点构架，没有要同步缓存数据，用本机缓存应该都能满足需求。
+
+使用本机缓存的方式很简单，只要在Startup.ConfigureServices调用AddMemoryCache，就能通过注入IMemoryCache使用本机缓存。如下：
+
+Startup.cs
+
+```C#
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMemoryCache();
+        // ...
+    }
+}
+```
+
+Controllers\HomeController.cs
+
+```C#
+using Microsoft.Extensions.Caching.Memory;
+//...
+public class HomeController: Controller
+{
+    private static IMemoryCache _memoryCache;
+
+    public HomeController(IMemoryCache memoryCache)
+    {
+        _memoryCache = memoryCache;
+    }
+
+    public IActionResult Index()
+    {
+        _memoryCache.Set("Sample", new UserModel()
+        {
+            Id = 1,
+            Name = "John"
+        });
+        var model = _memoryCache.Get<UserModel>("Sample");
+        return View(model);
+    }
+}
+```
+
+用Get/Set方法，就可以透过Key做为取值的识别，存放任何型别的数据。
+
+### 分布式缓存
+
+当ASP.NET Core网站有横向扩充，架设多个站点需求时，分布式缓存就是一个很好的同步缓存数据解决方案。
+
+基本上就是NoSQL的概念，把分布式缓存的数据位置，指向外部的储存空间，如：SQL Server、Redis等等。只要继承IDistributedCache，就可以被当作分布式缓存的服务使用。
+
+本机缓存及分布式缓存构架，如图：
+
+![x](./Resource/3.jpg)
+
+在 Startup.ConfigureServices 注入 IDistributedCache 使用分散式快取。如下：
+
+Startup.cs
+
+```C#
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDistributeMemoryCache();
+        // ...
+    }
+}
+```
+
+AddDistributeMemoryCache是通过操作分布式缓存的IDistributedCache，将数据存于本机内存中。
+
+Controllers\HomeController.cs
+
+```C#
+using Microsoft.Extensions.Caching.Memory;
+//...
+public class HomeController: Controller
+{
+    private static IDistributedCache _distributeCache;
+
+    public HomeController(IDistributedCache distributeCache)
+    {
+        _distributeCache = distributeCache;
+    }
+
+    public IActionResult Index()
+    {
+        _distributeCache.Set("Sample", ObjectToByteArray(new UserModel()
+        {
+            Id = 1,
+            Name = "John"
+        }));
+        var model = ByteArrayToObject<UserModel>(_distributeCache.Get("Sample"));
+        return View(model);
+    }
+
+    private byte[] ObjectToByteArray(object obj)
+    {
+        var binaryFormatter = new BinaryFormatter();
+        using(var memoryStream = new MemoryStream())
+        {
+            binaryFormatter.Serialize(memoryStream, obj);
+            return memoryStream.ToArray();
+        }
+    }
+
+    private T ByteArrayToObject(byte[] bytes)
+    {
+        using(var memoryStream = new MemoryStream())
+        {
+            var binaryFormatter = new BinaryFormatter();
+            memoryStream.Write(bytes, 0, bytes.Length);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var obj = binaryFormatter.Deserialize(memoryStream);
+            return (T)obj;
+        }
+    }
+}
+```
+
+IDistributedCache的Get/Set不像IMemoryCache可以存取任意型别，IDistributedCache的Get/Set只能存取`byte[]`型别，如果要将物件存入分布式缓存，就必须将物件转换成byte[]型别，或转成字串型别用GetString/SetString存取于分布式缓存。
+
+如果要将物件透过MemoryStream串行化，记得在物件加上[Serializable]。
+
+#### Redis
+
+下载免安装的Redis版本。下载地址：[https://github.com/MicrosoftArchive/redis/releases](https://github.com/MicrosoftArchive/redis/releases)
+
+在解压文件夹下运行命令：`redis-server.exe redis.windows.conf`
+
+将redis安装成服务。运行 `redis-server.exe --service-install redis.windows.conf`
+
+使用命令行操作redis
+
+- set：保存数据或修改数据，例 `set name lily`
+- get：取数据，例 `get name`
+
+更多请参考：[https://www.cnblogs.com/zqr99/p/7899701.html](https://www.cnblogs.com/zqr99/p/7899701.html)
+
+开源Redis可视化软件
+
+AnotherRedisDesktopManager: [https://github.com/qishibo/AnotherRedisDesktopManager](https://github.com/qishibo/AnotherRedisDesktopManager)
+
+Redis Desktop Manager: [https://github.com/uglide/RedisDesktopManager/](https://github.com/uglide/RedisDesktopManager/)
+
+安装套件
+
+如果要在`ASP.NET Core`中使用的Redis Cache，可以安装Microsoft提供的套件Microsoft.Extensions.Caching.Redis.Core。
+
+透过.NET Core CLI在项目文件夹执行安装指令：
+
+设定Redis Cache
+
+安装完成后，将Startup.ConfigureServices注册的分布式缓存服务，从AddDistributedMemoryCache改成AddDistributedRedisCache。如下：
+
+Startup.cs
+
+```C#
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // services.AddDistributeMemoryCache();
+        services.AddDistributedRedisCache(options =>
+        {
+            // Redis Server 的 IP 和 Port
+            options.Configuration = "10.30.47.131:6379";
+        });
+        // ...
+    }
+}
+```
+
+这样就完成将分布式缓存指向Redis Cache，Session的注册方式不变。
+
+只要设定AddDistributedRedisCache就可以使用Redis Session了，轻松简单。
+
+***`ASP.NET MVC`比较***
+
+`ASP.NET Core`的Redis Session跟`ASP.NET MVC`普遍用的StackExchange.Redis的运行方式有很大的差异。
+
+`ASP.NET MVC Redis Session`
+
+StackExchange.Redis在使用Redis时，是把Website的Session备份到Redis，读取还是在Website的內存，写入的话会再度备份到Redis。
+
+也就是说Session会存在于Website及Redis Cache中，HA的概念。
+
+可以试着把Redis Cache中Session清掉，当使用者下一个Requset来的时候，又会重新出现在Redis Cache中。
+
+`ASP.NET Core Redis Session`
+
+IDistributedCache运做方式变成Session直接在Redis Cache存取，如果把Redis Cache中Session清掉，当使用者下一个Requset来的时候，就会发现Session被清空了。
+
+##### StackExchange.Redis
+
+1. 安装依赖包：`Nugget: StackExchange.Redis`
+2. 新建RedisHelper类
+
+   ```C#
+   public class RedisHelper
+   {
+       private ConnectionMultiplexer Redis { get; set; }
+       private IDatabase DB { get; set; }
+
+       public RedisHelper(string connection)
+       {
+           Redis = ConnectionMultiplexer.Connect(connection);
+           DB = Redis.GetDatabase();
+       }
+
+       /// <summary>
+       /// 增加/修改
+       /// </summary>
+       /// <param name="key"></param>
+       /// <param name="value"></param>
+       /// <returns></returns>
+       public bool SetValue(string key, string value)
+       {
+           return DB.StringSet(key, value);
+       }
+
+       /// <summary>
+       /// 查询
+       /// </summary>
+       /// <param name="key"></param>
+       /// <returns></returns>
+       public string GetValue(string key)
+       {
+           return DB.StringGet(key);
+       }
+
+       /// <summary>
+       /// 删除
+       /// </summary>
+       /// <param name="key"></param>
+       /// <returns></returns>
+       public bool DeleteKey(string key)
+       {
+           return DB.KeyDelete(key);
+       }
+   }
+   ```
+
+3. 在控制台中使用
+
+   ```C#
+   RedisHelper redisHelper = new RedisHelper("127.0.0.1:6379");
+   string value = "测试数据";
+   bool testValue = redisHelper.SetValue("key", value);
+   string saveValue = redisHelper.GetValue("key");
+
+   Console.WriteLine(saveValue);
+
+   bool newValue = redisHelper.SetValue("key", "NewValue");
+   saveValue = redisHelper.GetValue("key");
+
+   Console.WriteLine(saveValue);
+
+   bool deleteKey = redisHelper.DeleteKey("key");
+   string empty = redisHelper.GetValue("key");
+
+   Console.WriteLine(empty);
+
+   Console.ReadKey();
+   ```
