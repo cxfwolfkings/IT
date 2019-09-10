@@ -5,6 +5,7 @@
 1. [5分钟上手TypeScript](#5分钟上手TypeScript)
    - [安装TypeScript](#安装TypeScript)
    - [构建你的第一个TypeScript文件](#构建你的第一个TypeScript文件)
+   - [从C#到TypeScript](#从C#到TypeScript)
 2. [简介](#简介)
    - [什么是TypeScript](#什么是TypeScript)
    - [TypeScript安装](#TypeScript安装)
@@ -175,6 +176,188 @@
   ![x](./Resource/20.png)
 
 参考文件：[https://www.tslang.cn/samples/index.html](https://www.tslang.cn/samples/index.html)
+
+### 从C#到TypeScript
+
+TypeScript和C#一样是微软搞出来的，而且都是大牛Anders Hejlsberg领导开发的。
+
+它们之间有很多共同点，现在尝试以C#程序员的角度来理解下TypeScript。
+
+TypeScript是一门JavaScript的超集语言，除了支持最新的JS语法外，TypeScript还会增加一些其他好用的语法糖。
+
+最重要的是它在兼顾JavaScript灵活的基础上增加了强类型系统，这样更友好的支持开发大型系统。
+
+现在来看下TypeScript基础类型：
+
+***数值***
+
+C#的数字类型有好几种：int, long, float, double, byte等。
+
+而TypeScript和JavaScript一样，所有的数字都是浮点数，都是用number表示，这样也省了很了事，少了C#里类似long转int overflow问题。
+
+下面用不同进制方式显示数字20。
+
+```ts
+let num = 20;      // 10进制
+let num = 0xa4;    // 16进制
+let num = 0b10010;  // 2进制
+let num = 0o24;    // 8进制
+```
+
+***布尔***
+
+boolean，和C#的功能一样，不多说。
+
+let isCheck: boolean = true;
+
+***枚举***
+
+enum，大家都知道javascript没有enum，这也是TypeScript为此作的补充。
+
+功能上和C#差不多：
+
+1. 目的都是为数值提供一个友好的名字，增加代码可读性和可重构性
+
+2. 默认情况下从0开始编号
+
+3. 也可以手动赋值
+
+4. 可以实现类似C# Flag特性，但也有一些细节不一样：
+
+5. C#的枚举值toString()会返回枚举的文本值，而TypeScript是数值
+
+6. TypeScript可以通过数值下标取得枚举字符串值
+
+```ts
+enum Action{
+    add = 1,
+    edit = 2,
+    del = 4,
+    all = add | edit | del
+}
+console.info(Action.add);  // 返回1
+console.info(Action.add.toString());  // 返回1
+console.info(Action[1]);  // 返回"add"
+console.info(Action[3]);  // 返回undefined
+console.info(Action.all); // 返回7
+console.info(Action.all & Action.add) //返回1
+```
+
+上面的Action编译成JavaScript的结果：
+
+```js
+var Action;
+(function (Action) {
+    Action[Action["add"] = 1] = "add";
+    Action[Action["edit"] = 2] = "edit";
+    Action[Action["del"] = 4] = "del";
+    Action[Action["all"] = 7] = "all";
+})(Action || (Action = {}));
+```
+
+***字符串***
+
+字符串也基本和C#一样，不过由于是JavaScript的超集，所以当然也支持单引号。
+
+C#6.0里的模板字符串语法糖$"this is {name}'s blog"在TypeScript里也有类似的支持，当然，这也是ES6的规范。
+
+```ts
+let name: string = 'brook';
+let note: string = `this is ${name}'s blog`;
+```
+
+***Symbol***
+
+这也是ES6的特性，用来当作唯一的标识，所有新建出来的Symbol都是不同的，不管传进去的值是否一样。
+
+Symbol非常适合做唯一key。
+
+```ts
+let key1 = Symbol('key');
+let key2 = Symbol('key');
+console.info(key1 === key2); // return false
+```
+
+***any***
+
+这个和C#的dynamic很相似，可以代表任何东西且在上面调用方法或属性不会在编译时期报错，当然也本来就是JavaScript最基本的东西。
+
+```ts
+let test: any = 'test';
+test = false;
+
+test.test(); //编译时期不会有报错
+let arr: any[] = ['test', false];
+```
+
+***void、null、undefined和never***
+
+void和C#的一样，表示没有任何东西。
+
+null和undefined和JavaScript一样，分别就是它们自己的类型，个人觉得这两者功能有点重合，建议只使用undefined。
+
+never是TypeScript引进的，个人觉得是一种语义上的类型，用来表示永远不会得到返回值，比如while(true){}或throw new Error()之类。
+
+```ts
+function test(): void{} //  void
+let a: string = null;
+let b: null = null; // null有自己的类型，
+//并且默认可以赋值给任何类型（除never之外），
+//可用--strictNullChecks标记来限制这个功能
+
+let a: string = undefined;  
+let b: undefined = undefined; // undefined， 同上
+function error(): never{ // never
+   throw new Error('error');
+}
+```
+
+***数组***
+
+有基本的数组:
+
+let arr: string[] = ['a', 'b', 'c'];
+
+也有类似C#的泛型List
+
+```ts
+let list: Array<string> = ['a', 'b', 'c'];
+```
+
+数组功能没C#配合linq那么强大，不过配合其他一些库如lodash也可以很方便的进行各种操作。
+
+数组还可以利用扩展操作符...来把数组解开再放入其他数组中。
+
+```ts
+let arr: number[] = [1, 2, 3];
+let newArr: number[] = [...arr, 4, 5];
+console.info(newArr); // 1, 2, 3, 4, 5
+```
+
+***元组***
+
+C#也有个鸡肋的Tuple，不好用，不过新版的Tuple好像已经在C#7.0的计划当中。
+
+下面这段代码是C#7.0的，真方便，不用再new Tuple<>，item1, item2之类的。
+
+```C#
+(string first, string middle, string last) LookupName(long id)
+{
+    return (first:'brook', middle:'', last:'shi');
+}
+var name = LookupName(id);
+Console.WriteLine(`first:${name.first}, middle:${name.middle}, last:${name.last}`);
+```
+
+TypeScript里的也不输给C#，不过叫法上是分开的，这里的元组只是对数组的处理，另外还有对象上的叫解构赋值，以后会写。
+
+```ts
+let tuple: [number, string] = [123, '456'];
+let num = tuple[0]; //num
+let str = tuple[1]: //string
+tuple[3] = '789'; //可以，越界后会以联合类型来判断，后面会讲联合类型
+tuple[4] = true; //不行
+```
 
 ## 简介
 

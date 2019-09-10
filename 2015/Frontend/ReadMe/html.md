@@ -45,6 +45,12 @@
    - [地理定位](#地理定位)
    - [拖放](#拖放)
    - [本地存储](#本地存储)
+     - [HTML本地存储对象](#HTML本地存储对象)
+       - [localStorage对象](#localStorage对象)
+       - [sessionStorage对象](#sessionStorage对象)
+     - [应用程序缓存](#应用程序缓存)
+   - [Web Workers](#Web&nbsp;Workers)
+   - [Server-Sent事件](#Server-Sent事件)
 
 蒂姆•伯纳斯-李与罗伯特•卡里奥（Robert Cailliau）共同发明了Web，也发明了HTML：超文本标记语言
 
@@ -2163,7 +2169,7 @@ ondragover 事件规定被拖动的数据能够被放置到何处。
 
 HTML 本地存储：优于 cookies。
 
-什么是 HTML 本地存储？
+***什么是 HTML 本地存储？***
 
 通过本地存储（Local Storage），web 应用程序能够在用户浏览器中对数据进行本地的存储。
 
@@ -2173,7 +2179,7 @@ HTML 本地存储：优于 cookies。
 
 本地存储经由起源地（origin）（经由域和协议）。所有页面，从起源地，能够存储和访问相同的数据。
 
-HTML 本地存储对象
+#### HTML本地存储对象
 
 HTML 本地存储提供了两个在客户端存储数据的对象：
 
@@ -2190,7 +2196,7 @@ if (typeof(Storage) !== "undefined") {
 }
 ```
 
-localStorage 对象
+##### localStorage对象
 
 localStorage 对象存储的是没有截止日期的数据。当浏览器被关闭时数据不会被删除，在下一天、周或年中，都是可用的。
 
@@ -2217,7 +2223,9 @@ document.getElementById("result").innerHTML = localStorage.lastname;
 
 删除 "lastname" localStorage 项目的语法如下：
 
+```js
 localStorage.removeItem("lastname");
+```
 
 注释：名称/值对始终存储为字符串。如果需要请记得把它们转换为其他格式！
 
@@ -2232,66 +2240,115 @@ if (localStorage.clickcount) {
 document.getElementById("result").innerHTML = "您已经点击这个按钮 " + localStorage.clickcount + " 次。";
 ```
 
-sessionStorage 对象
+##### sessionStorage对象
+
 sessionStorage 对象等同 localStorage 对象，不同之处在于只对一个 session 存储数据。如果用户关闭具体的浏览器标签页，数据也会被删除。
+
 下例在当前 session 中对用户点击按钮进行计数：
+
+```js
 if (sessionStorage.clickcount) {
   sessionStorage.clickcount = Number(sessionStorage.clickcount) + 1;
 } else {
   sessionStorage.clickcount = 1;
 }
 document.getElementById("result").innerHTML = "在本 session 中，您已经点击这个按钮 " + sessionStorage.clickcount + " 次。";
-应用程序缓存
+```
+
+#### 应用程序缓存
+
 使用应用程序缓存，通过创建 cache manifest 文件，可轻松创建 web 应用的离线版本。
-什么是应用程序缓存？
+
+***什么是应用程序缓存？***
+
 HTML5 引入了应用程序缓存（Application Cache），这意味着可对 web 应用进行缓存，并可在没有因特网连接时进行访问。
+
 应用程序缓存为应用带来三个优势：
-1.	离线浏览 - 用户可在应用离线时使用它们
-2.	速度 - 已缓存资源加载得更快
-3.	减少服务器负载 - 浏览器将只从服务器下载更新过或更改过的资源
+
+1. 离线浏览 - 用户可在应用离线时使用它们
+2. 速度 - 已缓存资源加载得更快
+3. 减少服务器负载 - 浏览器将只从服务器下载更新过或更改过的资源
+
 示例
+
+```html
 <!DOCTYPE HTML>
 <html manifest="demo.appcache">
 <body>
 文档内容 ......
 </body>
 </html>
-Cache Manifest 基础
-如需启用应用程序缓存，请在文档的 <html> 标签中包含 manifest 属性
+```
+
+***Cache Manifest 基础***
+
+如需启用应用程序缓存，请在文档的 `<html>` 标签中包含 manifest 属性
+
 每个指定了 manifest 的页面在用户对其访问时都会被缓存。如果未指定 manifest 属性，则页面不会被缓存（除非在 manifest 文件中直接指定了该页面）。
+
 manifest 文件的建议文件扩展名是：".appcache"。
+
 注意：manifest 文件需要设置正确的 MIME-type，即 "text/cache-manifest"。必须在 web 服务器上进行配置。
-Manifest 文件
+
+***Manifest 文件***
+
 manifest 文件是简单的文本文件，它告知浏览器被缓存的内容（以及不缓存的内容）。
+
 manifest 文件有三个部分：
-•	CACHE MANIFEST - 在此标题下列出的文件将在首次下载后进行缓存
-•	NETWORK - 在此标题下列出的文件需要与服务器的连接，且不会被缓存
-•	FALLBACK - 在此标题下列出的文件规定当页面无法访问时的回退页面（比如 404 页面）
-CACHE MANIFEST
+
+- CACHE MANIFEST - 在此标题下列出的文件将在首次下载后进行缓存
+- NETWORK - 在此标题下列出的文件需要与服务器的连接，且不会被缓存
+- FALLBACK - 在此标题下列出的文件规定当页面无法访问时的回退页面（比如 404 页面）
+
+***CACHE MANIFEST***
+
 第一行，CACHE MANIFEST，是必需的：
+
+```sh
 CACHE MANIFEST
 /theme.css
 /logo.gif
 /main.js
+```
+
 上面的 manifest 文件列出了三个资源：一个 CSS 文件，一个 GIF 图像，以及一个 JavaScript 文件。当 manifest 文件被加载后，浏览器会从网站的根目录下载这三个文件。然后，无论用户何时与因特网断开连接，这些资源依然可用。
-NETWORK
+
+***NETWORK***
+
 下面的 NETWORK 部分规定文件 "login.php" 永远不会被缓存，且离线时是不可用的：
+
+```sh
 NETWORK:
 login.asp
+```
+
 可以使用星号来指示所有其他其他资源/文件都需要因特网连接：
+
+```sh
 NETWORK:
 *
+```
 
+```sh
 FALLBACK
 /html/ /offline.html
+```
+
 下面的 FALLBACK 部分规定如果无法建立因特网连接，则用 "offline.html" 替代 /html/ 目录中的所有文件。
+
 注释：第一个 URI 是资源，第二个是替补。
+
 更新缓存
+
 一旦应用被缓存，它就会保持缓存直到发生下列情况：
-•	用户清空浏览器缓存
-•	manifest 文件被修改（参阅下面的提示）
-•	由程序来更新应用缓存
+
+- 用户清空浏览器缓存
+- manifest 文件被修改（参阅下面的提示）
+- 由程序来更新应用缓存
+
 实例 - 完整的 Cache Manifest 文件
+
+```sh
 CACHE MANIFEST
 # 2012-02-21 v1.0.0
 /theme.css
@@ -2303,50 +2360,72 @@ login.asp
 
 FALLBACK:
 /html/ /offline.html
+```
+
 提示：以 "#" 开头的是注释行，但也可满足其他用途。应用的缓存只会在其 manifest 文件改变时被更新。如果您编辑了一幅图像，或者修改了一个 JavaScript 函数，这些改变都不会被重新缓存。更新注释行中的日期和版本号是一种使浏览器重新缓存文件的办法。
-关于应用程序缓存的注意事项
+
+***关于应用程序缓存的注意事项***
+
 请留心缓存的内容。
+
 一旦文件被缓存，则浏览器会继续展示已缓存的版本，即使您修改了服务器上的文件。为了确保浏览器更新缓存，您需要更新 manifest 文件。
+
 注释：浏览器对缓存数据的容量限制可能不太一样（某些浏览器的限制是每个站点 5MB）。
-Web Workers
+
+### Web&nbsp;Workers
+
 Web worker 是运行在后台的 JavaScript，不会影响页面的性能。
-什么是 Web Worker？
+
+***什么是 Web Worker？***
+
 当在 HTML 页面中执行脚本时，页面是不可响应的，直到脚本已完成。
+
 Web worker 是运行在后台的 JavaScript，独立于其他脚本，不会影响页面的性能。您可以继续做任何愿意做的事情：点击、选取内容等等，而此时 web worker 运行在后台。
+
 示例
+
+```html
 <!DOCTYPE html>
 <html>
 <body>
-<p>计数: <output id="result"></output></p>
-<button onclick="startWorker()">开始 Worker</button> 
-<button onclick="stopWorker()">停止 Worker</button>
-<br /><br />
-<script>
-var w;
-function startWorker() {
-  if(typeof(Worker)!=="undefined") {
-    if(typeof(w)=="undefined") {
-      w=new Worker("/example/html5/demo_workers.js");
+  <p>计数: <output id="result"></output></p>
+  <button onclick="startWorker()">开始 Worker</button>
+  <button onclick="stopWorker()">停止 Worker</button>
+  <br /><br />
+  <script>
+    var w;
+    function startWorker() {
+      if(typeof(Worker)!=="undefined") {
+        if(typeof(w)=="undefined") {
+          w=new Worker("/example/html5/demo_workers.js");
+        }
+        w.onmessage = function (event) {
+          document.getElementById("result").innerHTML=event.data;
+        };
+      } else {
+        document.getElementById("result").innerHTML="Sorry, your browser does not support Web Workers...";
+      }
     }
-    w.onmessage = function (event) {
-      document.getElementById("result").innerHTML=event.data;
-    };
-  } else {
-    document.getElementById("result").innerHTML="Sorry, your browser does not support Web Workers...";
-  }
-}
-function stopWorker() { 
-  w.terminate();
-w = undefined;
-}
-</script>
+    function stopWorker() {
+      w.terminate();
+      w = undefined;
+    }
+  </script>
 </body>
 </html>
-检测 Web Worker 支持
+```
+
+***检测 Web Worker 支持***
+
 在创建 web worker 之前，请检测用户浏览器是否支持它
+
 创建 Web Worker 文件
+
 现在，让我们在一个外部 JavaScript 文件中创建我们的 web worker。
+
 在此处，我们创建了计数脚本。该脚本存储于 "demo_workers.js" 文件中
+
+```js
 var i=0;
 function timedCount() {
   i=i+1;
@@ -2354,25 +2433,44 @@ function timedCount() {
   setTimeout("timedCount()",500);
 }
 timedCount();
+```
+
 以上代码中重要的部分是 postMessage() 方法 - 它用于向 HTML 页面传回一段消息。
+
 注释: web worker 通常不用于如此简单的脚本，而是用于更耗费 CPU 资源的任务。
-创建 Web Worker 对象
+
+***创建 Web Worker 对象***
+
 现在我们已经有了 web worker 文件，我们需要从 HTML 页面调用它。
+
 上面的代码行检测是否存在 worker，如果不存在，- 它会创建一个新的 web worker 对象，然后运行 "demo_workers.js" 中的代码
+
 然后我们就可以从 web worker 发生和接收消息了。
+
 向 web worker 添加一个 "onmessage" 事件监听器
+
 当 web worker 传送消息时，会执行事件监听器中的代码。来自 web worker 的数据会存储于 event.data 中。
-终止 Web Worker
+
+***终止 Web Worker***
+
 当创建 web worker 后，它会继续监听消息（即使在外部脚本完成后）直到其被终止为止。
+
 如需终止 web worker，并释放浏览器/计算机资源，请使用 terminate() 方法
-复用 Web Worker
+
+***复用 Web Worker***
+
 如果您把 worker 变量设置为 undefined，在其被终止后，可以重复使用该代码
-Web Worker 和 DOM
+
+***Web Worker 和 DOM***
+
 由于 web worker 位于外部文件中，它们无法访问下例 JavaScript 对象：
-•	window 对象
-•	document 对象
-•	parent 对象
-Server-Sent 事件
+
+- window 对象
+- document 对象
+- parent 对象
+
+### Server-Sent事件
+
 Server-Sent 事件允许网页从服务器获得更新。
 Server-Sent 事件 - One Way Messaging
 Server-Sent 事件指的是网页自动从服务器获得更新。
