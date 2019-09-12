@@ -6,7 +6,7 @@
 2. jQuery
 3. es6
 4. [typescript](./ts.md)
-5. vue
+5. [vue](./vue.md)
 6. angular
 7. react
 8. node
