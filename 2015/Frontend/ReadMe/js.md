@@ -2,8 +2,9 @@
 
 ## 目录
 
-1. [DOM](#DOM)
+1. [DOM](DOM)
    - [frame](#frame)
+   - [选项卡](#选项卡)
    - [下拉框](#下拉框)
    - [表格](#表格)
 2. [API](#API)
@@ -20,11 +21,21 @@
    - [encode、decode](#encodeURI、encodeURIComponent、decodeURI、decodeURIComponent)
    - [content="IE=edge,chrome=1"详解](#content="IE=edge,chrome=1"详解)
    - [中文乱码问题](#中文乱码问题)
+   - [对象获取](#对象获取)
+   - [节点的兄弟，父级，子级元素](#节点的兄弟，父级，子级元素)
+   - [opener、parent、top](#opener、parent、top)
    - [table设置问题](#table设置问题)
+   - [table固定宽度](#table固定宽度)
+   - [隐藏显示div](#隐藏显示div)
    - [让div自动适应内容的高度](#让div自动适应内容的高度)
    - [CSS的overflow:hidden属性详细解释](#CSS的overflow:hidden属性详细解释)
+   - [document.oncontextmenu事件](#document.oncontextmenu事件)
+   - [document.write()](#document.write())
+   - [获取数组中的最大值和最小值的方法汇总](#获取数组中的最大值和最小值的方法汇总)
    - [理解javascript中的Function.prototype.bind](#理解javascript中的Function.prototype.bind)
    - [动态加载JS和CSS](#动态加载JS和CSS)
+   - [with](#with)
+   - [打印](#打印)
    - [异步](#异步)
    - [跨域](#跨域)
 
@@ -95,6 +106,190 @@ frames[0]
 if(self==top){
   //dosomething
 }
+```
+
+### 选项卡
+
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="keywords" content="关键词1,关键词2,关键词3" />
+    <meta name="description" content="对网站的描述" />
+    <title>标题</title>
+    <style type="text/css">
+      *{
+        margin:0;
+        padding:0;
+      }
+       #box{
+        margin: 150px;
+        width: 310px;
+        height: 263px;
+       }
+       #box .hd{
+        height: 30px;
+        border-top: 2px solid #206F96;
+        text-align: center;
+        font: 14px/30px "宋体";
+       }
+       #box  .hd .s1{
+        width: 102px;
+        height: 29px;
+        border-left:1px solid #CFCFCF;
+        border-right: 1px solid #CFCFCF;
+        float: left;
+       }
+       #box  .hd .s2{
+        width: 102px;
+        height: 29px;
+        border-right: 1px solid #CFCFCF;
+        border-bottom: 1px solid #CFCFCF;
+        background:url(images/1.jpg) repeat-x;
+        float: left;
+       }
+        #box  .hd .s3{
+        width: 102px;
+        height: 29px;
+        border-right: 1px solid #CFCFCF;
+        border-bottom: 1px solid #CFCFCF;
+        background:url(images/1.jpg) repeat-x;
+        float: left;
+       }
+       #box .bd ul{
+        list-style: none;
+       }
+        #box .bd ul li{
+          line-height: 30px;
+        }
+        #box .bd ul li a:link,#box .bd ul li a:visited{
+          text-decoration: none;
+          color: #666;
+          font-size: 14px;
+        }
+        #tupian,#junshi{
+          display: none;
+        }
+    </style>
+    <script type="text/javascript">
+      function xianshitupian(){
+        //让图片列表显示出来
+        document.getElementById("tupian").style.display = "block";
+        //让新闻列表隐藏
+        document.getElementById("xinwen").style.display = "none";
+        //让军事列表隐藏
+        document.getElementById("junshi").style.display = "none";
+
+        //让图片span去掉背景
+        document.getElementById("span_tupian").style.background = "none";
+        //让新闻span加上灰色背景
+        document.getElementById("span_xinwen").style.background = "url(images/1.jpg) repeat-x";
+        //让军事span加上灰色背景
+        document.getElementById("span_junshi").style.background = "url(images/1.jpg) repeat-x";
+
+        //让图片span去掉下边框线
+        document.getElementById("span_tupian").style.borderBottom = "none";
+        //让新闻span加上下边框线
+        document.getElementById("span_xinwen").style.borderBottom = "1px solid #CFCFCF";
+        //让军事span加上下边框线
+        document.getElementById("span_junshi").style.borderBottom = "1px solid #CFCFCF";
+      }
+
+      function xianshixinwen(){
+        //让新闻列表显示出来
+        document.getElementById("xinwen").style.display = "block";
+        //让图片列表隐藏
+        document.getElementById("tupian").style.display = "none";
+        //让军事列表隐藏
+        document.getElementById("junshi").style.display = "none";
+
+        //让新闻span去掉背景
+        document.getElementById("span_xinwen").style.background = "none";
+        //让图片span加上灰色背景
+        document.getElementById("span_tupian").style.background = "url(images/1.jpg) repeat-x";
+        //让军事span加上灰色背景
+        document.getElementById("span_junshi").style.background = "url(images/1.jpg) repeat-x";
+
+        //让新闻span去掉下边框线
+        document.getElementById("span_xinwen").style.borderBottom = "none";
+        //让图片span加上下边框线
+        document.getElementById("span_tupian").style.borderBottom = "1px solid #CFCFCF";
+        //让军事span加上下边框线
+        document.getElementById("span_junshi").style.borderBottom = "1px solid #CFCFCF";
+      }
+
+      function xianshijunshi(){
+        //让军事列表显示出来
+        document.getElementById("junshi").style.display = "block";
+        //让图片列表隐藏
+        document.getElementById("tupian").style.display = "none";
+        //让新闻列表隐藏
+        document.getElementById("xinwen").style.display = "none";
+
+        //让军事span去掉背景
+        document.getElementById("span_junshi").style.background = "none";
+        //让图片span加上灰色背景
+        document.getElementById("span_tupian").style.background = "url(images/1.jpg) repeat-x";
+        //让新闻span加上灰色背景
+        document.getElementById("span_xinwen").style.background = "url(images/1.jpg) repeat-x";
+
+        //让军事span去掉下边框线
+        document.getElementById("span_junshi").style.borderBottom = "none";
+        //让图片span加上下边框线
+        document.getElementById("span_tupian").style.borderBottom = "1px solid #CFCFCF";
+        //让新闻span加上下边框线
+        document.getElementById("span_xinwen").style.borderBottom = "1px solid #CFCFCF";
+      }
+    </script>
+  </head>
+  <body>
+     <div id="box">
+      <div class="hd">
+        <span id="span_xinwen" class="s1" onmouseover="xianshixinwen()">新闻</span>
+        <span id="span_tupian" class="s2" onmouseover="xianshitupian()">图片</span>
+        <span id="span_junshi" class="s3" onmouseover="xianshijunshi()">军事</span>
+      </div>
+      <div class="bd">
+        <div id="xinwen" class="info">
+          <ul>  
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+            <li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+          </ul>
+        </div>
+        <div id="tupian" class="info">
+          <ul>  
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+            <li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+          </ul>
+        </div>
+        <div id="junshi" class="info">
+          <ul>  
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+            <li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+          </ul>
+        </div>
+      </div>
+     </div>
+  </body>
+</html>
 ```
 
 ### 下拉框
@@ -657,6 +852,195 @@ function loadStyleString(cssText) {
 var css = "body{color:blue;}";
 loadStyleString(css);
 </script>
+```
+
+### Cookie
+
+JavaScript是运行在客户端的脚本，因此一般是不能够设置Session的，因为Session是运行在服务器端的。而cookie是运行在客户端的，所以可以用JS来设置cookie。
+
+假设有这样一种情况，在某个用例流程中，由A页面跳至B页面，若在A页面中采用JS用变量temp保存了某一变量的值，在B页面的时候，同样需要使用JS来引用temp的变量值，对于JS中的全局变量或者静态变量的生命周期是有限的，当发生页面跳转或者页面关闭的时候，这些变量的值会重新载入，即没有达到保存的效果。解决这个问题的最好的方案是采用cookie来保存该变量的值，那么如何来设置和读取cookie呢？
+
+首先需要稍微了解一下cookie的结构，简单地说：cookie是以键值对的形式保存的，即key=value的格式。各个cookie之间一般是以“;”分隔。
+
+JS设置cookie：
+
+```js
+//假设在A页面中要保存变量username的值("jack")到cookie中，key值为name，则相应的JS代码为：
+document.cookie="name="+username;  
+```
+
+JS读取cookie:
+
+```js
+//假设cookie中存储的内容为：name=jack;password=123
+//则在B页面中获取变量username的值的JS代码如下：
+var username=document.cookie.split(";")[0].split("=")[1];
+```
+
+```js
+//写cookies
+function setCookie(name,value) {
+  var Days = 30;
+  var exp = new Date();
+  exp.setTime(exp.getTime() + Days*24*60*60*1000);
+  document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+}
+
+//读取cookies
+function getCookie(name) {
+  var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+  if(arr=document.cookie.match(reg))
+    return unescape(arr[2]);
+  else
+    return null;
+}
+
+//删除cookies
+function delCookie(name) {
+  var exp = new Date();
+  exp.setTime(exp.getTime() - 1);
+  var cval=getCookie(name);
+  if(cval!=null)
+    document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+
+//使用示例
+setCookie("name","hayden");
+alert(getCookie("name"));
+
+//如果需要设定自定义过期时间
+//那么把上面的setCookie函数换成下面两个函数就ok;
+
+//程序代码
+function setCookie(name,value,time){
+  var strsec = getsec(time);
+  var exp = new Date();
+  exp.setTime(exp.getTime() + strsec*1);
+  document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+}
+
+function getsec(str) {
+  alert(str);
+  var str1=str.substring(1,str.length)*1;
+  var str2=str.substring(0,1);
+  if (str2=="s") {
+    return str1*1000;
+  } else if (str2=="h"){
+    return str1*60*60*1000;
+  } else if (str2=="d"){
+    return str1*24*60*60*1000;
+  }
+}
+//这是有设定过期时间的使用示例：
+//s20是代表20秒
+//h是指小时，如12小时则是：h12
+//d是天数，30天则：d30
+setCookie("name","hayden","s20");
+```
+
+### with
+
+***简要说明***
+
+with语句可以方便地用来引用某个特定对象中已有的属性，但是不能用来给对象添加属性。要给对象创建新的属性，必须明确地引用该对象。  
+
+***语法格式***
+
+```js
+with(object instance) {
+  //代码块  
+}
+```
+
+有时候，我在一个程序代码中，多次需要使用某对象的属性或方法，照以前的写法，都是通过 `对象.属性` 或者 `对象.方法` 这样的方式来分别获得该对象的属性和方法，着实有点麻烦，学习了with语句后，可以通过类似如下的方式来实现：
+
+```js
+with(objInstance) {
+  var str = 属性1;
+  .....  
+}
+```
+
+去除了多次写对象名的麻烦。
+
+***举例***
+
+```html
+<script language="javascript">  
+<!--  
+function Lakers() {  
+  this.name = "kobe bryant";  
+  this.age = "28";  
+  this.gender = "boy";  
+}  
+var people=new Lakers();  
+with(people) {  
+  var str = "姓名: " + name + "<br>";  
+  str += "年龄：" + age + "<br>";  
+  str += "性别：" + gender;  
+  document.write(str);  
+}  
+//-->  
+</script>
+```
+
+代码执行效果如下:  
+
+```sh
+姓名: kobe bryant  
+年龄：28  
+性别：boy
+```
+
+### 打印
+
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>中国绿色厨房计划</title>
+  <script language=javascript>
+    function printsetup(){
+      //  打印页面设置
+      wb.execwb(8,1);
+    }
+    function printpreview(){
+      //  打印页面预览
+      wb.execwb(7,1);
+    }
+    function printit(){
+      if (confirm('确定打印吗？')){
+        wb.ExecWB(6,1)
+        //wb.execwb(1,1)//打开
+        //wb.ExecWB(2,1);//关闭现在所有的IE窗口，并打开一个新窗口
+        //wb.ExecWB(4,1)//;保存网页
+        //wb.ExecWB(6,1)//打印
+        //wb.ExecWB(7,1)//打印预览
+        //wb.ExecWB(8,1)//打印页面设置
+        //wb.ExecWB(10,1)//查看页面属性
+        //wb.ExecWB(15,1)//好像是撤销，有待确认
+        //wb.ExecWB(17,1)//全选
+        //wb.ExecWB(22,1)//刷新
+        //wb.ExecWB(45,1)//关闭窗体无提示
+      }
+    }
+  </script>
+</head>
+<body>
+  <div style="width:640px;height:20px;margin:100px auto 0 auto;font-size:12px;text-align:right;">
+    <input value="打印" type="button" onclick="javascript:window.print()" />
+    <OBJECT classid="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2" height="0" id="wb" name="wb" width="0"></OBJECT>
+    <input type=button name=button_print style="display:none;" value="打印本单据" onclick="javascript:printit()">
+    <input type=button name=button_setup value="打印页面设置" onclick="javascript:printsetup();">
+    <input type=button name=button_show value="打印预览" onclick="javascript:printpreview();">
+    <input type=button name=button_fh value="关闭" onclick="javascript:window.close();">
+  </div>
+  <div style="width:640px;height:624px;margin:20px auto;">
+    <img src="images/money.jpg" />
+  </div>
+</body>
+</html>
 ```
 
 ### 异步
@@ -1448,6 +1832,130 @@ Header append X-UA-Compatible "chrome=1" env=gcf
 3. 一般1、2点中的编码方式应该一致，不一致可能出现乱码。
 4. 如果浏览器中显示乱码，但是页面源文件不是乱码，可以通过修改浏览器的编码方式看到正确的中文，如果在源文件中设置了正确的"charset"，就不需要修改浏览器的编码方式了。
 
+### 对象获取
+
+**[object Object]怎么获取？**
+
+```js
+var temp = "";
+for(var i in obj) { //用javascript的for/in循环遍历对象的属性
+  if(i.indexOf("Repeater1")>=0) {
+    temp+=i+":"+obj[i]+"\n";
+  }
+}
+alert(temp);
+```
+
+js中想根据动态key得到某对象中相对应的value的方法有二：
+一、var key = "name1";var value = obj[key];
+二、var key = "name1";var value = eval("obj."+key);
+
+### 节点的兄弟，父级，子级元素
+
+先说一下JS的获取方法，其要比JQUERY的方法麻烦很多，后面以JQUERY的方法作对比。
+
+JS的方法会比JQUERY麻烦很多，主要则是因为FF浏览器，FF浏览器会把你的换行也当最DOM元素
+
+```html
+<div id="test">
+  <div></div>
+  <div></div>
+</div>
+```
+
+原生的JS获取ID为test的元素下的子元素。可以用：
+
+```js
+var a = docuemnt.getElementById("test").getElementsByTagName("div"); // 这样是没有问题的
+```
+
+此时a.length=2；
+
+但是如果我们换另一种方法
+
+```js
+var b = document.getElementById("test").childNodes;  
+```
+
+此时b.length 在IE浏览器中没问题，其依旧等于2，但是在FF浏览器中则会使4，是因为FF把换行也当做一个元素了。所以，在此，我们就要做处理了，需遍历这些元素，把元素类型为空格而且是文本都删除。
+
+```js
+function del_ff(elem) {
+  var elem_child = elem.childNodes;
+  for(var i=0; i<elem_child.length; i++) {
+    if(elem_child[i].nodeName == "#text" && !/\s/.test(elem_child.nodeValue)){
+      elem.removeChild(elem_child)
+    }
+  }
+}
+```
+
+上述函数遍历子元素，当元素里面有节点类型是文本并且文本类型节点的节点值是空的。就把他删除。
+
+nodeNames可以得到一个节点的节点类型，/\s/是非空字符在JS里的正则表达式。前面加！,则表示是空字符
+
+test() 方法用于检测一个字符串是否匹配某个模式.语法是：RegExpObject.test(string)
+
+如果字符串 string 中含有与 RegExpObject 匹配的文本，则返回 true，否则返回 false。
+
+nodeValue表示得到这个节点里的值。
+
+removeChild则是删除元素的子元素。
+
+之后，在调用子，父，兄，这些属性之前，调用上面的函数把空格清理一下就可以了
+
+```html
+<div id="test">
+  <div></div>
+  <div></div>
+</div>
+<script>
+  function dom() {
+    var s= document.getElementById("test");
+    del_ff(s); // 清理空格
+    var chils= s.childNodes; // 得到s的全部子节点
+    var par=s.parentNode; // 得到s的父节点
+    var ns=s.nextSbiling; // 获得s的下一个兄弟节点
+    var ps=s.previousSbiling; // 得到s的上一个兄弟节点
+    var fc=s.firstChild; // 获得s的第一个子节点
+    var lc=s.lastChile; // 获得s的最后一个子节点
+  }
+</script>
+```
+
+下面介绍JQUERY的父，子，兄弟节点查找方法
+
+- jQuery.parent(expr)  找父亲节点，可以传入expr进行过滤，比如$("span").parent()或者$("span").parent(".class")
+- jQuery.parents(expr),类似于jQuery.parent(expr),但是是查找所有祖先元素，不限于父元素
+- jQuery.children(expr).返回所有子节点，这个方法只会返回直接的孩子节点，不会返回所有的子孙节点
+- jQuery.contents(),返回下面的所有内容，包括节点和文本。这个方法和children()的区别就在于，包括空白文本，也会被作为一个jQuery对象返回，children()则只会返回节点
+- jQuery.prev()，返回上一个兄弟节点，不是所有的兄弟节点
+- jQuery.prevAll()，返回所有之前的兄弟节点
+- jQuery.next(),返回下一个兄弟节点，不是所有的兄弟节点
+- jQuery.nextAll()，返回所有之后的兄弟节点
+- jQuery.siblings(),返回兄弟姐妹节点，不分前后
+- jQuery.find(expr),跟jQuery.filter(expr)完全不一样。jQuery.filter()是从初始的jQuery对象集合中筛选出一部分，而jQuery.find()的返回结果，不会有初始集合中的内容，比如$("p"),find("span"),是从<p>元素开始找<span>,等同于$("p span")
+
+```html
+<noscript>
+  <iframe src="*.htm"></iframe>
+</noscript>
+```
+
+前面应该还有一段js代码。noscript元素用来定义在脚本未被执行时的替代内容（文本）。此标签可被用于可识别`<script>`标签但无法支持其中的脚本的浏览器。此段代码意思为如果浏览器不支持script的代码，则会显示嵌入的那个页面的内容。
+
+### opener、parent、top
+
+opener即谁打开我的，比如A页面利用window.open弹出了B页面窗口，那么A页面所在窗口就是B页面的opener，在B页面通过opener对象可以访问A页面。
+
+parent表示父窗口，比如一个A页面利用iframe或frame调用B页面，那么A页面所在窗口就是B页面的parent。
+
+top是parent的特殊情况，表示顶层窗口。
+
+在JS 中，window.opener只是对弹出窗口的母窗口的一个引用。比如：a.html中，通过点击按钮等方式window.open出一个新的窗口 b.html。那么在b.html中，就可以通过window.opener（省略写为opener）来引用a.html，包括a.html的 document等对象，操作a.html的内容。
+
+假如这个引用失败，那么将返回null。所以在调用opener的对象前，要先判断对象是否为null，否则会出现“对象为空或者不存在”的JS错误。
+
 ### table设置问题
 
 设置table的Width
@@ -1460,6 +1968,284 @@ table边框问题，一般在设置边框宽度时光增加border=1显示出来�
 
 ```html
 <table cellpadding="0" cellspacing="0" border=1>
+```
+
+### table固定宽度
+
+table-layout:fixed 属性的解说
+
+如果想要一个table固定大小，里面的文字强制换行(尤其是在一长串英文文本，并且中间无空格分隔的情况下)，以达到使过长的文字不撑破表格的目的，一般是使用样式：table-layout:fixed。但是在Firefox下面，会有一些问题，参考 Gmail的一些做法，做了几个测试，得出一种解决办法。
+
+例1：(IE浏览器)普通的情况，CODE:
+
+```html
+<table border=1 width=80>
+  <tr>
+    <td>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+  </tr>
+</table>
+```
+
+效果：可以看到width=80并没有起作用，表格被字符撑开了。
+
+例2：(IE浏览器)使用样式 `table-layout:fixed`，CODE:
+
+```html
+<style>
+  .tbl {
+    table-layout:fixed
+  }
+</style>
+<table class=tbl border=1 width=80>
+  <tr>
+    <td>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+  </tr>
+</table>
+```
+
+效果：width=80起作用了，但是表格换行了。
+
+例3：(IE浏览器)使用样式table-layout:fixed与nowrap，CODE:
+
+```html
+<style>
+  .tbl {
+    table-layout:fixed
+  }
+</style>
+<table class=tbl border=1 width=80>
+  <tr>
+    <td nowrap>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+  </tr>
+</table>
+```
+
+效果：width=80起作用了，换行也被干掉了。
+
+例4：(IE浏览器)在使用数值固定td大小情况下使用样式table-layout:fixed与nowrap，CODE:
+
+```html
+<style>
+  .tbl {
+    table-layout:fixed
+  }
+</style>
+<table class=tbl border=1 width=80>
+  <tr>
+    <td width=20 nowrap>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+    <td nowrap>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+  </tr>
+</table>
+```
+
+效果：不幸发生了，第一个td的nowrap不起作用了
+
+例5：(IE浏览器)在使用百分比固定td大小情况下使用样式table-layout:fixed与nowrap，CODE:
+
+```html
+<style>
+  .tbl {
+    table-layout:fixed
+  }
+</style>
+<table class=tbl border=1 width=80>
+  <tr>
+    <td width=25% nowrap>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+    <td nowrap>abcdefghigklmnopqrstuvwxyz 1234567890</td>
+  </tr>
+</table>
+```
+
+效果：改成百分比，终于搞定了
+
+例6：(Firefox浏览器)在使用百分比固定td大小情况下使用样式table-layout:fixed与nowrap 效果：把例5放到firefox下面，又ft了
+
+例7：(Firefox浏览器)在使用百分比固定td大小情况下使用样式table-layout:fixed与nowrap,并且使用div，CODE:
+
+```html
+<style>
+  .tbl {
+    table-layout:fixed
+  }
+  .td {
+    overflow:hidden;
+  }
+</style>
+<table class=tbl border=1 width=80>
+  <tr>
+    <td width=25% class=td nowrap>
+      <div>abcdefghigklmnopqrstuvwxyz 1234567890</div>
+    </td>
+    <td class=td nowrap>
+      <div>abcdefghigklmnopqrstuvwxyz 1234567890</div>
+    </td>
+  </tr>
+</table>
+```
+
+效果：天下终于太平了
+
+例8：(Firefox浏览器)在使用数值固定td大小情况下使用样式table-layout:fixed与nowrap,并且使用div，CODE:
+
+```html
+<style>
+  .tbl {
+    table-layout:fixed
+  }
+  .td {
+    overflow:hidden;
+  }
+</style>
+<table class=tbl border=1 width=80>
+  <tr>
+    <td width=20 class=td nowrap>
+      <div>abcdefghigklmnopqrstuvwxyz 1234567890</div>
+    </td>
+    <td class=td nowrap>
+      <div>abcdefghigklmnopqrstuvwxyz 1234567890</div>
+    </td>
+  </tr>
+</table>
+```
+
+效果： nowrap又不起作用了
+
+但是使用它在不同浏览器中又会出现问题，显示效果整齐了，确显示内容被覆盖了，这又怎样解决呢，我又开始了搜索，可以强制换行，却又导致有的单词被分家了连不起来，后来有在表单格式中加了一句word-wrap:break-word，详细内容如下：word-wrap是控制换行的。
+
+使用break-word时，是将强制换行。中文没有任何问题，英文语句也没问题。但是对于长串的英文，就不起作用。break-word是控制是否断词的。normal是默认情况，英文单词不被拆开。break-all，是断开单词。在单词到边界时，下个字母自动到下一行。主要解决了长串英文的问题。keep-all，是指Chinese, Japanese, and Korean不断词。即只用此时，不用word-wrap，中文就不会换行了。（英文语句正常。）
+
+ie下：使用word-wrap:break-word;所有的都正常。
+
+ff下：如这2个都不用的话，中文不会出任何问题。英文语句也不会出问题。但是，长串英文会出问题。
+
+为了解决长串英文，一般用word-wrap:break-word;word-break:break-all;。但是，此方式会导致普通的英文语句中的单词会被断开（ie下也是）。
+
+目前主要的问题存在于长串英文和英文单词被断开。其实长串英文就是一个比较长的单词而已。
+
+即英文单词应不应该被断开那？那问题很明显了，显然不应该被断开了。
+
+对于长串英文，就是恶意的东西，自然不用去管了。但是，也要想些办法，不让它把容器撑大。
+
+用：overflow:auto; ie下，长串会自动折行。ff下，长串会被遮盖。
+
+所以，综上，最好的方式是word-wrap:break-word;overflow:hidden;而不是word-wrap:break-word;word-break:break-all;。
+
+word-wrap:break-word;overflow:auto;在ie下没有任何问题。在ff下，长串会被遮住部分内容。加这句话   style="word-wrap:break-word;table-layout: fixed;"，上面的问题就解决了。希望对大家有意!!!!!
+
+table-layout  版本：CSS2　兼容性：IE5+　继承性：无
+
+语法：table-layout : auto | fixed
+
+取值：
+
+- auto: 默认值。默认的自动算法。布局将基于各单元格的内容。表格在每一单元格内所有内容读取计算之后才会显示出来
+- fixed: 固定布局的算法。在这种算法中，表格和列的宽度取决于 col 对象的宽度总和，假如没有指定，则会取决于第一行每个单元格的宽度。假如表格没有指定宽度( width )属性，则表格被呈递的默认宽度为 100% 。
+
+说明：
+
+设置或检索表格的布局算法。
+
+你可以通过此属性改善表格呈递性能。此属性导致IE以一次一行的方式呈递表格内容从而提供给信息用户更快的速度。此属性依据此下顺序使用其中一种方式布置表格栏宽度：
+
+使用 col 或 colGroup 对象的宽度( width )属性信息。
+
+使用表格第一行内的单元格的宽度( width )信息。
+
+依据表格列数等分表格宽度。而不考虑表格内容的实际宽度。
+
+假如单元格的内容超过了列宽度，内容将会被换行。假如无法换行，则内容会被裁切。假如此属性被设置为 fixed ，则 overflow 能够被用于控制处理溢出单元格( td )宽度的内容。假如表格行高度被指定了，那么换行的内容如果超出了指定表格行高度也会在纵向上被裁切。
+
+设置此属性值为 fixed ，有助于提高表格性能。对于长表格效果尤其显著。
+
+设置表格行高可以进一步提高呈递速度，浏览器不需要检测行内每一个单元格内容去确定行高就可以开始解析以及呈递。
+
+此属性对于 currentStyle 对象而言是只读的。对于其他对象而言是可读写的。
+
+对应的脚本特性为 tableLayout。
+
+```html
+<!--固定表格的宽度，超出部分用...代替-->
+<style>
+table {
+  font-size:small;
+  text-align:left;
+  table-layout:fixed;
+  margin: 0px;
+  border-style: solid;
+  border-color:Black;
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+td {
+  border:solid 1pxblack;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+</style>
+<colgroup>
+  <colwidth="65px"/>
+  <colwidth="141px"/>
+  <colwidth="60px"/>
+  <colwidth="101px"/>
+  <colwidth="52px"/>
+  <colwidth="70px"/>
+  <colwidth="59px"/>
+  <colwidth="56px"/>
+  <colwidth="56px"/>
+  <colwidth="56px"/>
+  <colwidth="56px"/>
+  <colwidth="56px"/>
+  <colwidth="56px"/>
+  <colwidth="56px"/>
+  <colwidth="42px"/>
+  <colwidth="60px"/>
+  <colwidth="50px"/>
+  <colwidth="40px"/>
+  <colwidth="20px"/>
+  <colwidth="20px"/>
+  <colwidth="20px"/>
+</colgroup>
+```
+
+### 隐藏显示div
+
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Test</title>
+    <script type="text/javascript">
+        function selectCond(id) {
+            if (id == "" || id == null) {
+                if (document.all['tab'].style.display == "") {
+                    document.all['tab'].style.display = "none";
+                    return;
+                }
+                document.all['tab'].style.display = "";
+            } else {
+                if (document.all['tab' + id].style.display == "") {
+                    document.all['tab' + id].style.display = "none";
+                    return;
+                }
+                document.all['tab' + id].style.display = "";
+            }
+        }
+    </script>
+</head>
+<body>
+    <fieldset>
+        <legend>
+            <span onclick="selectCond();">
+                <span>请点击</span>
+            </span>
+        </legend>
+        <div id="tab" style="display: none">
+            这就是隐藏的内容！o(∩_∩)o 哈哈
+        </div>
+    </fieldset>
+</body>
+</html>
 ```
 
 ### 让div自动适应内容的高度
@@ -1565,6 +2351,91 @@ text-overflow: ellipsis; /* for IE */
 像`<a>`这类默认非块的元素，要加上 display:block 才有效果。
 
 别忘了设置width或者max-width
+
+### document.oncontextmenu事件
+
+鼠标右击，BODY中用 `oncontextmenu='return false'` 来取消鼠标右键；
+
+### document.write()
+
+可以用在两个方面：页面载入过程中用实时脚本创建页面内容，以及用延时脚本创建本窗口或新窗口的内容。该方法需要一个字符串参数，它是写到窗口或框架中的HTML内容。这些字符串参数可以是变量或值为字符串的表达式，写入的内容常常包括HTML标记语言。
+
+记住，在载入页面后，浏览器输出流自动关闭。在此之后，任何一个对当前页面进行操作的document.write()方法将打开—个新的输出流，它将清除当前页面内容(包括源文档的任何变量或值)。因此，假如希望用脚本生成的HTML替换当前页面，就必须把HTML内容连接起来赋给一个变量，使用一个document.write()方法完成写操作。不必清除文档并打开一个新数据流，一个document.write()调用就可完成所有的操作。
+
+关于document.write()方法还有一点要说明的是它的相关方法document.close()。脚本向窗口（不管是本窗口或其他窗口）写完内容后，必须关闭输出流。在延时脚本的最后一个document.write()方法后面，必须确保含有document.close()方法，不这样做就不能显示图像和表单。并且，任何后面调用的document.write()方法只会把内容追加到页面后，而不会清除现有内容来写入新值。为了演示document.write()方法，我们提供了同一个应用程序的两个版本。一个向包含脚本的文档中写内容，另—个向一个单独的窗口写内容。请在文本编辑器中键入每个文档，以.html文件扩展名保存，并在浏览器中打开文档。
+
+示例1创建一个按钮，它为文档组合新的HTML内容，包括新文档标题的HTML标记和标记的颜色属性。示例中有一个读者所不熟悉的操作符+＝，它把其右侧的字符串加到其左侧的变量中，这个变量用来存放字符串，这个操作符能很方便地把几个单独的语句组合成—个长字符串。使用组合在newContent变量中的内容，document.write()语句可以把所有新内容写到文档中，完全清除示例1中的内容。然后需要调用document.close()语句关闭输出流。当载入该文档并单击按钮时，可以注意到浏览器标题栏中的文档标题因此而改变。当回到原始文档并再次单击该按钮时，可以看到动态写入的第二个页面的载入速度甚至比重载原始文档还要快。
+
+示例1 在当前窗口使用document.write()。
+
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Writing to Same Doc</title>
+  <script language="JavaScript">
+    function reWrite(){
+      // assemble content for new window
+      var newContent = "<html><head><title>A New Doc</title></head>"
+      newContent += "<body bgcolor='aqua'><h1>This document is brand new.</h1>"
+      newContent += "Click the Back button to see original document."
+      newContent += "</body></html>"
+      // write HTML to new window document
+      document.write(newContent)
+      document.close() // close layout stream
+    }
+  </script>
+</head>
+<body>
+  <form>
+    <input type="button" value="Replace Content" onClick="reWrite()">
+  </form>
+</body>
+</html>
+```
+
+示例2中，情况有点复杂，因为脚本创建了一个子窗口，整个脚本生成的文档都将写入该窗口中。为了使新窗口的引用在两个函数中保持激活状态，我们将newWindow变量声明为全局变量。页面载入时，onLoad事件处理调用makeNewWindow()函数，该函数生成一个空的子窗口。另外，我们在window.open()方法的第三个参数中加入一个属性，使子窗口的状态栏可见。
+
+页面上的按钮调用subWrite()方法，它执行的第一个任务是检查子窗口的closed属性。假如关闭了引用窗口，该属性（只在较新的浏览器版本中存在）返回true。如果是这种情况（假如用户手动关闭窗口），该函数再次调用makeNewWindow()函数来重新打开那个窗口。
+
+窗口打开后，新的内容作为字符串变量组合在一起。与示例1一样，一次性写入内容（虽然对单独的窗口没有必要），接下来调用close()方法。但是注意一个重要的区别：write()和close()方法都明显地指定了子窗口。
+
+示例2 在另一个窗口中使用document.write()
+
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Writing to Subwindow</title>
+  <script language="JavaScript">
+    var newWindow
+    function makeNewWindow(){
+      newWindow = window.open("","","status,height=200,width=300")
+    }
+    function subWrite(){
+      // make new window if someone has closed it
+      if(newWindow.closed){
+        makeNewWindow()
+      }
+      // bring subwindow to front
+      newWindow.focus()
+      // assemble content for new window
+      var newContent = "<html><head><title>A New Doc</title></head>"
+      newContent += "<body bgcolor='coral'><h1>This document is brand new.</h1>"
+      newContent += "</body></html>"
+      // write HTML to new window document
+      newWindow.document.write(newContent)
+      newWindow.document.close()    // close layout stream
+    }
+  </script>
+</head>
+<body onLoad="makeNewWindow()">
+  <form>
+    <input type="button" value="Write to Subwindow" onClick="subWrite()">
+  </form>
+</body>
+</html>
+```
 
 ### 获取数组中的最大值和最小值的方法汇总
 
@@ -1851,3 +2722,16 @@ exit;
 [http://www.phonegap100.com/portal.php?mod=view&aid=72](http://www.phonegap100.com/portal.php?mod=view&aid=72)
 
 [http://www.cnblogs.com/oneword/archive/2012/12/03/2799443.html](http://www.cnblogs.com/oneword/archive/2012/12/03/2799443.html)
+
+### 正则表达式
+
+```js
+MatchCollection collection = Regex.Matches(html, "<(a|link|img|script|input|form).[^>]*(href|src|action)=(\\\"|'|)(.[^\\\"']*)(\\\"|'|)[^>]*>", RegexOptions.IgnoreCase);
+
+foreach (Match match in collection) {
+  if (match.Groups[match.Groups.Count - 2].Value.IndexOf("~") != -1) {
+    string url = this.Page.ResolveUrl(match.Groups[match.Groups.Count - 2].Value);
+    html = html.Replace(match.Groups[match.Groups.Count - 2].Value, url);
+  }
+}
+```

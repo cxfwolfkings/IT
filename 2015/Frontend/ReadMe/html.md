@@ -37,6 +37,17 @@
    - [Canvas](#Canvas)
    - [SVG](#SVG)
    - [Canvas&nbsp;vs&nbsp;SVG](#Canvas&nbsp;vs&nbsp;SVG)
+   - [VML](#VML)
+     - [Shape](#Shape)
+     - [Line,Polyline(线)对象](#Line,Polyline(线)对象)
+     - [Oval(圆)对象](#Oval(圆)对象)
+     - [Group容器](#Group容器)
+     - [ShapeType给VML制作模版](#ShapeType给VML制作模版)
+     - [脚本动态生成VML](#脚本动态生成VML)
+     - [给VML增加事件](#给VML增加事件)
+     - [数据图表](#数据图表)
+     - [矢量地图](#矢量地图)
+     - [文本修改留痕](#文本修改留痕)
 4. [媒体](#媒体)
    - [Object元素](#Object元素)
    - [音频](#音频)
@@ -1574,6 +1585,388 @@ SVG
 - 最适合带有大型渲染区域的应用程序（比如谷歌地图）
 - 复杂度高会减慢渲染速度（任何过度使用 DOM 的应用都不快）
 - 不适合游戏应用
+
+### VML
+
+VML的全称是Vector Markup Language(矢量可标记语言)，矢量的图形，意味着图形可以任意放大缩小而不损失图形的质量，这在制作地图上有很大用途。
+
+在VML里面，标记使用的是XML扩张，需要一个namespace(命名空间)，你可以使用惯用的“v”作为命名空间，使用IE5.0到IE6.0通用的定义如下:
+
+```html
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<STYLE>
+  v\:* { Behavior: url(#default#VML) }
+</STYLE>
+```
+
+xmlns全称就是XML NameSpace也就是命名空间。Behavior(行为)也是IE5.0新推出的东西，它的功能非常强大，结合样式表，可以给任何HTML对象增加行为(新的属性、方法、事件)，而在这里，它的用处是把命名空间“v”和系统预定义的行为VML连接。这样定义以后，你就可以使用下面的标记了，和普通的HTML标记有所区别，每个标记都增加了一个命名空间: `<v:shape></v:shape>`
+
+和其他HTML元素一样，VML标记里面可以定义DHTML大部分属性和事件，比如说id,name,title,onmouseover等等。在写法上VML比较灵活，很多属性既可以写在标记里面，又可以独立出一个新的标记来表示:
+
+```html
+<v:shape id=shape1 name=shape1 onmouseover="alert(this.id)" StrokeColor=red Path="m 0,01 10,10 x e"></v:shape>
+```
+
+等同于下面的写法:
+
+```html
+<v:shape id=shape1 name=shape1 onmouseover="alert(this.id)">
+<v:Stroke StrokeColor=red/>
+<v:Path v="m 0,0 l 10,10 x e"/>
+</v:shape>
+```
+
+当然不是所有的属性都可以写成独立的标记，常用的比如说上面的 Stroke(按我的理解可以翻译成线性)，Path，Shadow，Fill(填充)等，VML这样的方式可以理解为 shape 的属性分类，使属性更直观。
+
+Shape 对象派生出来的一些对象，更加直接的图象，比如说 Rect(矩形)，RoundRect(圆边的矩形)，Oval(圆)，Line(线)，PolyLine(不规则折线)，Image(图形文件)等等，以后将对这些对象细细描述。
+
+#### Shape
+
+Shape是VML最基本的对象，利用它可以画出所有你想要的图形。在VML中，使用的坐标并不是Document的坐标，它有自己的坐标系，这样一来，动态改变它的坐标，就可以实现放大、缩小、旋转等功能了。shape的 CoordSize 属性就是用来定义坐标的，它有两个参数，<v:shape CoordSize="2800,2800" />， 这里的2800,2800 是横纵坐标被分成了2800个点，并不是HTML里面默认像素。如果没有设置圆点，VML默认是 0,0 (左上角)，当然你也可以使用 CoordOrig 属性设置VML的圆点坐标。
+
+```html
+<v:shape CoordOrig="-1400,-1400" CoordSize="2800,2800" style="width:500;height:500" />
+```
+
+注意:定义的坐标只是相对的，真正显示的图形大小还需要 style="width:500;height:500" 来定义！
+
+上面的定义后，你可用的坐标是 x(-1400到1400) y(-1400到1400) ，这样的坐标就像数学里面的坐标了，把画版分成了四个块。
+
+在解决实际问题的时候，我发现，IE会自动把可见的VML图象放在相对的(0,0)位置，意思是说，上面两张图如果没有增加两个辅助的坐标，在IE上显示出来是并列的两个正方形。
+
+shape中最主要的属性是Path，它是个功能强大的画笔，语法很简单，由几个字母组成，下面详细讲述：
+
+- m x,y: MoveTo把画笔移动到 (x,y)；
+- l x,y: LineTo从当前点到(x,y)画一条线；可以给连续的几个点，VML会连续画出来直到遇到 x 命令。
+- x: Close结束一条线；
+- e: End结束画图
+
+shape的其他常用属性:
+
+- FillColor: 填充颜色，使用HTML中规定的颜色；例如:fillcolor=red
+- Filled: 是否要填充图形，如果图形不是封闭的，也会自动封闭图形进行填充。当Filled="true"(默认),fillcolor才有效果；
+- StrokeColor: 线的颜色；
+- StrokeWeight: 线的宽度；
+- Title: 当鼠标移动到该图形上的时候，显示的文字，和HTML里面的alt、tilte一样；
+- Type: 指定该图形属于那个ShapeType，ShapeType可以为VML制定模版，将在以后加以描述；
+
+前面的这些属性，FillColor、Filled可以在`<v:Fill />`中使用，StrokeColor、StrokeWeight可以在`<v:Stroke />`中使用。也可以在 Shape 或者 继承Shape的对象中使用它。
+
+在下面几节，将详细介绍 Shape 延伸出来的一些具体对象，诸如 Rect、RoundRect、Oval、Line等对象。
+
+#### Line,Polyline(线)对象
+
+Line是做图中最常用的，它有两个特殊的属性 from 和 to，就是起始点和终止点坐标。
+
+```html
+<v:line from="0,0" to="100,50" style="position:relative;"/>
+```
+
+如果要改变线的样式，LineStyle (Stroke)属性可以做到: Single(默认)，ThinThin，ThinThick，ThickBetweenThin
+
+如果要改变线的类型，可以用 DashStyle(Stroke)属性:
+
+```html
+<v:line style="position:relative" from="0,0" to="100,0" >
+  <v:stroke dashstyle="Dot"/>
+</v:line>
+```
+
+- Solid(默认):见上图
+- ShortDash:
+- ShortDot:
+- ShortDashDot:
+- ShortDashDotDot:
+- Dot:
+- Dash:
+- LongDash:
+- DashDot:
+- LongDashDot:
+- LongDashDotDot:
+
+在画坐标的时候，需要箭头，VML已经定义好了箭头，在Stroke体现: EndArrow 和 StartArrow 属性，一个是线开始的时候有箭头，另一个是线结束的时候有箭头。箭头的样式也有不少：
+
+```html
+<v:line style="position:relative" from="0,0" to="100,0" >
+  <v:stroke EndArrow="Classic"/>
+</v:line>
+```
+
+- EndArrow="Block":
+- EndArrow="Classic":(这个看起来还比较舒服)
+- EndArrow="Diamond":
+- StartArrow="Oval":
+- StartArrow="Open":
+
+PolyLine是 Line 的变形，是不规则的连续的线。它有个特殊的属性 Points ,用来设置每个点的坐标。例如：
+
+```html
+<v:PolyLine filled="false" Points="0,0 0,100 20,150 200,100"style="position:relative"/>
+```
+
+一样可以设置它的线的样式和类型以及箭头 ( IE5.0中，PolyLine不支持 Arrow )
+
+```html
+<v:PolyLine filled="false" Points="0,0 0,100 20,150 200,100"style="position:relative"/>
+  <v:stroke StartArrow="Oval" EndArrow="Classic" dashstyle="Dot" />
+</v:PolyLine>
+```
+
+#### Oval(圆)对象
+
+用VML画圆(Oval)是非常简单的，只要设置圆的高和宽就可以了。当然定位也是常用的：
+
+```html
+<v:oval style="position:relative;left:5;top:5;width:100;height:80"/>
+```
+
+还要注意的是，top和left是圆的左上角坐标，width 和 height 是圆的宽和高，不是圆的半径。其圆心坐标是(left-width/2,top-height/2)。
+
+说到圆，不得不想到弧(arc) VML已经定义了弧对象，它有除了圆的基本性质外，两个特殊的属性startangle 和 endangle，就是起始角度和结束角度，单位是度，而不是弧度：
+
+```html
+<v:arc filled=false style="position:relative;width:100;height:100" StartAngle="0" EndAngle="270" />
+```
+
+注意到没有，0角度是从平常的90度开始的。
+
+#### Image(图像)对象
+
+Image对象从外部调用一个图形文件，只要IE能够显示的格式都可以。需要注意的是，VML只用来显示这张图片，并没有将这图片矢量化，如果以后放大缩小，画质会改变的。
+
+```html
+<v:image src="big.GIF" style="position:relative;top:0;left:0;width:165;height:157" />
+```
+
+刚刚查询 MSDN 关于VML资料的时候，左边的相关菜单已经 Unavailable 了，这是否意味着 VML 将被 Microsoft 抛弃？因为有取VML和Flash之长处的 SVG 的崛起，VML 黯然失色，曾经问一个开发过VML软件的老外，他都强烈建议我使用SVG。但我觉得 SVG固然强大，但它和Flash一样，有自己的菜单，有自己固定的区域，和别的网页元素结合的不太好(个人观点)，VML还是有其生存意义的。不过可以肯定，在IE以后的版本，对VML都是支持的。如果你要查询一些VML的原始资料，可以访问下面的地址：[https://msdn.microsoft.com/zh-cn/ee384217](https://msdn.microsoft.com/zh-cn/ee384217)
+
+#### Group容器
+
+Group的使用很简单，但功能很强大。它能让一系列的VML对象使用共同的坐标系，它很常用的，基本上如果使用了超过一个VML对象的页面都使用Group。使用Group还有个好处，就是可以动态改变CoordSize值放大或缩小整个 Group 里面的VML。
+
+```html
+<v:group ID="group1" style="position:relative;WIDTH:200px;HEIGHT:200px;" coordsize = "2000,2000">
+<v:rect style="WIDTH:2000px;HEIGHT:2000px" fillcolor="#99cccc">
+    <v:shadow on="t" type="single" color="silver" offset="5pt,5pt">
+</v:rect>
+<v:oval style="position:relative;top:100;left:100;width:1000;height:1000;z-index:7;" fillcolor="red" strokeColor="red"/>
+<v:rect style="position:relative;top:500;left:300;width:1000;height:1000;z-index:8;" fillcolor="blue" strokeColor="blue"/>
+<v:line from="200,200" to="1000,1700" style="z-index:9" fillcolor="yellow" strokeColor="yellow" strokeWeight=2pt/>
+</v:group>
+```
+
+相信如果你看懂了上面的代码，对 Group 一定理解了。上面使用了一个和Group一样大小的 Rect 作为 Group的边框，然后加上阴影渲染。用MSDN的一个很有意思的例子再看看 Group 的重要用法：(改变滚动条的值，右边的图片会相应的旋转)
+
+该例子中，那张图片完全是用VML画出来的，动态改变 Group 的 Rotation 属性就可以实现整个 Group 里面的对象旋转。
+
+#### ShapeType给VML制作模版
+
+VML的这个功能很有用，模版，顾名思义，它可以减少书写代码的量，又使的代码可读性提高。在理解VML模版的时候，可以 和 HTML 的 CSS 一样理解，它是定义好的一种形状，下次使用的时候直接声明 type 属性就可以了。看看下面的例子：
+
+```html
+<v:shapetype id="arrowUP" coordsize="6 6"> <!--三角形 向上-->
+    <v:path v="m 3,0 l 0,6,6,6,3,0 x e" />
+</v:shapetype>
+<v:shapetype id="arrowDown" coordsize="6 6"> <!--三角形 向下-->
+    <v:path v="m 0,0 l 3,6,6,0,0,0 x e" />
+</v:shapetype>
+```
+
+定义好上面的模版后，以后就可以直接调用了：
+
+```html
+<v:shape type="#arrowUP" style="position:relative;width:50;height:50"/>
+<v:shape type="#arrowDown" style="position:relative;width:50;height:50"/>
+<v:shape fillcolor=blue type="#arrowDown" style="position:relative;width:80;height:80" />
+```
+
+不知道大家有没有注意到，VML里面对“,”使用不强制的，你可以使用 coordsize="6,6" 也可以使用 coordsize="6 6" ，效果是一样的。
+
+#### 脚本动态生成VML
+
+我们编写 VML 很重要的就是要和 数据库结合，如果和数据库结合了，读数据和把数据转换成 VML 变成了两部分。如果直接使用 ASP 生成 包含很多 VML 的页面， 一旦数据量多了，整个页面就变得很庞大，下载速度慢了，IE解释代码的速度也慢了，所以用脚本动态生成 VML 变得非常重要了。
+
+用 VML 画一个示意图，可以更明确上面的意义：
+
+```html
+<html>
+<head>
+  <title>Untitled</title>
+</head>
+  <script language="JavaScript">
+    function createPoint(x,y,value) {
+      ...
+    }
+  </script>
+<body>
+</body>
+</html>
+```
+
+Iframe
+
+主页面带有脚本，可以实现诸如增加 VML 元素的功能。
+
+子页面是个ASP程序，从数据库中读取数据，生成相应的脚本，比如:
+
+```html
+<script>
+  self.parent.createPoint(10,10,"第一点");
+  self.parent.createPoint(1055,1330,"第二点");
+  self.parent.createPoint(2330,1230,"第三点");
+</script>
+```
+
+这样，读数据和初始法脚本就同时进行了。
+
+前面的图文简单的说就是：使用一个 Iframe 做后台，前台用脚本生成。也许担心，后台已经完成了，但前台还没有初始化的情况，你可以放心，因为读数据的过程肯定相对要慢，如果担心数据量少，只要你把脚本放在 Body 前面，Iframe 放在 Body 的最后面，就不会产生同步错误的问题了。
+
+现在来具体讲讲如何用脚本动态产生 VML 。其实这和用脚本动态产生 HTML 是一样的过程。
+
+```html
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+  <title>动态创建VML</title>
+  <style>
+    v\:* { BEHAVIOR: url(#default#VML) }
+  </style>
+  <script language="JavaScript">
+    function createPoint(x,y,v) {
+      var strElement="<v:rect title='"+v+"' style='top:"+x+";left:"+y+"width:100;height:100'></v:rect>";
+      var newPoint = document.createElement(strElemnt);
+      group1.insertBefore(newPoint);
+    }
+  </script>
+</head>
+<body>
+  <v:group ID="group1" style="WIDTH:200px;HEIGHT:200px;" coordsize = "200,200"></v:group>
+  <iframe src="readData.asp" name="data" style="display:none"></iframe>
+</body>
+</html>
+```
+
+相应的在 readData.asp 里面:
+
+```html
+<script>
+<%
+'数据库连接部分
+'读数据部分
+Do Until rs.EOF
+%>
+  parent.createPoint(<%=x%>,<%=y%>,<%=value%>);
+<%
+Loop
+'数据库关闭部分
+%>
+</script>
+```
+
+上面的颜色采用 HomeSite 4.5.2风格
+
+看完上面的，是否对这种模式有所理解呢？下面谈谈动态生成 VML 所要注意的一些问题，先说说 document 的 createElement 方法。IE版本不同， createElement 的使用也有所区别，在早期版本的IE， createElement 只能 创建 Select 里面 OPTION ，比如说 var newOption=document.createElement("OPTION"); 但在 IE5.0 以后，createElement 可以创建所有的对象，使用的方式是 var newElement=document.createElement(`<div id='oDIV'></div>`); 注意到没有， 这里的参数必须是个完成的 HTML 标记，而不是 DIV，用这个方法的好处就是，可以用一个语句把新创建的对象描述清楚。insertBefore 方法很好用，它把新创建的对象插入到 最后。
+
+我们一开始就有了 Group1 ，所有以后动态生成的 VML 直接插入到 Group1 的后面就可以了。曾经做了三个实验，第一个是普通的，用ASP生成 VML 代码；第二个是不用Iframe，在同一个页面生成脚本；第三个就是上面的例子，使用Iframe 产生脚本。结果 在大数据量的条件下，效率最高的是第三个，其次是第二个，第一个有明显的慢的感觉。
+
+接下来的一节，将讲述VML最激动人心的功能，放大缩小！
+
+#### 给VML增加事件
+
+VML 和 HTML 的紧密结合，使的给 VML　增加事件变得很容易．所有的 HTML 里面的事件都可以应用到 VML 中间来！下面的例子是演示：当鼠标移动到圆的时候，圆就跟着鼠标移动了，当鼠标点击后，圆停止移动。
+
+```html
+<v:oval id="circle" style="position:relative;width:100;height:80;" onmouseover="move()"fillcolor=red />
+<script>
+  var canmove=false;
+  function move() {
+    circle.style.position="absolute";
+    canmove=true;
+    document.onmousemove=new Function("if(canmove){circle.style.posLeft=event.x;circle.style.posTop=event.y;}");
+  }
+  document.onclick=new Function("canmove=false");
+</script>
+```
+
+不知道你有没有注意，VML的事件区域是严格按照本身的形状的，并不是像图片那样，都是矩形。顺便介绍一下 Function 对象，使用Function 对象，如果函数的内容比较少，而且调用就一次，就可以使用 Function 对象了，使用方法就是用 new 创建一个 Function 对象,参数就是 函数的内容。控制事件的比较好的办法是使用一个全局变量，一个事件的执行依赖一个全局变量，而另一个事件可以设置这个全局变量， 这样一来，就可以让事件来控制事件了。
+
+#### 数据图表
+
+现在我们来看看VML的一些应用。数据图表可以说是VML的拿手好菜。绘制图表，最重要的步骤是把数据转换成坐标。由于VML是矢量的， 给数据的取值范围有很大的自由度，因为你可以用带小数的坐标值，也可以是非常大的数据做为坐标值。
+
+在做图表之前，必须明确一些事情，要把图表看成一个整体，这意味着使用 Group 将 VML 包容起来；x,y 轴是在第四像限里面的；VML的大小由 width,height 决定，而不是由coordsize决定。接下来，让我们看看几个经典的图表。
+
+曲线图(走势图)：看起来是曲线，其实细分起来就是一段段小折线组成的。所以我们可以选择PolyLine来做。首先我们来画坐标轴：
+
+```html
+<v:group ID="group1" style="WIDTH:500pt;HEIGHT:300pt" coordsize="5000,3000">
+  <v:line from="200,100" to="200,2800" style="Z-INDEX:8;POSITION:absolute" strokeweight="1pt">
+    <v:stroke StartArrow="classic"/>
+  </v:line>
+  <v:line from="200,2800" to="4800,2800" style="Z-INDEX:8;POSITION:absolute" strokeweight="1pt">
+    <v:stroke EndArrow="classic"/>
+  </v:line>
+  <v:rect style="WIDTH:4900px;HEIGHT:3000px" coordsize="21600,21600" fillcolor="white" strokecolor="black" />
+</group>
+```
+
+也许你希望显示坐标轴上的刻度，这也很容易实现，我们可以用一个绝对定位的P来做坐标，在Group里面，使用绝对实际上是相对Group的相对定位的。坐标值需要你自己调整了。因为我们画分横坐标使用的是 px=200+73*i;(其中200是距离左边的距离) 纵坐标是 py=2800-73*i; (因为总共的高度是2800,所以要用减去)现在，把数据转换成坐标变得很容易了。 当然这里的 i 是 0,1,2..7 ，也可以是你具体的数据，换算的时候，只需要按照比例得到坐标值，比如说你的纵坐标的价值是从 100，200，300，..700 相应的反应到坐标上就是 px=200+73*i*1/100 (其中,i为数据值,1/100是坐标值和数据的比例)
+
+画图表的准备工作已经全部做好了，现在就差数据了。有了数据，把数据灌输到 PolyLine 里面，曲线就显示出来了。现在我们使用一些假数据，看看上面的效果如何！
+
+#### 矢量地图
+
+在国外很多网站上都有VML制作地图的应用，他们把这个应用叫做GIS (Geographic Information Systems) 翻译过来就是地理信息系统。在以前，如果要在网页上实现，必须编写 ActiveX 控件，或者使用 Java, 现在，使用VML就可以做到了。可以看看下面的地址：
+
+- [http://perso.wanadoo.fr/prosper/carto/demo.htm](#http://perso.wanadoo.fr/prosper/carto/demo.htm)
+- [http://www.vmlsource.com/vmlcanada.htm](#http://www.vmlsource.com/vmlcanada.htm)
+- 一个国外的VML地图(因为它初始页面限制只能使用IE 5.0 IE6 都不让看，我把框架拷贝了一份,去掉左边的 Railways 复选框效果会好些)
+
+本人因为参与一个和气象有关系的项目，也做了一个矢量地图（这次有机会整理一下VML，也是因为做了这个项目）。其实画出地图并不难，关键是数据的收集，数据的转换。一般来说地图的数据是经度和纬度，不考虑地球是球形的话，可以把经度和纬度看成是平行的坐标轴，那样数据就好处理多了。储存数据的时候也需要讲究一下，因为地图上可能并不都是连续的， 有岛屿什么的，所以，在两个不连续的数据中要用个特殊的数据标记一下，以便读出来的时候知道要从新开始画了。
+
+在画这个地图的前，地图的经纬度信息都知道了，接下来做的事情就是画坐标。然后转换数据。然后就可以生成地图了。
+
+看上去应该和显示中的地图差不多吧！不过你还可以对这个地图无止境的放大缩小，这就是 VML 强大之处。
+
+如果你对VML地图有兴趣，请查看 Iframe 中的源代码。下面一节，也是个比较实用的，介绍如何使用 VML 在文本上留痕。
+
+#### 文本修改留痕
+
+在办公自动化，公文审核的时候，就需要用到 留痕操作了，就是把修改的东西直接在文本上显示，而不直接改动它。在以前，我没有用VML去做，很勉强的用 TextRange 改变文本的颜色，然后增加一个层显示更改信息。第一次修改还可以实现， 但不能做到再次修改，因为，第二次修改的时候，那些原来创建的对象都消失了，而这些对象都是通过 Select 操作得到的，用户不选择，脚本就没有办法创建那些对象。
+
+不久前，我想到了 VML ，开始还觉得是不可能的事情，但我发现了 TextRange 对象一个很强大的方法 getClientRects(),这个方法可以返回 TextRange 对象包含的每一行的矩形信息。意思是说，如果你用鼠表选择一段文本，文本会自动高亮显示， 这样看上去就是一块块矩形组成的不规则图形。getClientRects 方法就可以得到这些矩形的坐标和高宽，这样一来，就可以在选择的文本外套一层 VML 画的矩形，Oh my god...真是酷呆了。当我第一次看到它的时候，兴奋的抱着小白(猫)满屋子乱跳。     接下来，讲讲 TextRange 对象以及 getClientRects 和 VML 结合画痕迹：
+
+TextRange 对象，顾名思义，文本区域，就是网页上的一部分区域，可以是文本也可以是图像和别的段落格式。所有能用鼠标选择的都可以变成 TextRange 对象。IE4 的时候就出现了。TextRange 有个强大的方法就是 execCommand()，它可以执行很多命令，动态更改网页中内容、样式。 创建 TextRange 对象一般有两种途径，一种是用户选择了一段文本，可以使用 var oTextRange=document.selection.createRange(); 还有种就是直接把document 创建成 TextRange :var oTextRange=document.createTextRane() 。不知道有没有注意，两个方式使用的函数不一样，第一个因为本省就是文字了，所有使用 createRange(), 第二个不能确定是否都是文字，所有，必须用 createTextRange()。
+
+使用 getClientRects 返回的是一个 TextRectangle 对象，它是一个集合，没个子集拥有四个属性 bottom,top,left,right ，就是两个角的坐标，这个坐标值是相对于页面的，所以可以直接应用到 VML 中来。
+
+```js
+function createRect(num) {
+  var newMark=document.createElement("<div id='mark"+num+"'></div>");
+  edit.insertBefore(newMark);
+  var oRcts = oTempRange.getClientRects();//oTempRange是一个 TextRange 对象
+  for(var i=0;i<oRcts.length;i++) {
+    var t=oRcts[i].top;
+    var l=oRcts[i].left;
+    var r=oRcts[i].right;
+    var b=oRcts[i].bottom;
+    var newRect=document.createElement("<v:roundRect oncontextmenu='popID="+num+";popUp();' id='Rect"+num+"no"+i+"' style='position:absolute;visibility:hidden' filled=f strokeColor=red strokeWeight=1.5pt></v:roundRect>");
+    newMark.insertBefore(newRect);
+    newRect.style.posTop=t+document.body.scrollTop-3;
+    newRect.style.posLeft=l-2;
+    newRect.style.width=r-l;
+    newRect.style.height=b-t;
+    newRect.style.visibility="";
+  }
+}
+```
+
+其他的代码就不再说了，我想说说整个脚本执行的过程。首先用户用鼠标选择一段文字，然后脚本马上把选择的文字创建成临时 TextRange 对象，并且通过 execCommand 把这段文字的背景颜色改掉，以做对比。当用户点右键的时候， 脚本检查到用户的事件源，如果临时 TextRange 对象存在，菜单上将显示 “标记选择中的”这项，如果事件源是已经标记过的文本，菜单上将显示“取消标记”这项。当用户意见选择“标记选中的”的时候，脚本弹出 对话框，提示用户意见输入对选择的这段文字的 处理。
+
+脚本得到用户的选择，就执行上面的代码，用 VML 把选择的文字框起来，然后生成一个层，上面记录的是修改的内容。当用户选择的“取消标记”，本身已经标记过的文字在点右键的事件上就有个 popID=XX 的表达式，popID是个全局变量， 通过这个popID 到 Document 中去寻找相应的 VML 标记和层，然后使他们的 outerHTML 为空，就起到了取消标记的目的！
+
+可以访问下面的页面，可以实现过程的：[文本修改留痕]( http://www.g168.net/txt/vml/test.html)
+
+到目前为止，关于VML的介绍已经全部写完了。当然我想这里面错误还是有的，理解上也有很不足，表达上还有欠缺的地方。由于 VML 应用的还不太普遍，但功能强大，我觉得有必要让大家都了解一下VML技术，至少让大家知道，很多东西其实都可以用VML完成的。大家一起研究吧！
 
 ## 媒体
 

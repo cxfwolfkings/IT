@@ -5,7 +5,8 @@
 1. [调试C#控制台应用](调试C#控制台应用)
 2. [调试.NET Core WebApi](#调试.NET&nbsp;Core&nbsp;WebApi)
 3. [git的配置](#git的配置)
-4. [配置项](#配置项)
+4. [快捷键](#快捷键)
+5. [配置项](#配置项)
 
 ## 调试C#控制台应用
 
@@ -354,21 +355,21 @@ vscode 自定义配置参考：
   },
   // vscode默认启用了根据文件类型自动设置tabsize的选项
   "editor.detectIndentation": false,
-  // #每次保存的时候自动格式化 
+  // #每次保存的时候自动格式化
   "editor.formatOnSave": true,
   // #每次保存的时候将代码按eslint格式进行修复
   "eslint.autoFixOnSave": true,
-  //  #让prettier使用eslint的代码格式进行校验 
+  //  #让prettier使用eslint的代码格式进行校验
   "prettier.eslintIntegration": true,
-  //  #去掉代码结尾的分号 
+  //  #去掉代码结尾的分号
   "prettier.semi": false,
-  //  #使用带引号替代双引号 
+  //  #使用带引号替代双引号
   "prettier.singleQuote": true,
   //  #让函数(名)和后面的括号之间加个空格
   "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
-  // #这个按用户自身习惯选择 
+  // #这个按用户自身习惯选择
   "vetur.format.defaultFormatter.html": "js-beautify-html",
-  // #让vue中的js按编辑器自带的ts格式进行格式化 
+  // #让vue中的js按编辑器自带的ts格式进行格式化
   "vetur.format.defaultFormatter.js": "vscode-typescript",
   "vetur.format.defaultFormatterOptions": {
     "js-beautify-html": {

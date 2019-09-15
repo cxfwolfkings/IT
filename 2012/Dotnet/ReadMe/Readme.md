@@ -10,14 +10,15 @@
    - [大型、关键业务应用程序指南](#大型、关键业务应用程序指南)
    - [模式和实践](#模式和实践)
 2. C#
-   - [GDI](./3.md)
+   - [GDI](./3.md#GDI+)
+   - [并发编程](./3.md#并发编程)
 3. CLR
 4. dotnet
    - [MVC](./1.md)
    - [WebAPI](./2.md)
    - [WCF](./4.md)
 5. dotnet core
-   - [.NET Core](./DotnetCore/0.md)
+   - [.NET Core](./core.md)
    - [ABP](./6.md)
 6. [附录](#附录)
    - [Debug远程访问](#Debug远程访问)
