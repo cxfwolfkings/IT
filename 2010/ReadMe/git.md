@@ -6,6 +6,7 @@
 2. [常见问题](#常见问题)
 3. [Git&nbsp;hook配置](#Git&nbsp;hook配置)
 4. [客户端工具](#客户端工具)
+5. [下载速度](#下载速度)
 
 官网：[https://git-scm.com/](https://git-scm.com/)
 
@@ -121,3 +122,20 @@ Git也具有在特定事件发生之前或之后执行特定脚本代码功能�
 - GitHub for Desktop
 - Source Tree
 - TortoiseGit
+
+## 下载速度
+
+1. 打开本机host文件
+
+2. 利用[网站](https://www.ipaddress.com/)查询IP：
+   - github.com
+   - github.global.ssl.fastly.net
+
+3. 配置在host中
+
+   ```sh
+   140.82.114.3 github.com
+   199.232.5.194 github.global.ssl.fastly.net
+   ```
+
+4. 刷新 DNS 缓存：`ipconfig /flushdns`，OK!
