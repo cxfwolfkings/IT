@@ -14,7 +14,7 @@
    - [并发编程](./3.md#并发编程)
 3. CLR
 4. dotnet
-   - [MVC](./1.md)
+   - [MVC](./MVC.md)
    - [WebAPI](./2.md)
    - [WCF](./4.md)
 5. dotnet core

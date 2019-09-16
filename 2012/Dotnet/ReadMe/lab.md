@@ -1,8 +1,8 @@
-# 项目总结
+# 实验室管理系统总结
 
 ## 目录
 
-1. [mvc](#mvc)
+1. [mvc](mvc)
    - [过滤器](#过滤器)
    - [登录](#登录)
    - [公用方法](#公用方法)
@@ -11,7 +11,8 @@
    - [分布式缓存](#分布式缓存)
      - [Redis](#Redis)
        - [StackExchange.Redis](#StackExchange.Redis)
-3. [前端](../../../../2015/Frontend/ReadMe/vue_2.md)
+3. [前端vue](#前端vue)
+4. [部署](#部署)
 
 ## mvc
 
@@ -456,9 +457,9 @@ IDistributedCache的Get/Set不像IMemoryCache可以存取任意型别，IDistrib
 
 下载免安装的Redis版本。下载地址：[https://github.com/MicrosoftArchive/redis/releases](https://github.com/MicrosoftArchive/redis/releases)
 
-在解压文件夹下运行命令：`redis-server.exe redis.windows.conf`
+在解压文件夹下运行命令：`./redis-server.exe redis.windows.conf`
 
-将redis安装成服务。运行 `redis-server.exe --service-install redis.windows.conf`
+将redis安装成服务。运行 `./redis-server.exe --service-install redis.windows.conf`
 
 使用命令行操作redis
 
@@ -593,3 +594,34 @@ IDistributedCache运做方式变成Session直接在Redis Cache存取，如果把
 
    Console.ReadKey();
    ```
+
+## 前端vue
+
+## 部署
+
+部署在IIS服务器上
+
+代码部分：`UseIIS()`
+
+![x](./Resource/47.png)
+
+发布配置：IIS
+
+![x](./Resource/48.png)
+
+IIS配置：
+
+![x](./Resource/49.png)
+
+[前端Vue部署](../../../2015/Frontend/ReadMe/vue.md#部署)
+
+IIS URLRewrite vue单页应用程序（history模式）
+
+- vue的单页应用部署后，当我们进入到某个路由之后，按F5刷新页面会出现404错误：
+- IIS下部署后的解决方案一般是使用 `URLRewrite`
+- 首先要安装[URLRewrite](https://www.iis.net/downloads/microsoft/url-rewrite)
+- 安装完 `URL重写工具2.0`，现在在IIS上添加重写规则
+  
+  ![x](./Resource/50.png)
+
+- 现在再刷新就不会404了

@@ -5,10 +5,16 @@
 1. [简介](简介)
    - [安装](#安装)
    - [起步](#起步)
-   - [过滤器](#过滤器)
-   - [周期事件](#周期事件)
-   - [计算属性](#计算属性)
-   - [监视](#监视)
+   - [模板语法](#模板语法)
+     - [插值](#插值)
+     - [过滤器](#过滤器)
+     - [指令](#指令)
+     - [语法糖](#语法糖)
+     - [用户输入](#用户输入)
+     - [周期事件](#周期事件)
+     - [计算属性](#计算属性)
+     - [监视](#监视)
+2. [开发](#开发)
    - [获取DOM元素](#获取DOM元素)
    - [mint-ui](#mint-ui)
    - [wappalyzer](#wappalyzer)
@@ -16,7 +22,8 @@
    - [vue-resource](#vue-resource)
    - [axios](#axios)
    - [i18n](#i18n)
-2. [总结](#总结)
+3. [部署](#部署)
+4. [总结](#总结)
 
 ## 简介
 
@@ -362,7 +369,162 @@ v-for的使用
 - 通过new Vue()这样的一个对象，来`$on('事件名',fn(prop1,pro2))`
 - 另一个组件引入同一个vuebus，来`$emit('事件名',prop1,pro2)`
 
-### 过滤器
+### 模板语法
+
+Vue.js 使用了基于 HTML 的模版语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
+
+Vue.js 的核心是一个允许你采用简洁的模板语法来声明式的将数据渲染进 DOM 的系统。
+
+结合响应系统，在应用状态改变时， Vue 能够智能地计算出重新渲染组件的最小代价并应用到 DOM 操作上。
+
+#### 插值
+
+文本：数据绑定最常见的形式就是使用 {{...}}（双大括号）的文本插值：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>{{ message }}</p>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue.js!'
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+Html：使用v-html指令用于输出html代码。这里要注意，如果将用户产生的内容使用v-html 输出后，有可能导致xss 攻击，所以要在服务端对用户提交的内容进行处理，一般可将尖括号"<>"转义。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div v-html="message"></div>
+  </div>
+  <script>
+  new Vue({
+    el: '#app',
+    data: {
+      message: '<h1>菜鸟教程</h1>'
+    }
+  })
+  </script>
+</body>
+</html>
+```
+
+属性：HTML属性中的值应使用 v-bind 指令。以下实例判断 class1 的值，如果为 true 使用 class1 类的样式，否则不使用该类：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <style>
+  .class1{
+    background: #444;
+    color: #eee;
+  }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+  <div id="app">
+    <label for="r1">修改颜色</label><input type="checkbox" v-model="use" id="r1">
+    <br><br>
+    <div v-bind:class="{'class1': use}">
+      v-bind:class 指令
+    </div>
+  </div>
+  <script>
+  new Vue({
+      el: '#app',
+      data:{
+          use: false
+      }
+  });
+  </script>
+</body>
+</html>
+```
+
+给元素绑定href时可以也绑一个target，新窗口打开页面。
+
+```html
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<div id="app">
+  <h2><a v-bind:href="url" v-bind:target="target">菜鸟教程</a></h2>
+</div>
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    url: 'http://www.runoob.com',
+    target:'_blank'
+  }
+})
+</script>
+```
+
+表达式：Vue提供了完全的 JavaScript 表达式支持。Vue只支持单个表达式，不支持语句和流控制。另外，在表达式中，不能使用用户自定义的全局变量，只能使用Vue白名单内的全局变量，例如Math和Date。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{5+5}}<br>
+    {{ ok ? 'YES' : 'NO' }}<br>
+    {{ message.split('').reverse().join('') }}
+    <div v-bind:id="'list-' + id">菜鸟教程</div>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        ok: true,
+        message: 'RUNOOB',
+        id : 1
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+当我们给一个比如 props 中，或者 data 中被观测的对象添加一个新的属性的时候，不能直接添加，必须使用 Vue.set 方法。
+
+Vue.set 方法用来新增对象的属性。如果要增加属性的对象是响应式的，那该方法可以确保属性被创建后也是响应式的，同时触发视图更新
+
+这里本来 food 对象是没有 count 属性的，我们要给其添加 count 属性就必须使用 Vue.set 方法，而不能写成this.food.count = 1
+
+如果想显示{{}}标签，而不进行替换，使用v-pre 即可跳过这个元素和它的子元素的编译过程。
+
+#### 过滤器
 
 - content | 过滤器，vue中没有提供相关的内置过滤器，可以自定义过滤器
 - 组件内的过滤器 + 全局过滤器
@@ -375,13 +537,182 @@ v-for的使用
   - 全局 ：范围大，如果出现同名时，权利小
   - 组件内: 如果出现同名时，权利大，范围小
 
-### 周期事件
+Vue允许你自定义过滤器，被用作一些常见的文本格式化。由“管道符”指示；过滤器函数接受表达式的值作为第一个参数。
+
+以下实例对输入的字符串第一个字母转为大写：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{ message | capitalize }}
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'runoob'
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+过滤器可以串联：{{ message | filterA | filterB }}。
+
+过滤器是 JavaScript 函数，因此可以接受参数：{{ message | filterA('arg1', arg2) }}。这里，message 是第一个参数，字符串 'arg1' 将传给过滤器作为第二个参数，arg2 表达式的值将被求值然后传给过滤器作为第三个参数。
+
+过滤器可以接收多个表达式，如下示例，message 和 mesage2 将作为过滤器的前两个参数：
+
+```html
+<div id="app">
+  {{ message,message2 | capitalize('aa') }}
+</div>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      message: 'runoob',
+      message2: 'runoob'
+    },
+    filters: {
+      capitalize: function (value,value2,value3) {
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)+value.substring(0,value2.length-1)+value2.charAt(value2.length-1).toUpperCase()+'<br>'+value3
+      }
+    }
+  })
+</script>
+```
+
+结果为：RunoobrunooB aa
+
+过滤器应当用于处理简单的文本转换，如果要实现更为复杂的数据变换，应该使用计算属性。
+
+#### 指令
+
+指令是带有 v- 前缀的特殊属性。用于在表达式的值改变时，将某些行为应用到DOM上。例如，v-if指令可以根据表达式seen的值(true或false)来决定是否插入p元素。
+
+参数：在指令后以冒号指明。例如，v-bind指令被用来响应地更新HTML属性：
+
+```html
+<a v-bind:href="url">菜鸟教程</a>
+```
+
+在这里href是参数，告知v-bind指令将该元素的href属性与表达式url的值绑定。给元素绑定href时可以也绑一个target，新窗口打开页面。
+
+另一个例子是v-on 指令，它用于监听 DOM 事件：
+
+```html
+<a v-on:click="doSomething">
+```
+
+在这里参数是监听的事件名。表达式可以是一个方法名，这些方法都写在Vue实例的methods属性内，并且是函数的形式，函数内的this指向的是当Vue实例本身，因此可以直接使用this.xxx的形式来访问或修改数据。表达式除了方法名，也可以直接是一个内联语句。Vue将methods里的方法也代理了，所以也可以像访问Vue数据那样来调用方法。
+
+修饰符：以半角句号.指明的特殊后缀，用于指出一个指定应该以特殊方式绑定。例如，.prevent修饰符告诉v-on指令对于触发的事件调用 event.preventDefault()：
+
+```html
+<form v-on:submit.prevent="onSubmit"></form>
+```
+
+#### 语法糖
+
+语法糖是指在不影响功能的情况下，添加某种方法实现同样的效果，从而方便程序开发。
+
+Vue.js为两个最为常用的指令提供了特别的缩写：
+
+v-bind缩写：v-bind:xxx -> :xxx
+
+v-on 缩写：v-on:evnetName -> @evnetName
+
+#### 用户输入
+
+在 input 输入框中我们可以使用 v-model 指令来实现双向数据绑定：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>{{ message }}</p>
+    <input v-model="message">
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Runoob!'
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+v-model 指令用来在 input、select、textarea、checkbox、radio 等表单控件元素上创建双向数据绑定，根据表单上的值，自动更新绑定的元素的值。
+
+按钮的事件我们可以使用 v-on 监听，并对用户的输入进行响应。
+
+以下实例在用户点击按钮后对字符串进行反转操作：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>{{ message }}</p>
+    <button v-on:click="reverseMessage">反转字符串</button>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Runoob!'
+      },
+      methods: {
+        reverseMessage: function () {
+          this.message = this.message.split('').reverse().join('')
+        }
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+#### 周期事件
 
 - 声明周期事件（钩子）回调函数
   - created: 数据的初始化、DOM没有生成
   - mounted: 将数据装载到DOM元素上，此时有DOM
 
-### 计算属性
+#### 计算属性
 
 - 案例：
   - 计算器
@@ -395,15 +726,16 @@ v-for的使用
     // 凡是与this相关的属性在计算属性中出现，任意一个发生改变，就会触发
     ```
 
-### 监视
+#### 监视
 
 - watch 可以对（单个）变量进行监视，也可以深度监视
 - 如果需求是对于10个变量进行监视？
-- 计算属性computed 可以监视多个值，并且指定返回数据，并且可以显示
-- 是options中的根属性
-  - watch监视单个
-  - computed可以监视多个this相关属性值的改变，如果和原值一样
-  - 不会触发函数的调用，并且可以返回对象
+- 计算属性 computed 可以监视多个值，并且指定返回数据，并且可以显示
+- options 中的根属性
+  - watch 监视单个
+  - computed 可以监视多个 this 相关属性值的改变，如果和原值一样不会触发函数的调用，并且可以返回对象
+
+## 开发
 
 ### 获取DOM元素
 
@@ -636,6 +968,8 @@ beforeRouteLeave (to, from, next) {
 - index.html -> 中国人
 - index.html -> 美国人
 - vue-i18n
+
+## 部署
 
 ## 总结
 

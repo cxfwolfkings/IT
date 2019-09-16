@@ -2,7 +2,7 @@
 
 ## 目录
 
-1. [简介](#简介)
+1. [简介](简介)
    - [数字](#数字)
    - [垃圾回收](#垃圾回收)
    - [代码执行](#代码执行)
@@ -10,15 +10,20 @@
    - [最优方法](#最优方法)
    - [CLR](#CLR)
    - [管道模型](#管道模型)
+2. [开发](#开发)
+   - [日志](#日志)
+     - [NLog](#NLog)
+   - [Filter](#Filter)
+   - [依赖注入](#依赖注入)
    - [模块化](#模块化)
    - [结构化配置](#结构化配置)
    - [多环境开发](#多环境开发)
    - [单元测试](#单元测试)
-   - [发布](#发布)
-2. [日志](./1.md)
-3. [Filter](./3.md)
-4. [依赖注入](./4.md)
-5. [项目总结](./sc.md)
+   - [EF Core](#EFCore)
+3. [部署](#部署)
+4. 项目总结
+   - [实验室管理系统](./lab.md)
+5. [参考](#参考)
 
 ## 简介
 
@@ -586,6 +591,137 @@ Middleware支持Run、Use和Map三种方法进行注册。
 
    ![pipeline](../Resource/4.png)
 
+## 开发
+
+### 日志
+
+在.Net Core框架里，日志功能主要由 ILoggerFactory, ILoggerProvider, ILogger 这三个接口体现。
+
+![Logger](../Resource/1.png)
+
+1. ILoggerFactory：工厂接口。只提供注册LoggerProvider的方法和创建单实例Logger对象的方法。
+2. ILoggerProvider：提供真正具有日志输出功能的Logger对象的接口。每一种日志输出方式对应一个不同的LoggerProvider类。
+3. ILogger：Logger接口。Logger实例内部会维护一个ILogger接口的集合，集合的每一项都是由对应的LoggerProvider类注册生成的Logger对象而来。当调用Logger的日志输出方法时，实际是循环调用内部集合的每一个Logger对象的输出方法，所以就能看到不同效果。
+
+添加包：  
+
+```bat
+dotnet add package Microsoft.Extensions.Logging  
+dotnet add package Microsoft.Extensions.Logging.Console  
+dotnet add package Microsoft.Extensions.Logging.Debug  
+dotnet add package Microsoft.Extensions.Logging.Filter
+```
+
+日志级别从低到高一共六级，默认情况下，控制台上输出的日志会采取下面的格式：  
+日志等级 | 显示文字 |  前景色 | 背景色 | 说明  
+-|-|-|-|-
+Trace | trce | Gray | Black | 包含最详细消息的日志。 这些消息可能包含敏感的应用程序数据。 默认情况下禁用这些消息，并且不应在生产环境中启用这些消息。
+Debug | dbug | Gray | Black | 在开发过程中用于交互式调查的日志。 这些日志应主要包含对调试有用的信息，不具有长期价值。
+Information | info | DarkGreen | Black | 跟踪应用程序的一般流程的日志。 这些日志应具有长期价值。
+Warning | warn | Yellow | Black | 突出显示应用程序流中异常或意外事件的日志，但是否则不会导致应用程序执行停止。
+Error | fail | Red | Black | 当当前执行流程由于失败而停止时，会突出显示的日志。这些应该指示当前活动中的故障，而不是应用程序范围的故障。
+Critical | cril | White | Red | 描述不可恢复的应用程序或系统崩溃或灾难性的日志失败需要立即关注。
+None |  |  |  | 不用于写日志消息。 指定记录类别不应写任何消息。
+
+#### NLog
+
+NLog是一个简单灵活的.Net日志记录类库。相比Log4Net来说，配置要简单许多。
+
+添加包：
+
+```bat
+dotnet add package NLog.Extensions.Logging
+dotnet add package NLog.Web.AspNetCore
+```
+
+### Filter
+
+#### 1、MVC框架内置过滤器
+
+下图展示了 Asp.Net Core MVC 框架默认实现的过滤器的执行顺序：
+
+![Filter](../Resource/5.png)
+
+- Authorization Filters：身份验证过滤器，处在整个过滤器通道的最顶层。对应的类型为：AuthorizeAttribute.cs
+- Resource Filters：资源过滤器。因为所有的请求和响应都将经过这个过滤器，所以在这一层可以实现类似缓存的功能。对应的接口有同步和异步两个版本：IResourceFilter.cs、IAsyncResourceFilter.cs
+- Action Filters：方法过滤器。在控制器的Action方法执行之前和之后被调用，一个很常用的过滤器。对应的接口有同步和异步两个版本：IActionFilter.cs、IAsyncActionFilter.cs
+- Exception Filters：异常过滤器。当Action方法执行过程中出现了未处理的异常，将会进入这个过滤器进行统一处理，也是一个很常用的过滤器。对应的接口有同步和异步两个版本：IExceptionFilter.cs、IAsyncExceptionFilter.cs
+- Result Filters：返回值过滤器。当Action方法执行完成的结果在组装或者序列化前后被调用。对应的接口有同步和异步两个版本：IResultFilter.cs、IAsyncResultFilter.cs
+
+#### 2、过滤器的引用
+
+1. 作为特性标识引用  
+标识在控制器上，则访问这个控制器下的所有方法都将调用这个过滤器；也可以标识在方法上，则只有被标识的方法被调用时才会调用过滤器。
+
+2. 全局过滤器  
+使用了全局过滤器后，所有的控制器下的所有方法被调用时都将调用这个过滤器。
+
+3. 通过ServiceFilter引用  
+通过在控制器或者Action方法上使用ServiceFilter特性标识引用过滤器。通过此方法可以将通过构造方法进行注入并实例化的过滤器引入框架内。
+
+4. 通过TypeFilter引入  
+用TypeFilter引用过滤器不需要将类型注入到DI容器。另外，也可以通过TypeFilter引用需要通过构造方法注入进行实例化的过滤器。
+
+#### 3、自定义过滤器执行顺序
+
+以ActionFilter执行顺序为例，默认执行顺序如下：
+
+1. Controller OnActionExecuting
+2. Global OnActionExecuting
+3. Class OnActionExecuting
+4. Method OnActionExecuting
+5. Method OnActionExecuted
+6. Class OnActionExecuted
+7. Global OnActionExecuted
+8. Controller OnActionExecuted
+
+#### 4、过滤器与中间件
+
+1. 过滤器是MVC框架的一部分，中间件属于 Asp.Net Core 管道的一部分。
+2. 过滤器在处理请求和响应时更加的精细一些，在用户权限、资源访问、Action执行、异常处理、返回值处理等方面都能进行控制和处理。而中间件只能粗略的过滤请求和响应。
+
+### 依赖注入
+
+#### 1、概念介绍
+
+Dependency Injection：又称依赖注入，简称DI。在以前的开发方式中，层与层之间、类与类之间都是通过 new 一个对方的实例进行相互调用，这样在开发过程中有一个好处，可以清晰的知道在使用哪个具体的实现。随着软件体积越来越庞大，逻辑越来越复杂，当需要更换实现方式，或者依赖第三方系统的某些接口时，这种相互之间持有具体实现的方式不再合适。为了应对这种情况，就要采用契约式编程：相互之间依赖于规定好的契约（接口），不依赖于具体的实现。这样带来的好处是相互之间的依赖变得非常简单，又称松耦合。至于契约和具体实现的映射关系，则会通过配置的方式在程序启动时由运行时确定下来。这就会用到DI。
+
+#### 2、DI的注册与注入
+
+在 Startup.cs 的 ConfigureServices 的方法里，通过参数的 AddScoped 方法，指定接口和实现类的映射关系，注册到 DI 容器里。在控制器里，通过构造方法将具体的实现注入到对应的接口上，即可在控制器里直接调用了。除了在 ConfigureServices 方法里进行注册外，还可以在 Main 函数里进行注册，等效于 Startup.cs 的 ConfigureServices 方法。
+
+通常依赖注入的方式有三种：构造函数注入、属性注入、方法注入。在Asp.Net Core里，采用的是构造函数注入。
+
+在以前的 Asp.Net MVC 版本里，控制器必须有一个无参的构造函数，供框架在运行时调用创建控制器实例，在 Asp.Net Core 里，这不是必须的了。当访问控制器的 Action 方法时，框架会依据注册的映射关系生成对应的实例，通过控制器的构造函数参数注入到控制器中，并创建控制器实例。
+
+当构造函数有多个，并且参数列表不同时，框架又会采用哪一个构造函数创建实例呢？
+
+框架在选择构造函数时，会依次遵循以下两点规则：
+
+1. 使用有效的构造函数创建实例
+2. 如果有效的构造函数有多个，选择参数列表集合是其他所有构造函数参数列表集合的超集的构造函数创建实例
+
+如果以上两点都不满足，则抛出 System.InvalidOperationException 异常。
+
+![DI](../Resource/6.png)
+
+Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以直接在构造函数和 Startup.cs 的方法里注入使用
+
+![DI](../Resource/7.png)
+
+#### 3、生命周期管理
+
+框架对注入的接口创建的实例有一套生命周期的管理机制，决定了将采用什么样的创建和回收实例。
+
+![DI](../Resource/8.png)
+
+在同一个请求里，Transient对应的实例都是不一致的，Scoped对应的实例是一致的。而在不同的请求里，Scoped对应的实例是不一致的。在两个请求里，Singleton对应的实例都是一致的。
+
+#### 4、第三方DI容器
+
+除了使用框架默认的DI容器外，还可以引入其他第三方的DI容器。比如：Autofac，引入Autofac的nuget包：
+> dotnet add package Autofac.Extensions.DependencyInjection
+
 ### 模块化
 
 - .NET Core的另一个考虑是构建和实现模块化的应用程序。
@@ -824,13 +960,70 @@ Middleware支持Run、Use和Map三种方法进行注册。
    dotnet add package Newtonsoft.Json
    ```
 
-### 发布
+## EFCore
 
-- Asp.Net Core在Windows上可以采用两种运行方式。一种是自托管运行，另一种是发布到IIS托管运行。
+### 添加初始种子数据
 
-1. 自托管
+1. 在DataContext中重写OnModelCreating方法
 
-   （1）依赖 `.Net Core` 环境
+   ```C#
+   public class DataContext : DbContext
+   {
+       protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+       {
+            optionsBuilder.UseMySQL("server=localhost;userid=root;pwd=123456;port=3306;database=test;sslmode=none;");
+       }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<City>().HasData(
+                new City{ Id = 1, Name = "成都" }, new City { Id =5, Name = "北京" });
+        }
+
+        public  DbSet<City> Citys { get; set; }
+   }
+   ```
+
+   其中，
+
+   ```C#
+   modelBuilder.Entity<City>().HasData( new City { Id = 1, Name = "成都" }, new City { Id =5, Name = "北京" });
+   ```
+
+   就是要添加的初始种子数据
+
+2. 在程序包管理器中执行 add-migration initcitydata 命令
+
+   initcitydata是迁移文件的名字（时间戳 + 文件名）
+
+   输出如下：To undo this action, use Remove-Migration.标识生成代码执行成功
+
+3. 在程序包管理器中执行update-database命令
+
+   输出如下：
+
+   ```sh
+   Applying migration '20190513104003_changehasdata'.
+   Done.
+   ```
+
+   并检查数据库中数据是否被初始化，如数据正常表示更新数据库操作成功
+
+   如果在生产环境上不同版本数据库字段有修改该如何更新，可以在DbContext初始化时增加
+
+   ```C#
+   Database.SetInitializer(new MigrateDatabaseToLatestVersion<OrderContext, Configuration>());
+   ```
+
+   示例地址：[https://github.com/HeBianGu/.NetCore-LearnDemo.git](https://github.com/HeBianGu/.NetCore-LearnDemo.git)
+
+## 部署
+
+`Asp.Net Core`在Windows上可以采用两种运行方式。一种是自托管运行，另一种是发布到IIS托管运行。
+
+### 自托管
+
+1. 依赖 `.Net Core` 环境
 
    ```sh
    # 发布：
@@ -839,11 +1032,11 @@ Middleware支持Run、Use和Map三种方法进行注册。
    dotnet xxx.dll
    ```
 
-   （2）自带运行时发布
+2. 自带运行时发布
 
-    在跨平台发布时，`.Net Core` 可以通过配置的方式指定目标平台，在发布时将对应的运行时一并打包发布。
+   在跨平台发布时，`.Net Core` 可以通过配置的方式指定目标平台，在发布时将对应的运行时一并打包发布。
 
-    这样目标平台不需要安装 `.Net Core` 环境就可以部署。
+   这样目标平台不需要安装 `.Net Core` 环境就可以部署。
 
    cmd 窗口运行 `dotnet restore` 命令，还原目标平台相关的包。这个过程耗时较长。还原完成后，执行 `dotnet publish` 命令进行发布
 
@@ -854,9 +1047,11 @@ Middleware支持Run、Use和Map三种方法进行注册。
    dotnet publish -r ubuntu.14.04-x64
    ```
 
-2. IIS托管
+### IIS托管
 
-   首先要安装一个工具[.NET Core Windows Server Hosting](https://go.microsoft.com/fwlink/?LinkId=817246)。该工具支持将IIS作为一个反向代理，将请求导向Kestrel服务器。引入相关nuget包：
+1. 首先要安装一个工具[.NET Core Windows Server Hosting](https://go.microsoft.com/fwlink/?LinkId=817246)。
+
+   该工具支持将IIS作为一个反向代理，将请求导向Kestrel服务器。引入相关nuget包：
 
    ```sh
    dotnet add package Microsoft.AspNetCore.Server.IISIntegration
@@ -888,9 +1083,11 @@ Middleware支持Run、Use和Map三种方法进行注册。
    </configuration>
    ```
 
-   执行 `dotnet publish` 发布后开始配置IIS，修改应用程序池，.Net CLR 版本修改为：无托管代码
+2. 执行 `dotnet publish` 发布后开始配置IIS，修改应用程序池，.Net CLR 版本修改为：无托管代码
 
-   在上面的例子里，IIS 通过 `Asp.Net Core Module`，提供了反向代理的机制。通过访问 IIS 地址，将请求导向 `Asp.Net Core` 内置的 Kestrel 服务器，经过处理后再反向回传到 IIS。整个过程 IIS 只作为一个桥梁，不做任何逻辑处理。
+在上面的例子里，IIS 通过 `Asp.Net Core Module`，提供了反向代理的机制。通过访问 IIS 地址，将请求导向 `Asp.Net Core` 内置的 Kestrel 服务器，经过处理后再反向回传到 IIS。整个过程 IIS 只作为一个桥梁，不做任何逻辑处理。
+
+### [查看项目部署示例](./lab#部署)
 
 ## 参考
 
