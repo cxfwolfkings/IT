@@ -7,3 +7,8 @@
    - 变量，表达式和语句
    - 函数
 3. [Web开发](./2.md)
+4. [参考](#参考)
+
+## 参考
+
+- [100天从新手到大师](https://github.com/jackfrued/Python-100-Days)
