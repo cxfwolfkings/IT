@@ -18,6 +18,8 @@
    - [Web Workers](#Web&nbsp;Workers)
    - [Server-Sent事件](#Server-Sent事件)
 3. [总结](#总结)
+   - [常用对象](#常用对象)
+   - [call、Apply](#call、Apply)
    - [encode、decode](#encodeURI、encodeURIComponent、decodeURI、decodeURIComponent)
    - [content="IE=edge,chrome=1"详解](#content="IE=edge,chrome=1"详解)
    - [中文乱码问题](#中文乱码问题)
@@ -34,10 +36,13 @@
    - [获取数组中的最大值和最小值的方法汇总](#获取数组中的最大值和最小值的方法汇总)
    - [理解javascript中的Function.prototype.bind](#理解javascript中的Function.prototype.bind)
    - [动态加载JS和CSS](#动态加载JS和CSS)
+   - [Cookie](#Cookie)
    - [with](#with)
    - [打印](#打印)
    - [异步](#异步)
    - [跨域](#跨域)
+   - [JS制作的日期](./datetime.html)
+   - [HTML-embed标签详解](#HTML-embed标签详解)
 
 ## DOM
 
@@ -1723,6 +1728,350 @@ flush();
 
 ## 总结
 
+### 常用对象
+
+```sh
+网页可见区域宽： document.body.clientWidth;
+网页可见区域高： document.body.clientHeight;
+网页可见区域宽： document.body.offsetWidth （包括边线的宽）
+网页可见区域高： document.body.offsetHeight （包括边线的宽）
+网页正文全文宽： document.body.scrollWidth;
+网页正文全文高： document.body.scrollHeight;
+网页被卷去的高： document.body.scrollTop;
+网页被卷去的左： document.body.scrollLeft;
+网页正文部分上： window.screenTop;
+网页正文部分左： window.screenLeft;
+屏幕分辨率的高： window.screen.height;
+屏幕分辨率的宽： window.screen.width;
+屏幕可用工作区高度： window.screen.availHeight;
+屏幕可用工作区宽度：window.screen.availWidth;
+
+scrollHeight: 获取对象的滚动高度。  
+scrollLeft:设置或获取位于对象左边界和窗口中目前可见内容的最左端之间的距离
+scrollTop:设置或获取位于对象最顶端和窗口中可见内容的最顶端之间的距离
+scrollWidth:获取对象的滚动宽度
+offsetHeight:获取对象相对于版面或由父坐标 offsetParent 属性指定的父坐标的高度
+offsetLeft:获取对象相对于版面或由 offsetParent 属性指定的父坐标的计算左侧位置
+offsetTop:获取对象相对于版面或由 offsetTop 属性指定的父坐标的计算顶端位置  
+event.clientX 相对文档的水平座标
+event.clientY 相对文档的垂直座标
+
+event.offsetX 相对容器的水平坐标
+event.offsetY 相对容器的垂直坐标  
+document.documentElement.scrollTop 垂直方向滚动的值
+event.clientX+document.documentElement.scrollTop 相对文档的水平座标+垂直方向滚动的量
+要获取当前页面的滚动条纵坐标位置，用：
+document.documentElement.scrollTop;
+而不是：
+document.body.scrollTop;
+documentElement 对应的是 html 标签，而 body 对应的是 body 标签
+
+事件源对象
+event.srcElement.tagName
+event.srcElement.type
+
+捕获释放
+event.srcElement.setCapture();  
+event.srcElement.releaseCapture();  
+
+事件按键
+event.keyCode
+event.shiftKey
+event.altKey
+event.ctrlKey
+
+事件返回值
+event.returnValue
+
+鼠标位置
+event.x
+event.y
+
+窗体活动元素
+document.activeElement
+
+绑定事件
+document.captureEvents(Event.KEYDOWN);
+
+访问窗体元素
+document.all("txt").focus();
+document.all("txt").select();
+
+窗体命令
+document.execCommand
+
+窗体COOKIE
+document.cookie
+
+菜单事件
+document.oncontextmenu
+
+创建元素
+document.createElement("SPAN");  
+
+根据鼠标获得元素：
+document.elementFromPoint(event.x,event.y).tagName=="TD"
+document.elementFromPoint(event.x,event.y).appendChild(ms)  
+
+窗体图片
+document.images[索引]
+
+窗体事件绑定
+document.onmousedown=scrollwindow;
+
+元素
+document.窗体.elements[索引]
+
+对象绑定事件
+document.all.xxx.detachEvent('onclick',a);
+
+插件数目
+navigator.plugins
+
+取变量类型
+typeof($js_libpath) == "undefined"
+
+下拉框
+下拉框.options[索引]
+下拉框.options.length
+
+查找对象
+document.getElementsByName("r1");
+document.getElementById(id);
+
+定时
+timer=setInterval('scrollwindow()',delay);
+clearInterval(timer);
+
+UNCODE编码
+escape() ,unescape
+
+父对象
+obj.parentElement(dhtml)
+obj.parentNode(dom)
+
+交换表的行
+TableID.moveRow(2,1)
+
+替换CSS
+document.all.csss.href = "a.css";
+
+并排显示
+display:inline
+
+隐藏焦点
+hidefocus=true
+
+根据宽度换行
+style="word-break:break-all"
+
+自动刷新
+<meta HTTP-EQUIV="refresh" C>
+
+简单邮件
+<a href="mailto:aaa@bbb.com?subject=ccc&body=xxxyyy">  
+
+快速转到位置
+obj.scrollIntoView(true)
+
+锚
+<a name="first">
+<a href="#first">anchors</a>
+
+网页传递参数
+location.search();
+
+可编辑
+obj.contenteditable=true
+
+执行菜单命令
+obj.execCommand
+
+双字节字符
+/[^\x00-\xff]/
+
+汉字
+/[\u4e00-\u9fa5]/
+
+让英文字符串超出表格宽度自动换行
+word-wrap: break-word; word-break: break-all;
+
+透明背景
+<IFRAME src="1.htm" width=300 height=180 allowtransparency></iframe>
+
+获得style内容
+obj.style.cssText
+
+HTML标签
+document.documentElement.innerHTML
+
+第一个style标签
+document.styleSheets[0]
+
+style标签里的第一个样式
+document.styleSheets[0].rules[0]
+
+防止点击空链接时，页面往往重置到页首端。
+<a href="javascript unction()">word</a>
+
+上一网页源
+asp:
+request.servervariables("HTTP_REFERER")
+javascript:
+document.referrer
+
+释放内存
+CollectGarbage();
+
+禁止右键
+document.oncontextmenu = function() { return false;}
+
+禁止保存
+<noscript><iframe src="*.htm"></iframe></noscript>
+
+禁止选取
+<body oncontextmenu="return false" ondragstart="return false" onselectstart ="return false" onselect="document.selection.empty()" oncopy="document.selection.empty()" onbeforecopy="return false"onmouseup="document.selection.empty()">
+
+禁止粘贴
+<input type=text>
+
+地址栏图标
+<link rel="Shortcut Icon" href="favicon.ico">
+favicon.ico 名字最好不变16*16的16色,放虚拟目录根目录下
+
+收藏栏图标
+<link rel="Bookmark" href="favicon.ico">
+
+查看源码
+<input type=button value=查看网页源代码>
+
+关闭输入法
+<input style="ime-mode isabled">
+
+自动全选
+<input type=text name=text1 value="123">
+
+ENTER键可以让光标移到下一个输入框
+<input >
+
+文本框的默认值
+<input type=text value="123">
+
+title换行
+obj.title = "123 sdfs"
+
+获得时间所代表的微秒
+var n1 = new Date("2004-10-10".replace(/-/g, "\/")).getTime()
+
+窗口是否关闭
+win.closed
+
+checkbox扁平
+<input type=checkbox style="position: absolute; clip:rect(5px 15px 15px 5px)"><br>
+
+获取选中内容
+document.selection.createRange().duplicate().text
+
+自动完成功能
+
+<input  type=text  autocomplete=on>打开该功能  
+<input  type=text  autocomplete=off>关闭该功能
+窗口最大化
+<body >
+
+无关闭按钮IE
+window.open("aa.htm", "meizz", "fullscreen=7");
+
+统一编码/解码
+alert(decodeURIComponent(encodeURIComponent("http://你好.com?as= hehe")))
+encodeURIComponent对":"、"/"、";" 和 "?"也编码
+
+表格行指示
+```
+
+```html
+<tr>
+//各种尺寸
+s  +=  "\r\n网页可见区域宽："+  document.body.clientWidth;
+s  +=  "\r\n网页可见区域高："+  document.body.clientHeight;
+s  +=  "\r\n网页可见区域高："+  document.body.offsetWeight  +"  (包括边线的宽)";
+s  +=  "\r\n网页可见区域高："+  document.body.offsetHeight  +"  (包括边线的宽)";
+s  +=  "\r\n网页正文全文宽："+  document.body.scrollWidth;
+s  +=  "\r\n网页正文全文高："+  document.body.scrollHeight;
+s  +=  "\r\n网页被卷去的高："+  document.body.scrollTop;
+s  +=  "\r\n网页被卷去的左："+  document.body.scrollLeft;
+s  +=  "\r\n网页正文部分上："+  window.screenTop;
+s  +=  "\r\n网页正文部分左："+  window.screenLeft;
+s  +=  "\r\n屏幕分辨率的高："+  window.screen.height;
+s  +=  "\r\n屏幕分辨率的宽："+  window.screen.width;
+s  +=  "\r\n屏幕可用工作区高度："+  window.screen.availHeight;
+s  +=  "\r\n屏幕可用工作区宽度："+  window.screen.availWidth;
+```
+
+### call、Apply
+
+我们知道，Array.prototype.slice.call(arguments)能将具有length属性的对象转成数组，除了IE下的节点集合（因为ie下的dom对象是以com对象的形式实现的，js对象与com对象不能进行转换）。如：
+
+```js
+var a={length:2,0:'first',1:'second'};
+Array.prototype.slice.call(a); // ["first", "second"]
+  
+var a={length:2};
+Array.prototype.slice.call(a); // [undefined, undefined]
+```
+
+可能刚开始学习js的童鞋并不是很能理解这句为什么能实现这样的功能。比如我就是一个，所以，来探究一下。
+
+首先，slice有两个用法，一个是String.slice,一个是Array.slice，第一个返回的是字符串，第二个返回的是数组，这里我们看第2个。
+
+```js
+Array.prototype.slice.call(arguments) // 能够将arguments转成数组，那么就是arguments.toArray().slice();到这里，是不是就可以说Array.prototype.slice.call(arguments)的过程就是先将传入进来的第一个参数转为数组，再调用slice？
+```
+
+再看call的用法，如下例子
+
+```js
+var a = function(){
+  console.log(this);    // 'littledu'
+  console.log(typeof this);      //  Object
+  console.log(this instanceof String);    // true
+}
+a.call('littledu');
+```
+
+可以看出，call了后，就把当前函数推入所传参数的作用域中去了，不知道这样说对不对，但反正this就指向了所传进去的对象就肯定的了。
+
+到这里，基本就差不多了，我们可以大胆猜一下slice的内部实现，如下
+
+```js
+Array.prototype.slice = function(start,end){
+  var result = new Array();
+  start = start || 0;
+  end = end || this.length; //this指向调用的对象，当用了call后，能够改变this的指向，也就是指向传进来的对象，这是关键
+  for(var i = start; i < end; i++){
+    result.push(this[i]);
+  }
+  return result;
+}
+```
+
+最后，附个转成数组的通用函数
+
+```js
+var toArray = function(s){
+  try{
+    return Array.prototype.slice.call(s);
+  } catch(e){
+    var arr = [];
+    for(var i = 0,len = s.length; i < len; i++){
+      //arr.push(s[i]);
+      arr[i] = s[i];  //据说这样比push快
+    }
+    return arr;
+  }
+}
+```
+
 ### encodeURI、encodeURIComponent、decodeURI、decodeURIComponent
 
 1、用来编码和解码URI的
@@ -2734,4 +3083,198 @@ foreach (Match match in collection) {
     html = html.Replace(match.Groups[match.Groups.Count - 2].Value, url);
   }
 }
+```
+
+### HTML-embed标签详解
+
+一、基本语法：embed src=url
+
+说明：embed可以用来插入各种多媒体，格式可以是 Midi、Wav、AIFF、AU、MP3等等，
+      Netscape及新版的IE 都支持。url为音频或视频文件及其路径，可以是相对路径或绝对路径。
+
+示例：
+
+```html
+<embed src="your.mid">
+```
+
+二、属性设置：
+
+1、自动播放：
+
+语法：autostart=true、false
+
+说明：该属性规定音频或视频文件是否在下载完之后就自动播放。
+
+- true：音乐文件在下载完之后自动播放；
+- false：音乐文件在下载完之后不自动播放。
+
+示例：
+
+```html
+<embed src="your.mid" autostart=true>
+<embed src="your.mid" autostart=false>
+```
+
+2、循环播放：
+
+语法：loop=正整数、true、false
+
+说明：该属性规定音频或视频文件是否循环及循环次数。
+
+属性值为正整数值时，音频或视频文件的循环次数与正整数值相同；
+
+- 属性值为true时，音频或视频文件循环；
+- 属性值为false时，音频或视频文件不循环。
+
+示例：
+
+```html
+<embed src="your.mid" autostart=true loop=2>
+<embed src="your.mid" autostart=true loop=true>
+<embed src="your.mid" autostart=true loop=false>
+```
+
+3、面板显示：
+
+语法：hidden=ture、no
+
+说明：该属性规定控制面板是否显示，默认值为no。
+
+- ture：隐藏面板；
+- no：显示面板。
+
+示例：
+
+```html
+<embed src="your.mid" hidden=ture>
+<embed src="your.mid" hidden=no>
+```
+
+4、开始时间：
+
+语法：starttime=mm:ss（分：秒）
+
+说明：该属性规定音频或视频文件开始播放的时间。未定义则从文件开头播放。
+
+示例：
+
+```html
+<embed src="your.mid" starttime="00:10">
+```
+
+5、音量大小：
+
+语法：volume=0-100之间的整数
+
+说明：该属性规定音频或视频文件的音量大小。未定义则使用系统本身的设定。
+
+示例：
+
+```html
+<embed src="your.mid" volume="10">
+```
+
+6、容器属性：
+
+语法：height=# width=#
+
+说明：取值为正整数或百分数，单位为像素。该属性规定控制面板的高度和宽度。
+
+- height：控制面板的高度；
+- width：控制面板的宽度。
+
+示例：
+
+```html
+<embed src="your.mid" height=200 width=200>
+```
+
+7、容器单位：
+
+语法：units=pixels、en
+
+说明：该属性指定高和宽的单位为pixels或en。
+
+示例：
+
+```html
+<embed src="your.mid" units="pixels" height=200 width=200>
+<embed src="your.mid" units="en" height=200 width=200>
+```
+
+8、外观设置：
+
+语法：controls=console、smallconsole、playbutton、pausebutton、stopbutton、
+      volumelever 说明：该属性规定控制面板的外观。默认值是console。
+
+- console：一般正常面板；
+- smallconsole：较小的面板；
+- playbutton：只显示播放按钮；
+- pausebutton：只显示暂停按钮；
+- stopbutton：只显示停止按钮；
+- volumelever：只显示音量调节按钮。
+
+示例：
+
+```html
+<embed src="your.mid" controls=smallconsole>
+<embed src="your.mid" controls=volumelever>
+```
+
+9、对象名称：
+
+语法：name=#
+
+说明：#为对象的名称。该属性给对象取名，以便其他对象利用。
+
+示例：
+
+```html
+<embed src="your.mid" >
+```
+
+10、说明文字：
+
+语法：title=#
+
+说明：#为说明的文字。该属性规定音频或视频文件的说明文字。
+
+示例：
+
+```html
+<embed src="your.mid" title="第一首歌">
+```
+
+11、前景色和背景色：
+
+语法：palette=color|color
+
+说明：该属性表示嵌入的音频或视频文件的前景色和背景色，第一个值为前景色，第二个值为背景
+      色，中间用 | 隔开。color可以是RGB色（RRGGBB）也可以是颜色名，还可以是transparent
+     （透明）。 示例：<embed src="your.mid" palette="red|black">
+
+12、对齐方式：
+
+语法：align=top、bottom、center、baseline、 left、right、texttop、middle、
+      absmiddle、absbottom
+
+说明：该属性规定控制面板和当前行中的对象的对齐方式。
+
+- center：控制面板居中；
+- left：控制面板居左；
+- right：控制面板居右；
+- top：控制面板的顶部与当前行中的最高对象的顶部对齐；
+- bottom：控制面板的底部与当前行中的对象的基线对齐；
+- baseline：控制面板的底部与文本的基线对齐；
+- texttop：控制面板的顶部与当前行中的最高的文字顶部对齐；
+- middle：控制面板的中间与当前行的基线对齐；
+- absmiddle：控制面板的中间与当前文本或对象的中间对齐；
+- absbottom：控制面板的底部与文字的底部对齐。
+
+示例：
+
+```html
+<embed src="your.mid" align=top>
+<embed src="your.mid" align=center>
 ```
