@@ -10,6 +10,7 @@
    - [数据类型](#数据类型)
    - [运算符](#运算符)
    - [系统变量列表](#系统变量列表)
+   - [排序算法](#排序算法)
 2. [安装与配置](#安装与配置)
 
 ## 简介
@@ -209,6 +210,76 @@ version|string|GLOBAL
 wait_timeout|num|GLOBAL, SESSION
 warning_count|num|LOCAL
 unique_checks|bool|SESSION
+
+### 排序算法
+
+```php
+<?php
+// 简单的，现在我们把冒泡法封装成函数，利用以后使用
+function bubbleSort(&$myarr) {
+    // 这是一个中间变量
+    $temp = 0;
+    // 我们要把数组，从小到大外层循环
+    for($i = 0; $i < count($myarr) - 1; $i ++) {
+        for($j = 0; $j < count($myarr) - 1 - $i; $j ++) {
+            // 说明前面的数比后面的数大，就要交换
+            if ($myarr[$j] > $myarr[$j + 1]) {
+                $temp = $myarr[$j];
+                $myarr[$j] = $myarr[$j + 1];
+                $myarr[$j + 1] = $temp;
+            }
+        }
+    }
+    echo "<br/>函数中的myarr数组";
+    print_r($myarr);
+}
+
+/**
+ * 选择排序法
+ * @param unknown $arr
+ */
+function selectSort(&$arr){
+    $temp=0;
+    for($i=0;$i<count($arr)-1;$i++){
+        //假设 $i就是最小的数
+        $minVal=$arr[$i];
+        //记录我认为的最小数的下标
+        $minIndex=$i;
+        for($j=$i+1;$j<count($arr);$j++){
+            //说明我们认为的最小值，不是最小
+            if($minVal>$arr[$j]){
+                $minVal=$arr[$j];
+                $minIndex=$j;
+            }
+        }
+        //最后交换
+        $temp=$arr[$i];
+        $arr[$i]=$arr[$minIndex];
+        $arr[$minIndex]=$temp;
+    }
+}
+
+//插入排序法(小->大)
+function insertSort(&$arr){
+    //先默认下标为0 ，这个数已经是有序
+    //1. 知道思想->看懂代码->写(灵活)
+    for($i=1;$i<count($arr);$i++){
+        //$insertVal是准备插入的数
+        $insertVal=$arr[$i];
+        //准备先和$insertIndex比较
+        $insertIndex=$i-1;
+        //如果这个条件满足，说明我们还没有找到适当的位置
+        while($insertIndex>=0&&$insertVal<$arr[$insertIndex]){
+            //同时把数后移
+            $arr[$insertIndex+1]=$arr[$insertIndex];
+            $insertIndex--;
+        }
+        //插入(这时就给$insertVal找到适当位置)
+        $arr[$insertIndex+1]=$insertVal;
+    }
+}
+?>
+```
 
 ## 安装与配置
 

@@ -2,12 +2,158 @@
 
 ## 目录
 
-1. [支持webP的WebAssembly方案](#支持webP的WebAssembly方案)
+1. [简介](简介)
+   - [示例：小程序简历](#示例：小程序简历)
+2. [支持webP的WebAssembly方案](#支持webP的WebAssembly方案)
    - [WebAssembly工作流程](#WebAssembly工作流程)
    - [浏览器环境支持webP](#浏览器环境支持webP)
    - [微信小程序环境支持webP](#微信小程序环境支持webP)
    - [写在最后](#写在最后)
    - [参考资料](#参考资料)
+
+## 简介
+
+小程序：一种新的应用形态
+
+- 一种不需要安装下载即可使用的应用。
+- 触手可及：
+  - 通过扫一扫，或者搜索，或者通过公众号跳转。
+- 用完即走：
+- 用户不同关心是否安装太多应用的问题，应用无处不在，随时可用，无需安装，也无需卸载。
+
+![x](./Resource/42.png)
+
+### 示例：小程序简历
+
+在这个例子里，你能学会：
+
+- 搭建开发环境
+- 基本的元素，view，image，text等。
+- 基本的布局：flex
+- swiper的使用
+- template的使用
+- 拨打电话
+- 发送信息到微信
+- GPS导航
+- 配置后端PHP服务器
+- 从后端拉取JSON，并渲染
+- 发布小程序
+
+![x](./Resource/1.bmp)
+
+***搭建开发环境***
+
+- 注册小程序账号
+- 安装小程序开发环境
+- 熟悉开发环境
+- 熟悉小程序代码结构
+
+***布局的基本知识***
+
+padding, margin, border
+
+![x](./Resource/2.bmp)
+
+View组件 & Flexbox弹性盒模型。
+
+- display
+- flex-direction
+- justify-content
+- align-items
+
+![x](./Resource/3.jpg)
+
+***创建第一个小程序项目***
+
+- app.js:
+- app.json: 设定窗口标签
+- app.wxss: 暂不使用，清空，内容转移到index.wxss
+- pages:
+  - index.js
+  - index.wxml: 基础布局view，上下两层
+  - index.wxss:
+
+***理解元素***
+
+- view（对比div）
+- image（对比img）
+- text
+
+***WXML***
+
+- 数据绑定
+- 列表渲染
+- 条件渲染
+
+***申请腾讯云***
+
+- 在小程序后台申请开通腾讯云
+- 配置腾讯云账号
+- 新建后端小程序项目
+- 上传测试代码
+- 跑通示例小程序。
+- Wafer 2 Deom
+- CodeIgniter
+
+***配置详解***
+
+- pages
+- window
+- tabBar
+- debug
+
+避坑提示：
+
+- pages里面，第一个页面是缺省启动页面，这个约定俗成，无法通过其它方法控制。
+- 在tarBar上没有涉及的页面，tarBar不显示。
+
+***生命周期***
+
+- App的生命周期
+- App中的对象
+- 页面的生命周期
+  - navigateTo
+  - redirectTo
+  - navigator 元素
+- 参数传递
+
+<span style="color:red">避坑提示：navigateTo无法跳转到tarBar上已有的页面，只能跳到tarBar上没有的页面。</span>
+
+***小程序UI***
+
+- 布局
+  - Flex布局
+    - 弹性盒模型
+      - display
+      - flex-direction
+      - flex-wrap
+      - justify-content
+      - align-items
+      - flex-flow：flex-direction，flex-wrap的缩写
+  - 相对定位和绝对定位
+  - ~~浮动布局（一般不用）~~
+- 样式
+  - 基本使用
+    - Margin & padding & border
+  - 属性
+  - 选择器
+- 组件
+  - view
+  - swiper
+  - scroll-view
+  - icon
+  - text
+  - progress
+- 表单
+  - button
+  - checkbox
+  - input
+  - label
+  - picker
+  - radio
+  - slider
+  - switch
+  - form
 
 ## 支持webP的WebAssembly方案
 
