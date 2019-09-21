@@ -2,7 +2,14 @@
 
 ## 目录
 
+1. [样式](#样式)
+   - [背景透明](#背景透明)
+   - [固定](#固定)
+   - [整页加载](#整页加载)
+
 ## 样式
+
+### 背景透明
 
 ```css
 /* 背景图 */
@@ -31,14 +38,16 @@ body {
 /* 去掉 div 的 width、height，就可以被内部元素自动撑开 */
 ```
 
-- css三种方法实现：上面固定，左侧固定，右侧内容可滚动
-  
-  html:
+### 固定
 
-  ```html
-  <body>
-    <div class="header">
-    </div>
+css三种方法实现：上面固定，左侧固定，右侧内容可滚动
+  
+html:
+
+```html
+<body>
+  <div class="header">
+  </div>
     <div class="main">
         <div class="sidebar">sidebar</div>
         <div class="content">
@@ -151,3 +160,73 @@ body {
   ```
 
   总结：position:absolute是相对于最近的祖先定位为relative、absolute、fixed中的任何一个进行定位，若没有这样的祖先则相对于body进行定位。position:absolute和position:fixed均脱离了标准流。
+
+### 整页加载
+
+自己写的一个通用示例，由css实现
+
+html:
+
+```html
+<div id="loading">
+  <div>
+    <img src="~/static/img/loading.gif" alt="loading..." />
+  </div>
+</div>
+```
+
+image:
+
+![x](./Resource/loading.gif)
+
+css:
+
+```css
+/* 元素透明（自身） */
+#loading {
+  display:none;
+  position: fixed;
+  z-index: 400;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #595758;
+  background-color: rgba(120,120,120,0.7); /* IE9、标准浏览器、IE6和部分IE7内核的浏览器(如QQ浏览器)会读懂 */
+}
+@media \0screen\,screen\9 { /* 只支持IE6、7、8 */
+  #loading {
+      background-color: #000000;
+      filter: Alpha(opacity=70);
+      position: static; /* IE6、7、8只能设置position:static(默认属性) ，否则会导致子元素继承Alpha值 */
+      *zoom: 1; /* 激活IE6、7的haslayout属性，让它读懂Alpha */
+  }
+}
+
+#loading div {
+  width: 100%; 
+  height: 100%; 
+  position: relative
+}
+
+#loading div img {
+  position:absolute; 
+  margin:auto; 
+  top:0;
+  bottom:0;
+  left:0;
+  right:0
+}
+```
+
+js:
+
+```js
+// 调用任务前显示
+$('#loading').show();
+// ...
+// 结束任务后隐藏
+$('#loading').hide();
+```
