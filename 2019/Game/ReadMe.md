@@ -6,6 +6,7 @@
    - [web平台简介](#web平台简介)
    - [剖析一个影像游戏](#剖析一个影像游戏)
    - [案例](#案例)
+   - [cocos](./cocos.md)
 2. [工具](#工具)
    - [Web游戏](#Web游戏)
 3. [总结](#总结)
@@ -596,3 +597,6 @@ var tNow = window.performance.now();
 25. Clay
 
     通过clay.io创建HTML5游戏将非常简单。原文地址：[http://devzum.com/2015/02/25/25-best-html5-javascript-game-engine-libraries-for-developers/](http://devzum.com/2015/02/25/25-best-html5-javascript-game-engine-libraries-for-developers/)
+
+- 《游戏编程精粹系列》
+- [http://www.aiwisdom.com/](http://www.aiwisdom.com/)

@@ -10,6 +10,7 @@
    - [微信小程序环境支持webP](#微信小程序环境支持webP)
    - [写在最后](#写在最后)
    - [参考资料](#参考资料)
+3. [附录](#附录)
 
 ## 简介
 
@@ -247,3 +248,15 @@ C/C++/Rust/Java 等高级语言开发的代码或功能库 -> Emscripten 编译 
 4. Download and install — Emscripten 1.38.38 documentation: https://emscripten.org/docs/getting_started/downloads.html
 5. 探究 WebP 的一些事儿: https://aotu.io/notes/2016/06/23/explore-something-of-webp/index.html
 6. libwebp 开源项目: https://github.com/webmproject/libwebp/blob/master/README.webp_js
+
+## 附录
+
+盖世五侠：
+
+![x](./Resource/1.png)
+
+```md
+URL: http://
+Token: JmUrzC7uXVgvBAi6hGMDpzCT
+EncodingAESKey: qMqTsXMBNnNfsmzpsPYAFUHuIFHjrSBn2y3zsNXIfam
+```
