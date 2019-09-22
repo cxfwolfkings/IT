@@ -28,6 +28,12 @@
      - [单选按钮](#单选按钮)
      - [select列表](#select列表)
      - [修饰符](#修饰符)
+   - [组件](#组件)
+     - [全局组件](#全局组件)
+     - [局部组件](#局部组件)
+     - [组件通信](#组件通信)
+       - [props](#props)
+       - [自定义事件](#自定义事件)
 2. [开发](#开发)
    - [获取DOM元素](#获取DOM元素)
    - [mint-ui](#mint-ui)
@@ -2550,6 +2556,439 @@ var vm=new Vue({
   console.log(vm.checked);
   console.log(vm.checkedNames);
 </script>
+```
+
+### 组件
+
+组件(Component)是 Vue.js 最强大的功能之一。
+
+组件可以扩展 HTML 元素，封装可重用的代码。
+
+组件系统让我们可以用独立可复用的小组件来构建大型应用，几乎任意类型的应用的界面都可以抽象为一个组件树：
+
+![x](./Resource/53.png)
+
+**为什么使用组件？**
+
+为了应对频繁的需求变化！
+
+Vue组件的模板在某些情况下会受到HTML的限制，比如`<table>`内规定只允许`<tr>`、`<td>`、`<th>`等这些表格元素，所以在`<table>`内直接使用组件是无效的。这种情况下，可以使用特殊的is属性来挂载组件。
+
+注册一个全局组件语法格式如下：`Vue.component(tagName, options)`
+
+tagName 为组件名，options 为配置选项。注册后，我们可以使用以下方式来调用组件：`<tagName></tagName>`
+
+#### 全局组件
+
+所有实例都能用全局组件。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <runoob></runoob>
+  </div>
+  <script>
+    // 注册
+    Vue.component('runoob', {
+      template: '<h1>自定义组件!</h1>'
+    })
+    // 创建根实例
+    new Vue({
+      el: '#app'
+    })
+  </script>
+</body>
+</html>
+```
+
+拓展-如何通过调整组件属性，实现修改组件的显示等内部属性。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="div_col">
+    <p>自定义事件</p>
+    <p>{{total}}</p>
+    <example1 v-on:incretment="incretmentTotal" value="点击"></example1>
+  </div>
+  <script>
+    Vue.component('example1', {
+      props: ['value'],
+      template: '<button v-on:click="incrementHanlder">{{value}}</button>',
+      // data: function () {
+      //   return {
+      //     count: 0
+      //   }
+      // },
+      methods: {
+        incrementHanlder: function () {
+          // this.count += 1
+          this.$emit('incretment')
+        }
+      }
+    })
+    new Vue({
+      el: '#div_col',
+      data: {
+        total: 0
+      },
+      methods: {
+        incretmentTotal: function () {
+          this.total += 1
+        }
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+#### 局部组件
+
+全局组件（任何Vue实例都可以使用），局部组件（只有在注册该组件的实例作用域下有效，使用components选项注册，可以嵌套）：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <runoob></runoob>
+  </div>
+  <script>
+    var Child = {
+      template: '<h1>自定义组件!</h1>'
+    }
+    // 创建根实例
+    new Vue({
+      el: '#app',
+      components: {
+        // <runoob> 将只在父模板可用
+        'runoob': Child
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+除了template（template的DOM 结构必须被一个元素包含，否则无法渲染）选项外，组件中还可以像Vue实例那样使用其他的选项，比如data、computed、methods等。但是在使用data时，和实例稍有区别，data必须是函数，然后将数据return出去。
+
+JavaScript对象是引用关系，所以如果return出的对象引用了外部的一个对象，那这个对象就是共享的，任何一方修改都会同步。
+
+#### 组件通信
+
+组件不仅仅是要把模板的内容进行复用，更重要的是组件间要进行通信。
+
+![x](./Resource/54.png)
+
+##### props
+
+"prop"是父组件用来传递数据的一个自定义属性。
+
+父组件的数据需要通过props把数据传给子组件，子组件需要显式地用props选项声明"prop"；props的值可以是两种，一种是字符串数组，一种是对象。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <child message="hello!"></child>
+  </div>
+  <script>
+    // 注册
+    Vue.component('child', {
+      // 声明 props
+      props: ['message'],
+      // 同样也可以在 vm 实例中像 “this.message” 这样使用
+      template: '<span>{{ message }}</span>'
+    })
+    // 创建根实例
+    new Vue({
+      el: '#app'
+    })
+  </script>
+</body>
+</html>
+```
+
+动态 Prop 类似于用 v-bind 绑定 HTML 特性到一个表达式，也可以用 v-bind 动态绑定 props 的值到父组件的数据中。每当父组件的数据变化时，该变化也会传导给子组件：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div>
+      <input v-model="parentMsg">
+      <br>
+      <child v-bind:message="parentMsg"></child>
+    </div>
+  </div>
+  <script>
+    // 注册
+    Vue.component('child', {
+      // 声明 props
+      props: ['message'],
+      // 同样也可以在 vm 实例中像 “this.message” 这样使用
+      template: '<span>{{ message }}</span>'
+    })
+    // 创建根实例
+    new Vue({
+      el: '#app',
+      data: {
+        parentMsg: '父组件内容'
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+以下实例中将 v-bind 指令将 todo 传到每一个重复的组件中：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <ol>
+      <todo-item v-for="item in sites" v-bind:todo="item"></todo-item>
+    </ol>
+  </div>
+  <script>
+    Vue.component('todo-item', {
+      props: ['todo'],
+      template: '<li>{{ todo.text }}</li>'
+    })
+    new Vue({
+      el: '#app',
+      data: {
+        sites: [
+          { text: 'Runoob' },
+          { text: 'Google' },
+          { text: 'Taobao' }
+        ]
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+props中声明的数据与组件data函数return的数据主要区别就是props的来自父级，而data中的是组件自己的数据，作用域是组件本身，这两种数据都可以在模板template及计算属性computed和方法methods中使用。如果要传递多个数据，在props数组中添加项即可。
+
+由于HTML特性不区分大小写，当使用DOM 模板时，驼峰命名(CamelCase)的props名称要转为短横分隔命名(kebab-case)。如果你要直接传递数字、布尔值、数组、对象，而且不使用v-bind，传递的仅仅是字符串。
+
+Vue2.x通过props传递数据是单向的，也就是父组件数据变化时会传递给子组件，但是反过来不行。业务中会经常遇到两种需要改变prop的情况，一种是父组件传递初始值进来，子组件将它作为初始值保存起来，在自己的作用域下可以随意使用和修改。这种情况可以在组件data内再声明一个数据，引用父组件的prop。另一种情况就是prop作为需要被转变的原始值传入。这种情况用计算属性就可以了。注意，在js中对象和数组是引用类型，指向同一个内存空间，所以props是对象和数组时，在子组件内改变是会影响父组件的。
+
+Prop验证：组件可以为 props 指定验证要求。prop 是一个对象而不是字符串数组时，它包含验证要求。
+
+```js
+Vue.component('my-component', {
+  props: {
+    // 基础的类型检查 (`null` 和 `undefined` 会通过任何类型验证)
+    propA: Number,
+    // 多个可能的类型
+    propB: [String, Number],
+    // 必填的字符串
+    propC: {
+      type: String,
+      required: true
+    },
+    // 带有默认值的数字
+    propD: {
+      type: Number,
+      default: 100
+    },
+    // 带有默认值的对象
+    propE: {
+      type: Object,
+      // 对象或数组默认值必须从一个工厂函数获取
+      default: function () {
+        return { message: 'hello' }
+      }
+    },
+    // 自定义验证函数
+    propF: {
+      validator: function (value) {
+        // 这个值必须匹配下列字符串中的一个
+        return ['success', 'warning', 'danger'].indexOf(value) !== -1
+      }
+    }
+  }
+})
+```
+
+当 prop 验证失败的时候，（开发环境构建版本的）Vue 将会产生一个控制台的警告。type 可以是下面原生构造器：
+
+- String
+- Number
+- Boolean
+- Array
+- Object
+- Date
+- Function
+- Symbol
+
+type 也可以是一个自定义构造器，使用 instanceof 检测。
+
+props 验证补充代码：注意 替换 vue.min.js 为 vue.js，验证结果可以到浏览器 console 查看，自定义验证函数尚未尝试出来
+
+```html
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.js"></script>
+
+<div id="app">
+  <example :propa="'asda'" :propb="'aasasa'" :propc="'sdf'" :prope="{a:'a'}" :propf="100"></example>
+</div>
+<script type="text/javascript">
+  Vue.component('example', {
+    props: {
+      // 基础类型检测 (`null` 意思是任何类型都可以)
+      propa: Number,
+      // 多种类型
+      propb: [String, Number],
+      // 必传且是字符串
+      propc: {
+        type: String,
+        required: true
+      },
+      // 数字，有默认值
+      propd: {
+        type: Number,
+        default: 1000
+      },
+      // 数组/对象的默认值应当由一个工厂函数返回
+      prope: {
+        type: Object,
+        default: function () {
+          return { message: 'hello' }
+        }
+      },
+      // 自定义验证函数
+      propf: {
+        type: Number,
+        validator: function (value) {
+          // 这个值必须匹配下列字符串中的一个
+          return value > 0 ? -1 : 1
+        },
+        defalut: 12
+      }
+    },
+    template: `
+  <table border="1px">
+    <tr>
+             <th>propA</th>
+             <th>propB</th>
+             <th>propC</th>
+             <th>propD</th>
+        <th>propE</th>
+             <th>propF</th>
+    </tr>
+    <tr>
+             <td>{{ propa }}</td>
+             <td>{{ propb }}</td>
+             <td>{{ propc }}</td>
+             <td>{{ propd }}</td>
+        <td>{{ prope }}</td>
+             <td>{{ propf }}</td>
+    </tr>
+  </table>`
+  })
+  new Vue({
+    el: "#app"
+  });
+</script>
+```
+
+##### 自定义事件
+
+父组件是使用props传递数据给子组件，但如果子组件要把数据传递回去，就需要使用自定义事件！（观察者模式）。我们可以使用v-on绑定自定义事件，每个Vue实例都实现了事件接口(Events interface)，即：
+
+- 父组件使用$on(eventName)监听事件
+- 子组件使用$emit(eventName)触发事件
+
+另外，父组件可以在使用子组件的地方直接用v-on来监听子组件触发的事件。
+
+以下实例中子组件已经和它外部完全解耦了。它所做的只是触发一个父组件关心的内部事件。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="counter-event-example">
+      <p>{{ total }}</p>
+      <button-counter v-on:increment="incrementTotal"></button-counter>
+      <button-counter v-on:increment="incrementTotal"></button-counter>
+    </div>
+  </div>
+  <script>
+    Vue.component('button-counter', {
+      template: '<button v-on:click="incrementHandler">{{ counter }}</button>',
+      data: function () {
+        return {
+          counter: 0
+        }
+      },
+      methods: {
+        incrementHandler: function () {
+          this.counter += 1
+          this.$emit('increment')
+        }
+      },
+    })
+    new Vue({
+      el: '#counter-event-example',
+      data: {
+        total: 0
+      },
+      methods: {
+        incrementTotal: function () {
+          this.total += 1
+        }
+      }
+    })
+  </script>
+</body>
+</html>
 ```
 
 ## 开发
