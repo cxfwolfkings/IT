@@ -9,6 +9,7 @@
    - [基本初等函数](#基本初等函数)
      - [幂函数](#幂函数)
      - [三角函数](#三角函数)
+     - [反三角函数](#反三角函数)
 
 ## 函数
 
@@ -102,6 +103,22 @@ Trigonometric Function
 $y=sin x$ 与 $y=cos x$ 的定义域均为 $(-∞, +∞)$，均以 $2π$ 为周期。$y=sin x$ 为<b style="color:blue">奇函数</b>，$y=cos x$ 为<b style="color:blue">偶函数</b>。它们都是<b style="color:blue">有界函数</b>。
 
 ![x](./Resource/21.png)
+
+正切函数：$y=tanx$；定义域：$x≠(2n+1)π/2$；周期：$π$；奇函数
+
+余切函数：$y=cotx$；定义域：$x≠nπ$；周期：$π$；奇函数
+
+![x](./Resource/14.jpg)
+
+正割函数：$y=secx=\frac{1}{cosx}$；余割函数：$y=cscx=\frac{1}{sinx}$
+
+![x](./Resource/15.jpg)
+
+#### 反三角函数
+
+反正弦函数：$y=arcsinx$
+
+![x](./Resource/16.jpg)
 
 ## 附录
 

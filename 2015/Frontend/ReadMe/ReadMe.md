@@ -13,6 +13,7 @@
 9. [小程序](./wechat.md)
 10. [Flutter](./Flutter.md)
 11. [项目总结](./summary.md)
+12. [附录](#附录)
 
 ## 附录
 
@@ -21,3 +22,5 @@
 开源之祖 sourceforeg .net  
 
 Php 开源 php-open.com  模仿->()创新
+
+[Spine](http://maccman.github.com/spine)实现了类
