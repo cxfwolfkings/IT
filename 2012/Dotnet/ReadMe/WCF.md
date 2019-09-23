@@ -25,17 +25,17 @@
 
 ## 简介
 
-- WCF 是 .NET 框架的一部分，由 .NET Framework 3.0 开始引入，与Windows Presentation Foundation 及 Windows Workflow Foundation 并行为新一代 Windows 操作系统以及 WinFX 的三个重大应用程序开发类库。
+WCF 是 .NET 框架的一部分，由 .NET Framework 3.0 开始引入，与Windows Presentation Foundation 及 Windows Workflow Foundation 并行为新一代 Windows 操作系统以及 WinFX 的三个重大应用程序开发类库。
   
-  在 .NET Framework 2.0 以及前版本中，微软发展了 Web Service(SOAP with HTTP communication)，.NET Remoting (TCP/HTTP/Pipeline communication) 以及基础的 Winsock 等通信支持。
+在 .NET Framework 2.0 以及前版本中，微软发展了 Web Service(SOAP with HTTP communication)，.NET Remoting (TCP/HTTP/Pipeline communication) 以及基础的 Winsock 等通信支持。
   
-  由于各个通信方法的设计方法不同，而且彼此之间也有相互的重叠性，对于开发人员来说，不同的选择会有不同的程序设计模型，而且必须要重新学习，让开发人员在使用中有许多不便。同时，面向服务架构(Service-Oriented Architecture) 也开始盛行于软件工业中，因此微软重新查看了这些通信方法，并设计了一个统一的程序开发模型，对于数据通信提供了最基本最有弹性的支持，这就是 **Windows Communication Foundation**。
+由于各个通信方法的设计方法不同，而且彼此之间也有相互的重叠性，对于开发人员来说，不同的选择会有不同的程序设计模型，而且必须要重新学习，让开发人员在使用中有许多不便。同时，面向服务架构(Service-Oriented Architecture) 也开始盛行于软件工业中，因此微软重新查看了这些通信方法，并设计了一个统一的程序开发模型，对于数据通信提供了最基本最有弹性的支持，这就是 **Windows Communication Foundation**。
 
-  在 David Chappell 所撰的《Introducing Windows Communication Foundation》一文中，用了一个活鲜鲜的例子，来说明 WCF 的优势所在。假定我们要为一家汽车租赁公司开发一个新的应用程序，用于租车预约服务。该租车预约服务会被多种应用程序访问，包括呼叫中心(Call Center)，基于 J2EE 的租车预约服务以及合作伙伴的应用程序(Partner Application)
+在 David Chappell 所撰的《Introducing Windows Communication Foundation》一文中，用了一个活鲜鲜的例子，来说明 WCF 的优势所在。假定我们要为一家汽车租赁公司开发一个新的应用程序，用于租车预约服务。该租车预约服务会被多种应用程序访问，包括呼叫中心(Call Center)，基于 J2EE 的租车预约服务以及合作伙伴的应用程序(Partner Application)
 
-  从功能的角度来看，WCF 完全可以看作是 ASMX，.Net Remoting，Enterprise Service，WSE，MSMQ 等技术的并集。（注：这种说法仅仅是从功能的角度。事实上 WCF 远非简单的并集这样简单，它是真正面向服务的产品，它已经改变了通常的开发模式。）因此，对于上述汽车预约服务系统的例子，利用 WCF，就可以解决包括安全、可信赖、互操作、跨平台通信等等需求。开发者再不用去分别了解 .Net Remoting，ASMX 等各种技术了。
+从功能的角度来看，WCF 完全可以看作是 ASMX，.Net Remoting，Enterprise Service，WSE，MSMQ 等技术的并集。（注：这种说法仅仅是从功能的角度。事实上 WCF 远非简单的并集这样简单，它是真正面向服务的产品，它已经改变了通常的开发模式。）因此，对于上述汽车预约服务系统的例子，利用 WCF，就可以解决包括安全、可信赖、互操作、跨平台通信等等需求。开发者再不用去分别了解 .Net Remoting，ASMX 等各种技术了。
 
-  概括地说，WCF具有如下的优势：
+概括地说，WCF具有如下的优势：
 
 1. 统一性
 
@@ -61,7 +61,7 @@
 
 ### 契约
 
-- WCF 的基本概念是以契约 (Contract) 来定义双方沟通的协议，合约必须要以接口的方式来体现，而实际的服务代码必须要由这些合约接口派生并实现。合约分成了四种：
+WCF 的基本概念是以契约 (Contract) 来定义双方沟通的协议，合约必须要以接口的方式来体现，而实际的服务代码必须要由这些合约接口派生并实现。合约分成了四种：
 
 1. 数据契约(Data Contract)，订定双方沟通时的数据格式。
 2. 服务契约(Service Contract)，订定服务的定义。
@@ -70,46 +70,46 @@
 
 ### 协议绑定
 
-- 由于 WCF 支持了HTTP，TCP，Named Pipe，MSMQ，Peer-To-Peer TCP 等协议，而 HTTP 又分为基本 HTTP 支持 (BasicHttpBinding) 以及 WS-HTTP 支持 (WsHttpBinding)，而 TCP 亦支持 NetTcpBinding，NetPeerTcpBinding 等通信方式，因此，双方必须要统一通信的协议，并且也要在编码以及格式上要有所一致。
+由于 WCF 支持了HTTP，TCP，Named Pipe，MSMQ，Peer-To-Peer TCP 等协议，而 HTTP 又分为基本 HTTP 支持 (BasicHttpBinding) 以及 WS-HTTP 支持 (WsHttpBinding)，而 TCP 亦支持 NetTcpBinding，NetPeerTcpBinding 等通信方式，因此，双方必须要统一通信的协议，并且也要在编码以及格式上要有所一致。
 
-  虽然 WCF 也可以使用 SOAP 做通信格式，但它和以往的 `ASP.NET` XML Web Services 不同，因此有部分技术文章中，会将 `ASP.NET` 的 XML Web Services 称为ASMX Service。
+虽然 WCF 也可以使用 SOAP 做通信格式，但它和以往的 `ASP.NET` XML Web Services 不同，因此有部分技术文章中，会将 `ASP.NET` 的 XML Web Services 称为ASMX Service。
 
-  WCF 的服务可以挂载于 Console Application，Windows Application，IIS (ASP. NET) Application，Windows Service 以及 Windows Activation Services 中，但大多都会挂在 Windows Service。
+WCF 的服务可以挂载于 Console Application，Windows Application，IIS (ASP. NET) Application，Windows Service 以及 Windows Activation Services 中，但大多都会挂在 Windows Service。
 
 ### 安全性层次
 
-- WCF 实现上已经支持了传输层次安全性 (Transport-level security) 以及消息层次安全性 (Message-level security) 两种。
+WCF 实现上已经支持了传输层次安全性 (Transport-level security) 以及消息层次安全性 (Message-level security) 两种。
 
 1. 传输层次安全性：在数据传输时期加密，例如 SSL。
 2. 消息层次安全性：在数据处理时就加密，例如使用数字签名，散列或是使用密钥加密法等。
 
 ### WCF和WEBAPI的选择
 
-- WCF：
+WCF：
 
 1. 当你想创建一个支持消息、消息队列、双工通信的服务时
 2. 当你想创建一个服务，可以用更快速的传输通道时，像 TCP、Named Pipes 或者甚至是 UDP（在WCF4.5中），在其他传输通道不可用的时候也可以支持 HTTP。
 
-- Web API：
+Web API：
 
 1. 当你想创建一个基于 HTTP 的面向资源的服务并且可以使用 HTTP 的全部特征时（比如URIs、request/response头，缓存，版本控制，多种内容格式）
 2. 当你想让你的服务用于浏览器、手机、iPhone和平板电脑时
 
 ## 服务的实现
 
-- 接着将介绍如何创建客户端，来共享协定程序集。把协定和实现分开，是共享协定的一个准备工作。
+接着将介绍如何创建客户端，来共享协定程序集。把协定和实现分开，是共享协定的一个准备工作。
 
 ### 自定义服务宿主
 
-- 使用 WCF 可以在任意宿主上运行服务。
+使用 WCF 可以在任意宿主上运行服务。
   
-  对于服务主机，必须引用 RoomReservationService 库和 System.ServiceModel 程序集。
+对于服务主机，必须引用 RoomReservationService 库和 System.ServiceModel 程序集。
   
-  该服务从实例化和打开 ServiceHost 类型的对象开始。这个类在 System.ServiceModel 名称空间中定义。
+该服务从实例化和打开 ServiceHost 类型的对象开始。这个类在 System.ServiceModel 名称空间中定义。
   
-  实现该服务的 RoomReservationService 类在构造函数中定义。调用Open()方法会启动服务的监听器信道，该服务准备用于侦听请求。Close()方法会停止信道。
+实现该服务的 RoomReservationService 类在构造函数中定义。调用Open()方法会启动服务的监听器信道，该服务准备用于侦听请求。Close()方法会停止信道。
   
-  下面的示例代码还添加了 ServiceMetadataBehavior 类型的一个操作，添加该操作，就允许使用 WSDL 创建一个客户端应用程序。
+下面的示例代码还添加了 ServiceMetadataBehavior 类型的一个操作，添加该操作，就允许使用 WSDL 创建一个客户端应用程序。
 
   ```C#
   using System;
@@ -166,21 +166,21 @@
   }
   ```
 
-  对于 WCF 配置，需要把用服务库创建的应用程序配置文件复制到宿主应用程序中。
+对于 WCF 配置，需要把用服务库创建的应用程序配置文件复制到宿主应用程序中。
   
-  使用 WCF Service Configuration Editor 可以编辑这个配置文件。除了使用配置文件之外，还可以通过编程方式配置所有内容，并使用几个默认值。
+使用 WCF Service Configuration Editor 可以编辑这个配置文件。除了使用配置文件之外，还可以通过编程方式配置所有内容，并使用几个默认值。
   
-  宿主应用程序的示例代码不需要任何配置文件。使用自定义服务宿主，可以在 WCF 库的项目设置中取消用来启动 WCF 服务宿主的 WCF 选项。
+宿主应用程序的示例代码不需要任何配置文件。使用自定义服务宿主，可以在 WCF 库的项目设置中取消用来启动 WCF 服务宿主的 WCF 选项。
 
 ### WCF客户端
 
-- 因为服务宿主用 ServiceMetadataBehavior 配置，所以它提供了一个 MEX 端点。启动服务宿主后，就可以在 VisualStudio 中添加一个服务引用。在添加服务引用时，会弹出对话框。用 URL：`http://localhost:9000/RoomReservation?wsdl` 进入服务元数据的连接，把名称空间设置为RoomReservationService。这将为生成的代理类定义名称空间。
+因为服务宿主用 ServiceMetadataBehavior 配置，所以它提供了一个 MEX 端点。启动服务宿主后，就可以在 VisualStudio 中添加一个服务引用。在添加服务引用时，会弹出对话框。用 URL：`http://localhost:9000/RoomReservation?wsdl` 进入服务元数据的连接，把名称空间设置为RoomReservationService。这将为生成的代理类定义名称空间。
 
-  添加服务引用，会在服务中添加对 System.Runtime.Serialization 和 System.ServiceModel 程序集的引用，还会添加一个包含绑定信息和端点地址的配置文件。
+添加服务引用，会在服务中添加对 System.Runtime.Serialization 和 System.ServiceModel 程序集的引用，还会添加一个包含绑定信息和端点地址的配置文件。
 
-  从数据协定中把 RoomReservation 生成为一个部分类。这个类包含协定的所有 DataMember 元素。RoomServiceClient 类是客户端的代理，该客户端包含由服务协定定义的方法。使用这个客户端，可以将会议室预订信息发送给正在运行的服务。
+从数据协定中把 RoomReservation 生成为一个部分类。这个类包含协定的所有 DataMember 元素。RoomServiceClient 类是客户端的代理，该客户端包含由服务协定定义的方法。使用这个客户端，可以将会议室预订信息发送给正在运行的服务。
 
-  在代码文件中，通过按钮的 Click 事件调用 ReserveRoomAsync 方法。
+在代码文件中，通过按钮的 Click 事件调用 ReserveRoomAsync 方法。
 
   ```C#
   using System;
@@ -222,15 +222,15 @@
   }
   ```
 
-  运行服务和客户端，创建数据库后，就可以将会议室预订信息添加到数据库中。在 RoomReservation 解决方案的设置中，可以配置多个启动项目，在本例中是RoomReservationClient 和 RoomReservationHost。
+运行服务和客户端，创建数据库后，就可以将会议室预订信息添加到数据库中。在 RoomReservation 解决方案的设置中，可以配置多个启动项目，在本例中是RoomReservationClient 和 RoomReservationHost。
 
 ### 诊断
 
-- 运行客户端和服务应用程序时，知道后台发生了什么很有帮助。为此，WCF 需要配置一个跟踪源。可以使用 Service Configuration Editor，选择 Diagnostics 节点，启用 Tracing and Message Logging 功能来配置跟踪。
+运行客户端和服务应用程序时，知道后台发生了什么很有帮助。为此，WCF 需要配置一个跟踪源。可以使用 Service Configuration Editor，选择 Diagnostics 节点，启用 Tracing and Message Logging 功能来配置跟踪。
 
-  把跟踪源的跟踪级别设置为 Verbose 会生成非常详细的信息。这个配置更改把跟踪源和监昕器添加到应用程序配置文件中。
+把跟踪源的跟踪级别设置为 Verbose 会生成非常详细的信息。这个配置更改把跟踪源和监昕器添加到应用程序配置文件中。
 
-  示例：978118314425_Full Code\314425 ch43 code\WCF\RoomReservation\ RoomReservationHost\App.config
+示例：978118314425_Full Code\314425 ch43 code\WCF\RoomReservation\ RoomReservationHost\App.config
 
 ### 与客户端共享协定程序集
 
