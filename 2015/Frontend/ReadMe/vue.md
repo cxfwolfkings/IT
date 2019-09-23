@@ -34,6 +34,12 @@
      - [组件通信](#组件通信)
        - [props](#props)
        - [自定义事件](#自定义事件)
+       - [其它组件传值](#其它组件传值)
+     - [内容分发](#内容分发)
+     - [高级用法](#高级用法)
+       - [组件递归](#组件递归)
+       - [异步组件](#异步组件)
+   - [自定义指令](#自定义指令)
 2. [开发](#开发)
    - [获取DOM元素](#获取DOM元素)
    - [mint-ui](#mint-ui)
@@ -42,6 +48,8 @@
    - [vue-resource](#vue-resource)
    - [axios](#axios)
    - [i18n](#i18n)
+   - [动画](#动画)
+     - [过渡](#过渡)
 3. [部署](#部署)
 4. [总结](#总结)
    - [多页面](#多页面)
@@ -2991,6 +2999,356 @@ props 验证补充代码：注意 替换 vue.min.js 为 vue.js，验证结果可
 </html>
 ```
 
+$emit()方法的第一个参数是自定义事件的名称，后面的参数都是要传递的数据，可以不填或填写多个。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div id="counter-event-example">
+          <p>{{ total }}</p>
+          <button-counter v-on:increment="incrementTotal"></button-counter><br/>
+          <button-counter v-on:increment="incrementTotal"></button-counter>
+        </div>
+    </div>
+<script>
+    Vue.component('button-counter', {
+        template: '<div><button v-on:click="incrementHandler(1)">-</button>{{ counter }}<button v-on:click="incrementHandler(2)">+</button></div>',
+        data: function () {
+          return {
+            counter: 0
+          }
+        },
+        methods: {
+          incrementHandler: function (v) {
+              if(v==1){
+                  this.counter -= 1
+                    this.$emit('increment',1)
+              }else{
+                  this.counter += 1
+                    this.$emit('increment',2)
+              }
+          }
+        },
+      })
+      new Vue({
+        el: '#counter-event-example',
+        data: {
+          total: 0
+        },
+        methods: {
+          incrementTotal: function (d) {
+              if(d==1){
+                  this.total -= 1
+              }else{
+                  this.total += 1
+              }
+
+          }
+        }
+      })
+</script>
+</body>
+</html>
+```
+
+如果你想在某个组件的根元素上监听一个原生(DOM)事件。可以使用 .native 修饰 v-on。例如：
+
+```html
+<my-component v-on:click.native="doTheThing"></my-component>
+```
+
+示例：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>点击元素输出元素内容:</p>
+    <ol>
+      <todo-item v-for="item in sites" v-bind:todo="item" @click.native="alert(item.text)"></todo-item>
+    </ol>
+  </div>
+  <script>
+    Vue.component('todo-item', {
+      props: ['todo'],
+      template: '<li>{{ todo.text }}</li>'
+    })
+    new Vue({
+      el: '#app',
+      data: {
+        sites: [
+          { text: 'Runoob' },
+          { text: 'Google' },
+          { text: 'Taobao' }
+        ]
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+<b style="color:red">data 必须是一个函数</b>
+
+上面例子中，可以看到 button-counter 组件中的 data 不是一个对象，而是一个函数：
+
+这样的好处就是每个实例可以维护一份被返回对象的独立的拷贝，如果 data 是一个对象则会影响到其他实例，如下所示：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="components-demo3" class="demo">
+    <button-counter2></button-counter2>
+    <button-counter2></button-counter2>
+    <button-counter2></button-counter2>
+  </div>
+  <script>
+    var buttonCounter2Data = {
+      count: 0
+    }
+    Vue.component('button-counter2', {
+      /*
+      data: function () {
+          // data 选项是一个函数，组件不相互影响
+          return {
+              count: 0
+          }
+      },
+      */
+      data: function () {
+        // data 选项是一个对象，会影响到其他实例
+        return buttonCounter2Data
+      },
+      template: '<button v-on:click="count++">点击了 {{ count }} 次。</button>'
+    })
+    new Vue({ el: '#components-demo3' })
+  </script>
+</body>
+</html>
+```
+
+##### 其它组件传值
+
+- 中央事件总线bus
+- 父子链：$parent, $children，缺点：紧耦合
+- 子组件索引：$refs.componentName，缺点：$refs只在组件渲染完成后才填充，并且它是非响应式的。它仅仅作为一个直接访问子组件的应急方案，应当避免在模板或计算属性中使用$refs。
+
+#### 内容分发
+
+slot：通过$slots可以访问某个具名slot，this.$slots.default包括了所有没有被包含在具名slot中的节点。
+
+#### 高级用法
+
+##### 组件递归
+
+组件的模板一般都是在template选项内定义的，Vue提供了一个内联模板的功能，在使用组件时，给组件标签使用inline-template特性，组件就会把它的内容当作模板，而不是把它当内容分发，这让模板更灵活。
+
+Vue.js提供了一个特殊的元素`<component>`用来动态地挂载不同的组件，使用is特性来选择要挂载的组件。
+
+##### 异步组件
+
+- $nextTick
+- X-Templates
+
+### 自定义指令
+
+除了默认设置的核心指令(v-model 和 v-show)，Vue 也允许注册自定义指令。可以全局注册、局部注册。
+
+下面我们注册一个全局指令 v-focus, 该指令的功能是在页面加载时，元素获得焦点：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>页面载入时，input 元素自动获取焦点：</p>
+    <input v-focus>
+  </div>
+  <script>
+    // 注册一个全局自定义指令 v-focus
+    Vue.directive('focus', {
+      // 当绑定元素插入到 DOM 中。
+      inserted: function (el) {
+        // 聚焦元素
+        el.focus()
+      }
+    })
+    // 创建根实例
+    new Vue({
+      el: '#app'
+    })
+  </script>
+</body>
+</html>
+```
+
+我们也可以在实例使用 directives 选项来注册局部指令，这样指令只能在这个实例中使用：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>页面载入时，input 元素自动获取焦点：</p>
+    <input v-focus>
+  </div>
+  <script>
+    // 创建根实例
+    new Vue({
+      el: '#app',
+      directives: {
+        // 注册一个局部的自定义指令 v-focus
+        focus: {
+          // 指令的定义
+          inserted: function (el) {
+            // 聚焦元素
+            el.focus()
+          }
+        }
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+#### 钩子
+
+自定义指令的选项是由几个钩子函数组成的，每个都是可选的。
+
+- bind: 只调用一次，指令第一次绑定到元素时调用，用这个钩子函数可以定义一个在绑定时执行一次的初始化动作。
+- inserted: 被绑定元素插入父节点时调用（父节点存在即可调用，不必存在于 document 中）。
+- update: 被绑定元素所在的模板更新时调用，而不论绑定值是否变化。通过比较更新前后的绑定值，可以忽略不必要的模板更新（详细的钩子函数参数见下）。
+- componentUpdated: 被绑定元素所在模板完成一次更新周期时调用。
+- unbind: 只调用一次， 指令与元素解绑时调用。
+
+**钩子函数参数：**
+
+- el: 指令所绑定的元素，可以用来直接操作 DOM。
+- binding: 一个对象，包含以下属性：
+  - name: 指令名，不包括 v- 前缀。
+  - value: 指令的绑定值，例如：v-my-directive="1 + 1", value 的值是 2。
+  - oldValue: 指令绑定的前一个值，仅在 update 和 componentUpdated 钩子中可用。无论值是否改变都可用。
+  - expression: 绑定值的字符串形式。 例如 v-my-directive="1 + 1" ， expression 的值是 "1 + 1"。
+  - arg: 传给指令的参数。例如 v-my-directive:foo，arg 的值是 "foo"。
+  - modifiers: 一个包含修饰符的对象。例如：v-my-directive.foo.bar，修饰符对象modifiers的值是 { foo: true, bar: true }。
+  - vnode: Vue 编译生成的虚拟节点，查阅 VNode API 了解更多详情。
+  - oldVnode: 上一个虚拟节点，仅在 update 和 componentUpdated 钩子中可用。
+
+以下实例演示了这些参数的使用：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app" v-runoob:hello.a.b="message">
+  </div>
+  <script>
+    Vue.directive('runoob', {
+      bind: function (el, binding, vnode) {
+        var s = JSON.stringify
+        el.innerHTML =
+          'name: ' + s(binding.name) + '<br>' +
+          'value: ' + s(binding.value) + '<br>' +
+          'expression: ' + s(binding.expression) + '<br>' +
+          'argument: ' + s(binding.arg) + '<br>' +
+          'modifiers: ' + s(binding.modifiers) + '<br>' +
+          'vnode keys: ' + Object.keys(vnode).join(', ')
+      }
+    })
+    new Vue({
+      el: '#app',
+      data: {
+        message: '菜鸟教程!'
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+运行结果：
+
+```sh
+name: "runoob"
+value: "菜鸟教程!"
+expression: "message"
+argument: "hello"
+modifiers: {"a":true,"b":true}
+vnode keys: tag, data, children, text, elm, ns, context, functionalContext, key, componentOptions, componentInstance, parent, raw, isStatic, isRootInsert, isComment, isCloned, isOnce
+```
+
+有时候我们不需要其他钩子函数，我们可以简写函数，如下格式：
+
+```js
+Vue.directive('runoob', function (el, binding) {
+  // 设置指令的背景颜色
+  el.style.backgroundColor = binding.value.color
+})
+```
+
+指令函数可接受所有合法的 JavaScript 表达式，以下实例传入了 JavaScript 对象：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div v-runoob="{ color: 'green', text: '菜鸟教程!' }"></div>
+  </div>
+  <script>
+    Vue.directive('runoob', function (el, binding) {
+      // 简写方式设置文本及背景颜色
+      el.innerHTML = binding.value.text
+      el.style.backgroundColor = binding.value.color
+    })
+    new Vue({
+      el: '#app'
+    })
+  </script>
+</body>
+</html>
+```
+
 ## 开发
 
 ### 获取DOM元素
@@ -3020,6 +3378,219 @@ props 验证补充代码：注意 替换 vue.min.js 为 vue.js，验证结果可
 - `https://wappalyzer.com/download`
 
 ### vue-router
+
+Vue.js 路由允许我们通过不同的 URL 访问不同的内容。
+
+通过 Vue.js 可以实现多视图的单页Web应用（single page web application，SPA）。
+
+Vue.js 路由需要载入 [vue-router](https://github.com/vuejs/vue-router) 库
+
+中文文档地址：[vue-router文档](https://github.com/vuejs/vue-router)。
+
+**安装：**
+
+- 直接下载 / CDN：[https://unpkg.com/vue-router/dist/vue-router.js](https://unpkg.com/vue-router/dist/vue-router.js)
+- NPM：推荐使用淘宝镜像：`cnpm install vue-router`
+
+**简单实例：**
+
+Vue.js + vue-router 可以很简单的实现单页应用。
+
+`<router-link>` 是一个组件，该组件用于设置一个导航链接，切换不同 HTML 内容。 to 属性为目标地址， 即要显示的内容。
+
+以下实例中我们将 vue-router 加进来，然后配置组件和路由映射，再告诉 vue-router 在哪里渲染它们。代码如下所示：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+  <script src="https://cdn.staticfile.org/vue-router/2.7.0/vue-router.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Hello App!</h1>
+    <p>
+      <!-- 使用 router-link 组件来导航. -->
+      <!-- 通过传入 `to` 属性指定链接. -->
+      <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
+      <router-link to="/foo">Go to Foo</router-link>
+      <router-link to="/bar">Go to Bar</router-link>
+    </p>
+    <!-- 路由出口 -->
+    <!-- 路由匹配到的组件将渲染在这里 -->
+    <router-view></router-view>
+  </div>
+  <script>
+    // 0. 如果使用模块化机制编程，導入Vue和VueRouter，要调用 Vue.use(VueRouter)
+
+    // 1. 定义（路由）组件。
+    // 可以从其他文件 import 进来
+    const Foo = { template: '<div>foo</div>' }
+    const Bar = { template: '<div>bar</div>' }
+
+    // 2. 定义路由
+    // 每个路由应该映射一个组件。 其中"component" 可以是
+    // 通过 Vue.extend() 创建的组件构造器，
+    // 或者，只是一个组件配置对象。
+    // 我们晚点再讨论嵌套路由。
+    const routes = [
+      { path: '/foo', component: Foo },
+      { path: '/bar', component: Bar }
+    ]
+
+    // 3. 创建 router 实例，然后传 `routes` 配置
+    // 你还可以传别的配置参数, 不过先这么简单着吧。
+    const router = new VueRouter({
+      routes // （缩写）相当于 routes: routes
+    })
+
+    // 4. 创建和挂载根实例。
+    // 记得要通过 router 配置参数注入路由，
+    // 从而让整个应用都有路由功能
+    const app = new Vue({
+      router
+    }).$mount('#app')
+
+    // 现在，应用已经启动了！
+  </script>
+</body>
+</html>
+```
+
+点击过的导航链接都会加上样式 `class ="router-link-exact-active router-link-active"`。
+
+**相关属性：**
+
+接下来我们可以了解下更多关于 `<router-link>` 的属性。
+
+- to：表示目标路由的链接。 当被点击后，内部会立刻把 to 的值传到 router.push()，所以这个值可以是一个字符串或者是描述目标位置的对象。
+
+  ```html
+  <!-- 字符串 -->
+  <router-link to="home">Home</router-link>
+  <!-- 渲染结果 -->
+  <a href="home">Home</a>
+
+  <!-- 使用 v-bind 的 JS 表达式 -->
+  <router-link v-bind:to="'home'">Home</router-link>
+
+  <!-- 不写 v-bind 也可以，就像绑定别的属性一样 -->
+  <router-link :to="'home'">Home</router-link>
+
+  <!-- 同上 -->
+  <router-link :to="{ path: 'home' }">Home</router-link>
+
+  <!-- 命名的路由 -->
+  <router-link :to="{ name: 'user', params: { userId: 123 }}">User</router-link>
+
+  <!-- 带查询参数，下面的结果为 /register?plan=private -->
+  <router-link :to="{ path: 'register', query: { plan: 'private' }}">Register</router-link>
+  ```
+
+- replace：设置 replace 属性的话，当点击时，会调用 router.replace() 而不是 router.push()，导航后不会留下 history 记录。
+
+  ```html
+  <router-link :to="{ path: '/abc'}" replace></router-link>
+  ```
+
+- append：设置 append 属性后，则在当前（相对）路径前添加基路径。例如，我们从 /a 导航到一个相对路径 b，如果没有配置 append，则路径为 /b，如果配了，则为 /a/b
+
+  ```html
+  <router-link :to="{ path: 'relative/path'}" append></router-link>
+  ```
+
+- tag：有时候想要 `<router-link>` 渲染成某种标签，例如 `<li>`。 于是我们使用 tag prop 类指定何种标签，同样它还是会监听点击，触发导航。
+
+  ```html
+  <router-link to="/foo" tag="li">foo</router-link>
+  <!-- 渲染结果 -->
+  <li>foo</li>
+  ```
+  
+- active-class：设置 链接激活时使用的 CSS 类名。可以通过以下代码来替代。
+
+  ```html
+  <style>
+    ._active{
+       background-color : red;
+    }
+  </style>
+  <p>
+    <router-link v-bind:to = "{ path: '/route1'}" active-class = "_active">Router Link 1</router-link>
+    <router-link v-bind:to = "{ path: '/route2'}" tag = "span">Router Link 2</router-link>
+  </p>
+  ```
+
+  注意这里 class 使用 active_class="_active"。
+
+- exact-active-class：配置当链接被精确匹配的时候应该激活的 class。可以通过以下代码来替代。
+
+  ```html
+  <p>
+    <router-link v-bind:to = "{ path: '/route1'}" exact-active-class = "_active">Router Link 1</router-link>
+    <router-link v-bind:to = "{ path: '/route2'}" tag = "span">Router Link 2</router-link>
+   </p>
+   ```
+
+- exact-active-class 和 active-class 的区别
+
+  router-link 默认情况下的路由是模糊匹配，例如当前路径是 /article/1 那么也会激活 `<router-link to="/article">`，所以当设置 exact-active-class 以后，这个 router-link 只有在当前路由被全包含匹配时才会被激活 exact-active-class 中的 class，例如：
+  
+  ```html
+  <router-link to="/article" active-class="router-active"></router-link>
+  ```
+
+  当用户访问 /article/1 时会被激活为：
+
+  ```html
+  <a href="#/article" class="router-active" rel="nofollow"></a>
+  ```
+
+  而当使用：
+
+  ```html
+  <router-link to="/article" exact-active-class="router-active"></router-link>
+  ```
+
+  当用户访问 /article/1 时，不会激活这个 link 的 class：
+
+  ```html
+  <a href="#/article" rel="nofollow"></a>
+  ```
+
+- event：声明可以用来触发导航的事件。可以是一个字符串或是一个包含字符串的数组。
+
+  ```html
+  <router-link v-bind:to = "{ path: '/route1'}" event = "mouseover">Router Link 1</router-link>
+  ```
+
+  以上代码设置了 event 为 mouseover ，及在鼠标移动到 Router Link 1 上时导航的 HTML 内容会发生改变。
+
+**NPM路由实例：**
+
+接下来我们演示了一个使用 npm 简单的路由实例，开始前，请先下载该实例源代码：[https://github.com/chrisvfritz/vue-2.0-simple-routing-example](https://github.com/chrisvfritz/vue-2.0-simple-routing-example)
+
+下载完后，解压该目录，重命名目录为 vue-demo，vu 并进入该目录，执行以下命令：
+
+```sh
+# 安装依赖，使用淘宝资源命令 cnpm
+cnpm install
+# 启动应用，地址为 localhost:8080
+cnpm run dev
+```
+
+如果你需要发布到正式环境可以执行以下命令：
+
+```sh
+cnpm run build
+```
+
+执行成功后，访问 `http://localhost:8080` 查看效果
+
+**总结：**
 
 有时候，同一个路径可以匹配多个路由，此时，匹配的优先级就按照路由的定义顺序：谁先定义的，谁的优先级就最高。
 
@@ -3260,6 +3831,97 @@ new Vue({
 - index.html -> 中国人
 - index.html -> 美国人
 - vue-i18n
+
+### 动画
+
+本章节我们主要讨论 Vue.js 的过渡效果与动画效果。
+
+#### 过渡
+
+Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用过渡效果。
+
+Vue 提供了内置的过渡封装组件，该组件用于包裹要实现过渡效果的组件。
+
+```html
+<transition name = "nameoftransition">
+  <div></div>
+</transition>
+```
+
+我们可以通过以下实例来理解 Vue 的过渡是如何实现的：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+  <style>
+    /* 可以设置不同的进入和离开动画 */
+    /* 设置持续时间和动画函数 */
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 2s
+    }
+
+    /* .fade-leave-active, 2.1.8 版本以下 */
+    .fade-enter,
+    .fade-leave-to {
+      opacity: 0
+    }
+  </style>
+</head>
+
+<body>
+  <div id="databinding">
+    <button v-on:click="show = !show">点我</button>
+    <transition name="fade">
+      <p v-show="show" v-bind:style="styleobj">动画实例</p>
+    </transition>
+  </div>
+  <script type="text/javascript">
+    var vm = new Vue({
+      el: '#databinding',
+      data: {
+        show: true,
+        styleobj: {
+          fontSize: '30px',
+          color: 'red'
+        }
+      },
+      methods: {
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+实例中通过点击 "点我" 按钮将变量 show 的值从 true 变为 false。如果为 true 显示子元素 p 标签的内容。
+
+下面这段代码展示了 transition 标签包裹了 p 标签：
+
+```html
+<transition name = "fade">
+  <p v-show = "show" v-bind:style = "styleobj">动画实例</p>
+</transition>
+```
+
+过渡其实就是一个淡入淡出的效果。Vue在元素显示与隐藏的过渡中，提供了 6 个 class 来切换：
+
+- v-enter：定义进入过渡的开始状态。在元素被插入之前生效，在元素被插入之后的下一帧移除。
+- v-enter-active：定义进入过渡生效时的状态。在整个进入过渡的阶段中应用，在元素被插入之前生效，在过渡/动画完成之后移除。这个类可以被用来定义进入过渡的过程时间，延迟和曲线函数。
+- v-enter-to: 2.1.8版及以上 定义进入过渡的结束状态。在元素被插入之后下一帧生效（与此同时 v-enter 被移除），在过渡/动画完成之后移除。
+- v-leave: 定义离开过渡的开始状态。在离开过渡被触发时立刻生效，下一帧被移除。
+- v-leave-active：定义离开过渡生效时的状态。在整个离开过渡的阶段中应用，在离开过渡被触发时立刻生效，在过渡/动画完成之后移除。这个类可以被用来定义离开过渡的过程时间，延迟和曲线函数。
+- v-leave-to: 2.1.8版及以上 定义离开过渡的结束状态。在离开过渡被触发之后下一帧生效（与此同时 v-leave 被删除），在过渡/动画完成之后移除。
+
+![x](./Resource/2.png)
+
+对于这些在过渡中切换的类名来说，如果你使用一个没有名字的 `<transition>`，则 v- 是这些类名的默认前缀。如果你使用了 `<transition name="my-transition">`，那么 v-enter 会替换为 my-transition-enter。
+
+v-enter-active 和 v-leave-active 可以控制进入/离开过渡的不同的缓和曲线，在下面章节会有个示例说明。
 
 ## 部署
 

@@ -5,8 +5,10 @@
 1. [调试C#控制台应用](调试C#控制台应用)
 2. [调试.NET Core WebApi](#调试.NET&nbsp;Core&nbsp;WebApi)
 3. [git的配置](#git的配置)
-4. [快捷键](#快捷键)
-5. [配置项](#配置项)
+4. [总结](#总结)
+   - [快捷键](#快捷键)
+   - [配置项](#配置项)
+   - [问题](#问题)
 
 ## 调试C#控制台应用
 
@@ -331,7 +333,7 @@ vscode 自定义配置参考：
 
 [http://blog.csdn.net/u010019717/article/details/50443970](http://blog.csdn.net/u010019717/article/details/50443970)
 
-## 配置项
+### 配置项
 
 ```json
 {
@@ -394,6 +396,17 @@ vscode 自定义配置参考：
   "markdown.extension.tableFormatter.enabled": false, // 表格格式化
   "markdownlint.config": {
     "MD033": false // 是否允许插入html
-  }
+  },
+  "search.followSymlinks": false
 }
+```
+
+### 问题
+
+#### rg.exe占用CPU过高
+
+解决方法：添加如下配置
+
+```json
+"search.followSymlinks": false
 ```
