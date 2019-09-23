@@ -965,6 +965,17 @@ Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以�
 
 ## EFCore
 
+**示例：**
+
+执行命令：
+
+```sh
+# 添加迁移，migrationName自己取
+add-migration migrationName
+# 更新到数据库
+update-database
+```
+
 ### 添加初始种子数据
 
 1. 在DataContext中重写OnModelCreating方法
