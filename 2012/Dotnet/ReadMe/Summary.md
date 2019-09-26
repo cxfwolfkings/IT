@@ -2,6 +2,212 @@
 
 ## 目录
 
+## 授权认证
+
+先来了解ASP.NET是如何进行Form认证的：
+
+1. 终端用户在浏览器的帮助下，发送Form认证请求。
+2. 浏览器会发送存储在客户端的所有相关的用户数据。
+3. 当服务器端接收到请求时，服务器会检测请求，查看是否存在 "Authentication Cookie" 的Cookie。
+4. 如果查找到认证Cookie，服务器会识别用户，验证用户是否合法。
+5. 如果未找到"Authentication Cookie"，服务器会将用户作为匿名（未认证）用户处理，在这种情况下，如果请求的资源标记着 protected/secured，用户将会重定位到登录页面。
+
+示例：
+
+1. 创建 AuthenticationController 和 Login 行为方法
+
+    ```C#
+    public class AuthenticationController : Controller
+    {
+        // GET: Authentication
+        public ActionResult Login()
+        {
+            return View();
+        }
+    }
+
+    ```
+
+2. 创建Model
+   
+    ```C#
+    public class UserDetails
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+    ```
+
+3. 创建Login View
+
+    ```C#
+    @model WebApplication1.Models.UserDetails
+    @{
+        Layout = null;
+    }
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>Login</title>
+    </head>
+    <body>
+        <div>
+            @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
+            {
+                @Html.LabelFor(c=>c.UserName)
+                @Html.TextBoxFor(x=>x.UserName)
+                <br />
+                @Html.LabelFor(c => c.Password)
+                @Html.PasswordFor(x => x.Password)
+                <br />
+                <input type="submit" name="BtnSubmit" value="Login" />
+            }
+        </div>
+    </body>
+    </html>
+    ```
+
+    在上述代码中可以看出，使用HtmlHelper类在View中替代了纯HTML代码。View中可使用"Html"调用HtmlHelper类；HtmlHelper类函数返回html字符串
+
+   示例1:
+
+   ```C#
+   @Html.TextBoxFor(x=>x.UserName)
+   ```
+
+   转换为HTML代码
+
+   ```html
+   <input id="UserName" name="UserName" type="text" value="" />
+   ```
+
+   示例2：
+
+   ```C#
+   @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
+   {
+
+   }
+   ```
+
+   转换为HTML代码：
+
+   ```html
+   <form action="/Authentication/DoLogin" method="post"></form>
+   ```
+
+4. 实现Form认证
+
+   web.config
+
+   ```xml
+   <authentication mode="Forms">
+     <forms loginurl="~/Authentication/Login"></forms>
+   </authentication>
+   ```
+
+5. 让Action方法更安全
+
+   在Index action方法中添加认证属性 [Authorize]
+
+   ```C#
+   [Authorize]
+   public ActionResult Index()
+   {
+       EmployeeListViewModel employeeListViewModel = new EmployeeListViewModel();
+       // ......
+   }
+   ```
+
+6. 创建 login action 方法
+
+   通过调用业务层功能检测用户是否合法。  
+   如果是合法用户，创建认证Cookie。可用于以后的认证请求过程中。  
+   如果是非法用户，给当前的ModelState添加新的错误信息，将错误信息显示在View中。
+
+    ```C#
+    [HttpPost]
+    public ActionResult DoLogin(UserDetails u)
+    {
+        EmployeeBusinessLayer bal = new EmployeeBusinessLayer();
+        if (bal.IsValidUser(u))
+        {
+            // 在客户端创建一个新cookie
+            FormsAuthentication.SetAuthCookie(u.UserName, false);
+            return RedirectToAction("Index", "Employee");
+        }
+        else
+        {
+            ModelState.AddModelError("CredentialError", "Invalid Username or Password");
+            return View("Login");
+        }
+    }
+    ```
+
+7. 在 View 中显示信息
+
+    ```C#
+    @Html.ValidationMessage("CredentialError", new {style="color:red;" })
+    @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
+    {
+        // ……
+    }
+    ```
+
+理解：
+
+1.	为什么Dologin会添加 HttpPost属性，还有其他类似的属性吗？
+该属性使得DoLogin方法只能由Post请求调用。如果有人尝试用Get调用DoLogin，将不会起作用。还有很多类似的属性如HttpGet，HttpPut和HttpDelete属性.
+
+2.	FormsAuthentication.SetAuthCookie是必须写的吗？
+是必须写的。让我们了解一些小的工作细节。
+客户端通过浏览器给服务器发送请求。当通过浏览器生成后，所有相关的Cookies也会随着请求一起发送。
+服务器接收请求后，准备响应。请求和响应都是通过HTTP协议传输的，HTTP是无状态协议。每个请求都是新请求，因此当同一客户端发出二次请求时，服务器无法识别，为了解决此问题，服务器会在准备好的请求包中添加一个Cookie，然后返回。
+当客户端的浏览器接收到带有Cookie的响应，会在客户端创建Cookies。
+如果客户端再次给服务器发送请求，服务器就会识别。
+FormsAuthentication.SetAuthCookie将添加"Authentication"这个特殊的Cookie来响应。
+3.	是否意味着没有Cookies，FormsAuthentication将不会有作用？
+不是的，可以使用URI代替Cookie。打开Web.Config文件，修改Authentication/Forms部分：
+<forms cookieless="UseUri" loginurl="~/Authentication/Login"></forms>
+
+授权的Cookie会使用URL传递。
+通常情况下，Cookieless属性会被设置为"AutoDetect"，表示认证工作是通过不支持URL传递的Cookie完成的。
+4.	FormsAuthentication.SetAuthCookie中第二个参数"false"表示什么？
+false决定了是否创建永久有用的Cookie。临时Cookie会在浏览器关闭时自动删除，永久Cookie不会被删除。可通过浏览器设置或是编写代码手动删除。
+5.	当凭证错误时，UserName 文本框的值是如何被重置的？
+HTML帮助类会从Post数据中获取相关值并重置文本框的值。这是使用HTML 帮助类的一大优势。
+6.	What does Authorize attribute do?
+In Asp.net MVC there is a concept called Filters. Which will be used to filter out requests and response. There are four kind of filters. We will discuss each one of them in our 7 days journey. Authorize attribute falls under Authorization filter. It will make sure that only authenticated requests are allowed for an action method.
+7.	Can we attach both HttpPost and Authorize attribute to same action method?
+Yes we can.
+8.	Why there is no ViewModel in this example?
+As per the discussion we had in Lab 6, View should not be connected to Model directly. We must always have ViewModel in between View and Model. It doesn't matter if view is a simple "display view" or "data entry view", it should always connected to ViewModel. Reason for not using ViewModel in our project is simplicity. In real time project I strongly recommend you to have ViewModel everywhere.
+9.	需要为每个Action方法添加授权属性吗？
+不需要，可以将授权属性添加到Controller级别或 Global级别。When attached at controller level, it will be applicable for all the action methods in a controller. When attached at Global level, it will be applicable for all the action method in all the controllers.
+	Controller Level
+[Authorize]
+public class EmployeeController : Controller
+{
+....
+Global level
+	Step 1 - Open FilterConfig.cs file from App_start folder.
+	Step 2 - Add one more line RegisterGlobalFilters as follows.
+public static void RegisterGlobalFilters(GlobalFilterCollection filters)
+{
+    filters.Add(new HandleErrorAttribute());//Old line
+    filters.Add(new AuthorizeAttribute());//New Line
+}
+	Step 3 - Attach AllowAnonymous attribute to Authentication controller.
+[AllowAnonymous]
+public class AuthenticationController : Controller
+{
+	Step 4 – Execute and Test the application in the same way we did before.
+10.	Why AllowAnonymous attribute is required for AuthenticationController?
+We have attached Authorize filter at global level. That means now everything is protected including Login and DoLogin action methods. AllowAnonymous opens action method for non-authenticated requests.
+11.	How come this RegisterGlobalFilters method inside FilterConfig class invoked?
+It was invoked in Application_Start event written inside Global.asax file.
+
 ## 任务调度
 
 简单的基于 Timer 的定时任务，使用过程中慢慢发现这种方式可能并不太合适，有些任务可能只希望在某个时间段内执行，只使用 timer 就显得不是那么灵活了，希望可以像 quartz 那样指定一个 cron 表达式来指定任务的执行时间。
