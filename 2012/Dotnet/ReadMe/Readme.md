@@ -11,21 +11,46 @@
    - [模式和实践](#模式和实践)
 2. C#
    - [GDI](./CSharp.md#GDI+)
+   - [数据结构](./CSharp.md#数据结构)
+     - [集合](./CSharp.md#集合)
+       - [IEqualityComparer使用](./CSharp.md#IEqualityComparer使用)
    - [并发编程](./CSharp.md#并发编程)
+     - [实现异步3种方式](./CSharp.md#实现异步3种方式)
+       - [异步模式](./CSharp.md#异步模式)
+       - [基于事件的异步模式](./CSharp.md#基于事件的异步模式)
+       - [基于任务的异步模式](./CSharp.md#基于任务的异步模式)
+     - [线程](./CSharp.md#线程)
+       - [Thread](./CSharp.md#Thread)
+       - [ThreadPool](./CSharp.md#ThreadPool)
+       - [Parallel](./CSharp.md#Parallel)
+       - [Task](./CSharp.md#Task)
+     - [问题](./CSharp.md#问题)
+       - [争用条件](./CSharp.md#争用条件)
+       - [死锁](./CSharp.md#死锁)
+     - [同步](./CSharp.md#同步)
+     - [错误处理](./CSharp.md#错误处理)
+     - [任务取消](./CSharp.md#任务取消)
+   - [网络通信](./CSharp.md#网络通信)
+     - [Socket编程](#Socket编程)
 3. CLR
 4. dotnet
    - [MVC](./MVC.md)
    - [WebAPI](./WebAPI.md)
    - [WCF](./WCF.md)
    - [Xamarin](./Xamarin.md)
-5. dotnet core
-   - [.NET Core](./core.md)
-   - [ABP](./ABP.md)
-6. [附录](#附录)
+5. [dotnet core](./core.md)
+6. [ABP](./ABP.md)
+7. 附录
    - [Debug远程访问](#Debug远程访问)
    - [Ioc](./Ioc.md)
    - [ORM](./Orm.md)
-   - [总结](./Summary.md)
+   - [Nuget](./Nuget.md)
+8. 总结
+   - [任务调度](./Summary.md#任务调度)
+   - [发布](./Summary.md#发布)
+   - [问题总结](./Summary.md#问题总结)
+9. 项目
+   - [实验室管理系统](./lab.md#实验室管理系统总结)
 
 ## Microsoft技术栈
 

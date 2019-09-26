@@ -24,9 +24,7 @@
    - [自托管](#自托管)
    - [IIS托管](#IIS托管)
    - [部署示例](#部署示例)
-4. 项目总结
-   - [实验室管理系统](./lab.md)
-5. [参考](#参考)
+4. [参考](#参考)
 
 ## 简介
 
@@ -600,7 +598,7 @@ Middleware支持Run、Use和Map三种方法进行注册。
 
 在.Net Core框架里，日志功能主要由 ILoggerFactory, ILoggerProvider, ILogger 这三个接口体现。
 
-![Logger](../Resource/1.png)
+![Logger](./Resource/1.png)
 
 1. ILoggerFactory：工厂接口。只提供注册LoggerProvider的方法和创建单实例Logger对象的方法。
 2. ILoggerProvider：提供真正具有日志输出功能的Logger对象的接口。每一种日志输出方式对应一个不同的LoggerProvider类。

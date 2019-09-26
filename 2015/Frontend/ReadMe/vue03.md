@@ -374,3 +374,27 @@ JsBarcode("#barcode")
     }
    })
    ```
+
+## 问题
+
+- 错误：<i style="color:red">无法加载文件 C:\Users\gxf\AppData\Roaming\npm\nodemon.ps1，因为在此系统上禁止运行脚本。</i>
+
+  原因：笔记本禁止运行脚本
+
+  解决方法：
+
+  ```sh
+  1.管理员身份打开powerShell
+  2.输入 set-ExecutionPolicy RemoteSigned 
+  3.选择 Y 或者 A，就好了
+  ```
+
+- 错误：<i style="color:red">Vue项目启动出现 Error:Cannot find module 'array-includes'</i>
+
+  解决方法：
+
+  ```sh
+  1. 删掉项目中的node_modules文件夹，
+  2 .执行 npm cache clean 或者  cnpm cache clean 命令清除掉cache缓存，
+  3.然后cnpm install 和npm run dev就可以在这台电脑运行你的项目
+  ```

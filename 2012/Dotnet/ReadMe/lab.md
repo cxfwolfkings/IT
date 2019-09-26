@@ -6,13 +6,20 @@
    - [过滤器](#过滤器)
    - [登录](#登录)
    - [公用方法](#公用方法)
-2. [MemoryCache](#MemoryCache)
+2. [EF Core](#EFCore)
+   - [数据库上下文](#数据库上下文)
+   - [工作单元](#工作单元)
+   - [仓储](#仓储)
+   - [领域模型](#领域模型)
+   - [领域服务](#领域服务)
+   - [应用服务](#应用服务)
+3. [MemoryCache](#MemoryCache)
    - [本机缓存](#本机缓存)
    - [分布式缓存](#分布式缓存)
      - [Redis](#Redis)
        - [StackExchange.Redis](#StackExchange.Redis)
-3. [前端vue](#前端vue)
-4. [部署](#部署)
+4. [前端vue](#前端vue)
+5. [部署](#部署)
 
 ## mvc
 
@@ -321,6 +328,420 @@ public static bool IsAjax(HttpContext context)
 }
 ```
 
+## EFCore
+
+### 数据库上下文
+
+```C#
+/// <summary>
+/// 数据库上下文
+/// </summary>
+public class LaboratoryDbContext : DbContext
+{
+    public DbSet<Account> Accounts { get; set; } // 账号信息
+    public DbSet<LaboratoryEntity> Laboratories { get; set; } // 实验室
+    public DbSet<AssetCategory> AssetCategories { get; set; } // 固定资产类别
+    // ...
+
+    /// <summary>
+    /// 配置时
+    /// </summary>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        // 从 appsetting.json 中获取配置信息
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+        // 延迟加载使用 MySQL 数据库
+        optionsBuilder.UseLazyLoadingProxies().UseMySql(config.GetConnectionString("DefaultConnection"));
+    }
+
+    /// <summary>
+    /// 模型创建时
+    /// </summary>
+    protected override void OnModelCreating(ModelBuilder modelBuilder) 
+    {
+        // 应用设置
+        modelBuilder.ApplyConfiguration(new LabAdminMap());
+        // 创建数据
+        modelBuilder.Entity<Account>().HasData(
+            new Account { 
+                Id = 1, 
+                AccountNo = "00000", 
+                AccountName = "Admin", 
+                Password = MD5Helper.MD5Encrypt32("123456"), 
+                RecentLogin = DateTime.Parse("2019-08-01"), 
+                DepartmentNo = (int)Dept.Electrical + "" },
+            new Account { 
+                Id = 2, 
+                AccountNo = "-00001", 
+                AccountName = "User1", 
+                Password = MD5Helper.MD5Encrypt32("123456"), 
+                RecentLogin = DateTime.Parse("2019-08-01"), 
+                DepartmentNo = (int)Dept.Electrical + "" },
+        );
+        // 调用基类方法
+        base.OnModelCreating(modelBuilder);
+    }
+}
+
+/// <summary>
+/// 实验室管理员表的具体设置
+/// </summary>
+public class LabAdminMap : IEntityTypeConfiguration<LaboratoryAdmin>
+{
+    public void Configure(EntityTypeBuilder<LaboratoryAdmin> builder)
+    {
+        // 创建外键
+        builder.HasOne(m => m.AdminUser)
+            .WithMany(m => m.AdminUsers)
+            .HasForeignKey(m => m.AdminAccountId);
+        // 创建外键
+        builder.HasOne(m => m.Laboratory)
+            .WithMany(m => m.AdminLabs)
+            .HasForeignKey(m => m.LaboratoryId);
+        // 创建索引
+        builder.HasKey(m => new { m.AdminAccountId, m.LaboratoryId });
+        // 应用到表
+        builder.ToTable("bas_lab_admin");
+    }
+}
+```
+
+### 工作单元
+
+```C#
+/// <summary>
+/// 工作单元接口
+/// </summary>
+public interface IUnitOfWork : IDisposable
+{
+    // 数据库上下文
+    DbContext DbContext { get; }
+    // 是否提交成功
+    bool Commit();
+}
+
+/// <summary>
+/// 工作单元类
+/// </summary>
+public class UnitOfWork : IUnitOfWork
+{
+    // 数据库上下文实例
+    public DbContext DbContext { get; }
+    // 构造函数注入
+    public UnitOfWork(LaboratoryDbContext context)
+    {
+        DbContext = context;
+    }
+    // 上下文提交
+    public bool Commit()
+    {
+        return DbContext.SaveChanges() > 0;
+    }
+    // 垃圾回收
+    public void Dispose()
+    {
+        DbContext.Dispose();
+        GC.SuppressFinalize(this);
+    }
+}
+```
+
+### 仓储
+
+```C#
+/// <summary>
+/// 定义泛型仓储接口，并继承IDisposable，显式释放资源
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
+public interface IRepository<TEntity> where TEntity : class
+{
+    // 添加
+    TEntity Add(TEntity obj, bool IsCommit = true);
+    // 根据id获取对象
+    TEntity GetById(long id);
+    // 获取列表
+    IQueryable<TEntity> GetAll();
+    // 获取列表（数据跟踪：内存和数据库的连接未断）
+    IQueryable<TEntity> GetAllAsTracking();
+    // 根据对象进行更新
+    void Update(TEntity obj, bool IsCommit = true);
+    // 更新多项
+    void UpdateRange(IEnumerable<TEntity> objs, bool IsCommit = true);
+    // 根据id删除
+    void Remove(long id, bool IsCommit = true);
+    // 查询列表
+    IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+    // 查询单项
+    TEntity FindOne(Expression<Func<TEntity, bool>> predicate);
+    // 判断是否存在
+    bool Exists(Expression<Func<TEntity, bool>> predicate);
+    // 添加多项
+    void AddRange(IEnumerable<TEntity> objs, bool IsCommit = true);
+    // 添加多项（异步）
+    Task AddRangeAsync(IEnumerable<TEntity> objs, bool IsCommit = true);
+    void Remove(TEntity obj, bool IsCommit = true);
+    void RemoveRange(IEnumerable<TEntity> entities, bool IsCommit = true);
+}
+
+/// <summary>
+/// 泛型仓储，实现泛型仓储接口
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
+public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+{
+    protected readonly LaboratoryDbContext Db;
+    // 仓储容器
+    protected readonly DbSet<TEntity> DbSet;
+    protected IUnitOfWork UnitOfWork;
+
+    public Repository(IUnitOfWork unitOfWork)
+    {
+        Db = unitOfWork.DbContext as LaboratoryDbContext;
+        DbSet = Db.Set<TEntity>();
+        this.UnitOfWork = unitOfWork;
+    }
+    public virtual TEntity Add(TEntity obj, bool IsCommit = true)
+    {
+        TEntity entity = DbSet.Add(obj).Entity;
+        if (IsCommit) UnitOfWork.Commit();
+        return entity;
+    }
+    public void AddRange(IEnumerable<TEntity> objs, bool IsCommit = true)
+    {
+        DbSet.AddRange(objs);
+        if (IsCommit) UnitOfWork.Commit();
+    }
+    public virtual async Task AddRangeAsync(IEnumerable<TEntity> objs, bool IsCommit = true)
+    {
+        await DbSet.AddRangeAsync(objs);
+        if (IsCommit) UnitOfWork.Commit();
+    }
+    public virtual TEntity GetById(long id)
+    {
+        return DbSet.Find(id);
+    }
+    public virtual IQueryable<TEntity> GetAll()
+    {
+        return DbSet.AsNoTracking();
+    }
+    public virtual IQueryable<TEntity> GetAllAsTracking()
+    {
+        return DbSet.AsTracking();
+    }
+    public virtual void Update(TEntity obj, bool IsCommit = true)
+    {
+        // 有数据跟踪时，直接更新
+        //DbSet.Update(obj);
+        // 没有数据跟踪时，需要绑定，标记更新状态
+        DbSet.Attach(obj);
+        Db.Entry(obj).State = EntityState.Modified;
+        if (IsCommit) UnitOfWork.Commit();
+    }
+    public virtual void UpdateRange(IEnumerable<TEntity> objs, bool IsCommit = true)
+    {
+        DbSet.AttachRange(objs);
+        foreach (var obj in objs)
+        {
+            Db.Entry(obj).State = EntityState.Modified;
+        }
+        if (IsCommit) UnitOfWork.Commit();
+    }
+    public virtual void Remove(long id, bool IsCommit = true)
+    {
+        DbSet.Remove(DbSet.Find(id));
+        if (IsCommit) UnitOfWork.Commit();
+    }
+    public virtual void RemoveRange(IEnumerable<TEntity> entities, bool IsCommit = true)
+    {
+        DbSet.RemoveRange(entities);
+        if (IsCommit) UnitOfWork.Commit();
+    }
+    public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+    {
+        return DbSet.Where(predicate);
+    }
+    public TEntity FindOne(Expression<Func<TEntity, bool>> predicate)
+    {
+        return DbSet.FirstOrDefault(predicate);
+    }
+    public bool Exists(Expression<Func<TEntity, bool>> predicate)
+    {
+        return DbSet.Any(predicate);
+    }
+    public void Remove(TEntity obj, bool IsCommit = true)
+    {
+        DbSet.Remove(obj);
+        if (IsCommit) UnitOfWork.Commit();
+    }
+}
+```
+
+### 领域模型
+
+```C#
+/// <summary>
+/// 实验室管理员
+/// </summary>
+[Table("bas_lab_admin")]
+public class LaboratoryAdmin
+{
+    [Column("lab_id")]
+    public long LaboratoryId { get; set; }
+    [Column("admin_account_id")]
+    public long AdminAccountId { get; set; }
+    [Column("authority_depts", TypeName = "varchar(200)")]
+    public string AuthorityDepts { get; set; }
+    [Column("created_time")]
+    public DateTime CreatedTime { get; set; }
+    [ForeignKey("LaboratoryId")]
+    public virtual LaboratoryEntity Laboratory { get; set; }
+    [ForeignKey("AdminAccountId")]
+    public virtual Account AdminUser { get; set; }
+}
+```
+
+### 领域服务
+
+```C#
+public interface IAccountRepository : IRepository<Account>
+{
+
+}
+
+public class AccountRepository : Repository<Account>, IAccountRepository
+{
+    public AccountRepository(IUnitOfWork unitOfWork) : base(unitOfWork) { }
+}
+```
+
+### 应用服务
+
+```C#
+/// <summary>
+/// 基础服务抽象类
+/// </summary>
+public abstract class BaseSevice<TViewModel, TEntity> where TViewModel : BaseViewModel
+        where TEntity : RootEntity
+{
+    protected abstract IRepository<TEntity> Repository { get; }
+    private readonly IMapper _mapper;
+
+    public BaseSevice(IMapper mapper)
+    {
+        this._mapper = mapper;
+    }
+
+    public IEnumerable<TViewModel> GetAll()
+    {
+        return _mapper.Map<IEnumerable<TViewModel>>(Repository.GetAll());
+    }
+
+    public TViewModel GetById(long id)
+    {
+        return _mapper.Map<TViewModel>(Repository.GetById(id));
+    }
+
+    public void Remove(long id)
+    {
+        Repository.Remove(id);
+    }
+
+    public void Save(TViewModel viewModel)
+    {
+        var dataEntity = _mapper.Map<TEntity>(viewModel);
+        if (dataEntity.Id == 0) Repository.Add(dataEntity);
+        else Repository.Update(dataEntity);
+    }
+}
+
+/// <summary>
+/// CRUD操作接口
+/// </summary>
+public interface IService<T> where T : BaseViewModel
+{
+    IEnumerable<T> GetAll();
+    T GetById(long id);
+    void Save(T viewModel);
+    void Remove(long id);
+}
+
+/// <summary>
+/// 资产应用服务接口
+/// </summary>
+public interface IAssetService : IService<AssetViewModel>
+{
+    /// <summary>
+    /// 获取部件
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task<PageModel<AssetViewModel>> GetAssetsAsync(AssetInputDto input);
+}
+
+/// <summary>
+/// 资产应用服务实现类
+/// </summary>
+public class AssetService : BaseSevice<AssetViewModel, Asset>, IAssetService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly IConfiguration _configuration;
+    private readonly IAssetRepository _assetRepository;
+
+    /// <summary>
+    /// 构造器注入
+    /// </summary>
+    public AssetService(IMapper mapper
+            , IUnitOfWork unitOfWork
+            , IConfiguration configuration
+            , IAssetRepository assetRepository) : base(mapper)
+    {
+        _mapper = mapper;
+        _unitOfWork = unitOfWork;
+        _configuration = configuration;
+
+        _assetRepository = assetRepository;
+    }
+
+    public async Task<PageModel<AssetViewModel>> GetAssetsAsync(AssetInputDto input)
+    {
+        var query = _assetRepository.GetAllAsTracking();
+        // 主键Id
+        if (input.Id > 0)
+        {
+            query = query.Where(_ => _.Id == input.Id);
+        }
+        // 型号
+        if (input.ModelId > 0)
+        {
+            query = query.Where(_ => _.ModelId == input.ModelId);
+        }
+        // 内部编号
+        if (!string.IsNullOrEmpty(input.InternalNo))
+        {
+            query = query.Where(_ => _.InternalNo.Contains(input.InternalNo));
+        }
+        // 查询
+        var list = await query
+               .OrderBy(x => x.Id)
+               .Skip((input.PageIndex - 1) * input.PageSize).Take(input.PageSize)
+               .ToListAsync();
+        var total = await query.CountAsync();
+        // 返回
+        return new PageModel<AssetViewModel>()
+        {
+            Total = total,
+            Data = _mapper.Map<List<AssetViewModel>>(list)
+        };
+    }
+}
+```
+
+<b style="color:yellow">提示：</b>Queryable的常用方法可以查看[示例](#示例)。
+
 ## MemoryCache
 
 ### 本机缓存
@@ -605,9 +1026,30 @@ IDistributedCache运做方式变成Session直接在Redis Cache存取，如果把
 
 ![x](./Resource/47.png)
 
-发布配置：IIS
+发布配置：IIS（也可以文件系统）
 
 ![x](./Resource/48.png)
+
+生成的配置文件 web.config：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <location path="." inheritInChildApplications="false">
+    <system.webServer>
+      <handlers>
+        <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
+      </handlers>
+      <aspNetCore processPath="dotnet" arguments=".\LeadChina.Laboratory.Api.dll" stdoutLogEnabled="false" hostingModel="InProcess" stdoutLogFile=".\logs\stdout">
+        <environmentVariables>
+          <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Development" />
+          <environmentVariable name="COMPLUS_ForceENC" value="1" />
+        </environmentVariables>
+      </aspNetCore>
+    </system.webServer>
+  </location>
+</configuration>
+```
 
 IIS配置：
 
@@ -615,13 +1057,38 @@ IIS配置：
 
 [前端Vue部署](../../../2015/Frontend/ReadMe/vue.md#部署)
 
-IIS URLRewrite vue单页应用程序（history模式）
+<b style="color:red">刷新404</b>
 
-- vue的单页应用部署后，当我们进入到某个路由之后，按F5刷新页面会出现404错误：
-- IIS下部署后的解决方案一般是使用 `URLRewrite`
-- 首先要安装[URLRewrite](https://www.iis.net/downloads/microsoft/url-rewrite)
-- 安装完 `URL重写工具2.0`，现在在IIS上添加重写规则
-  
-  ![x](./Resource/50.png)
+```md
+环境：
+  IIS URLRewrite vue单页应用程序（history模式）
+行为：
+  当我们进入到某个路由之后，按F5刷新页面会出现404错误：
+解决方法：
+  IIS下部署后的解决方案一般是使用 "URLRewrite"
+  1. 首先要安装 "URLRewrite"，网址：https://www.iis.net/downloads/microsoft/url-rewrite
+  2. 安装完 "URL重写工具2.0" 后在IIS上添加重写规则
+```
 
-- 现在再刷新就不会404了
+![x](./Resource/50.png)
+
+现在再刷新就不会404了，web.config配置文件如下：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+                <rule name="Vue页面刷新404">
+                    <match url=".*" />
+                    <conditions>
+                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                    </conditions>
+                    <action type="Rewrite" url="/index.html" />
+                </rule>
+            </rules>
+        </rewrite>
+    </system.webServer>
+</configuration>
+```

@@ -1,27 +1,5 @@
 # CSharp
 
-## 目录
-
-1. [GDI+](#GDI+)
-2. [并发编程](#并发编程)
-   - [实现异步3种方式](#实现异步3种方式)
-     - [异步模式](#异步模式)
-     - [基于事件的异步模式](#基于事件的异步模式)
-     - [基于任务的异步模式](#基于任务的异步模式)
-   - [线程](#线程)
-     - [Thread](#Thread)
-     - [ThreadPool](#ThreadPool)
-     - [Parallel](#Parallel)
-     - [Task](#Task)
-   - [问题](#问题)
-     - [争用条件](#争用条件)
-     - [死锁](#死锁)
-   - [同步](#同步)
-   - [错误处理](#错误处理)
-   - [任务取消](#任务取消)
-3. [网络通信](#网络通信)
-   - [Socket编程](#Socket编程)
-
 ## GDI+
 
 (Graphics Device Interface)在`.Net Framework`中用于提供二维图形图像处理功能。
@@ -49,6 +27,36 @@
 ### MetaFile类
 
 - 加载和显示矢量图像。
+
+## 数据结构
+
+### 集合
+
+#### IEqualityComparer使用
+
+```C#
+/// <summary>
+/// 示例
+/// </summary>
+public class AssetComparer : IEqualityComparer<Asset>
+{
+    public bool Equals(Asset x, Asset y)
+    {
+        if (x != null && y != null)
+        {
+            return x.Id == y.Id;
+        }
+        return false;
+    }
+
+    public int GetHashCode(Asset obj)
+    {
+        return base.GetHashCode();
+    }
+}
+```
+
+<b style="color:red">注意:</b> 这里的方法中会先执行GetHashCode方法，如果GetHashCode方法返回的是不相同的值，那就直接忽略Equals方法。
 
 ## 并发编程
 
