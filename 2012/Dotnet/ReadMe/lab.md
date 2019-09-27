@@ -1059,7 +1059,7 @@ IIS配置：
 
 <b style="color:red">刷新404</b>
 
-```md
+```txt
 环境：
   IIS URLRewrite vue单页应用程序（history模式）
 行为：
@@ -1067,6 +1067,14 @@ IIS配置：
 解决方法：
   IIS下部署后的解决方案一般是使用 "URLRewrite"
   1. 首先要安装 "URLRewrite"，网址：https://www.iis.net/downloads/microsoft/url-rewrite
+     问题：
+       Windows10中的IIS10.0安装php manager和IIS URL 重写2.0组件会提示“必须安装IIS7以上才可以”
+     解决方法：
+       打开regedit，找到：HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W3SVC\Parameters
+       右侧的 MajorVersion 是DWORD值，它的值十进制是10，把它改成9。
+       再找到：HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\InetStp
+       也是 MajorVersion 项，这个也是 dword 值 10（注意是十进制），把它改成9！
+       然后安装程序即可顺利安装上了！记得装完之后改回来。（URL重写2.0组件只需要第二步即可）
   2. 安装完 "URL重写工具2.0" 后在IIS上添加重写规则
 ```
 

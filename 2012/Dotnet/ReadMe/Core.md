@@ -1,31 +1,5 @@
 # .NET Core
 
-## 目录
-
-1. [简介](简介)
-   - [数字](#数字)
-   - [垃圾回收](#垃圾回收)
-   - [代码执行](#代码执行)
-   - [装箱与拆箱](#装箱与拆箱)
-   - [最优方法](#最优方法)
-   - [CLR](#CLR)
-   - [管道模型](#管道模型)
-2. [开发](#开发)
-   - [日志](#日志)
-     - [NLog](#NLog)
-   - [Filter](#Filter)
-   - [依赖注入](#依赖注入)
-   - [模块化](#模块化)
-   - [结构化配置](#结构化配置)
-   - [多环境开发](#多环境开发)
-   - [单元测试](#单元测试)
-   - [EF Core](#EFCore)
-3. [部署](#部署)
-   - [自托管](#自托管)
-   - [IIS托管](#IIS托管)
-   - [部署示例](#部署示例)
-4. [参考](#参考)
-
 ## 简介
 
 源码：[http://github.com/dotnet/corefx](http://github.com/dotnet/corefx)
@@ -723,6 +697,184 @@ Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以�
 除了使用框架默认的DI容器外，还可以引入其他第三方的DI容器。比如：Autofac，引入Autofac的nuget包：
 > dotnet add package Autofac.Extensions.DependencyInjection
 
+### 异常处理
+
+1. 配置HTTP错误代码页
+
+    ```C#
+    // 在 Startup.cs 文件的 Configure 方法中添加如下代码
+    app.UseStatusCodePagesWithReExecute("/errors/{0}");
+
+    // 创建 Errors 控制器返回指定错误页
+    public class ErrorsController : Controller
+    {
+        private IHostingEnvironment _env;
+
+        public ErrorsController(IHostingEnvironment env)
+        {
+            _env = env;
+        }
+
+        [Route("errors/{statusCode}")]
+        public IActionResult CustomError(int statusCode)
+        {
+            var filePath = $"{_env.WebRootPath}/errors/{(statusCode == 404 ? 404 : 500)}.html";
+            return new PhysicalFileResult(filePath, new MediaTypeHeaderValue("text/html"));
+        }
+    }
+    ```
+
+2. 使用MVC过滤器
+
+    ```C#
+    public class CustomerExceptionAttribute : ExceptionFilterAttribute
+    {
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public CustomerExceptionAttribute(
+            IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
+
+        public override void OnException(ExceptionContext filterContext)
+        {
+            if (!_hostingEnvironment.IsDevelopment())
+            {
+                return;
+            }
+            HttpRequest request = filterContext.HttpContext.Request;
+            Exception exception = filterContext.Exception;
+            // 异常是否处理
+            if (filterContext.ExceptionHandled == true)
+            {
+                return;
+            }
+            if (exception is UserFriendlyException)
+            {
+                //filterContext.Result = new ApplicationErrorResult
+                filterContext.HttpContext.Response.StatusCode = 400;
+                filterContext.HttpContext.Response.WriteAsync(exception.Message);
+            }
+
+            // 下面进行异常处理的逻辑，可以记录日志、返回前端友好提示等
+            // ...
+
+            // 设置异常已经处理,否则会被其他异常过滤器覆盖
+            filterContext.ExceptionHandled = true;
+            // 在派生类中重写时，获取或设置一个值，该值指定是否禁用IIS自定义错误。
+            filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
+        }
+    }
+    ```
+
+3. 异常捕获中间件(Middleware)
+
+    使用MVC自带中间件：
+
+    ```C#
+    // 在Startup.cs中添加如下代码
+    if (env.IsDevelopment())
+    {   // 开发模式
+        app.UseDeveloperExceptionPage();
+    }
+    else
+    {   // 使用默认的异常处理
+        // app.UseExceptionHandler();
+        // 使用自定义处理
+        app.UseExceptionHandler(build =>
+        build.Run(async context =>
+        {
+                var ex = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+                if (ex != null)
+                {
+                    string innerException = String.Empty;
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        innerException += ex.InnerException?.Message + "\r\n" + ex.InnerException?.StackTrace + "\r\n";
+                    }
+                    string message = $@"【{ex.Message}】内部错误【{ex.InnerException?.Message}】";
+                    // 这里可以进行异常记录和针对异常做不同处理，我这里示例返回500
+                    context.Response.StatusCode = 500;
+                    context.Response.ContentType = "text/plain;charset=utf-8";
+                    await context.Response.WriteAsync("服务器变成蝴蝶飞走了！");
+                }
+                else
+                {
+                    context.Response.StatusCode = 500;
+                    if (context.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+                    {
+                        context.Response.ContentType = "text/html";
+                        await context.Response.SendFileAsync($@"{env.WebRootPath}/errors/500.html");
+                    }
+                }
+            }
+        ));
+    }
+    ```
+
+    自定义中间件（可以进行日志记录）：
+
+    ```C#
+    public class ExceptionHandlerMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public ExceptionHandlerMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            try
+            {
+                // 这里也可以进行请求和响应日志的的记录
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                var statusCode = context.Response.StatusCode;
+                // 进行异常处理
+            }
+            finally
+            {
+                var statusCode = context.Response.StatusCode;
+                var msg = String.Empty;
+                switch (statusCode)
+                {
+                    case 500:
+                        msg = "服务器系统内部错误";
+                        break;
+
+                    case 401:
+                        msg = "未登录";
+                        break;
+
+                    case 403:
+                        msg = "无权限执行此操作";
+                        break;
+
+                    case 408:
+                        msg = "请求超时";
+                        break;
+                }
+                if (!string.IsNullOrWhiteSpace(msg))
+                {
+                    await HandleExceptionAsync(context, statusCode, msg);
+                }
+            }
+        }
+        private static Task HandleExceptionAsync(HttpContext context, int statusCode, string msg)
+        {
+            context.Response.ContentType = "application/json;charset=utf-8";
+            context.Response.StatusCode = statusCode;
+            return context.Response.WriteAsync(msg);
+        }
+    }
+    ```
+
 ### 模块化
 
 - .NET Core的另一个考虑是构建和实现模块化的应用程序。
@@ -961,7 +1113,9 @@ Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以�
    dotnet add package Newtonsoft.Json
    ```
 
-## EFCore
+### 身份认证与授权
+
+### EFCore
 
 **示例：**
 
@@ -1028,6 +1182,21 @@ update-database
    ```
 
    示例地址：[https://github.com/HeBianGu/.NetCore-LearnDemo.git](https://github.com/HeBianGu/.NetCore-LearnDemo.git)
+
+### IActionResult
+
+- ActionResult继承了IActionResult
+- JsonResult、RedirectResult、FileResult、ViewResult、ContentResult均继承了ActionResult
+
+  ![x](./Resource/52.png)
+
+### StatusCodePagesMiddleware中间件
+
+- [代码示例](../Project/MyStudy/StatusCodePagesMiddleware1.cs)
+- [ASP.NET Core应用的错误处理 1：三种呈现错误页面的方式](http://www.cnblogs.com/artech/p/error-handling-in-asp-net-core-1.html)
+- [ASP.NET Core应用的错误处理 2：DeveloperExceptionPageMiddleware中间件](http://www.cnblogs.com/artech/p/error-handling-in-asp-net-core-2.html)
+- [ASP.NET Core应用的错误处理 3：ExceptionHandlerMiddleware中间件](http://www.cnblogs.com/artech/p/error-handling-in-asp-net-core-3.html)
+- [ASP.NET Core应用的错误处理 4：StatusCodePagesMiddleware中间件](http://www.cnblogs.com/artech/p/error-handling-in-asp-net-core-4.html)
 
 ## 部署
 
