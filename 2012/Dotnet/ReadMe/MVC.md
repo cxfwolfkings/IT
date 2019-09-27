@@ -1,20 +1,5 @@
 # MVC
 
-## 目录
-
-1. [路由](路由)
-2. [控制器](#控制器)
-3. [视图](#视图)
-4. [过滤器](#过滤器)
-   - [Authorization Filter](#AuthorizationFilter)
-   - [Exception Filter](#ExceptionFilter)
-   - [Action Filter](#ActionFilter)
-   - [Result Filter](#ResultFilter)
-5. [身份验证和授权](#身份验证和授权)
-6. [模块化开发](#模块化开发)
-7. [捆绑(Bundle)](#捆绑(Bundle))
-8. [总结](#总结)
-
 - View: Razor
 - MVC: Route, Filter, Bundle
 - IOC: Unity
@@ -208,6 +193,112 @@ public class SelectiveCacheController : Controller {
 ```
 
 Authorize特性指示是否拥有权
+
+### 数据验证
+
+1. 创建自定义验证
+
+  ```C#
+  public class FirstNameValidation:ValidationAttribute
+  {
+      protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+      {
+          if (value == null) // Checking for Empty Value
+          {
+              return new ValidationResult("Please Provide First Name");
+          }
+          else
+          {
+              if (value.ToString().Contains("@"))
+              {
+                  return new ValidationResult("First Name should Not contain @");
+              }
+          }
+          return ValidationResult.Success;
+      }
+  }
+  ```
+
+  Note: Creating multiple classes inside single file is never consider as good practice. So in your sample I recommend you to create a new folder called "Validations" in root location and create a new class inside it.
+
+2. 绑定到模型字段上
+
+  ```C#
+  [FirstNameValidation]
+  public string FirstName { get; set; }
+  ```
+
+**有关错误验证的保留值**
+
+```C#
+public class CreateEmployeeViewModel
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Salary { get; set; }
+}
+
+public ActionResult SaveEmployee(Employee e, string BtnSubmit)
+{
+    switch (BtnSubmit)
+    {
+        case "Save Employee":
+            if (ModelState.IsValid)
+            {
+                EmployeeBusinessLayer empBal = new EmployeeBusinessLayer();
+                empBal.SaveEmployee(e);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                CreateEmployeeViewModel vm = new CreateEmployeeViewModel();
+                vm.FirstName = e.FirstName;
+                vm.LastName = e.LastName;
+                if (e.Salary.HasValue)
+                {
+                    vm.Salary = e.Salary.ToString();                        
+                }
+                else
+                {
+                    vm.Salary = ModelState["Salary"].Value.AttemptedValue;                       
+                }
+                return View("CreateEmployee", vm); 
+            }
+        case "Cancel":
+            return RedirectToAction("Index");
+    }
+    return new EmptyResult();
+}
+```
+
+视图中取值：
+
+```html
+@using WebApplication1.ViewModels
+@model CreateEmployeeViewModel
+
+<input type="text" id="TxtFName" name="FirstName" value="@Model.FirstName" />
+<input type="text" id="TxtLName" name="LastName" value="@Model.LastName" />
+<input type="text" id="TxtSalary" name="Salary" value="@Model.Salary" />
+```
+
+1. 是否是真的将值保留？
+
+   不是，是从post数据中重新获取的。
+
+2. 为什么需要在初始化请求时，在Add New 方法中传递 new CreateEmployeeViewModel()？
+
+   因为在View中，试着将Model中的数据重新显示在文本框中。如：
+
+   ```html
+   <input id="TxtSalary" name="Salary" type="text" value="@Model.Salary" />
+   ```
+
+   如上所示，正在访问当前Model的"First Name"属性，如果Model 为空，会抛出类无法实例化的异常"Object reference not set to an instance of the class"。
+
+3. 上述的这些功能，有什么方法可以自动生成？
+
+   使用HTML帮助类就可以实现。
 
 ### 模块化开发
 
