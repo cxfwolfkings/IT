@@ -51,7 +51,7 @@
    - [WebAPI](./WebAPI.md)
    - [WCF](./WCF.md)
    - [Xamarin](./Xamarin.md)
-5.  [dotnet core](./core.md)
+5. [dotnet core](./core.md)
    - [简介](./core.md#简介)
      - [数字](./core.md#数字)
      - [垃圾回收](./core.md#垃圾回收)
@@ -79,19 +79,19 @@
      - [IIS托管](./core.md#IIS托管)
      - [部署示例](./core.md#部署示例)
    - [参考](./core.md#参考)
-12. 附录
+6. 附录
    - [Debug远程访问](#Debug远程访问)
    - [Ioc](./Ioc.md)
    - [ORM](./Orm.md)
    - [Nuget](./Nuget.md)
    - [ABP](./ABP.md)
-13. 总结
+7. 总结
    - [任务调度](./Summary.md#任务调度)
    - [发布](./Summary.md#发布)
    - [问题总结](./Summary.md#问题总结)
      - [虚拟目录没有权限](./Summary.md#虚拟目录没有权限)
      - [关于IIS的IUSER和IWAM帐户](./Summary.md#关于IIS的IUSER和IWAM帐户)
-14. 项目
+8. 项目
    - [实验室管理系统](./lab.md#实验室管理系统总结)
 
 ## Microsoft技术栈
