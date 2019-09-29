@@ -1,0 +1,132 @@
+<html>
+
+<head>
+  <title>布局页示例</title>
+  <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    header {
+      background: red;
+      height: 50px;
+      position: fixed;
+      width: 100%;
+    }
+
+    section {
+      width: 100%;
+      height: 100%
+    }
+
+    .menu {
+      position: fixed;
+      top: 50px;
+      bottom: 0px;
+      float: left;
+      width: 15%;
+      background: yellow
+    }
+
+    .content {
+      width: 85%;
+      height: 100%;
+      margin-left: 15%;
+      background: chartreuse;
+      position: absolute;
+      top: 50px;
+    }
+
+    /* 只显示两行 */
+    /* .news {
+      text-overflow: -o-ellipsis-lastline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    } */
+
+    .news {
+      position: relative;
+      line-height: 20px; /* 每行的高度 */
+      max-height: 40px; /* 容器的高度，2行 */
+      overflow: hidden;
+    }
+
+    .news::after {
+      content: attr(data-text); /* 多余字符标识，可以通过data-*设置 */
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      padding-left: 40px; /* "..."与前文距离 */
+      background: -webkit-linear-gradient(left, transparent, chartreuse 55%);
+      background: -o-linear-gradient(right, transparent, chartreuse 55%);
+      background: -moz-linear-gradient(right, transparent, chartreuse 55%);
+      background: linear-gradient(to right, transparent, chartreuse 55%);
+    }
+
+    ul>li {
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+    }
+
+    /* 设置菜单只显示4个字符，超出部分用"..."表示 */
+    ul>li>span {
+      display: block;
+      /* 块元素中才有效果 */
+      overflow: hidden;
+      /* 超出部分隐藏，不显示滚动条 */
+      white-space: nowrap;
+      /* 不换行 */
+      text-overflow: ellipsis;
+      /* 超出部分用"..."表示 */
+      width: 5em;
+      /* 因为默认显示4个字符，再加上最后1个字符"..."，所以总共是5个字符 */
+      margin: auto;
+      /* 为了在父元素中居中显示 */
+    }
+  </style>
+</head>
+
+<body style="height: 100%">
+  <header></header>
+  <section>
+    <div class="menu">
+      <ul>
+        <li>菜单1</li>
+        <li>菜单2</li>
+        <li>菜单3</li>
+        <li>菜单4</li>
+        <li><span>这是一个很长很长的菜单</span></li>
+      </ul>
+    </div>
+    <div class="content">
+      <div class="news" data-text="">
+        8月中旬百度、快手联合投资了知乎4.34亿美元，此举被视为百度加快专业内容布局的一环。今天百度知识垂类产品总负责人阮瑜表示，百度百科等6大类知识类产品已经积累了10亿条高质量内容。
+        根据百度所说，过去十多年，百度知道、百度百科、百度文库等六大知识类产品已经累计生产了10多亿条高质量内容，这些内容主要由网民和专业人士、机构用了十多年时间共同生产出来，充分发挥了互联网的共享精神，更充分释放了百度搜索作为平台的社会价值。
+        以百度百科、百度文库和百度知道为例，这三大产品已经和中国科协、中国抗癌协会、人民日报数字传播、国家哲学社会科学文献中心等7000多家权威机构建立合作，近万名专家参与相关内容的编辑和审核。
+      </div>
+      <br>
+      <div class="news" data-text="">
+        8月中旬百度、快手联合投资了知乎4.34亿美元，此举被视为百度加快专业内容布局的一环。今天百度知识垂类产品总负责人阮瑜表示，百度百科等6大类知识类产品已经积累了10亿条高质量内容。
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div>2019-09-29</div>
+  </footer>
+</body>
+<script>
+  const news = document.querySelectorAll('.news');
+  for (let i = 0; i < news.length; i++) {
+    if (news[i].scrollHeight > news[i].clientHeight) {
+      news[i].setAttribute('data-text', '...');
+    }
+  }
+</script>
+
+</html>
