@@ -140,4 +140,27 @@ Git也具有在特定事件发生之前或之后执行特定脚本代码功能�
    199.232.5.194 github.global.ssl.fastly.net
    ```
 
+   同时将DNS信息配置到Git安装目录下的hosts文件中
+
 4. 刷新 DNS 缓存：`ipconfig /flushdns`，OK!
+
+## git push一直停留在writing objects，速度慢
+
+```sh
+git config --global http.postBuffer 5242880000
+```
+
+作用：因为http.postBuffer默认上限为1M,上面的命令是把git的配置里http.postBuffer的变量改大为500M , 文件大,上传慢
+
+```sh
+git config --global http.lowSpeedLimit 0
+git config --global http.lowSpeedTime 999999
+```
+
+使用git更新或提交中途有时出现The remote end hung up unexpectedly的异常，特别是资源库在国外的情况下。此问题可能由网络原因引起。配置git的最低速度和最低速度时间：
+
+```sh
+git config --global pack.windowMemory 1024m
+```
+
+fatal: Out of memory, malloc failed问题的解决

@@ -107,7 +107,7 @@
    - [Debug远程访问](#Debug远程访问)
    - [Ioc](./Ioc.md)
    - [ORM](./Orm.md)
-   - [Nuget](./Nuget.md)
+   - [Nuget](./Appendix.md#Nuget)
    - [ABP](./ABP.md)
 7. 总结
    - [任务调度](./Summary.md#任务调度)
