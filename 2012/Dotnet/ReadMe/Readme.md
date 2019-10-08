@@ -16,13 +16,16 @@
 
 ## 第三部分 B/S开发
 
-### 第1天：[身份认证与授权](./3.1_身份认证与授权.md)
+### 第1天：[安全性概述](./3.1_安全性概述.md)
 
-- Session 和 Cookie
-- Token
-  - OAuth2 和 JWT - 如何设计安全的API？
-  - JWT详细介绍
-  - OAuth2详细介绍
+### 第2天：[Session身份认证](./3.2_Session身份认证.md)
+
+### 第3天：[Token身份认证](./3.3_Token身份认证.md)
+
+- OAuth2 和 JWT - 如何设计安全的API？
+- 为什么要使用JWT / Json Web Token基础 / 认证流程 / .NET Core中使用JWT
+
+### 第4天：[授权](./3.4_授权.md)
 
 ## 第四部分 C/S开发
 
