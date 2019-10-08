@@ -103,6 +103,22 @@
 - 使用进程 - fork函数 / multiprocessing模块 / 进程池 / 进程间通信
 - 使用线程 - thread模块 / threading模块 / Thread类 / Lock类 / Condition类 / 线程池
 
+### 第9天：[网络编程入门](./1.9_网络编程入门.md)
+
+- 计算机网络基础 - 计算机网络发展史 / “TCP-IP”模型 / IP地址 / 端口 / 协议 / 其他相关概念
+- 网络应用模式 - “客户端-服务器”模式 / “浏览器-服务器”模式
+- 基于HTTP协议访问网络资源 - 网络API概述 / 访问URL / requests模块 / 解析JSON格式数据
+- Python网络编程 - 套接字的概念 / socket模块 / socket函数 / 创建TCP服务器 / 创建TCP客户端 / 创建UDP服务器 / 创建UDP客户端 / SocketServer模块
+- 电子邮件 - SMTP协议 / POP3协议 / IMAP协议 / smtplib模块 / poplib模块 / imaplib模块
+- 短信服务 - 调用短信服务网关
+
+### 第10天：[图像和文档处理](./1.10_图像和文档处理.md)
+
+- 用Pillow处理图片 - 图片读写 / 图片合成 / 几何变换 / 色彩转换 / 滤镜效果
+- 读写Word文档 - 文本内容的处理 / 段落 / 页眉和页脚 / 样式的处理
+- 读写Excel文件 - xlrd模块 / xlwt模块
+- 生成PDF文件 - pypdf2模块 / reportlab模块
+
 1. 入门
    - [变量，表达式和语句](./1.md#变量，表达式和语句)
      - [变量和类型](./1.md#变量和类型)
