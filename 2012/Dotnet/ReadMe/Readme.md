@@ -20,6 +20,9 @@
 
 ### 第2天：[Session身份认证](./3.2_Session身份认证.md)
 
+- Cookie和Session简介
+- 扩展：ASP.NET页面之间传递值的方式
+
 ### 第3天：[Token身份认证](./3.3_Token身份认证.md)
 
 - OAuth2 和 JWT - 如何设计安全的API？
@@ -30,6 +33,18 @@
 ## 第四部分 C/S开发
 
 ## 第五部分 项目总结和附录
+
+### 第1天：[游戏框架简介](./5.1_游戏框架简介.md)
+
+- [MonoGame](https://github.com/mono/MonoGame)：一个用来创建跨平台游戏的强大框架。
+- [CocosSharp](https://github.com/mono/CocosSharp)：CocosSharp 是 Cocos2D 和 Cocos3D API 的 C# 实现版本，可以在所有支持 MonoGame 的平台上运行。
+- [Duality](https://github.com/AdamsLair/duality)：Duality 是一个 2D 游戏开发框架。专注于功能的模块化，自带一个可视化编辑器。
+- [Paradox](https://github.com/SiliconStudio/paradox)：Paradox 游戏引擎。
+
+### 第2天：[人工智能（Artificial Intelligence）框架简介](./5.2_AI框架简介.md)
+
+- [AIMLBot（Program#）](http://aimlbot.sourceforge.net/)：使用 C# 编写的一个小型、快速、兼容标准、易于定制的聊天机器人，基于 AIML （人工智能标记语言 Artificial Intelligence Markup Language）。
+- [SIML](http://simlbot.com/)：智能综合智能标记语言（Synthetic Intelligence Markup Language），下一代聊天机器人及数字助手语言。
 
 1. [Microsoft技术栈](#Microsoft技术栈)
    - [尽量早日放弃Silverlight和Flash](#尽量早日放弃Silverlight和Flash)
