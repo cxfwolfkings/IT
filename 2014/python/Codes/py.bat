@@ -1,0 +1,1 @@
+"F:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\python" %1
