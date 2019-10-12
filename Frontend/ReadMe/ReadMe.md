@@ -35,9 +35,7 @@
 
 ### 第9天：html5
 
-### 第10天：jQuery类库
-
-### 第11天：jQuery常用插件库
+### 第10天：[jQuery类库](./1.10_jQuery类库.md)
 
 1. jQuery简介
 2. 选择器
@@ -48,9 +46,15 @@
 7. 示例
    - 输入框输入限制
 
+### 第11天：[jQuery常用插件库](./1.11_jQuery常用插件库.md)
+
 ## 第二部分 node + npm + es6 + typescript
 
-### 第1天：服务器端javascript
+### 第1天：[服务器端javascript](./2.1_服务器端javascript.md)
+
+### 第2天：[node入门](./2.2_node入门.md)
+
+### 第3天：[npm介绍](./2.3_npm介绍.md)
 
 ## 第三部分 vue + angular + react
 
@@ -101,11 +105,17 @@
 
 ### 第8天：[Vue项目总结与参考](./3.8_Vue总结与参考.md)
 
+### 第9天：[Angular简介](./3.9_Angular简介.md)
+
+### 第10天：[React简介](./3.10_React简介.md)
+
 ## 第四部分 微信小程序
 
 ### 第1天：[小程序简介](./4.1_小程序简介.md)
 
 ## 第五部分 项目总结 + 附录
+
+### 第1天：[js总结](./5.1_js总结.md)
 
 ## 附录
 
@@ -126,6 +136,10 @@ Php 开源 php-open.com  模仿->()创新
 1. 布局
 2. 内容
    - 文字效果
+
+### [第3天：jQMobile](./6.3_jQMobile.md)
+
+### [第4天：PhoneGap](./6.4_PhoneGap.md)
 
 ## 谷歌浏览器出现“错误代码：ERR_UNSAFE_PORT”的解决办法
 

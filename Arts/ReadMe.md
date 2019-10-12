@@ -28,10 +28,16 @@
 - 配置项
 - 问题
   
-### 第4天：[VSStudio](./1.5_VSStudio.md)
+### 第5天：[VSStudio](./1.5_VSStudio.md)
 
 - 问题
   - vs2019使用.NETCore3.0
+
+### 第6天：[Make](./1.6_make.md)
+
+### 第7天：[Cygwin & MinGW](./1.7_Cygwin&MinGW.md)
+
+### 第8天：[JetBrain](./1.8_JetBrain.md)
 
 ## 第二部分 管理工具
 
@@ -45,6 +51,15 @@
 - [客户端工具](#客户端工具)
 - [下载速度](#下载速度)
 
+### 第3天：[svn](./2.3_svn.md)
+
 ## 第二部分 运维工具
 
+### 第1天：[汇总](./3.1_汇总.md)
+
 ## 第二部分 设计工具
+
+### 第1天：[汇总](./4.1_汇总.md)
+
+- [XMind](./4.1_汇总.md#XMind)
+- [Markdown](./4.1_汇总.md#Markdown)

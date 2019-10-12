@@ -30,6 +30,8 @@
 
 ### 第4天：[授权](./3.4_授权.md)
 
+### 第6天：[MVC](./3.6_MVC.md)
+
 ## 第四部分 C/S开发
 
 ## 第五部分 项目总结和附录
@@ -45,6 +47,8 @@
 
 - [AIMLBot（Program#）](http://aimlbot.sourceforge.net/)：使用 C# 编写的一个小型、快速、兼容标准、易于定制的聊天机器人，基于 AIML （人工智能标记语言 Artificial Intelligence Markup Language）。
 - [SIML](http://simlbot.com/)：智能综合智能标记语言（Synthetic Intelligence Markup Language），下一代聊天机器人及数字助手语言。
+
+### 第3天：[附录](./5.3_附录.md)
 
 1. [Microsoft技术栈](#Microsoft技术栈)
    - [尽量早日放弃Silverlight和Flash](#尽量早日放弃Silverlight和Flash)
