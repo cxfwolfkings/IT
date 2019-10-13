@@ -1,5 +1,7 @@
 # 数据库
 
+<b style="color:red">多抽出一分钟时间学习，让你的生命更加精彩。</b>
+
 ## 目录
 
 1. 起步
@@ -31,3 +33,19 @@
        - [md5](./MySQL/ReadMe/2.md#md5)
 
 [SSMS](https://docs.microsoft.com/zh-cn/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017)
+
+## 第一部分 SQL
+
+## 第二部分 关系型数据库
+
+参考：
+
+- Sql Server: [https://docs.microsoft.com/zh-cn/sql/index](https://docs.microsoft.com/zh-cn/sql/index)
+- PostgreSQL: [https://www.postgresql.org/](https://www.postgresql.org/)
+- Oracle: [https://www.oracle.com/index.html](https://www.oracle.com/index.html)
+
+### 第1天：[RDBMS概念](./2.1_RDBMS概念.md)
+
+- SQL92标准
+- SQL99标准
+- 数据库范式
