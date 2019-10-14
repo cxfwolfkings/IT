@@ -26,6 +26,9 @@
 ### 第3天：[Token身份认证](./3.3_Token身份认证.md)
 
 - OAuth2 和 JWT - 如何设计安全的API？
+
+### 第4天：[JWT](./3.4_JWT.md)
+
 - 为什么要使用JWT / Json Web Token基础 / 认证流程 / .NET Core中使用JWT
 
 ### 第4天：[授权](./3.4_授权.md)
