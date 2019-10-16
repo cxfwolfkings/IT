@@ -94,7 +94,7 @@
 ### 第6天：[VueUI插件](./3.6_VueUI插件.md)
 
 - ElementUI
-   - 表单验证
+  - 表单验证
 - mint-ui
 - iview
 
@@ -118,6 +118,8 @@
 - 开始例子
 
 ### 第10天：[Angular开发](./3.10_Angular开发.md)
+
+### 第11天：[Angular开发2](./3.11_Angular开发2.md)
 
 ### 第10天：[React简介](./3.10_React简介.md)
 
