@@ -194,9 +194,13 @@
 - 动静分离和Nginx配置
 - 配置HTTPS
 
-### 第10天：[实战Flask](./2.10_实战Flask.md)
+### 第10天：[Flask入门](./2.10_Flask入门.md)
 
-- Flask入门
+- 安装
+- 快速上手
+
+### 第11天：[Flask入门](./2.10_Flask入门.md)
+
 - 模板的使用
 - 表单的处理
 - 数据库操作
@@ -267,7 +271,7 @@
 
 ### 第2天：[Pandas入门](./4.2_Pandas入门.md)
 
-### 第3天：NumPy和SciPy的应用
+### 第3天：[NumPy和SciPy的应用](./4.3_NumPy和SciPy的应用.md)
 
 ### 第4天：Matplotlib和数据可视化
 

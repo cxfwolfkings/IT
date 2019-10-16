@@ -1,0 +1,16 @@
+{
+  "name": "mongoskin",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "node build/build.js",
+    "start": "node ."
+  },
+  "author": "Colin Chen",
+  "license": "BSD",
+  "dependencies": {
+    "mongodb": "^2.2.36",
+    "mongoskin": "^2.1.0"
+  },
+  "devDependencies": {}
+}

@@ -14,6 +14,8 @@
 **/RemoteSystemsTempFiles
 **/.externalToolBuilders
 **/.settings
+**/__pycache__
+**/venv
 *.docx
 *.doc
 *.pptx

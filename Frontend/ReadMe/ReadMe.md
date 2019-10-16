@@ -117,7 +117,7 @@
   - 手动初始化
 - 开始例子
 
-### 第10天：[Angular语法](./3.10_Angular语法.md)
+### 第10天：[Angular开发](./3.10_Angular开发.md)
 
 ### 第10天：[React简介](./3.10_React简介.md)
 
