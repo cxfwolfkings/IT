@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>组件Demo08_分发</title>
+  <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <child-component>
+      <p>分发的内容</p>
+      <p>更多分发的内容</p>
+    </child-component>
+  </div>
+  <div id="app1">
+    <child-component1>
+      <h2 slot="header">标题</h2>
+      <p>正文内容</p>
+      <p>更多的正文内容</p>
+      <div slot="footer">底部信息</div>
+    </child-component1>
+  </div>
+  <div id="app2">
+    <child-component2>
+      <template>
+        <p>来自父组件的内容</p>
+        <p>{{props.msg}}</p>
+      </template>
+    </child-component2>
+  </div>
+  <script>
+    /**
+     * 子组件child-component的模板内定义了一个<slot>元素，并且用一个<p>作为默认的内容，
+     * 在父组件没有使用slot时，会渲染这段默认的文本；如果写入了slot，那就会替换整个<slot>
+     */
+    Vue.component('child-component', {
+      template: `
+        <div>
+          <slot>
+            <p>如果父组件没有插入内容，我将作为默认出现</p>
+          </slot>
+        </div>
+      `
+    });
+    /**
+     * 子组件内声明了3个<slot>元素，其中在<div class＝"main">内的<slot>没有使用name特性，
+     * 它将作为默认slot出现，父组件没有使用slot特性的元素与内容都将出现在这里。
+     * 如果没有指定默认的匿名slot，父组件内多余的内容片段都将被抛弃。
+     *
+     * 通过$slots可以访问某个具名slot，this.$slots.default包括了所有没有被包含在具名slot中的节点。
+     */
+    Vue.component('child-component1', {
+      template: `
+        <div class="container">
+          <div class="header">
+            <slot name="header"></slot>
+          </div>
+          <div class="main">
+            <slot></slot>
+          </div>
+          <div class="footer">
+            <slot name="footer"></slot>
+          </div>
+        </div>
+      `,
+      mounted: function() {
+        var header = this.$slots.header;
+        var main = this.$slots.default;
+        var footer = this.$slots.footer;
+        console.log(footer);
+        console.log(footer[0].elm.innerHTML);
+      }
+    });
+    /**
+     * 观察子组件的模板，在<slot>元素上有一个类似props传递数据给组件的写法msg＝"xxx"，将
+     * 数据传到了插槽。父组件中使用了<template>元素，而且拥有一个scope＝"props"的特性，这里的props
+     * 只是一个临时变量，就像v-for="item in items"里面的item一样。template内可以通过临时变量props
+     * 访问来自子组件插槽的数据msg。
+     */
+    Vue.component('child-component', {
+      template: `
+        <div class="container">
+          <slot msg="来自子组件的内容"></slot>
+        </div>
+      `
+    });
+    var app = new Vue({
+      el: '#app'
+    });
+    var app1 = new Vue({
+      el: '#app1'
+    });
+    var app2 = new Vue({
+      el: '#app2'
+    });
+  </script>
+</body>
+</html>

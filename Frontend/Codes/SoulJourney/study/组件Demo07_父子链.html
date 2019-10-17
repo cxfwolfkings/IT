@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>组件Demo07_父子链</title>
+  <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{message}}
+    <component-a></component-a>
+  </div>
+  <div id="app1">
+    <button @click="handleRef">通过ref获取子组件实例</button>
+    <!-- 用特殊的属性ref来为子组件指定一个索引名称 -->
+    <component-b ref="comA"></component-b>
+  </div>
+  <script>
+    /**
+     * 尽管Vue允许这样操作，但在业务中，子组件应该尽可能地避免依赖父组件的数据，更不应该去主动修改它的数据，
+     * 因为这样使得父子组件紧藕合，只看父组件，很难理解父组件的状态，因为它可能被任意组件修改，
+     * 理想情况下，只有组件自己能修改它的状态。父子组件最好还是通过props和$emit来通信。
+     */
+    Vue.component('component-a', {
+      template: '<button @click="handleEvent">通过父链直接修改数据</button>',
+      methods: {
+        handleEvent: function(){
+          // 访问到父链后，可以做任何操作，比如直接修改数据
+          this.$parent.message = '来自组件component-a的内容';
+        }
+      }
+    });
+    /**
+     * $refs只在组件渲染完成后才填充，并且它是非响应式的。它仅仅作为一个直接访问子组件的应急方案，
+     * 应当避免在模板或计算属性中使用$refs
+     */
+    Vue.component('component-b', {
+      template: '<div>子组件</div>',
+      data: function(){
+        return {
+          message: '子组件内容'
+        }
+      }
+    });
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: ''  
+      }
+    });
+    var app1 = new Vue({
+      el: '#app1',
+      methods: {
+        handleRef: function() {
+          // 通过$refs来访问指定的实例
+          var msg = this.$refs.comA.message;
+          console.log(msg);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

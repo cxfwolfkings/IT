@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>组件Demo05_双向绑定（父子）</title>
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>总数：{{total}}</p>
+    <my-component v-model="total"></my-component>
+    <button @click="handleReduce">-1</button>
+  </div>
+  <script>
+    /**
+     * Vue2.x 可以在自定义组件上使用v-model 指令，不过组件$emit()的事件名是特殊的input，
+     * 这也可以称作是一个语法糖。
+     * v-model还可以用来创建自定义的表单输入组件，进行数据绑定，示例如下
+     * 实现这样一个具有双向绑定的v-model 组件要满足下面两个要求： 
+     * ● 接收一个value属性。
+     * ● 在有新的value时触发input事件。
+     */ 
+    Vue.component('my-component', {
+      props: ['value'],
+      template: '<input :value="value" @input="updateValue">',
+      methods: {
+        updateValue: function (event) {
+          this.$emit('input', event.target.value);
+        } 
+      }
+    });
+    var app = new Vue({
+      el: '#app',
+      data: {
+        total: 0  
+      },
+      methods: {
+        handleReduce: function() {
+          this.total--;  
+        }  
+      }
+    });
+  </script>      
+</body>
+</html>

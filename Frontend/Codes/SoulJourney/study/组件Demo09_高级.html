@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>组件Demo09_高级</title>
+  <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <child-component :count="1"></child-component>
+  </div>
+  <div id="app1">
+    <child-component1 inline-template>
+      <div>
+        <h2>在父组件中定义子组件的模板</h2>
+        <p>{{message}}</p>
+        <p>{{msg}}</p>
+      </div>
+    </child-component1>
+  </div>
+  <div id="app2">
+    <component :is="currentView"></component>
+    <button @click="handleChangeView('A')">切换到A</button>
+    <button @click="handleChangeView('B')">切换到B</button>
+    <button @click="handleChangeView('C')">切换到C</button>
+  </div>
+  <div id="app3">
+    <child-component2></child-component2>
+  </div>
+  <script>
+    /**
+     * 设置name后，在组件模板内就可以递归使用了，不过需要注意的是，必须给一个条件来限制递归数量，
+     * 否则会抛出错误：max stack size exceeded。
+     * 组件递归使用可以用来开发一些具有未知层级关系的独立组件，比如级联选择器和树形控件等
+     */
+    Vue.component('child-component', {
+      name: 'child-component',
+      props: {
+        count: {
+          type: Number,
+          default: 1
+        }
+      },
+      template: `
+        <div class="child">
+          <child-component :count="count+1" v-if="count<3"></child-component>
+        </div>
+      `
+    });
+    /**
+     * 在父组件中声明的数据message和子组件中声明的数据msg，两个都可以渲染（如果同名，
+     * 优先使用子组件的数据）。这反而是内联模板的缺点，就是作用域比较难理解，
+     * 如果不是非常特殊的场景， 建议不要轻易使用内联模板。
+     */
+    Vue.component('child-component1', {
+      data: function(){
+        return {
+          msg: '在子组件声明的数据'
+        }
+      }
+    });
+    Vue.component('child-component2', function (resolve, reject) {
+      window.setTimeout(function() {
+        resolve({
+          template: '<div>我是异步渲染的</div>'
+        });
+      }, 2000);
+    });
+
+    var app = new Vue({
+      el: '#app'
+    });
+    var app1 = new Vue({
+      el: '#app1',
+      data: {
+        message: '在父组件声明的数据'
+      }
+    });
+    /**
+     * 动态地改变currentView的值就可以动态挂载组件了。也可以直接绑定在组件对象上
+     */
+    var app2 = new Vue({
+      el: '#app2',
+      components: {
+        comA: {
+          template: '<div>组件A</div>'
+        },
+        comB: {
+          template: '<div>组件B</div>'
+        },
+        comC: {
+          template: '<div>组件C</div>'
+        }
+      },
+      data: {
+        currentView: 'comA'
+      },
+      methods: {
+        handleChangeView: function(component) {
+          this.currentView = 'com' + component;
+        }
+      }
+    });
+    var app3 = new Vue({
+      el: '#app3'
+    });
+  </script>
+</body>
+</html>

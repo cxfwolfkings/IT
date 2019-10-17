@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>组件Demo06_中央事件总线</title>
+  <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{message}}
+    <component-a></component-a>
+  </div>
+  <script>
+    /**
+     * 这种方法巧妙而轻量地实现了任何组件间的通信
+     */ 
+    var bus = new Vue();
+    Vue.component('component-a', {
+      template: '<button @click="handleEvent">传递事件</button>',
+      methods: {
+        handleEvent: function(){
+          bus.$emit('on-message', '来自组件component-a的内容');
+        }
+      }
+    });
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: ''  
+      },
+      mounted: function() {
+        var _this = this;
+        // 在实例初始化时，监听来自bus实例的事件
+        bus.$on('on-message', function(msg){
+          _this.message = msg;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

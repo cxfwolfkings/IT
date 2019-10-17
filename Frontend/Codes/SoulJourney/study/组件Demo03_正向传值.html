@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>组件Demo03_正向传值（父 -> 子）</title>
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <child message="hello!" warning-text="提示信息"></child>
+  <br>
+  <child message="[1,2,3]" warning-text="无v-bind"></child>
+  <br>
+  <child :message="[1,2,3]" warning-text="有v-bind"></child>
+  <br>
+  <input v-model="parentMsg">
+  <br>
+  <child v-bind:message="parentMsg"></child>
+  <my-component :init-count="1"></my-component>
+  <my-component2 :width="100"></my-component>
+  <ol>
+    <todo-item v-for="item in sites" v-bind:todo="item"></todo-item>
+  </ol>  
+</div>  
+<script>
+  /**
+   * "prop"是父组件用来传递数据的一个自定义属性。
+   * 父组件的数据需要通过props把数据传给子组件，子组件需要显式地用props选项声明"prop"
+   * 
+   * 类似于用v-bind绑定HTML特性到一个表达式，也可以用v-bind动态绑定props的值到父组件的数据中。
+   * 每当父组件的数据变化时，该变化也会传导给子组件
+   * 
+   * 由于HTML特性不区分大小写，当使用DOM模板时，驼峰命名(CamelCase)的props名称要转为短横分隔命名(kebab-case)。
+   * 
+   * 如果你要直接传递数字、布尔值、数组、对象，而且不使用v-bind，传递的仅仅是字符串。
+   * 
+   * Vue2.x通过props传递数据是单向的，也就是父组件数据变化时会传递给子组件，但是反过来不行。
+   * 业务中会经常遇到两种需要改变prop的情况，
+   * 一种是父组件传递初始值进来，子组件将它作为初始值保存起来，在自己的作用域下可以随意使用和修改。这种情况可以在组件data内再声明一个数据，引用父组件的prop。
+   * 另一种情况就是prop作为需要被转变的原始值传入。这种情况用计算属性就可以了。
+   */
+  // 注册
+  Vue.component('child', {
+    // 声明 props
+    props: ['message', 'warningText'],
+    // 同样也可以在 vm 实例中像 "this.message" 这样使用
+    template: '<span>{{warningText}}：{{message}}</span>'
+  });
+  // 组件中声明了数据count，它在组件初始化时会获取来自父组件的initCount，之后就与之无关了，
+  // 只用维护count，这样就可以避免直接操作initCount。
+  Vue.component('my-component', {
+    // 声明 props
+    props: ['initCount'],
+    template: '<div>{{count}}</div>',
+    data: function () {
+      return {
+        count: this.initCount
+      }
+    }
+  });
+  // 因为用css传递宽度要带单位(px)，但是每次都写太麻烦，而且数值计算一般是不带单位的，
+  // 所以统一在组件内使用计算属性就可以了。
+  Vue.component('my-component2', {
+    // 声明 props
+    props: ['width'],
+    template: '<div :style="style">组件内容</div>',
+    computed: {
+      style: function () {
+        return {
+          width: this.width + 'px'
+        }
+      }
+    }
+  });
+  Vue.component('todo-item', {
+    props: ['todo'],
+    template: '<li>{{ todo.text }}</li>'
+  });
+  /**
+   * type 可以是下面原生构造器：
+   * •	String
+   * •	Number
+   * •	Boolean
+   * •	Function
+   * •	Object
+   * •	Array
+   * type也可以是一个自定义构造器，使用instanceof检测。
+   * 当prop验证失败时，在开发版本下会在控制台抛出一条警告。
+   */
+  Vue.component('example', {
+    props: {
+      // 基础类型检测（`null`意思是任何类型都可以）
+      propA: Number,
+      // 多种类型
+      propB: [String, Number],
+      // 必传且是字符串
+      propC: {
+        type: String,
+        required: true
+      },
+      // 数字，有默认值
+      propD: {
+        type: Number,
+        default: 100
+      },
+      // 数组／对象的默认值应当由一个工厂函数返回
+      propE: {
+        type: Object,
+        default: function () {
+          return { message: 'hello' }
+        }
+      },
+      // 自定义验证函数
+      propF: {
+        validator: function (value) {
+          return value > 10
+        }
+      }
+    }
+  });
+  // 以下实例中用 v-bind 指令将 todo 传到每一个重复的组件中
+  // 创建根实例
+  new Vue({
+    el: '#app',
+    data: {
+      parentMsg: '父组件内容',
+      sites: [
+        { text: 'Runoob' },
+        { text: 'Google' },
+        { text: 'Taobao' }
+      ]
+    }
+  });
+</script>    
+</body>
+</html>

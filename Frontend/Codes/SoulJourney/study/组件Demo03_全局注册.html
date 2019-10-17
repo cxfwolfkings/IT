@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Vue组件Demo01_全局注册</title>
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <my-component></my-component>
+  <button-component></button-component>
+  <button-component></button-component>
+  <button-component></button-component>
+</div>
+<script>
+  var data = {
+      counter: 0
+  };
+  Vue.component('my-component', {
+    // 选项
+    template: '<div>这是一个全局注册的组件</div>'
+  });
+  Vue.component('button-component', {
+    // 选项
+    template: '<button @click="counter++">{{counter}}</button>',
+    data: function() {
+        // JavaScript对象是引用关系，所以如果return出的对象引用了外部的一个对象，那这个对象就是共享的，任何一方修改都会同步。
+        // return data;
+        // 返回一个新实例，3个按钮就不会互相影响
+        return {
+          counter: 0
+        };
+    }
+  });
+  var app = new Vue({
+    el: '#app'
+  });
+</script>
+</body>
+</html>

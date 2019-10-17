@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>组件Demo02_局部注册</title>
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <!-- <my-component></my-component> -->
+  <table>
+    <tbody is="my-component"></tbody> 
+  </table>
+</div>
+<script>
+  /*
+   * Vue组件的模板在某些情况下会受到HTML的限制，比如<table>内规定只允许<tr>、<td>、<th>等这些表格元素，
+   * 所以在<table>内直接使用组件是无效的。这种情况下，可以使用特殊的is属性来挂载组件。
+   * tbody在渲染时，会被替换为组件的内容。常见的限制元素还有<ul>、<ol>、<select>
+   * 
+   * 除了template（template的DOM结构必须被一个元素包含，否则无法渲染）选项外，组件中还可以像Vue实例那样使用其他的选项，
+   * 比如data、computed、methods等。但是在使用data时，和实例稍有区别，data必须是函数，然后将数据return出去。
+   */
+  var child = {
+    template: `<div>
+                 {{message}}
+              </div>`,
+    data: function() {
+      return {
+        message: '这是一个局部注册的组件'
+      }
+    }
+  };
+  var app = new Vue({
+    el: '#app',
+    components: {
+      'my-component': child
+    }
+  });
+</script>
+</body>
+</html>
