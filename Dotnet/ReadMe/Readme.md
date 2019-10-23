@@ -6,17 +6,73 @@
 2. 第二部分 C#编程和面向对象
 3. 第三部分 B/S开发
 4. 第四部分 C/S开发
-5. 第五部分 项目总结和附录
+5. 第五部分 通信
+6. 第六部分 项目总结和附录
 
 ## 第一部分 C#介绍和.NET平台
 
+### 第1天：[.NET体系结构](./1.1_.NET体系结构.md)
+
+- 公共语言运行库
+- 中间语言
+- 程序集
+- 名称空间
+
+### 第2天：[C#语言](./1.2_C#语言.md)
+
+- 字符串和正则
+- 文件和注册表
+- 事务处理
+- 网络
+- 错误和异常
+
+### 第3天：[程序集](./1.3_程序集.md)
+
+### 第4天：[代码诊断](./1.4_代码诊断.md)
+
+### 第5天：[安全性](./1.5_安全性.md)
+
+### 第6天：[互操作](./1.6_互操作.md)
+
+### 第7天：[本地化](./1.7_本地化.md)
+
 ## 第二部分 C#编程和面向对象
 
-### 第9天：[WCF](./2.9_WCF.md)
+### 第1天：[面向对象](./2.1_面向对象.md)
+
+- 对象和类型
+- 继承
+- 运算符和类型强制转换
+- 委托和事件
+
+### 第2天：[泛型和反射](./2.2_泛型和反射.md)
+
+### 第3天：[数据结构](./2.3_数据结构.md)
+
+- 数组
+- 集合
+
+### 第4天：[LINQ](./2.4_LINQ.md)
+
+### 第5天：[动态语言扩展](./2.5_动态语言扩展.md)
+
+### 第6天：[异步编程](./2.6_异步编程.md)
+
+### 第7天：[内存管理和指针](./2.7_内存管理和指针.md)
+
+### 第8天：[windows服务](./2.8_windows服务.md)
+
+### 第9天：[ADO.NET](./2.9_ADO.NET.md)
 
 ## 第三部分 B/S开发
 
 ### 第1天：[安全性概述](./3.1_安全性概述.md)
+
+### 第1天：[核心ASP.NET](./3.1_核心ASP.NET.md)
+
+### 第2天：[WebForms](./3.2_WebForms.md)
+
+### 第3天：[MVC](./3.3_MVC.md)
 
 ### 第2天：[Session身份认证](./3.2_Session身份认证.md)
 
@@ -39,21 +95,49 @@
 
 ## 第四部分 C/S开发
 
-## 第五部分 项目总结和附录
+### 第1天：[核心XAML](./4.1_核心XAML.md)
 
-### 第1天：[游戏框架简介](./5.1_游戏框架简介.md)
+### 第2天：[MEF](./4.2_MEF.md)
+
+### 第3天：[windows运行库](./4.3_windows运行库.md)
+
+### 第4天：[处理XML](./4.4_处理XML.md)
+
+### 第5天：[WPF](./4.5_WPF.md)
+
+### 第6天：[Windows Store](./4.6_WindowsStore.md)
+
+## 第五部分 通信
+
+### 第1天：[WCF](./5.1_WCF.md)
+
+### 第2天：[Web API](./5.2_WebAPI.md)
+
+### 第3天：[Workflow](./5.3_Workflow.md)
+
+### 第4天：[对等网络](./5.4_对等网络.md)
+
+### 第5天：[消息队列](./5.5_消息队列.md)
+
+## 第六部分 项目总结和附录
+
+### 第1天：[游戏框架简介](./6.1_游戏框架简介.md)
 
 - [MonoGame](https://github.com/mono/MonoGame)：一个用来创建跨平台游戏的强大框架。
 - [CocosSharp](https://github.com/mono/CocosSharp)：CocosSharp 是 Cocos2D 和 Cocos3D API 的 C# 实现版本，可以在所有支持 MonoGame 的平台上运行。
 - [Duality](https://github.com/AdamsLair/duality)：Duality 是一个 2D 游戏开发框架。专注于功能的模块化，自带一个可视化编辑器。
 - [Paradox](https://github.com/SiliconStudio/paradox)：Paradox 游戏引擎。
 
-### 第2天：[人工智能（Artificial Intelligence）框架简介](./5.2_AI框架简介.md)
+### 第2天：[人工智能（Artificial Intelligence）框架简介](./6.2_AI框架简介.md)
 
 - [AIMLBot（Program#）](http://aimlbot.sourceforge.net/)：使用 C# 编写的一个小型、快速、兼容标准、易于定制的聊天机器人，基于 AIML （人工智能标记语言 Artificial Intelligence Markup Language）。
 - [SIML](http://simlbot.com/)：智能综合智能标记语言（Synthetic Intelligence Markup Language），下一代聊天机器人及数字助手语言。
 
-### 第3天：[附录](./5.3_附录.md)
+### 第3天：[ORM框架](./6.3_ORM框架.md)
+
+### 第4天：[IOC框架](./6.4_IOC框架.md)
+
+### 第3天：[附录](./6.3_附录.md)
 
 1. [Microsoft技术栈](#Microsoft技术栈)
    - [尽量早日放弃Silverlight和Flash](#尽量早日放弃Silverlight和Flash)
