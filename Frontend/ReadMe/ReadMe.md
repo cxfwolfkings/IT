@@ -105,23 +105,36 @@
 
 ### 第8天：[Vue项目总结与参考](./3.8_Vue总结与参考.md)
 
-### 第9天：[Angular入门](./3.9_Angular入门.md)
+### 第9-15天：[Angular](./3.9_Angular.md)
 
-- 起步
-  - 什么是 AngularJS
-  - 端对端的解决方案
-  - AngularJS的可爱之处
-  - AngularJS的禅道（理念）
-  - 引导程序
-  - 自动初始化
-  - 手动初始化
-- 开始例子
+- 什么是 AngularJS / 端对端的解决方案 / 可爱之处 / 禅道（理念）/ HelloWorld
 
-### 第10天：[React入门](./3.10_React入门.md)
+### 第15-24天：[React](./3.10_React.md)
 
-## 第四部分 微信小程序
+## 第四部分 微信小程序 + Flutter
 
-### 第1天：[小程序简介](./4.1_小程序简介.md)
+### 第1-6天：[小程序](./4.1_小程序.md)
+
+- 什么是小程序 / 注册小程序 / 开发环境
+- 布局：margin、padding、border、flex
+- 前端组件：view、image、text、Swiper、
+- 数据绑定 / Wafer2 / CodeIgniter / URI / 通过JSON文件读取数据 / 通过Controller返回数据
+- 项目配置（Pages、Windows、TabBar、Debug） / 生命周期 / UI（布局、样式、视图容器、表单）
+- 发起请求 / 上传图片（预览、回显） / 下载图片（回显、保存）/ 地图
+- 音频 / 视频 / 绘图 / 动画
+- 常用功能：拨电话
+- 项目实战：需求分析、技术选择、基本架构与关注点解决方案、代码编写
+
+### 第7-15天：[Flutter](./4.2_Flutter.md)
+
+- 安装 / 配置编辑器 / HelloWorld / 开发工具
+- Widget框架 / 布局 / 交互
+- Web / Android / iOS / React Native
+- 手势 / 动画 / 字体 / 盒约束 / 资源和图片
+- 文本输入 / 路由和导航 / 国际化
+- packages / 平台特定代码 / 文件读写 / 网络 / JSON和序列化
+- 测试 / 调试 / 构建发布
+- 总结：架构图、分层设计、渲染管道、构建漂亮的用户界面、滑动的魔法...
 
 ## 第五部分 项目总结 + 附录
 
