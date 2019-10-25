@@ -18,14 +18,17 @@
 
 ## 第二部分 Docker + K8s
 
-### 第1天：[Docker简介](./2.1_Docker简介.md)
+### 第1-5天：[Docker简介](./2.1_Docker简介.md)
 
-- 容器和Docker简介
-- Docker官网注册
-- Docker术语
-- 安装
-- MySQL示例
-- 命令
+1. 简介
+   - 什么是Docker / Windows容器 / 为什么使用Docker / 虚拟化与docker
+   - VM和Docker容器之间的比较 / Docker官网注册 / Docker术语
+   - 安装 / 配置 / 卸载 / MySQL示例
+2. 命令
+   - Docker子命令分类
+   - 镜像命令
+   - Dockerfile命令
+
 - 附录
 
 ## 第三部分 GitLab + Jenkins
