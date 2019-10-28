@@ -1,0 +1,278 @@
+﻿@model LeadChina.CCDMonitor.Web.Models.Vm.SurveyViewModel
+@{
+    Layout = "~/Views/Shared/_AdaptionLayout.cshtml";
+    ViewBag.Title = "LG 生产监控系统";
+    var isReadOnly = Model.SurveyId > 0 ? "readonly" : "";
+}
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel" style="max-width: 900px">
+            <div class="x_title">
+                @if (Model.SurveyId > 0)
+                {
+                    if (!string.IsNullOrEmpty(Model.ReadOnly))
+                    {
+                        <h2><small>查看问题</small></h2>
+                    }
+                    else
+                    {
+                        <h2><small>编辑问题</small></h2>
+                    }
+                }
+                else
+                {
+                    <h2><small>新建问题</small></h2>
+                }
+                @*<ul class="nav navbar-right panel_toolbox">
+                        <li>
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="#">Settings 1</a>
+                                </li>
+                                <li>
+                                    <a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>*@
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content" style="margin-top:15px">
+                <form class="form-horizontal form-label-left input_mask surveyForm"
+                      action="@Url.Action("Save")"
+                      method="post" enctype="multipart/form-data">
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group">
+                        <label class="control-label left-60" for="heard"><span style="color:red">*</span>&nbsp;问题编号</label>
+                        <div class="col-md-8 col-sm-8 col-xs-12 left-60">
+                            <input id="SurveyNo" class="form-control" type="text" autocomplete='off'
+                                   name="SurveyNo" maxlength="20" value="@Model.SurveyNo" @isReadOnly>
+                            <span class="text-danger msg-no" style="font-size:14px">@Model.ErrorNoMsg</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group">
+                        <label class="control-label left-60" for="heard"><span style="color:red">*</span>&nbsp;异常时间</label>
+                        <div class="col-md-8 col-sm-8 col-xs-12 left-60">
+                            <input id="SurveyDate" type='text' class="form-control date" name="SurveyDate"
+                                   value="@Model.SurveyDate" @Model.ReadOnly autocomplete='off' readonly
+                                   style="background-color:white"/>
+                            <span class="text-danger msg-date" style="font-size:14px">@Model.ErrorDateMsg</span>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                        <label class="control-label left-60" for="heard"><span style="visibility:hidden">*</span>&nbsp;问题说明</label>
+                        <div class="col-md-10 col-sm-10 col-xs-12 left-60">
+                            <textarea id="SurveyDesc" class="resizable_textarea form-control" name="SurveyDesc" rows="6"
+                                      placeholder="请输入..." maxlength="2000" style="resize:none"
+                                      @Model.ReadOnly>@Model.SurveyDesc</textarea>
+                        </div>
+                    </div>
+                    @if (string.IsNullOrEmpty(Model.ReadOnly))
+                    {
+                        <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                            <label class="control-label left-60" for="heard"><span style="visibility:hidden">*</span>&nbsp;图片上传</label>
+                            <div class="col-md-10 col-sm-10 col-xs-12 left-60">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">说明：可以将异常图片拖到下面的框中上传至服务器。</div>
+                                    <div class="panel-body dropzone"></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.SurveyImages))
+                    {
+                        foreach (var img in Model.SurveyImages.Split(';').Where(_ => !string.IsNullOrEmpty(_)))
+                        {
+                            <div class="col-md-3 col-sm-3 col-xs-12 form-group">
+                                <a href="/Upload/Survey/@img.Split('|')[1]" target="_blank" class="thumbnail survey-image">
+                                    <img src="/Upload/Survey/@img.Split('|')[1]" title="@img.Split('|')[0]"
+                                         style="width:100%; height: 100%">
+                                    @if (Model.ReadOnly != "readonly")
+                                    {
+                                        <span class="image-remove" data-image="@img"> + </span>
+                                    }
+                                </a>
+                            </div>
+                        }
+                    }
+                <div class="form-group">
+                    <!-- col-md-offset-3 左侧 margin -->
+                    <div class="col-md-12 col-sm-12 col-xs-12" style="text-align:right">
+                        @if (Model.ReadOnly != "readonly")
+                        {
+                            <button type="button" class="btn btn-success btn-submit">提交</button>
+                        }
+                        <button type="button" class="btn btn-default" onclick="location.href='@Url.Action("Index")'">取消</button>
+                    </div>
+                </div>
+                    @Html.HiddenFor(model => model.SurveyImages, new { id = "hidden_imgs" })
+                    @Html.HiddenFor(model => model.SurveyId)
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section style {
+    <!-- Dropzone.js -->
+    <link href="@Url.Content("~/static/css/dropzone.css")" rel="stylesheet">
+}
+
+@section scripts {
+    @Scripts.Render("~/gentelella")
+    <!-- Dropzone.js -->
+    <script src="@Url.Content("~/js/lib/dropzone.js")"></script>
+    <script>
+        // Disable auto discover for all elements:
+        Dropzone.autoDiscover = false;
+
+        $(function () {
+            const result = {
+                fileNum: 0,
+            };
+
+            function validate() {
+                let isValidate = true;
+                if (!$.trim($('#SurveyNo').val())) {
+                    $('.msg-no').show();
+                    $('.msg-no').text('请输入编号');
+                    isValidate = false;
+                } else {
+                    $('.msg-no').hide();
+                    $('.msg-no').text('');
+                }
+                if (!$.trim($('#SurveyDate').val())) {
+                    $('.msg-date').show();
+                    $('.msg-date').text('请输入时间');
+                    isValidate = false;
+                } else {
+                    $('.msg-date').hide();
+                    $('.msg-date').text('');
+                }
+                return isValidate;
+            }
+
+            var initImages = '@Model.SurveyImages';
+            let myDropzone = null;
+            if ($('.dropzone').length) {
+                myDropzone = new Dropzone('div.dropzone', {
+                    url: '@Url.Action("Upload")', // 文件提交地址
+                    method: "post",  // 也可用put
+                    paramName: "file", // 默认为file
+                    maxFiles: 100,// 一次性上传的文件数量上限
+                    maxFilesize: 100, // 文件大小，单位：MB
+                    parallelUploads: 100, // 一次上传的文件数量
+                    acceptedFiles: 'image/*', // 上传的类型
+                    dictDefaultMessage: '拖动文件至此或者点击上传',
+                    autoProcessQueue: false, // 取消自动上传
+                    uploadMultiple: true, // 允许上传多个文件
+                    addRemoveLinks: true, // 添加删除链接
+                    dictMaxFilesExceeded: "您最多只能上传100个文件！",
+                    dictResponseError: '文件上传失败!',
+                    dictInvalidFileType: "文件类型只能是*.jpg,*.gif,*.png,*.jpeg。",
+                    dictFallbackMessage: "浏览器不受支持",
+                    dictFileTooBig: "文件不能超过10M！",
+                    dictRemoveFile: "删除",
+                    dictCancelUpload: "",
+                    dictCancelUploadConfirmation: '您确认取消上传吗？',
+                    init: function () {
+                        this.on("addedfile", function (file) {
+                            // 添加文件时触发的事件
+                            if (file.size) {
+                                result.fileNum++;
+                            }
+                        });
+                        this.on("success", function (file, data) {
+                            // 上传成功触发的事件
+                            //result.upload = data['Data'];
+                            result.uploadStatus = '';
+                        });
+                        this.on("error", function (file, data) {
+                            // 上传失败触发的事件
+                            $('#loading').hide();
+                            result.uploadStatus = 'failure';
+                            if (data == '编号已存在') {
+                                $('.msg-no').text(data);
+                                $('.msg-no').show();
+                            }
+                        });
+                        this.on("removedfile", function (file) {
+                            // 删除文件时触发的方法
+                            if (file.size) {
+                                result.fileNum--;
+                            }
+                        });
+                        this.on("queuecomplete", function () {
+                            // 所有文件上传成功时触发
+                            $('#loading').hide();
+                            if (result.uploadStatus != 'failure') {
+                                location.href = '@Url.Action("Index")';
+                            //    if (result.upload) {
+                            //        let imgStr = $('#hidden_imgs').val();
+                            //        result.upload.forEach(_ => {
+                            //            imgStr += _.Item1 + '|' + _.Item2 + ';';
+                            //        });
+                            //        $('#hidden_imgs').val(imgStr)
+                            //    }
+                            //    $('.surveyForm').submit();
+                            }
+                        });
+                    }
+                });
+            }
+
+            //if (initImages) {
+            //    $.each(initImages.split(';').filter(_ => _), (i, img) => {
+            //        const mockFile = {
+            //            name: img.split('|')[0],
+            //            accepted: true,
+            //            status: 'queued'
+            //        };
+            //        myDropzone.emit("addedfile", mockFile);
+            //        myDropzone.emit("thumbnail", mockFile, '/Upload/Survey/' + img.split('|')[1]);
+            //    });
+            //}
+
+            $('.btn-submit').click(function () {
+                $('#loading').show();
+                if (validate()) {
+                    if (result.fileNum) {
+                        //console.log(myDropzone.files)
+                        var isSubmit = true;
+                        //myDropzone.emit('reset');
+                        for (var i = 0; i < myDropzone.files.length; i++) {
+                            if ((myDropzone.files[i].xhr &&
+                                myDropzone.files[i].xhr.responseText == '编号已存在') ||
+                                myDropzone.files[i].status == 'canceled') {
+                                myDropzone.files[i].status = 'queued';
+                            }
+                            if (myDropzone.files[i].status == 'error') {
+                                isSubmit = false;
+                            }
+                        }
+                        if (isSubmit) {
+                            myDropzone.options.params = {
+                                SurveyId: '@Model.SurveyId',
+                                SurveyNo: $.trim($('#SurveyNo').val()),
+                                SurveyDate: $.trim($('#SurveyDate').val()),
+                                SurveyDesc: $.trim($('#SurveyDesc').val()),
+                                SurveyImages: $.trim($('#hidden_imgs').val())
+                            };
+                            myDropzone.processQueue();
+                        }
+                    } else {
+                        $('.surveyForm').submit();
+                    }
+                } else {
+                    $('#loading').hide();
+                }
+            });
+        });
+    </script>
+}

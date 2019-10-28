@@ -58,4 +58,4 @@
 
 ## 第三部分 NoSQL数据库
 
-### 第1天：[Redis入门](./3.1_Redis入门.md)
+### 第1天：[Redis](./3.1_Redis.md)

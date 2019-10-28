@@ -1,0 +1,127 @@
+@{
+    Layout = "~/Views/Shared/_AdaptionLayout.cshtml";
+    ViewBag.Title = "LG 生产监控系统";
+}
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><small>检索条件</small></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content" style="margin-top:9px">
+                <form class="form-horizontal form-label-left input_mask">
+                    <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard" style="white-space:nowrap;">异常时间</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <input type="text" name="reservation-time" id="reservation-time" class="form-control" value=""
+                                   autocomplete='off' readonly style="background-color:white" />
+                        </div>
+                        @*<div class="input-prepend input-group">
+                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                <input type="text" name="reservation-time" id="reservation-time" class="form-control" value=""
+                                       autocomplete='off' readonly style="background-color:white"/>
+                                <span class="add-on input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar fa fa-remove" onclick="delSurveyDate()"
+                                       style="cursor:pointer"></i>
+                                </span>
+                            </div>*@
+                    </div>
+                    <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard" style="white-space:nowrap">问题编号</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <input type='text' class="form-control" id="input-number" autocomplete='off' />
+                        </div>
+                    </div>
+                    <!-- col-md-offset-3 -->
+                    <div class="col-md-3 col-sm-3 col-xs-12" style="float:right; text-align: right; margin-right: 1%">
+                        <button type="button" class="btn btn-success btn-search-qs">搜索</button>
+                        <button type="button" class="btn btn-primary btn-add-qs">新建</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><small>问题记录</small></h2>
+                @*<ul class="nav navbar-right panel_toolbox">
+                        <li>
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="#">Settings 1</a>
+                                </li>
+                                <li>
+                                    <a href="#">Settings 2</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>*@
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content" style="margin-top:15px">
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action tb-qs">
+                        <thead>
+                            <tr class="headings">
+                                <th class="column-title" style="width:10%">序号</th>
+                                <th class="column-title" style="width:10%">问题编号</th>
+                                <th class="column-title" style="width:20%">异常时间</th>
+                                <th class="column-title" style="width:50%">问题说明</th>
+                                <th class="column-title" style="width:10%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination" style="margin:0px; padding-left:10px">
+                            <li>
+                                <a href="javascript:;" onclick="goToPage(1)" aria-label="Previous">
+                                    <span aria-hidden="true">首页</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" onclick="goToPage(document.getElementById('span-page-index').innerText - 1)" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="li-page-route"><a>1</a></li>
+                            <li>
+                                <a href="javascript:;" onclick="goToPage(document.getElementById('span-page-index').innerText - 0 + 1)" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" onclick="goToPage(document.getElementById('span-page-total').innerText)" aria-label="Next">
+                                    <span aria-hidden="true">尾页</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a>当前第<span id="span-page-index">1</span>页，总共<span id="span-page-total">1</span>页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section style {
+
+}
+
+@section scripts {
+    @Scripts.Render("~/gentelella")
+}

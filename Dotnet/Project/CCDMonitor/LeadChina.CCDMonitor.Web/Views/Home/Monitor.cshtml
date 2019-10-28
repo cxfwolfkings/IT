@@ -1,0 +1,213 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdaptionLayout.cshtml";
+    ViewBag.Title = "LG 生产监控系统";
+}
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><small> 检索条件 </small></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content" style="margin-top:9px">
+                <form class="form-horizontal form-label-left input_mask">
+                    <div class="row">
+                        <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard" style="white-space:nowrap">起始时间</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                <input class="form-control beginDate" name="SurveyDate" autocomplete='off' readonly
+                                       style="background-color:white" />
+                            </div>
+                        </div>
+                        <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard">注意</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12" style="padding-top: 8px">
+                                <span style="background-color:yellow;color:red;font-weight:bold;white-space:nowrap">
+                                    默认显示起始时间之后5分钟的数据
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard">车间</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                <select v-model="selectedWp" class="form-control" required v-on:change="wpChange">
+                                    <option value=""></option>
+                                    <option v-for="item in workshops" :value="item.WorkShopNo">{{item.WorkShopName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard">产线</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                <select v-model="selectedLine" class="form-control" required v-on:change="psChange">
+                                    <option value=""></option>
+                                    <option v-for="item in lines" :value="item.LineNo">{{item.LineName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard">工序</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                <select v-model="selectedPs" class="form-control" required v-on:change="psChange">
+                                    <option value=""></option>
+                                    <option v-for="item in processes" :value="item.ProcessNo">{{item.ProcessName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-56 col-sm-3 col-xs-12 form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="heard">工位</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                <select v-model="selectedLoc" class="form-control" required>
+                                    <option value=""></option>
+                                    <option v-for="item in locs" :value="item.LocNo">{{item.LocName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- col-md-offset-3 -->
+                        <div class="col-md-3 col-sm-3 col-xs-12" style="float:right; text-align: right; margin-right: 3%">
+                            <button type="button" class="btn btn-default" v-on:click="test">测试</button>
+                            <button type="button" class="btn btn-success" v-on:click="search(1)">搜索</button>
+                            <button type="button" class="btn btn-primary btnChangeSrc" style="display:none" v-on:click="changeSrc()">查看原图</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><small> 生产监控 </small></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content div-img-content" style="display:none">
+                <div class="row">
+                    <div class="noDataLabel" style="text-align:center">暂无数据！</div>
+                    <div class="col-md-55" v-for="(s,i) in sources" :key="i" :index="i">
+                        <div class="thumbnail" v-on:click="showDialog(s)">
+                            <div class="image view view-first">
+                                <img style="width: 100%; height:100%; display: block;" :src="s.cover" alt="image" />
+                                <div class="mask">
+                                    <p>播放</p>
+                                    <div class="tools tools-bottom">
+                                        <a href="#"><i class="fa fa-video-camera"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="caption">
+                                <p>设备：{{s.DeviceNo}} - 相机：{{s.CameraNo}}</p>
+                                <p>时间：{{s.Datetime}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li>
+                                <a href="javascript:;" v-on:click="search(1)" aria-label="Previous">
+                                    <span aria-hidden="true">首页</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" v-on:click="search(pageIndex-1)" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li v-for="(p, i) in pageOptions" :key="i" :index="i" :class="{ 'li-page-route': pageIndex == i + 1 }">
+                                <a v-if="pageIndex == i + 1">{{p}}</a>
+                                <a v-else href="javascript:;" v-on:click="search(p)">{{p}}</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" v-on:click="search(pageIndex+1)" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" v-on:click="search(total)" aria-label="Next">
+                                    <span aria-hidden="true">尾页</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a>当前第{{pageIndex}}页，总共{{total}}页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="text-center modal inmodal hd" id="playDialog" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 6px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" style="font-size: 20px">生产监控</h4>
+            </div>
+            <div class="modal-body">
+                <div style="color:black;letter-spacing:1px;">
+                    <p>{{srcInfo}}</p>
+                </div>
+                <div class="progressDiv" style="height: 40px; line-height:40px; position: relative; top: 30px; width: 80%; margin-left: 10%">
+                    <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                         v-bind:style="{ width: processNum + '%', lineHeight: '40px', minWidth: '2em' }">
+                        {{processNum + '%'}}
+                    </div>
+                </div>
+                <div class="container1" style="min-height:100px"></div>
+                <div class="container2 hidden">
+                    <ul id="images"></ul>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align: center">
+                <button type="button" class="btn btn-info" title="减慢" v-on:click="slow">
+                    <span class="glyphicon glyphicon-backward"></span>
+                </button>
+                <button v-show="isPlayShow" type="button" class="btn btn-primary start" 
+                        title="开始" v-on:click="play" v-bind:disabled="isButtonDisabled">
+                    <span class="glyphicon glyphicon-play"></span>
+                </button>
+                <button v-show="isPauseShow" type="button" class="btn btn-warning pause" 
+                        title="暂停" v-on:click="pause" v-bind:disabled="isButtonDisabled">
+                    <span class="glyphicon glyphicon-pause"></span>
+                </button>
+                <button type="button" class="btn btn-danger" title="关闭" v-on:click="close">
+                    <span class="glyphicon glyphicon-stop"></span>
+                </button>
+                <button type="button" class="btn btn-info" title="快进" v-on:click="fast">
+                    <span class="glyphicon glyphicon-forward"></span>
+                </button>
+                <div class="input-group" style="width:30%; display:inline-table; margin-bottom: 0px; top: 10px">
+                    <div class="input-group-addon">当前帧速</div>
+                    <input v-model="fps" type="number" class="form-control" max="30" min="1" maxlength="3" readonly>
+                    @*<div class="input-group-addon" style="cursor:pointer" v-on:click="setSpeed"><span class="glyphicon glyphicon-ok"></span></div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section style {
+    <!-- Viewer Style -->
+    <link href="@Url.Content("~/static/css/viewer.css")" rel="stylesheet">
+    <style>
+        .pagination {
+            margin: 0px
+        }
+
+        .noDataLabel {
+            display: none;
+        }
+    </style>
+}
+
+@section scripts {
+    <script src="@Url.Content("~/js/lib/require.min.js")" data-main="@Url.Content("~/js/app/monitor.js?timestamp=" + DateTime.Now.Ticks)"></script>
+}

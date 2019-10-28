@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/LeadChina.CCDMonitor.Web.Models" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/LeadChina.CCDMonitor.Web.Models" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:9320/Services/MonitorWcfService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/System.IO" />
+  <xs:complexType name="SourceData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CreatedDate" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="DeviceNo" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/System.IO" minOccurs="0" name="ImageStream" nillable="true" type="q1:Stream" />
+      <xs:element minOccurs="0" name="LineNo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LocNo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProcessNo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SourceCameraNo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="WorkshopNo" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SourceData" nillable="true" type="tns:SourceData" />
+</xs:schema>

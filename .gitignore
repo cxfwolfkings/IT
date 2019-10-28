@@ -16,6 +16,7 @@
 **/.settings
 **/__pycache__
 **/venv
+**/cameral_shara_1
 *.docx
 *.doc
 *.pptx

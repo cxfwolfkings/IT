@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="LeadChina.CCDMonitor.Web.Services.MonitorWcfService" CodeBehind="MonitorWcfService.svc.cs" %>

@@ -3,6 +3,9 @@
 ## 定时任务
 
 - Quart.net：支持复杂灵活的Scheduling、支持ADO/RAM Job任务存储、支持集群、支持监听、支持插件。
+
+  job中使用依赖注入，请看代码示例！（.NET Core默认DI容器注册的EFCore数据库上下文组件，在并发时容易出问题，一个Operaion不允许在另一个Operaion执行完毕前执行，所以job中最好创建Context的新实例）
+
 - AspNetCore自带的HostService：一个轻量级的后台服务，需要搭配timer完成定时任务
 - [TimeJob](https://github.com/PomeloFoundation/dotNETCore-Extensions/tree/master/src/Pomelo.AspNetCore.TimedJob)
 - hangfire

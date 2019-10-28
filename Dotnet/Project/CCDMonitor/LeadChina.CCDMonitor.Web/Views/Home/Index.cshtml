@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "LG 生产监控系统";
+}
+@section scripts {
+    var
+    <script src="~/js/lib/require.min.js" data-main="@Url.Content("~/js/app/home.index.js?timestamp=" + DateTime.Now.Ticks)"></script>
+}
+<div class="row wrapper border-bottom white-bg page-heading" style="padding: 10px 10px">
+    <div class="col-lg-10">
+        @*<h2>Main Page</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">首页</a>
+            </li>
+            <li class="active">
+                <strong>生产监控</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设备选择</h5>
+                    <small></small>
+                </div>
+                <div class="ibox-content">
+                    <form role="form" class="form-inline">
+                        <div class="form-group">
+                            <label>车间 &nbsp;</label>
+                            <select class="form-control" style="width:150px;">
+                                <option>1号车间</option>
+                                <option>2号车间</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label> 产线&nbsp;</label>
+                            <select class="form-control" style="width:150px;">
+                                <option>1号车间</option>
+                                <option>2号车间</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label> 工序&nbsp;</label>
+                            <select class="form-control" style="width:200px;">
+                                <option>1号车间</option>
+                                <option>2号车间</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label> 工位&nbsp;</label>
+                            <select class="form-control" style="width:200px;">
+                                <option>1号车间</option>
+                                <option>2号车间</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary">筛选设备</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*<div class="col-lg-7">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Animation and Caption</h5>
+
+                </div>
+                <div class="ibox-content ">
+                    <div class="carousel slide" id="carousel2">
+                        <ol class="carousel-indicators">
+                            <li data-slide-to="0" data-target="#carousel2" class="active"></li>
+                            <li data-slide-to="1" data-target="#carousel2"></li>
+                            <li data-slide-to="2" data-target="#carousel2" class=""></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div v-bind:class="[i ==0 ?'active': '', 'item']" v-for="(s,i) in sources" :key="i" :index="i">
+                                <img :src="s" alt="..." class="img-responsive" />
+                                <div class="carousel-caption">
+                                    <h3>第{{i}} 张</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <a data-slide="prev" href="#carousel2" class="left carousel-control">
+                            <span class="icon-prev"></span>
+                        </a>
+                        <a data-slide="next" href="#carousel2" class="right carousel-control">
+                            <span class="icon-next"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <div class="row m-t">
+        @*<span v-for="(s,i) in sources" :key="i" :index="i" style="padding:10px;">
+                <img :src="s" style="width:100px;" class="m-t" />
+          </span>*@
+        <div class="col-xs-4 col-md-2" v-for="(s,i) in sources" :key="i" :index="i">
+            <div class="thumbnail" v-on:click="showDialog(s)">
+                <img :src="s.cover" />
+                <div class="caption">
+                    <p>camera001 - {{s.DirName}}</p>
+                    <img src="~/static/img/playicon.png" style="width:20px;" />
+                    <small class="text-muted">拍摄时间: 01:11:02</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section dialog{
+    @*<div class="modal inmodal hidden" id="myModal4" tabindex="-1" role="dialog" ></div>*@
+<div class="text-center modal inmodal hd" id="playDialog" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 6px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel" style="font-size: 24px">生产监控视频</h4>
+            </div>
+            <div class="modal-body">
+                <div style="color:black;letter-spacing:1px;">
+                    <p>1#车间/baking线/1号组盘位 Cameral001相机</p>
+                </div>
+                <div class="container1"></div>
+                <div class="container2 hidden">
+                    <ul id="images"></ul>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align: center">
+                <button type="button" class="btn btn-primary start" v-on:click="play">开始</button>
+                <button type="button" class="btn btn-warning pause" v-on:click="pause">暂停</button>
+                @*<button type="button" class="btn btn-white closeDialog" v-on:click="close">关闭</button>*@
+            </div>
+        </div>
+    </div>
+    </div>
+}
+
+@section style {
+    <style>
+        .form-group {
+            margin-left: 10px
+        }
+
+        .container1 {
+        }
+
+        .hd {
+            display: none;
+        }
+
+        .modal-backdrop.in {
+            opacity: 0.8
+        }
+    </style>
+}

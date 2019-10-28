@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="~/static/css/viewer.css" rel="stylesheet" type="text/css" />
+    <link href="~/static/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/static/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <link href="~/static/css/animate.css" rel="stylesheet" type="text/css" />
+    <link href="~/static/css/style.css" rel="stylesheet" type="text/css" />
+    @RenderSection("style", required: false)
+</head>
+<body class="pace-done">
+    <div id="wrapper" style="height:100%">
+        @Html.Partial("_sidebar")
+        <div id="page-wrapper" class="gray-bg" style="min-height:100%;overflow:hidden">
+            <div class="row">
+                <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                    <div class="navbar-header">
+                        <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                        <a class="navbar-brand" href="#" style="line-height:25px;">LG 生产监控系统</a>
+                    </div>
+                </nav>
+            </div>
+            <div class="wrapper wrapper-content animated fadeIn" style="margin-left:-10px; margin-right:-10px" id="app">
+                @RenderBody()
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+    </div>
+    @RenderSection("dialog", false)
+    @RenderSection("scripts", required: false)
+</body>
+</html>

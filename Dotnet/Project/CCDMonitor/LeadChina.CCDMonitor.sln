@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeadChina.CCDMonitor.Infrastrue", "LeadChina.CCDMonitor.Infrastrue\LeadChina.CCDMonitor.Infrastrue.csproj", "{9CC8A0DF-653B-45DD-887B-B970C99922B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeadChina.CCDMonitor.Web", "LeadChina.CCDMonitor.Web\LeadChina.CCDMonitor.Web.csproj", "{14262FAF-4728-448B-8F92-D65638096E9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CC8A0DF-653B-45DD-887B-B970C99922B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC8A0DF-653B-45DD-887B-B970C99922B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC8A0DF-653B-45DD-887B-B970C99922B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC8A0DF-653B-45DD-887B-B970C99922B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14262FAF-4728-448B-8F92-D65638096E9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14262FAF-4728-448B-8F92-D65638096E9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14262FAF-4728-448B-8F92-D65638096E9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14262FAF-4728-448B-8F92-D65638096E9C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9DE5938C-8B34-4EEC-B983-79A50D0D90AA}
+	EndGlobalSection
+EndGlobal
