@@ -33,7 +33,7 @@
 
 ### 第8天：客户端存储、多媒体和图形
 
-### 第9天：html5
+### 第9天：[html5](./1.9_html5.md)
 
 ### 第10天：[jQuery类库](./1.10_jQuery类库.md)
 
@@ -48,13 +48,23 @@
 
 ### 第11天：[jQuery常用插件库](./1.11_jQuery常用插件库.md)
 
+### 第12天：[require](./1.12_require.md)
+
+### 第13天：[Bootstrap](./1.13_Bootstrap.md)
+
 ## 第二部分 node + npm + es6 + typescript
 
 ### 第1天：[服务器端javascript](./2.1_服务器端javascript.md)
 
-### 第2天：[node入门](./2.2_node入门.md)
+### 第2-10天：[node](./2.2_node.md)
 
-### 第3天：[npm介绍](./2.3_npm介绍.md)
+### 第10-12天：[npm](./2.3_npm.md)
+
+### 第12-15天：[webpack](./2.4_webpack.md)
+
+### 第15-20天：[es6](./2.5_es6.md)
+
+### 第20-24天：[typescript](./2.6_typescript.md)
 
 ## 第三部分 vue + angular + react
 
@@ -107,9 +117,17 @@
 
 ### 第9-15天：[Angular](./3.9_Angular.md)
 
-- 什么是 AngularJS / 端对端的解决方案 / 可爱之处 / 禅道（理念）/ HelloWorld
+- 什么是 AngularJS & 端对端的解决方案 & 可爱之处 & 禅道（理念）
+- HelloWorld & 运行条件 & Angular 2 架构
+- 模块 & 组件 & 模板 & 元数据 & 数据绑定 & 指令 & 服务 & 依赖注入
+- 项目实战 & 总结 & 附录 & 参考
 
 ### 第15-24天：[React](./3.10_React.md)
+
+- 安装 & 元素渲染
+- JSX 简介
+- 组件 & Props
+- State & 生命周期
 
 ## 第四部分 微信小程序 + Flutter
 
