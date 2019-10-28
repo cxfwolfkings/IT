@@ -1,0 +1,71 @@
+<form nz-form [formGroup]="validateForm" class="ant-advanced-search-form">
+  <div nz-row [nzGutter]="24">
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchStoreName'">公司名称</nz-form-label>
+        <nz-form-control>
+          <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+          <input nz-input [formControlName]="'SearchStoreName'" maxlength="70" [attr.id]="'SearchStoreName'">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchBank'">开户行</nz-form-label>
+        <nz-form-control>
+          <input nz-input [formControlName]="'SearchBank'" maxlength="70" [attr.id]="'SearchBank'">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'Address'">地址</nz-form-label>
+        <nz-form-control>
+          <input nz-input [formControlName]="'SearchAddress'" maxlength="70" [attr.id]="'SearchAddress'">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div nz-row>
+    <div nz-col [nzSpan]="24" style="text-align: right;">
+      <button nz-button [nzType]="'primary'" (click)="searchInvoice()">搜索</button>
+      <button nz-button (click)="clearcompany()">清空</button>
+    </div>
+  </div>
+</form>
+<nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading" [nzTotal]="total"
+  [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="getInvoiceList()">
+  <thead>
+    <tr>
+      <th style="min-width: 240px">公司名称</th>
+      <th>开户行</th>
+      <th>银行账号</th>
+      <th>地址</th>
+      <th>纳税人识别号</th>
+      <th>电话</th>
+      <th style="min-width: 200px">二维码</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable.data">
+      <td>{{data.StoreName}}</td>
+      <td>{{data.Bank}}</td>
+      <td>{{data.Accounts}}</td>
+      <td>{{data.Address}}</td>
+      <td>{{data.TaxpayerNo}}</td>
+      <td>{{data.Telephone}}</td>
+      <td >
+        <!-- <a *ngIf="data.QRCode" target="_Blank" href="{{data.QRCode}}">查看</a> -->
+        <a *ngIf="data.QRCode" target="_Blank" href="{{data.QRCode}}">查看</a>
+        <a *ngIf="!data.QRCode" disabled="disabled" target="_Blank" href="{{data.QRCode}}">查看</a>
+      </td>
+      <!-- <td><a target="_Blank" href=""></a></td> -->
+      <!-- <td>
+        <a href="javascript:void(0);" (click)="">查看</a>
+        <nz-divider nzType="vertical"></nz-divider>
+      </td> -->
+    </tr>
+  </tbody>
+</nz-table>
+
+<!-- <a nz-popconfirm nzTitle="你确定删除这条数据么?" (nzOnConfirm)="confirm()" (nzOnCancel)="cancel()">Delete</a> -->

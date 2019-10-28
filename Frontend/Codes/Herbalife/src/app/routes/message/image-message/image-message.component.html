@@ -1,0 +1,446 @@
+
+
+  <nz-select *ngIf="actionStr!='view'" style="width: 200px;" nzShowSearch   [(ngModel)]="selectedLang" (ngModelChange)="isChangeLang($event)">
+      <nz-option nzLabel="双语消息" nzValue="CN,EN"></nz-option>
+      <nz-option nzLabel="仅中文消息" nzValue="CN"></nz-option>
+      <nz-option nzLabel="仅英文消息" nzValue="EN"></nz-option>
+    </nz-select>
+
+<nz-tabset>
+  <nz-tab nzTitle="消息和内容">
+    <form nz-form [formGroup]="validateForm"><!--(ngSubmit)="submitForm()"-->
+      <div nz-row [nzGutter]="24">
+        <div nz-col [nzSpan]="16">
+          <div *ngIf="imagemessage.items.length==1">
+            <nz-form-item *ngIf="selectedLang=='CN,EN'||selectedLang=='CN'">
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="titleCN" nzRequired class="text-left">
+                <span>
+                  中文标题
+                </span>
+              </nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                 <nz-input-group #titleCNNode [nzAddOnAfter]="titleCNWords">
+                  <input nz-input id="titleCN" formControlName="titleCN" [(ngModel)]="messageItem.title.CN" maxlength="40"
+                  (keyup)="commonService.changeWords(messageItem.title.CN, titleCNNode, 40)">
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateForm.get('titleCN').dirty && validateForm.get('titleCN').errors">请输入中文标题!</nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item *ngIf="selectedLang=='CN,EN'||selectedLang=='EN'">
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="titleEN" nzRequired class="text-left">
+                <span>
+                  英文标题
+                </span>
+              </nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                  <nz-input-group #titleENNode [nzAddOnAfter]="titleENWords">
+                <input nz-input id="titleEN" formControlName="titleEN" [(ngModel)]="messageItem.title.EN" maxlength="40"
+                (keyup)="commonService.changeWords(messageItem.title.EN, titleENNode, 40)">
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateForm.get('titleEN').dirty && validateForm.get('titleEN').errors">请输入英文标题!</nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="nickname" nzRequired class="text-left">
+                <span>
+                  封面图片(大图片建议尺寸:900px*500px,多图文非首个图文建议500px*500px)
+                </span>
+              </nz-form-label>
+              <!-- [nzRemove]="fdelete"   *ngIf="actionStr!='view'"-->
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                <div >
+                    <div class="clearfix">
+                        <nz-upload 
+                        nzDisabled={{isDisabled}}
+                        nzAction="{{uploadUrl}}"                   
+                        nzListType="picture"
+                        [nzShowButton]="actionStr!='view'"
+                        [nzBeforeUpload]="beforeUpload"
+                        [nzLimit]=1
+                        [nzRemove]="isRemove"
+                        [nzFileList]="imagemessage.items[0].fileList"
+                        (nzChange)="handleChange($event)">
+                        <button nz-button>
+                          <i class="anticon anticon-upload"></i><span>上传</span>
+                        </button>
+                      </nz-upload>
+                    </div>
+                    <div  *ngIf="messageItem.img.id==''&&!allvalidate" style="color:red">请上传封面图片</div>
+                </div>
+                <!-- <div *ngIf="actionStr=='view'">
+                    <img *ngIf="messageItem.fileList!=null" src="{{messageItem.fileList[0].url}}" style="width: 100px;height:100px"/>
+                </div> -->
+
+
+              </nz-form-control>
+              
+            </nz-form-item>
+            <nz-form-item *ngIf="selectedLang=='CN,EN'||selectedLang=='CN'">
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="summaryCN" nzRequired class="text-left">
+                <span>
+                  中文摘要
+                </span>
+              </nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                  <nz-input-group #summaryCNNode [nzAddOnAfter]="summaryCNWords">
+                <input nz-input id="summaryCN" formControlName="summaryCN" [(ngModel)]="imagemessage.summary.CN" maxlength="160"
+                (keyup)="commonService.changeWords(imagemessage.summary.CN, summaryCNNode, 160)">
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateForm.get('summaryCN').dirty && validateForm.get('summaryCN').errors">请输入中文摘要!</nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item *ngIf="selectedLang=='CN,EN'||selectedLang=='EN'">
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="summaryEN" nzRequired class="text-left">
+                <span>
+                  英文摘要
+                </span>
+              </nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                  <nz-input-group #summaryENNode [nzAddOnAfter]="summaryENWords">
+                <input nz-input id="summaryEN" formControlName="summaryEN" [(ngModel)]="imagemessage.summary.EN" maxlength="160"
+                (keyup)="commonService.changeWords(imagemessage.summary.EN, summaryENNode, 160)">
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateForm.get('summaryEN').dirty && validateForm.get('summaryEN').errors">请输入英文摘要!</nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+               <!--<nz-form-label [nzSm]="12" [nzXs]="24" nzRequired>(click)="radioclick(messageItem.isExternalLink)"-->
+              <nz-form-control [nzSm]="24" [nzXs]="24">
+                  <nz-radio-group formControlName="isExternalLink" [(ngModel)]="messageItem.isExternalLink"  >
+                      <!-- [(ngModel)]="radioValue" -->
+                      <label nz-radio [nzValue]="false" [nzDisabled]="isDisabled">正文链接</label>
+                      <label nz-radio [nzValue]="true" [nzDisabled]="isDisabled">外部链接</label>    
+                    </nz-radio-group>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <!--<nz-form-label [nzSm]="6" [nzXs]="24">
+              </nz-form-label>-->
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                <div *ngIf="!messageItem.isExternalLink">
+                  <div *ngIf="messageItem.contentId=='0'&&!allvalidate" style="color:red">请选择正文</div>
+                  <div nz-col [nzSpan]="16">
+                    <button nz-button nzType="primary" (click)="CreateContent()" *ngIf="actionStr!='view'">创建</button>
+                    <button nz-button nzType="primary" (click)="showModal()" *ngIf="actionStr!='view'">选择正文</button>
+                  </div>
+                  <!-- &nbsp;&nbsp;&nbsp;
+                  {{messageItem.content}} -->
+                  <div nz-col [nzSpan]="16">
+                    {{messageItem.content}}
+                  </div>
+                  <!-- <span *ngIf="messageItem.content!=''" (click)="deleteContent()">X</span> -->
+                </div>
+
+            
+                <div *ngIf="messageItem.isExternalLink">
+                    <div *ngIf="messageItem.externalLink==''&&!allvalidate" style="color:red">请输入外部链接</div>
+                    <nz-input-group #mainexternalLinkNode [nzAddOnAfter]="mainexternalLinkWords">
+                      <input nz-input placeholder="外部链接" formControlName="externalLink" [(ngModel)]="messageItem.externalLink"  maxlength="200"
+                      (keyup)="commonService.changeWords(messageItem.externalLink, mainexternalLinkNode, 200)">
+                    </nz-input-group>
+                  <nz-form-explain *ngIf="validateForm.get('externalLink').dirty && validateForm.get('externalLink').errors">
+                      外部链接限定200个字符
+                    </nz-form-explain>
+                </div>               
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <!--子图文消息编辑窗体-->
+          <div *ngIf="imagemessage.items.length>1">
+            <nz-form-item *ngIf="selectedLang=='CN,EN'||selectedLang=='CN'">
+                <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="titleCN" nzRequired class="text-left">
+                  <span>
+                    中文标题
+                  </span>
+                </nz-form-label>
+                <nz-form-control [nzSm]="14" [nzXs]="24"> 
+                  <nz-input-group #titleCNNode [nzAddOnAfter]="titleCNWords">           
+                    <input nz-input id="titleCN" formControlName="titleCN" [(ngModel)]="messageItem.title.CN" maxlength="40" 
+                    (keyup)="commonService.changeWords(messageItem.title.CN, titleCNNode, 40)">
+                  </nz-input-group>
+                    <nz-form-explain *ngIf="validateForm.get('titleCN').dirty && validateForm.get('titleCN').errors">请输入中文标题!</nz-form-explain>            
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item *ngIf="selectedLang=='CN,EN'||selectedLang=='EN'">
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="titleEN" nzRequired class="text-left">
+                <span>
+                  英文标题
+                </span>
+              </nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                <nz-input-group #titleENNode [nzAddOnAfter]="titleENWords">
+                  <input nz-input id="titleEN" formControlName="titleEN" [(ngModel)]="messageItem.title.EN" maxlength="40"
+                  (keyup)="commonService.changeWords(messageItem.title.EN, titleENNode, 40)">
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateForm.get('titleEN').dirty && validateForm.get('titleEN').errors">请输入英文标题!</nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="nickname" nzRequired class="text-left">
+                <span>
+                  封面图片(大图片建议尺寸:900px*500px,多图文非首个图文建议500px*500px)
+                </span>
+              </nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                <!--[(nzFileList)]="fileList1"-->
+                <div class="clearfix">
+                    <nz-upload
+                    nzAction="{{uploadUrl}}"
+                    nzListType="picture"
+                    nzFileType="image/png,image/jpeg"
+                    [nzShowButton]="actionStr!='view'"
+                    [nzBeforeUpload]="beforeUpload"
+                    [nzLimit]=1
+                    [nzRemove]="isRemove"
+                    [nzFileList]="messageItem.fileList"
+                    (nzChange)="handleChange($event)">
+                    <button nz-button>
+                      <i class="anticon anticon-upload"></i><span>上传</span>
+                    </button>
+                  </nz-upload>
+                </div>
+                <div  *ngIf="messageItem.img.id==''&&!allvalidate" style="color:red">请上传封面图片</div>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+               <!--<nz-form-label [nzSm]="12" [nzXs]="24" nzRequired> (click)="radioclick(messageItem.isExternalLink)"-->
+              <!--</nz-form-label>-->
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                  <nz-radio-group formControlName="isExternalLink" [(ngModel)]="messageItem.isExternalLink" >
+                      <!-- [(ngModel)]="radioValue" -->
+                      <label nz-radio [nzValue]="false" [nzDisabled]="isDisabled">正文链接</label>
+                      <label nz-radio [nzValue]="true" [nzDisabled]="isDisabled">外部链接</label>
+                    </nz-radio-group>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <!--<nz-form-label [nzSm]="6" [nzXs]="24">
+              </nz-form-label>-->
+              <nz-form-control [nzSm]="14" [nzXs]="24">
+                <div *ngIf="!messageItem.isExternalLink">
+                    <div *ngIf="messageItem.contentId=='0'&&!allvalidate" style="color:red">请选择正文</div>
+                  <button nz-button nzType="primary" (click)="CreateContent()" *ngIf="actionStr!='view'">创建</button>
+                  <button nz-button nzType="primary" (click)="showModal()" *ngIf="actionStr!='view'">选择正文</button>
+                  &nbsp;&nbsp;&nbsp;
+                  <div>
+                    {{messageItem.content}}
+                    <!-- <span *ngIf="messageItem.content!=''" (click)="deleteContent()">X</span> -->
+                  </div>
+                  <!-- {{messageItem.content}}
+                  <span *ngIf="messageItem.content!=''" (click)="deleteContent()">X</span> -->
+                </div>
+                <div *ngIf="messageItem.isExternalLink"> 
+                  <div *ngIf="messageItem.externalLink==''&&!allvalidate" style="color:red">请输入外部链接</div>
+                  <div>					                    
+                    <nz-input-group #mainexternalLinkNode [nzAddOnAfter]="mainexternalLinkWords">
+                      <input nz-input placeholder="外部链接" formControlName="externalLink"  [(ngModel)]="messageItem.externalLink" maxlength="200"
+                      (keyup)="commonService.changeWords(messageItem.externalLink, mainexternalLinkNode, 200)">
+                    </nz-input-group>
+                  </div>                
+                </div>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+
+       
+          <!--右侧子图文消息编辑窗体__End-->
+        </div>
+        <div nz-col [nzSpan]="8">
+          <!--右侧预览模块-->
+          <ul class="right_add">
+            <li [ngSwitch]="i" class="li_wrap"  *ngFor="let item of imagemessage.items;let i = index"
+             [attr.data-index]="i">
+              <!--主图文-->
+              <div *ngSwitchCase="0" (click)="selectItem(item,i)"  [ngClass]="{'active':item.isSelect}">  
+                <div style="display: block" *ngIf="!isSingleMessage(item)&&previewLanguage=='CN'" class="li_title">{{item.title.CN}}</div>
+                <div *ngIf="!isSingleMessage(item)&&previewLanguage=='EN'" class="li_title">{{item.title.EN}}</div>
+                <div class="li_img"> 
+                  <img *ngIf="item.fileList!=null" src="{{item.fileList[0].url}}" style="width: 100%"/>
+                  <div *ngIf="isSingleMessage(item)" class="img_title">
+                    <div *ngIf="previewLanguage=='CN'"  class="li_title">{{item.title.CN}}</div>
+                    <div *ngIf="previewLanguage=='EN'"  class="li_title">{{item.title.EN}}</div>
+                  </div>
+                </div>
+                <div *ngIf="!isSingleMessage(item)&&previewLanguage=='CN'" class="li_content">{{imagemessage.summary.CN}}</div>
+                <div *ngIf="!isSingleMessage(item)&&previewLanguage=='EN'" class="li_content">{{imagemessage.summary.EN}}</div>
+              </div>
+              <!--主图文__End-->
+              <!--子图文*ngIf="isSingleMessage(item)"-->
+              <div *ngSwitchDefault   (click)="selectItem(item,i)" class="add_li"  [ngClass]="{'active':item.isSelect}">
+                <i *ngIf="actionStr!='view'"  (click)="removeItem(item,i)" [ngClass]="{'anticon anticon-close-circle':item.isSelect}" ></i>
+
+                <div class="add_li_content">
+                    <div class="content_left">
+                      <span  *ngIf="previewLanguage=='CN'"  class="li_title">{{item.title.CN}}</span>
+                      <span  *ngIf="previewLanguage=='EN'"  class="li_title">{{item.title.EN}}</span>
+                    </div>
+                    <div class="content_right">
+                      <img *ngIf="item.fileList!=null" src={{item.fileList[0].url}} />                        
+                    </div>
+                </div>                
+              </div>
+              <!--子图文__End-->
+            </li>
+          </ul>
+          <div *ngIf="actionStr!='view'" (click)="appendNewItem()" class="additem">+添加</div>   
+          <!-- {{actionStr!='view'}} {{actionStr!='edit'}} {{selectedLang=='CN,EN'}} -->
+          <!-- <a *ngIf="(actionStr!='view' && actionStr!='edit')  || selectedLang=='CN,EN'" (click)="togglePreviewLanguage()">{{PreviewTitle}}</a>          -->
+          <a *ngIf="selectedLang=='CN,EN'" (click)="togglePreviewLanguage()">{{PreviewTitle}}</a> 
+          <!--右侧预览模块__End-->
+        </div>    
+         
+      </div>
+    </form>
+  </nz-tab>
+  <nz-tab  nzTitle="应用和收件人">
+    <div nz-col [nzSpan]="16">
+      <app-addressee></app-addressee>
+    </div>
+  </nz-tab>
+</nz-tabset>
+  <div>
+      <button nz-button nzType="primary" *ngIf="actionStr!='view'"  [disabled]="!isCheckedButton" (click)="submitForm('save',false,0)" >保存</button>
+      <button nz-button nzType="primary" *ngIf="actionStr!='view'"  [disabled]="!isCheckedButton" (click)="submitForm('send',false,0)">发送测试消息</button>
+      <button nz-button nzType="primary" *ngIf="actionStr!='view'"  [disabled]="!isCheckedButton" (click)="submitForm('submit',false,1)">提交</button>
+      <!-- <button nz-button nzType="primary" *ngIf="actionStr!='view'" (click)="submitForm('send',true)">发送</button> -->
+      <button nz-button nzType="default" (click)='returnBack()' *ngIf="messageId>0">返回</button>
+  </div>
+
+
+
+<!--选择文章弹出层-->
+<nz-modal [(nzVisible)]="isVisible" nzTitle="选择正文" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" nzWidth="1000">
+    <div>
+        <form nz-form [formGroup]="validateForm" class="ant-advanced-search-form">
+            <div nz-row [nzGutter]="24">
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="ID">ID</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input placeholder="ID" formControlName="Id" [(ngModel)]="searchListModel.Id">
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="cnContentTitle">名称</nz-form-label>
+                  <nz-form-control>
+                      <input nz-input placeholder="名称" formControlName="cnContentTitle" [(ngModel)]="searchListModel.cnContentTitle">
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="contentCategory">分类</nz-form-label>
+                  <nz-form-control>
+                    <nz-select [(ngModel)]="searchListModel.contentCategory" nzMode="multiple" 
+                      nzPlaceHolder="请选择分类" nzAllowClear 
+                      [formControlName]="'contentCategory'">
+                      <nz-option *ngFor="let c of categoryList" [nzValue]="c.CategoryID" [nzLabel]="c.NameCn"></nz-option>
+                      <nz-option *ngIf="isCategoryLoading" nzDisabled nzCustomContent>
+                        <i class="anticon anticon-loading anticon-spin loading-icon"></i> 数据加载中...
+                      </nz-option>
+                    </nz-select>
+
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <!--隐藏项-->
+              <div *ngIf="!ishidden" >              
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'createDateFrom'">创建时间</nz-form-label>
+                  <nz-form-control>
+                    <nz-date-picker formControlName="createDateFrom" nzPlaceHolder=" " [(ngModel)]="searchListModel.createDateFrom"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'createDateTo'">至</nz-form-label>
+                  <nz-form-control>
+                    <nz-date-picker formControlName="createDateTo" nzPlaceHolder=" " [(ngModel)]="searchListModel.createDateTo"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="creator">创建人</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input placeholder="创建人" formControlName="creator" [(ngModel)]="searchListModel.creator">
+                  </nz-form-control>
+                </nz-form-item>
+              </div>              
+              <!-- <div nz-col [nzSpan]="8">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="contentStatus">状态</nz-form-label>
+                <nz-form-control>
+                  <nz-select nzMode="tags" style="width: 100;" formControlName="contentStatus" nzPlaceHolder="消息类型" [(ngModel)]="searchListModel.contentStatus">
+                      <nz-option *ngFor="let option of listOfcontentStatus" [nzLabel]="option.name" [nzValue]="option.ID">
+                      </nz-option>
+                    </nz-select>
+
+                </nz-form-control>
+              </nz-form-item>      
+              </div> -->
+
+            </div>
+          
+            </div>
+            <div nz-row>
+              <div nz-col [nzSpan]="24" style="text-align: right;">
+                <a style="margin-left:8px;font-size:12px;" (click)="toggleCollapse()">
+                    {{searchbtn_name}}
+                    <i class="anticon" [class.anticon-down]="isCollapse" [class.anticon-up]="!isCollapse"></i>
+                </a>
+                <button nz-button [nzType]="'primary'" (click)="getContentList(true)">搜索</button>
+                <button nz-button (click)="resetForm()">清空</button>               
+              </div>
+            </div>
+          </form>
+          
+    </div>
+
+    <nz-table #ajaxTable  [nzFrontPagination]="false" [nzData]="dataSet" [nzLoading]="loading" [nzTotal]="total"
+    [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize"
+     (nzPageIndexChange)="getContentList()"
+      (nzPageSizeChange)="getContentList(true)">
+    <thead (nzSortChange)="sort($event)" nzSingleSort>
+      <tr>
+        <th>ID</th>
+        <th style="width: 30%">名称</th>
+        <th>
+          <span>状态</span>
+        </th>
+        <th>
+            <span>分类</span>
+          </th>
+        <th>
+          <span>创建时间</span>
+        </th>
+        <th>
+          <span>创建人</span>
+        </th>
+        <th>
+          <span>选择</span>
+        </th>        
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of ajaxTable.data">
+        <td>{{data.Id}}</td>
+        <td>{{data.CnContentTitle}}</td>
+        <td>{{data.StatusName}}</td>
+        <td>{{data.CategoryName}}</td>
+        <td>{{data.CreationTime}}</td>
+        <td>{{data.CreatorName}}</td>
+        <td> 
+        <input type="radio" name="ChooseContentIds"  (click)="selectContentID(data.Id,data.CnContentTitle)" />
+      </td>        
+      </tr>
+    </tbody>
+  </nz-table>
+    </nz-modal>
+<!--选择文章弹出层__End-->

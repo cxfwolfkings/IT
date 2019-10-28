@@ -1,0 +1,290 @@
+<!-- <a (click)="ApprovalMessage(10)">审核</a> -->
+<nz-tabset>
+  <nz-tab nzTitle="待审批" (nzClick)="changeTab(1)">
+    <form nz-form [formGroup]="validateForm" class="ant-advanced-search-form">
+      <div nz-row [nzGutter]="24">
+        <div nz-row>
+          <div nz-col [nzSpan]="8">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="Title">消息标题</nz-form-label>
+                <nz-form-control>
+                  <input nz-input placeholder="消息标题" formControlName="Title" [(ngModel)]="searchListModel.Title" maxlength="10">
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="8">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="BasicType">消息类型</nz-form-label>
+                <nz-form-control>
+                  <nz-select nzMode="tags"  formControlName="BasicType" nzPlaceHolder="消息类型" [(ngModel)]="searchListModel.BasicType">
+                      <nz-option *ngFor="let option of listOfBasicType" [nzLabel]="option.Typename" [nzValue]="option.ID">
+                      </nz-option>
+                    </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="8">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="MsgTag">内容分类</nz-form-label>
+                <nz-form-control>
+                  <nz-select nzMode="tags" formControlName="MsgTag" nzPlaceHolder="内容分类" [(ngModel)]="searchListModel.MsgTag">
+                    <nz-option *ngFor="let option of CategoryList" [nzLabel]="option.name" [nzValue]="option.id">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+        </div>
+        <!--隐藏项-->
+        <div *ngIf="!ishidden">
+          <div nz-row>
+            <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="CreatorIds">创建人</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input placeholder="创建人" formControlName="CreatorIds" [(ngModel)]="searchListModel.CreatorIds" maxlength="10">
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'CreationTimeBegin'">创建时间</nz-form-label>
+                  <nz-form-control>
+                    <nz-date-picker formControlName="CreationTimeBegin"  [(ngModel)]="searchListModel.CreateDateFrom"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'CreationTimeEnd'">至</nz-form-label>
+                  <nz-form-control>
+                    <nz-date-picker formControlName="CreationTimeEnd" [(ngModel)]="searchListModel.CreateDateTo"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>   
+          </div>       
+        </div>
+      </div>
+      <div nz-row>
+        <div nz-col [nzSpan]="24" style="text-align: right;">
+          <a style="margin-left:8px;font-size:12px;" (click)="toggleCollapse()">
+            {{searchbtn_name}}
+            <i class="anticon" [class.anticon-down]="isCollapse" [class.anticon-up]="!isCollapse"></i>
+          </a>
+          <button nz-button [nzType]="'primary'" (click)="getMessageList(true)">搜索</button>
+          <button nz-button (click)="resetForm()">清空</button>
+        </div>
+      </div>
+    </form>
+
+  <nz-table #ajaxTable  [nzFrontPagination]="false" [nzData]="dataSet" [nzLoading]="loading" [nzTotal]="total"
+  [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize"
+   (nzPageIndexChange)="getMessageList()"
+    (nzPageSizeChange)="getMessageList(true)">
+  <thead (nzSortChange)="sort($event)" nzSingleSort>
+    <tr>
+      <th style="width: 30%">消息标题</th>
+      <th>消息类型</th>
+      <th>
+        <span>内容分类</span>
+      </th>
+      <th>
+        <span>创建人</span>
+      </th>
+      <th>
+        <span>创建时间</span>
+      </th>
+      <th>
+        <span>审批人</span>
+      </th>      
+      <th>
+        <span>操作</span>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable.data">
+      <td>{{data.Title}}</td>
+      <td>{{fswitchTypename(data.TypeId)}}</td>
+      <td>{{data.MessageTag}}</td>
+      <td>{{data.CreatorName}}</td>
+      <td>{{data.CreateDate}}</td>      
+      <td>{{data.ApproverName}}</td>
+      <td>
+        <a href="javascript:void(0);" (click)="ViewMessage(data.ID,data.TypeId,data.AppID)">查看</a>
+        <nz-divider nzType="vertical" *ngIf="data.IsApproved==1"></nz-divider>
+        <a (click)="ApprovalMessage(data.ID)" *ngIf="data.IsApproved==1">审核</a></td>       
+    </tr>
+  </tbody>
+</nz-table>
+  <!--===============================================已审批界面============================================-->
+  <nz-tab nzTitle="已审批" (nzClick)="changeTab(2)">
+      <form nz-form [formGroup]="validateForm" class="ant-advanced-search-form">
+          <div nz-row [nzGutter]="24">
+            <div nz-row>
+              <div nz-col [nzSpan]="8">
+                  <nz-form-item nzFlex>
+                    <nz-form-label [nzFor]="Title">消息标题</nz-form-label>
+                    <nz-form-control>
+                      <input nz-input placeholder="消息标题" formControlName="Title" [(ngModel)]="searchListModel.Title" maxlength="10">
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+                <div nz-col [nzSpan]="8">
+                  <nz-form-item nzFlex>
+                    <nz-form-label [nzFor]="BasicType">消息类型</nz-form-label>
+                    <nz-form-control>                 
+                      <nz-select nzMode="tags" formControlName="BasicType" nzPlaceHolder="消息类型" [(ngModel)]="searchListModel.BasicType">
+                          <nz-option *ngFor="let option of listOfBasicType" [nzLabel]="option.Typename" [nzValue]="option.ID">
+                          </nz-option>
+                        </nz-select>       
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+                <div nz-col [nzSpan]="8">
+                  <nz-form-item nzFlex>
+                    <nz-form-label [nzFor]="MsgTag">内容分类</nz-form-label>
+                    <nz-form-control>
+                      <nz-select nzMode="tags" formControlName="MsgTag" nzPlaceHolder="内容分类" [(ngModel)]="searchListModel.MsgTag">
+                          <nz-option *ngFor="let option of CategoryList" [nzLabel]="option.name" [nzValue]="option.id">
+                          </nz-option>
+                        </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+            </div>           
+            <div *ngIf="!wasishidden" >
+              <div nz-row>
+                <div nz-col [nzSpan]="8">
+                    <nz-form-item nzFlex>
+                      <nz-form-label [nzFor]="CreatorIds">创建人</nz-form-label>
+                      <nz-form-control>
+                        <input nz-input placeholder="创建人" formControlName="CreatorIds" [(ngModel)]="searchListModel.CreatorIds" maxlength="10">
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                  <div nz-col [nzSpan]="8">
+                    <nz-form-item nzFlex>
+                      <nz-form-label [nzFor]="'CreationTimeBegin'">创建时间</nz-form-label>
+                      <nz-form-control>
+                        <nz-date-picker formControlName="CreationTimeBegin"  [(ngModel)]="searchListModel.CreateDateFrom"></nz-date-picker>
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                  <div nz-col [nzSpan]="8">
+                    <nz-form-item nzFlex>
+                      <nz-form-label [nzFor]="'CreationTimeEnd'">至</nz-form-label>
+                      <nz-form-control>
+                        <nz-date-picker formControlName="CreationTimeEnd" [(ngModel)]="searchListModel.CreateDateTo"></nz-date-picker>
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+              </div>
+              <div nz-row>
+                <div nz-col [nzSpan]="8">
+                    <nz-form-item nzFlex>
+                      <nz-form-label [nzFor]="SenderIds">审批人</nz-form-label>
+                      <nz-form-control>
+                        <input nz-input placeholder="审批人" formControlName="SenderIds" [(ngModel)]="searchListModel.SenderIds" maxlength="10">
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                  <div nz-col [nzSpan]="8">
+                      <nz-form-item nzFlex>
+                    <nz-form-label [nzFor]="ApprovalTimeBegin">审批时间</nz-form-label>
+                    <nz-form-control>
+                      <nz-date-picker formControlName="ApprovalTimeBegin" [(ngModel)]="searchListModel.ApprovaDateFrom"></nz-date-picker>
+                    </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                  <div nz-col [nzSpan]="8">
+                      <nz-form-item nzFlex>
+                        <nz-form-label [nzFor]="ApprovaTimeEnd">至</nz-form-label>
+                        <nz-form-control>
+                          <nz-date-picker formControlName="ApprovaTimeEnd" [(ngModel)]="searchListModel.ApprovaDateTo"></nz-date-picker>
+                        </nz-form-control>
+                    </nz-form-item>
+                  </div>                
+              </div>            
+            </div>      
+          </div>
+          <div nz-row>
+            <div nz-col [nzSpan]="24" style="text-align: right;">
+                <a style="margin-left:8px;font-size:12px;" (click)="wastoggleCollapse()">
+                    {{wassearchbtn_name}}
+                    <i class="anticon" [class.anticon-down]="wasisCollapse" [class.anticon-up]="!wasisCollapse"></i>
+                  </a>
+                <button nz-button [nzType]="'primary'" (click)="getMessageListIsApprover(true)">搜索</button>
+                <button nz-button (click)="resetFormApprover()">清空</button>
+              
+            </div>
+          </div>
+        </form>
+
+
+<nz-table #ajaxTable1  [nzFrontPagination]="false" [nzData]="OndataSet" [nzLoading]="loading" [nzTotal]="Ontotal"
+  [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize"
+   (nzPageIndexChange)="getMessageListIsApprover()"
+    (nzPageSizeChange)="getMessageListIsApprover(true)">
+  <thead (nzSortChange)="sort($event)" nzSingleSort>
+    <tr>
+      <th style="width: 30%">消息标题</th>
+      <th>消息类型</th>
+      <th>
+        <span>内容分类</span>
+      </th>
+      <th>
+        <span>创建人</span>
+      </th>
+      <th>
+        <span>创建时间</span>
+      </th>
+      <th>
+          <span>审批状态</span>
+      </th>
+      <th>
+        <span>审批人</span>
+      </th>
+      <th>
+        <span>审批时间</span>
+      </th>
+      <th>
+        <span>操作</span>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable1.data">
+      <td>{{data.Title}}</td>
+      <td>{{fswitchTypename(data.TypeId)}}</td>
+      <td>{{data.MessageTag}}</td>
+      <td>{{data.CreatorName}}</td>
+      <td>{{data.CreateDate}}</td>
+      <td>{{data.ApprovalStateString}}</td>
+      <td>{{data.ApproverName}}</td>
+      <td>{{data.ApprovalTime}}</td>    
+      <td>
+          <a href="javascript:void(0);" (click)="ViewMessage(data.ID,data.TypeId,data.AppID)">查看</a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table> 
+</nz-tab>
+
+
+<!--========================审批弹出层================================================-->
+<nz-modal [(nzVisible)]="isVisible" nzTitle="消息审批" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isOkLoading">
+  <ul>
+    <li>
+        结果
+      <nz-radio-group [(ngModel)]="ApprovalradioValue">
+        <label nz-radio nzValue="A">通过</label>
+        <label nz-radio nzValue="B">拒绝</label>
+      </nz-radio-group>
+    </li>
+    <li>
+      说明
+      <textarea row="4" nz-input [(ngModel)]="ExplainInputValue" maxlength="150"></textarea>
+    </li>
+  </ul>
+</nz-modal>

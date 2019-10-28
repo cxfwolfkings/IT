@@ -1,0 +1,176 @@
+ <!-- <button nz-button [nzType]="'primary'" (click)="addLocation()">新建</button> -->
+
+<div nz-row>
+  <div nz-col [nzLg]="4" [nzMd]="4" [nzSm]="4" [nzXs]="6">
+      <nz-tree #regionTree2 [(ngModel)]="RegionNodes2" [ngModelOptions]="{standalone: true}" (nzClick)="clickNode2($event)" >
+        </nz-tree>
+  </div>
+  <div nz-col [nzLg]="20" [nzMd]="20" [nzSm]="20" [nzXs]="18">
+      <form nz-form [formGroup]="validateForm" class="ant-advanced-search-form">
+          <div nz-row [nzGutter]="24">
+            <div nz-col [nzSpan]="8" [style.display]="'block'">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="'SearchUserID'">员工ID</nz-form-label>
+                <nz-form-control>
+                  <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+                  
+                  <input nz-input [formControlName]="'SearchUserID'" maxlength="100"    [attr.id]="'SearchUserID'">
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="8" [style.display]="'block'">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="'SearchName'">姓名</nz-form-label>
+                <nz-form-control>
+                  <input nz-input [formControlName]="'SearchName'" maxlength="100" [attr.id]="'SearchName'">
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="8" [style.display]="'block'">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="'SearchDepartment'">部门</nz-form-label>
+                <nz-form-control>
+                  <input nz-input [formControlName]="'SearchDepartment'" maxlength="100" [attr.id]="'SearchDepartment'">
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <div nz-row [nzGutter]="24" *ngIf="!isVisible">
+              <div nz-col [nzSpan]="8" [style.display]="'block'">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'SearchPosition'">职位</nz-form-label>
+                  <nz-form-control>
+                    <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+                    <input nz-input [formControlName]="'SearchPosition'" maxlength="100" [attr.id]="'SearchPosition'">
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8" [style.display]="'block'">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'SearchRegion'">工作地点</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input [formControlName]="'SearchRegion'" maxlength="100" [attr.id]="'SearchRegion'">
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col [nzSpan]="8" [style.display]="'block'">
+                <nz-form-item nzFlex>
+                  <nz-form-label [nzFor]="'SearchStatus'">状态</nz-form-label>
+                  <nz-form-control>
+                    <!-- <input nz-input [formControlName]="'SearchStatus'" maxlength="100" [attr.id]="'SearchStatus'"> -->
+                    <nz-select  [(ngModel)]="SearchAll" [formControlName]="'SearchAll'" nzAllowClear nzPlaceHolder="请选择">
+                      <nz-option nzValue="1" nzLabel="在职"></nz-option>
+                      <nz-option nzValue="2" nzLabel="离职"></nz-option>
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+          </div>
+          <div nz-row [nzGutter]="24" *ngIf="!isVisible">
+        
+            <div nz-col [nzSpan]="8" [style.display]="'block'">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="'CreationTimeBegin'">入职日期</nz-form-label>
+                <nz-form-control>
+                  <nz-date-picker [formControlName]="'CreationTimeBegin'"  [attr.id]="'CreationTimeBegin'"></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="8" [style.display]="'block'">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="'CreationTimeEnd'">至</nz-form-label>
+                <nz-form-control>
+                  <nz-date-picker [formControlName]="'CreationTimeEnd'" [attr.id]="'CreationTimeEnd'"></nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="8" [style.display]="'block'">
+              <nz-form-item nzFlex>
+                <nz-form-label [nzFor]="'SearchYears'">工作年限</nz-form-label>
+                <nz-form-control>
+                  <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+                  <input nz-input [formControlName]="'SearchYears'" maxlength="100" [attr.id]="'SearchYears'">
+                </nz-form-control>
+              </nz-form-item>
+            </div>                
+          </div>     
+          <div nz-row>
+              <div nz-col [nzSpan]="24" style="text-align: right;">
+                <a (click)="searchmore()">{{!isVisible?'快捷检索':'高级检索'}} <i class="anticon anticon-down"></i></a>
+                <button nz-button [nzType]="'primary'" (click)="searchcompany()">搜索</button>
+                <button nz-button (click)="clearuser()">清空</button>
+              </div>
+          </div> 
+        </form>
+        <nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading" [nzTotal]="total"
+        [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="getuserallList()">
+        <thead>
+          <tr>
+            <th>员工ID</th>
+            <th>中文名</th>
+            <th>英文名</th>
+            <th>性别</th>
+            <th>手机</th>
+            <th>邮箱</th>
+            <th>入职日期</th>
+            <th>部门</th>
+            <th>职位</th>
+            <th>上级</th>
+            <th>出生日期</th>
+            <th>工作地点</th>
+            <th>工作年限</th>
+            <th>语言</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of ajaxTable.data">
+            <td>{{data.EmployeeID}}</td>
+            <td>{{data.CName}}</td>
+            <td>{{data.EName}}</td>
+            <td class="Sex">{{data.Sex}}</td>
+            <td>{{data.MobilePhone}}</td>
+            <td class="Email">{{data.Email}}</td> 
+            <td>{{data.EmploymentDateStr}}</td>
+            <td class="Department">{{data.Department}}</td>
+            <td>{{data.Position}}</td>
+            <td>{{data.ParentCName}}</td>
+            <td>{{data.BirthdayStr}}</td>
+            <td>{{data.City}}</td>
+            <td>{{data.EmployeeYears}}</td>
+            <td class="LanguageStr">{{data.LanguageStr}}</td>
+            <td class="StatusName">{{data.StatusStr}}</td>
+            <td class="StatusName"><a href="javascript:void(0);" (click)="editUser(data.ChrisID,data.EmployeeID,data.CName,data.Department,data.Language)">编辑</a></td>
+          </tr>
+        </tbody>
+      </nz-table>
+  </div>
+</div>
+
+
+
+
+
+ <nz-modal [(nzVisible)]="isSee" nzTitle="用户信息修改" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isOkLoading">
+  <br>
+  <label style="margin-right: 17px;">员工ID:</label>
+  <input nz-input [(ngModel)]="EmployeeID" style="width: 80%;background-color:#f5f5f5;cursor: not-allowed;" readonly="readonly">
+  <br>
+  <br>
+  <label style="margin-right: 30px;">姓名:</label> 
+  <input nz-input [(ngModel)]="CName" style="width: 80%;background-color:#f5f5f5;cursor: not-allowed;" readonly="readonly">
+  <br>
+  <br>
+  <label style="margin-right: 30px;">部门:</label> 
+  <input nz-input [(ngModel)]="Department" style="width: 80%;background-color:#f5f5f5;cursor: not-allowed;" readonly="readonly">
+  <br>
+  <br>
+  <label style="margin-right: 30px;">语言:</label> 
+  <nz-select style="width: 80%;"  [(ngModel)]="selectlanguage" nzPlaceHolder="请选择">
+    <nz-option nzValue="1" nzLabel="中文"></nz-option>
+    <nz-option nzValue="2" nzLabel="英文"></nz-option>
+    </nz-select>
+
+</nz-modal>
+<!-- <a nz-popconfirm nzTitle="你确定删除这条数据么?" (nzOnConfirm)="confirm()" (nzOnCancel)="cancel()">Delete</a> -->

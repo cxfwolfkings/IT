@@ -1,0 +1,177 @@
+ <!-- <button nz-button [nzType]="'primary'" (click)="addLocation()">新增</button> -->
+ <form nz-form [formGroup]="validateForm" class="ant-advanced-search-form">
+  <div nz-row [nzGutter]="24">
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchName'">名称</nz-form-label>         
+        <nz-form-control>
+          <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+          <input nz-input [formControlName]="'SearchName'" maxlength="30" [attr.id]="'SearchStoreName'">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchRegionName'">区域</nz-form-label>
+        <nz-form-control>
+          <!-- <input nz-input [formControlName]="'SearchRegionName'" maxlength="100" [attr.id]="'SearchRegionName'"> -->
+          <nz-select [(ngModel)]="selecttest1" nzPlaceHolder="请选择" nzAllowClear [formControlName]="'selecttest1'">
+            <nz-option *ngFor="let c of locationlist1" [nzValue]="c.AreaName" [nzLabel]="c.AreaName"></nz-option>
+            <!-- <nz-option *ngFor="let p of provinceData" [nzValue]="p.ID" [nzLabel]="p.ID"></nz-option> -->
+            <!-- <nz-option *ngIf="isTypeLoading" nzDisabled nzCustomContent>
+              <i class="anticon anticon-loading anticon-spin loading-icon"></i> 数据加载中...
+            </nz-option> -->
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchAddress'">地址</nz-form-label>
+        <nz-form-control>
+          <input nz-input [formControlName]="'SearchAddress'" maxlength="40" [attr.id]="'SearchAddress'">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div nz-row [nzGutter]="24" *ngIf="!isVisible">
+      <div nz-col [nzSpan]="8" [style.display]="'block'">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="'SearchZipcode'">邮编</nz-form-label>
+          <nz-form-control>
+            <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+            <input nz-input [formControlName]="'SearchZipcode'" maxlength="10" [attr.id]="'SearchZipcode'">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="8" [style.display]="'block'">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="'SearchFax'">传真</nz-form-label>
+          <nz-form-control>
+            <input nz-input [formControlName]="'SearchFax'" maxlength="20" [attr.id]="'SearchFax'">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="8" [style.display]="'block'">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="'SearchPhone'">电话</nz-form-label>
+          <nz-form-control>
+            <input nz-input [formControlName]="'SearchPhone'" maxlength="20" [attr.id]="'SearchPhone'">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+  </div>
+  <div nz-row>
+      <div nz-col [nzSpan]="8">
+        <a nz-button [nzType]="'primary'" (click)="Addcompany()" >新增</a>
+      </div>
+      <div nz-col [nzSpan]="16" style="text-align: right;">
+        <a (click)="searchmore()">{{!isVisible?'快捷检索':'高级检索'}} <i class="anticon anticon-down"></i></a>
+        <button nz-button [nzType]="'primary'" (click)="searchcompany()">搜索</button>
+        <button nz-button (click)="clearcompany()">清空</button>
+      </div>
+    </div> 
+  <!-- <div nz-col [nzSpan]="16" [style.display]="'block'">
+    <nz-form-item nzFlex>
+      <nz-form-control>
+          <a nz-button [nzType]="'primary'" (click)="Addcompany()" >新增</a>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div nz-col [nzSpan]="2" [style.display]="'block'" *ngIf="isVisible">
+    <nz-form-item nzFlex>
+      <nz-form-control>
+        <a (click)="searchmore()" >高级检索</a>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div nz-col [nzSpan]="2" [style.display]="'block'" *ngIf="!isVisible">
+    <nz-form-item nzFlex>
+      <nz-form-control>
+        <a (click)="searchless()" >快捷检索</a>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div nz-col [nzSpan]="1" [style.display]="'block'">
+    <nz-form-item nzFlex>
+      <nz-form-control>
+        <button nz-button [nzType]="'primary'" (click)="searchcompany()">搜索</button>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div nz-col [nzSpan]="1" [style.display]="'block'">
+    <nz-form-item nzFlex>
+      <nz-form-control>
+        <button nz-button [nzType]="'primary'" (click)="clearcompany()">清空</button>
+      </nz-form-control>
+    </nz-form-item>
+  </div> -->
+</form>
+ <nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading" [nzTotal]="total"
+  [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="getcompanyList()">
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>区域</th>
+      <th>地址</th>
+      <th>邮编</th>
+      <th>传真</th>
+      <th>电话</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable.data">
+      <td>{{data.Name}}</td>
+      <td>{{data.RegionName}}</td>
+      <td>{{data.Address}}</td>
+      <td>{{data.Zipcode}}</td>
+      <td>{{data.Fax}}</td>
+      <td>{{data.Phone}}</td>
+      <td>
+        <a href="javascript:void(0);" (click)="editcompany(data.Id,data.Name,data.RegionName,data.Address,data.Zipcode,data.Fax,data.Phone,data.RegionId)">编辑</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a href="javascript:void(0)" (click)="deletecompany(data.Id)">删除</a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+ <nz-modal [(nzVisible)]="isSee" nzTitle="编辑公司信息" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isOkLoading">
+  <div>
+      <label class="ant-form-item-required">名称</label>
+      <input nz-input [(ngModel)]="Name">
+  </div>
+  <div>
+      <label class="ant-form-item-required">区域</label> 
+      <nz-select style="width: 100%;" [(ngModel)]="selecttest" nzPlaceHolder="请选择" nzAllowClear>
+          <nz-option *ngFor="let c of locationlist" [nzValue]="c.ID" [nzLabel]="c.AreaName"></nz-option>
+          <!-- <nz-option *ngFor="let p of provinceData" [nzValue]="p.ID" [nzLabel]="p.ID"></nz-option> -->
+          <!-- <nz-option *ngIf="isTypeLoading" nzDisabled nzCustomContent>
+            <i class="anticon anticon-loading anticon-spin loading-icon"></i> 数据加载中...
+          </nz-option> -->
+        </nz-select>
+  </div>
+  <div>
+      <label class="ant-form-item-required">地址</label> 
+      <input nz-input [(ngModel)]="Address">
+  </div>
+  <div>
+      <label class="ant-form-item-required">邮编</label> 
+      <input nz-input nz-input-number [(ngModel)]="Zipcode">
+  </div>
+  <div>
+      <label>传真</label> 
+      <input nz-input nz-input-number [(ngModel)]="Fax">
+  </div>
+  <div>
+      <label>电话</label> 
+      <input nz-input nz-input-number [(ngModel)]="Phone">
+      <!-- <input nz-input [(ngModel)]="companyLabel"  style="width:50%;border: 0px;margin-top: 0px;color: red" readonly="readonly"> -->
+      <span class="errorMsg">{{companyLabel}}</span>
+  </div>
+</nz-modal>
+<nz-modal [(nzVisible)]="isDelete" nzTitle="" (nzOnCancel)="DeleteCancel()" (nzOnOk)="DeleteOk()" [nzOkLoading]="isOkLoading">
+<label>是否确认删除这个企业?</label>
+</nz-modal>
+
+<!-- <a nz-popconfirm nzTitle="你确定删除这条数据么?" (nzOnConfirm)="confirm()" (nzOnCancel)="cancel()">Delete</a> -->

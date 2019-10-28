@@ -137,7 +137,9 @@
 
 ### 第4天：[IOC框架](./6.4_IOC框架.md)
 
-### 第3天：[附录](./6.3_附录.md)
+### 第5天：[附录](./6.5_附录.md)
+
+- 部署
 
 1. [Microsoft技术栈](#Microsoft技术栈)
    - [尽量早日放弃Silverlight和Flash](#尽量早日放弃Silverlight和Flash)

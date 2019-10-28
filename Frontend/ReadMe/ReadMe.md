@@ -140,7 +140,7 @@
 
 ### 第1天：[js总结](./5.1_js总结.md)
 
-## 附录
+### 第2天：[附录](./5.2_附录.md)
 
 网上有一个站点；禅意花园 -> csdn 网页论坛
 
@@ -164,77 +164,3 @@ Php 开源 php-open.com  模仿->()创新
 ### [第3天：jQMobile](./6.3_jQMobile.md)
 
 ### [第4天：PhoneGap](./6.4_PhoneGap.md)
-
-## 谷歌浏览器出现“错误代码：ERR_UNSAFE_PORT”的解决办法
-
-出错原因：谷歌浏览器（FF浏览器也有）对一些特殊的端口进行了限制
-
-解决方法：最简单的办法就是直接修改搭建项目的端口号，避开这些谷歌限制的端口号。
-
-```sh
-# 谷歌浏览器限制的一些端口号：
-1：    // tcpmux
-7：    // echo
-9：    // discard
-11：   // systat
-13：   // daytime
-15：   // netstat
-17：   // qotd
-19：   // chargen
-20：   // ftp data
-21：   // ftp access
-22：   // ssh
-23：   // telnet
-25：   // smtp
-37：   // time
-42：   // name
-43：   // nicname
-53：   // domain
-77：   // priv-rjs
-79：   // finger
-87：   // ttylink
-95：   // supdup
-101：  // hostriame
-102：  // iso-tsap
-103：  // gppitnp
-104：  // acr-nema
-109：  // pop2
-110：  // pop3
-111：  // sunrpc
-113：  // auth
-115：  // sftp
-117：  // uucp-path
-119：  // nntp
-123：  // NTP
-135：  // loc-srv /epmap
-139：  // netbios
-143：  // imap2
-179：  // BGP
-389：  // ldap
-465：  // smtp+ssl
-512：  // print / exec
-513：  // login
-514：  // shell
-515：  // printer
-526：  // tempo
-530：  // courier
-531：  // chat
-532：  // netnews
-540：  // uucp
-556：  // remotefs
-563：  // nntp+ssl
-587：  // stmp?
-601：  // ??
-636：  // ldap+ssl
-993：  // ldap+ssl
-995：  // pop3+ssl
-2049： // nfs
-3659： // apple-sasl / PasswordServer
-4045： // lockd
-6000： // X11
-6665： // Alternate IRC [Apple addition]
-6666： // Alternate IRC [Apple addition]
-6667： // Standard IRC [Apple addition]
-6668： // Alternate IRC [Apple addition]
-6669： // Alternate IRC [Apple addition]
-```

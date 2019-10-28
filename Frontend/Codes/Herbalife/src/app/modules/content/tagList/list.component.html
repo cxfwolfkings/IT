@@ -1,0 +1,97 @@
+<!--
+  内容标签列表模板页
+  add by Colin
+-->
+<form nz-form [formGroup]="searchForm" class="ant-advanced-search-form">
+  <div nz-row [nzGutter]="24">
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchName'">标签名称</nz-form-label>
+        <nz-form-control>
+          <input nz-input [formControlName]="'SearchName'" [attr.id]="'SearchName'" maxlength="50">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'selectedCategory'">内容分类</nz-form-label>
+        <nz-form-control >
+          <nz-select [(ngModel)]="selectedCategory" nzMode="multiple"
+            nzPlaceHolder="请选择" nzAllowClear 
+            [formControlName]="'selectedCategory'">
+            <nz-option *ngFor="let c of categoryList" [nzValue]="c.CategoryID" [nzLabel]="c.NameCn"></nz-option>
+            <nz-option *ngIf="isCategoryLoading" nzDisabled nzCustomContent>
+              <i class="anticon anticon-loading anticon-spin loading-icon"></i> 数据加载中...
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'SearchCreator'">创建用户</nz-form-label>
+        <nz-form-control>
+          <input nz-input [formControlName]="'SearchCreator'" [attr.id]="'SearchCreator'" maxlength="50">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div nz-row>
+    <div nz-col [nzSpan]="8">
+      <button nz-button [nzType]="'primary'" (click)="add()">新建</button>
+    </div>
+    <div nz-col [nzSpan]="16" style="text-align: right;">
+      <button nz-button [nzType]="'primary'" (click)="search()">搜索</button>
+      <button nz-button (click)="reset()">清空</button>
+    </div>
+  </div>
+</form>
+<nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading"
+  [nzTotal]="total" [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="getList()">
+  <thead>
+    <tr>
+      <!--<th>ID</th>-->
+      <th>标签名称</th>
+      <th>所属内容分类</th>
+      <th>创建用户</th>
+      <th>创建时间</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable.data">
+      <!--<td>{{data.Id}}</td>-->
+      <td>{{data.Name}}</td>
+      <td>{{data.CategoryName}}</td>
+      <td>{{data.Creator}}</td>
+      <td>{{data.CreateTime}}</td>
+      <td>
+        <a href="javascript:;" (click)="edit(data.Id, data.Name, data.CategoryId)">编辑</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <!--
+        <nz-popconfirm [nzTitle]="'确认删除？'" (nzOnConfirm)="del(data.Id)">
+          <a nz-popconfirm>删除</a>
+        </nz-popconfirm> 
+      -->
+      <a (click)="showConfirm(data.Id);">删除</a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+<nz-modal [(nzVisible)]="isEditModalVisible" nzTitle="内容标签" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()"
+  [nzOkLoading]="isOkLoading" nzMaskClosable="false">
+  <span style="color:red">*</span><label style="margin-right: 30px;">标签名称</label>
+  <input nz-input [(ngModel)]="txtName" style="width: 80%" maxlength="50">
+  <span class="errorMsg">{{txtNameError}}</span>
+  <br>
+  <span style="color:red">*</span><label style="margin-right: 30px;">内容分类</label>
+  <nz-select [(ngModel)]="txtCategory" nzPlaceHolder="请选择" nzAllowClear [style.width]="'80%'">
+    <nz-option *ngFor="let c of categoryList" [nzValue]="c.CategoryID" [nzLabel]="c.NameCn"></nz-option>
+    <nz-option *ngIf="isCategoryLoading" nzDisabled nzCustomContent>
+      <i class="anticon anticon-loading anticon-spin loading-icon"></i> 数据加载中...
+    </nz-option>
+  </nz-select>
+  <span class="errorMsg">{{txtCategoryError}}</span>
+  <br>
+</nz-modal>
+

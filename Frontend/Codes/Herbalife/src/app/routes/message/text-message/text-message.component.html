@@ -1,0 +1,100 @@
+<nz-select *ngIf="actionStr!='view'" style="width: 200px;" nzShowSearch   [(ngModel)]="selectedLang" (ngModelChange)="isChangeLang($event)">
+    <nz-option nzLabel="双语消息" nzValue="CN,EN"></nz-option>
+    <nz-option nzLabel="仅中文消息" nzValue="CN"></nz-option>
+    <nz-option nzLabel="仅英文消息" nzValue="EN"></nz-option>
+  </nz-select>
+<nz-tabset>
+  <nz-tab nzTitle="消息和内容">
+    <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
+      <div nz-row [nzGutter]="24">
+        <div nz-col [nzSpan]="16">
+          <nz-form-item>
+            <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzRequired nzFor="titleCN" class="text-left">消息标题</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" >
+                <nz-input-group #titleCnNode [nzAddOnAfter]="titleCnWords">
+                  <input nz-input   formControlName="titleCN" id="titleCN" [(ngModel)]="messageItem.title.CN" maxlength="150"  
+                  (keyup)="commonService.changeWords(messageItem.title.CN, titleCnNode, 150)">
+              </nz-input-group>
+              <nz-form-explain><标题不会出现在微信中，只作为助记符></nz-form-explain>
+              <!-- *ngIf="validateForm.get('titleCN').dirty && validateForm.get('titleCN').errors" -->
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item style="height: 140px" *ngIf="selectedLang=='CN,EN'||selectedLang=='CN'">
+            <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="textMessageContentCN" class="text-left" nzRequired>中文内容</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" >
+                <!-- [nzAutosize]="{ minRows: 6,maxRows: 6 }"  rows="6" -->
+                <nz-input-group #textMessageContentCnNode [nzAddOnAfter]="textMessageContentCN" class="textarea_span">
+                  <textarea nz-input style="height: 140px;" 
+                  type="textMessageContentCN" id="textMessageContentCN" formControlName="textMessageContentCN" 
+                  [(ngModel)]="messageItem.textMessageContent.CN" maxlength="500"  
+                  (keyup)="commonService.changeWords(messageItem.textMessageContent.CN, textMessageContentCnNode, 500)">
+                  </textarea>
+              </nz-input-group>
+
+              <nz-form-explain *ngIf="validateForm.get('textMessageContentCN').dirty && validateForm.get('textMessageContentCN').errors">请填写中文内容!</nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item style="height: 140px"  *ngIf="selectedLang=='CN,EN'||selectedLang=='EN'">
+            <nz-form-label [nzLg]="24" [nzMd]="24" [nzSm]="24" [nzXs]="24" nzFor="textMessageContentEN" class="text-left" nzRequired>英文内容</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <nz-input-group #textMessageContentEnNode [nzAddOnAfter]="textMessageContentEN" class="textarea_span">
+              <textarea nz-input style="height: 140px;"  type="textMessageContentEN" 
+              formControlName="textMessageContentEN" id="textMessageContentEN" 
+               [(ngModel)]="messageItem.textMessageContent.EN" maxlength="500"
+               (keyup)="commonService.changeWords(messageItem.textMessageContent.EN, textMessageContentEnNode, 500)">
+               </textarea>
+               </nz-input-group>
+              <nz-form-explain *ngIf="validateForm.get('textMessageContentEN').dirty && validateForm.get('textMessageContentEN').errors">
+                  请填写英文内容
+              </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item *ngIf="actionStr!='view'">
+            <!-- <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="nickname" >
+            </nz-form-label> -->
+            <!-- <nz-form-control [nzSm]="6" [nzXs]="24"></nz-form-control> -->
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+              <label nz-checkbox formControlName="ischeck" [(ngModel)]="isCheckedButton" ></label>
+              由于本消息直接保存在腾讯后台，根据传播部发送消息的规定，请不要发送包含企业内部敏感信息的消息
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <div class="preiview_wrap">
+            <div class="preiview_title">预览</div>
+            <div class="preview_body">
+              <div class="chat_icon">
+                <img src="./assets/image/touxiang.png" alt="">
+              </div>
+              <div class="chat_content">
+                  <pre *ngIf="previewLanguage=='CN'">{{messageItem.textMessageContent.CN}}</pre>
+                  <pre *ngIf="previewLanguage=='EN'">{{messageItem.textMessageContent.EN}}</pre>
+                  <pre *ngIf="previewLanguage=='CN,EN'">{{messageItem.textMessageContent.CN}}</pre>
+              </div>
+              <!-- <div *ngIf="previewLanguage=='CN'">{{messageItem.textMessageContent.CN}}</div>
+              <div *ngIf="previewLanguage=='EN'">{{messageItem.textMessageContent.EN}}</div> -->
+            </div>
+          </div>
+          <!-- <div><a *ngIf="(actionStr!='view' && actionStr!='edit')  || selectedLang=='CN,EN'"  (click)="togglePreviewLanguage()">{{PreviewTitle}}</a></div>           -->
+          <div><a *ngIf="selectedLang=='CN,EN'"  (click)="togglePreviewLanguage()">{{PreviewTitle}}</a></div>
+        </div>
+      </div>
+    </form>
+  </nz-tab>
+  <nz-tab nzTitle="应用和收件人">
+    <div nz-col [nzSpan]="16">
+        <app-addressee ></app-addressee>
+    </div>
+  </nz-tab>
+</nz-tabset>
+
+<nz-form-item nz-row style="margin-bottom:8px;">
+    <nz-form-control [nzSpan]="14" [nzOffset]="0">
+      <button nz-button nzType="primary" *ngIf="actionStr!='view'" [disabled]="!isCheckedButton" (click)="submitForm('save',false,0)">保存</button>
+      <button nz-button nzType="primary" *ngIf="actionStr!='view'" [disabled]="!isCheckedButton" (click)="submitForm('send',false,0)">发送测试消息</button>
+      <button nz-button nzType="primary" *ngIf="actionStr!='view'" [disabled]="!isCheckedButton" (click)="submitForm('submit',false,1)">提交</button>
+      <!-- <button nz-button nzType="primary" *ngIf="actionStr!='view'" (click)="submitForm('send',true)">发送</button> -->
+
+      <button nz-button nzType="default" (click)='returnBack()' *ngIf="messageId>0">返回</button>
+    </nz-form-control>
+  </nz-form-item>

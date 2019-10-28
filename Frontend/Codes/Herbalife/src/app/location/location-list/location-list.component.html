@@ -1,0 +1,47 @@
+ <!-- <button nz-button [nzType]="'primary'" (click)="addLocation()">新建</button> -->
+<nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading" [nzTotal]="total"
+  [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="getLocationList()">
+  <thead>
+    <tr>
+      <th>区域名称</th>
+      <th>排序</th>
+      <th>创建用户</th>
+      <th>创建时间</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable.data">
+      <td>{{data.AreaName}}</td>
+      <td>{{data.SortId}}</td>
+      <td>{{data.CreationName}}</td>
+      <td>{{data.CreationTime}}</td>
+      <td>
+        <a href="javascript:void(0);" (click)="editlocation(data.ID,data.AreaName,data.SortId)">编辑</a>
+        <!-- <nz-divider nzType="vertical"></nz-divider>
+        <a href="javascript:void(0)" (click)="deletelocation(data.ID)">删除</a> -->
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+<nz-modal [(nzVisible)]="isVisible" [nzTitle]="locationId>0?'编辑区域':'新建区域'" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isOkLoading">
+  <br>
+  <label style="margin-right: 30px;">区域名称</label>
+  <input nz-input [(ngModel)]="AreaName" maxlength="3"  style="width: 80%;margin-bottom: 10px">
+  <!-- <input nz-input [(ngModel)]="AreaLabel"  style="width:50%;border: 0px;left: 80px;margin-top: 0px;color: red"> -->
+  <span class="errorMsg">{{AreaLabel}}</span>
+  
+  <br>
+  <label style="margin-right: 60px;">排序</label>
+  <!-- <input nz-input-number [(ngModel)]="SortId" style="width: 80%" > -->
+  <nz-input-number [(ngModel)]="SortId" [nzMin]="0" [nzStep]="1" style="width:80%"></nz-input-number>
+  <!-- <input nz-input [(ngModel)]="sortLabel"  style="width:50%;border: 0px;left: 80px;margin-top: 0px;color: red"> -->
+  <span class="errorMsg">{{sortLabel}}</span>
+</nz-modal>
+
+
+<nz-modal [(nzVisible)]="isDelete" nzTitle="删除区域" (nzOnCancel)="DeleteCancel()" (nzOnOk)="DeleteOk()" [nzOkLoading]="isOkLoading">
+ <label>是否确认删除这条区域</label> 
+</nz-modal>
+
+<!-- <a nz-popconfirm nzTitle="你确定删除这条数据么?" (nzOnConfirm)="confirm()" (nzOnCancel)="cancel()">Delete</a> -->

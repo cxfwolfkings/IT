@@ -1,0 +1,526 @@
+/* You can add global styles to this file, and also import other style files */
+/* layout */
+.ant-layout-header{
+  background-color: #7ac143!important;
+  height: 85px;
+  line-height: 85px;
+}
+.ant-layout-header .logo img{
+  width: 195px;
+  height: auto;
+}
+.ant-layout-header .logo h3{
+  display: inline-block;
+  color: #fff;
+  font-size: 24px;
+  padding-left: 30px;
+}
+.ant-layout-header .ant-menu{
+  float: right;
+  border: none;
+  margin-top: 10px;
+}
+
+.ant-layout{
+  min-height: 100%;
+  background-color: #eee;
+}
+.ant-layout-footer{
+  background-color: #ccc;
+}
+.ant-layout-content{
+  padding: 12px 15px;
+  margin-left: 10px;
+  background-color: #ffffff;
+}
+.ant-layout-sider-children .ant-menu{
+  background-color: #fff;
+}
+.ant-tabs-nav .ant-tabs-tab{
+  padding:12px 16px 12px 0px ;
+  
+}
+.ant-form-item-label{
+  text-align: left;
+}
+.ant-breadcrumb{
+  margin-bottom: 10px;
+}
+.ant-table-wrapper{
+  margin-top: 10px;
+}
+button {
+  margin-left: 8px;
+}
+.page_title{
+  font-size: 24px;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  color: #333;
+}
+/* layout end */
+
+/*image-message.component start  */
+
+ul{
+  padding: 0px;
+}
+li{
+  list-style: none;
+}
+ul.right_add{
+  max-width: 347px;
+}
+.li_wrap{
+  border:1px solid #dee5e7;
+  margin-top: 5px;
+}
+.li_title,.li_content{
+  padding: 4px 5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.li_img{
+  width: 96%;
+  height: 190px;
+  border: solid 1px gainsboro;
+  background-color: #f2f2f2;
+  margin:5px auto;
+  position: relative;
+}
+.li_img:focus{
+  border: 2px solid #7ac143;
+}
+.li_img img{
+  width: 100px;
+  height: 100%;
+}
+.li_img .img_title{
+  width: 100%;
+  height: auto;
+  text-align: left;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(48, 45, 40, 0.5);
+
+}
+.additem{
+  border: dashed 1px gainsboro;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 15px;
+  max-width: 347px;
+}
+.add_li{
+  height: 80px;
+  position: relative;
+}
+.active{
+  border:solid 3px #7ac143; 
+}
+.add_li .anticon{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 18px;
+}
+.add_li_content{
+  padding: 10px;
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+}
+.content_left{
+  width: 60%;
+  height: 100%;
+}
+.content_right{
+  width: 30%;
+  height: 100%;
+  background-color: #eeeff1;
+}
+.content_right img{
+  width: 100%;
+  height: 100%;
+}
+/* text-message.component start */
+.preiview_wrap{
+  border: 1px solid #dee5e7;
+  max-width: 345px;
+  min-height: 422px;
+}
+.preiview_title{
+  background-color: #7ac143;
+  color: #ffffff;
+  padding: 15px 10px;
+}
+.preview_body{
+  padding: 10px;
+}
+.preview_body .chat_icon{
+  float: left;
+}
+.preview_body .chat_content{
+  margin-left: 55px;
+  padding: 10px 15px;
+  border: solid 1px #7aa23d;
+  border-radius: 6px;
+  line-height: 1.5em;
+  background: -webkit-linear-gradient(top, #c3df90 , #a7c664); /* Safari 5.1 - 6.0 */
+  background: -o-linear-gradient(bottom, #c3df90, #a7c664); /* Opera 11.1 - 12.0 */
+  background: -moz-linear-gradient(bottom, #c3df90, #a7c664); /* Firefox 3.6 - 15 */
+  background: linear-gradient(to bottom, #c3df90 , #a7c664); /* 标准的语法 */
+  box-shadow: 0 0 1px #fff inset;
+  position: relative;
+  width: 236px;
+  min-height: 40px;
+}
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  }
+.preview_body .chat_content:before{
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: #b5d27a;
+  transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  border-bottom: solid 1px #7aa23d;
+  border-left: solid 1px #7aa23d;
+  position: absolute;
+  left: -5px;
+  top: 15px;
+}
+.preview_body .chat_content pre{
+  font-size: 12px;
+  line-height: 1.5em;
+  background-color: inherit;
+  border: none;
+  padding: 0px;
+}
+
+/*message 高級搜索 */
+.ant-advanced-search-form {
+  padding: 24px;
+  background: #fbfbfb;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.ant-advanced-search-form .ant-form-item .ant-form-item-label{
+  min-width: 90px;
+}
+/* group list */
+.newgroup .input_label{
+  display:inline-block;
+  width: 65px;
+}
+.newgroup .ant-input,.textarea.ant-input{
+  width: 80%;
+  margin-top: 10px;
+}
+
+/* 改变主色调 */
+a{
+  color: #7ac143;
+}
+a:hover{
+  color: #ffae01;
+}
+/* menu */
+.ant-menu .ant-menu-submenu .ant-menu-submenu-title:hover{
+  color: #7ac143;
+}
+.ant-menu-item:hover{
+  color: #7ac143;
+}
+.ant-menu .ant-menu-sub .ant-menu-item:hover{
+  color: #7ac143;
+}
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  color: #7ac143;
+  background-color: #eee;
+}
+.ant-menu .ant-menu-item:after{
+  border-right: 3px solid #7ac143;
+}
+.ant-menu .ant-menu-submenu .ant-menu-submenu-title:hover .ant-menu-submenu-arrow:after,.ant-menu .ant-menu-submenu .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::before{
+  background-image: linear-gradient(to right, rgba(122, 193, 67, 0.65), rgba(122, 193, 67,0.65))!important;
+}
+/* tab */
+.ant-tabs-nav .ant-tabs-tab-active,.ant-tabs-nav .ant-tabs-tab:hover{
+  color: #7ac143;
+}
+.ant-tabs-ink-bar{
+  background-color: #7ac143;
+}
+/*按钮 */
+.ant-btn:hover{
+  border-color: #7ac143;
+  color: #7ac143;
+}
+.ant-btn-primary{
+  background-color: #7ac143;
+  border-color: #7ac143;
+  color: #fff;
+}
+.ant-btn-primary:hover{
+  background-color: #7aa23d;
+  border-color: #7aa23d;
+  color: #fff;
+}
+.ant-btn-primary:focus{
+  color: #fff!important;
+  border-color: #7ac143!important;
+  background-color:#7ac143!important; 
+}
+/* table */
+.ant-table-tbody > tr > td a:hover{
+  color: #ffae01;
+  text-decoration: underline;
+}
+.ant-pagination-item-active{
+  border-color: #7ac143;
+  background-color: #7ac143;
+}
+.ant-pagination-item-active a{
+  color: #fff;
+}
+.ant-pagination-item:hover{
+  background-color: #dcdcdc;
+  border-color: #dcdcdc;
+}
+.ant-pagination-item:hover a{
+  color: #000;
+}
+/*表单*/
+.ant-input:hover{
+  border-color: #7ac143;
+}
+.ant-input:focus{
+  outline: none;
+  border-color: #7ac143;
+  box-shadow: 0 0 0 2px rgba(122, 193, 67, 0.2);
+}
+.ant-select-selection:hover{
+  border-color: #7ac143;
+}
+.ant-select-open .ant-select-selection{
+  border-color: #7ac143;
+  box-shadow: 0 0 0 2px rgba(122, 193, 67, 0.2);
+}
+.ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item-selected:after, .ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item-selected:hover:after{
+  color: #7ac143;
+}
+.ant-radio-checked .ant-radio-inner{
+  border-color:#7ac143;
+}
+.ant-radio-inner:after{
+  background-color: #7ac143;
+}
+.ant-radio-checked .ant-radio-inner{
+  border:1px solid #7ac143;
+}
+.ant-radio-wrapper:hover .ant-radio .ant-radio-inner{
+  border:1px solid #7ac143;
+}
+.ant-checkbox-checked .ant-checkbox-inner, .ant-checkbox-indeterminate .ant-checkbox-inner{
+  background-color: #7ac143;
+  border-color: #7ac143;
+}
+.ant-checkbox-wrapper:hover .ant-checkbox-inner, .ant-checkbox:hover .ant-checkbox-inner, .ant-checkbox-input:focus + .ant-checkbox-inner,.ant-checkbox-checked:after{
+  border:1px solid #7ac143;
+}
+.ant-calendar-picker:hover .ant-calendar-picker-input{
+  border:1px solid #7ac143!important;
+}
+
+.ant-calendar .ant-calendar-ok-btn {
+  background-color: #7ac143;
+  border-color: #7ac143;
+}
+.ant-calendar .ant-calendar-ok-btn:hover{
+  background-color: #7aa23d;
+  border-color: #7aa23d;
+  color: #fff;
+}
+.ant-calendar-today .ant-calendar-date{
+  border-color: #7ac143;
+  color: #7ac143;
+}
+.ant-calendar-selected-day .ant-calendar-date{
+  background-color: #7ac143;
+  color: #fff;
+}
+.ant-calendar-selected-day .ant-calendar-date:hover, .ant-calendar-date:active{
+  background-color: #7aa23d;
+}
+
+/* 调整间距 */
+.ant-advanced-search-form .ant-form-item{
+  margin-bottom: 10px;
+}
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+  padding: 10px 16px;
+}
+.ant-table-body{
+  width: 100%;
+  overflow:auto;
+}
+.ant-table-body table td{
+  min-width: 120px;
+}
+.ant-table-thead td{
+  padding: 10px 16px;
+}
+.ant-select{
+  width: 100%;
+}
+
+/* 2018.11.1 formgroup固定 */
+.ant-anchor-ink:before{
+  background-color:transparent;
+}
+/* contentList */
+.ant-table-body table td.id{
+  min-width: 70px
+}
+.ant-table-body table td.StatusName,.ant-table-body table td.CategoryName{
+  min-width: 100px;
+}
+.ant-table-body table td.CreationTime{
+  min-width: 120px
+}
+.ant-table-body table td.CreatorName{
+  min-width: 150px;
+}
+.ant-table-body table td.CnContentTitle{
+  min-width: 300px;
+}
+/* commentList */
+.ant-table-body table td.Time{
+  min-width: 165px;
+}
+/* userallList */
+.ant-table-body table td.Sex{
+  min-width: 60px;
+}
+.ant-table-body table td.Email{
+  min-width: 180px;
+}
+.ant-table-body table td.LanguageStr{
+  min-width: 80px;
+}
+.ant-table-body table td.Department{
+  min-width: 150px;
+}
+.ant-table-body table td.work{
+  min-width: 200px;
+}
+.ant-table-body table td.nzType{
+  min-width: 305px;
+}
+
+body {
+  overflow: auto!important;
+}
+
+/* 文字靠右 */
+.ant-form-item-label{
+  text-align: right;
+}
+.text-left{
+  text-align: left;
+}
+.ant-advanced-search-form .ant-form-item-control-wrapper{
+  width:70%;
+}
+.ant-advanced-search-form .ant-form-item-control-wrapper .ant-select,.ant-advanced-search-form .ant-form-item-control-wrapper .ant-calendar-picker{
+  width: 100%;
+}
+@media (min-width:1200px){
+  .ant-advanced-search-form .ant-form-item-control-wrapper{
+    width:50%;
+  }
+}
+@media (min-width:970px) and (max-width: 1200px){
+  .ant-advanced-search-form .ant-form-item-control-wrapper{
+    width:80%;
+  }
+} 
+
+/* add by Colin 2018-11-12 错误提示 */
+span.errorMsg {
+  color:red; 
+  line-height: 1.5; 
+  margin-top: -2px; 
+  display: block;
+}
+
+.errorInput {
+  border-color: red!important;
+}
+.textarea_span .ant-input-wrapper{
+  position: relative;
+  border: 1px solid #d9d9d9;
+  height: 170px;
+  border-radius: 4px;
+}
+.textarea_span textarea{
+  border: none;
+  outline: none;
+}
+.textarea_span textarea:focus,.textarea_span textarea:hover{
+  border: none;
+  box-shadow:none;
+}
+.textarea_span .ant-input-wrapper:hover,.textarea_span .ant-input-wrapper:focus{
+  border:1px solid #7ac143;
+  box-shadow: 0 0 0 2px rgba(122, 193, 67, 0.2);
+
+}
+.has-error .ant-input-wrapper:hover,.has-error .ant-input-wrapper:focus{
+  border:1px solid #f5222d;
+}
+.has-error .textarea_span .ant-input:hover,.has-error .textarea_span .ant-input:focus{
+  box-shadow: none;
+  border-color: transparent;
+}
+.textarea_span .ant-input-group-addon{
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  bottom: 7px;
+  right: 50px;
+}
+@media(min-width: 1170px){
+  .ant-layout-content{
+    min-height: 810px;
+  }
+  .chose .ant-select-selection--multiple .ant-select-search--inline .ant-select-search__field{
+    width: 200px;
+  }
+}
+@media (min-width: 970px) and (max-width:1170px){
+  .ant-layout-content{
+    min-height: 650px;
+  }
+  .chose .ant-select-selection--multiple .ant-select-search--inline .ant-select-search__field{
+    width: 300px;
+  }
+}
+.ant-select-selection--multiple .ant-select-search--inline .ant-select-search__field{
+  width: 20px;
+}
+/* 创建图文消息 */
+.li_img-wrap:hover{
+  border: 2px solid #7ac143;
+}
+textarea{ 
+  resize:none 
+  } 

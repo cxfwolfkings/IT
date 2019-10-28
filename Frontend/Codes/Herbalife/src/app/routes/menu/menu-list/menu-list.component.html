@@ -1,0 +1,41 @@
+<div>
+  <a routerLink="../operation" nz-button nzType="primary">新增</a>
+  <div>
+    <nz-table #nzTable [nzData]="data" [nzShowPagination]="false" [nzFrontPagination]="false" [nzLoading]="menuService.loading">
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th>权限字符串</th>
+          <th>资源类型</th>
+          <th>拦截URL</th>
+          <th>排序</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--<ng-template ngFor let-data [ngForOf]="nzTable.data">-->
+          <!--<ng-template ngFor let-item [ngForOf]="expandDataCache[data.ID]">-->
+            <tr *ngFor="let data of nzTable.data">
+              <td [nzIndentSize]="data.level*20">
+                {{data.Remark}}
+              </td>
+              <td>{{data.PermissonString}}</td>
+              <td>{{data.SourceType==1?"模块类型":"菜单类型"}}</td>
+              <td>{{data.Url}}</td>
+              <td>{{data.SortOf}}</td>
+              <td>
+
+                <!-- <a [routerLink]="['../operation/'+item.ID]" [queryParams]="{ParentId:item.ParentId,fragment: 'top'}">编辑</a> -->
+                <a (click)="fupdate(data.ID,data.ParentId)" >编辑</a>
+
+                <nz-divider nzType="vertical"></nz-divider>
+                <a  (click)="showConfirm(data.ID);">删除</a>
+                <!-- <a *ngIf="item.ParentId==0"(click)="showConfirmForFirstMenu(item.ID)">删除</a> -->
+              </td>
+            </tr>
+          <!--</ng-template>-->
+        <!--</ng-template>-->
+      </tbody>
+    </nz-table>
+  </div>
+</div>

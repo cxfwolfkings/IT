@@ -1,0 +1,29 @@
+<!--
+  角色编辑页
+  add by Colin
+-->
+<form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
+  <nz-form-item>
+    <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="RoleName">角色名称</nz-form-label>
+    <nz-form-control [nzSm]="14" [nzXs]="24">
+      <input nz-input formControlName="RoleName" id="RoleName" [ngModel]="RoleName" maxlength="50">
+      <nz-form-explain *ngIf="validateForm.get('RoleName').dirty && validateForm.get('RoleName').errors">请输入角色名称！</nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="Permissions">操作权限</nz-form-label>
+    <nz-form-control [nzSm]="14" [nzXs]="24">
+      <input nz-input formControlName="Permissions" id="Permissions" style="display:none" [ngModel]="Permissions">
+      <nz-form-explain *ngIf="validateForm.get('Permissions').dirty && validateForm.get('Permissions').errors">请选择操作权限！</nz-form-explain>
+      <nz-tree #nzTree [(ngModel)]="nodes" [ngModelOptions]="{standalone: true}" [nzCheckable]="true" 
+        [nzMultiple]="true" [nzDefaultCheckedKeys]="checkedKeys" [nzDefaultExpandAll]="true">
+      </nz-tree>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item nz-row style="margin-bottom:8px;">
+    <nz-form-control [nzSpan]="14" [nzOffset]="7">
+      <button nz-button nzType="primary" (click)="savePemissions()" [disabled]="isSaving">保存</button>
+      <button nz-button nzType="default" (click)="backList()">取消</button>
+    </nz-form-control>
+  </nz-form-item>
+</form>

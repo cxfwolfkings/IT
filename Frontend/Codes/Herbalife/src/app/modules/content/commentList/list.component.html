@@ -1,0 +1,115 @@
+<!--
+  评论列表页 
+  add by Colin 
+-->
+<form nz-form [formGroup]="commentForm" class="ant-advanced-search-form">
+  <div nz-row [nzGutter]="24">
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'commentator'">评论人</nz-form-label>
+        <nz-form-control>
+          <!-- 下面的单引号不可省略，否则表单对象找不到对应的表单控件 -->
+          <input nz-input [formControlName]="'commentator'" [attr.id]="'commentator'" maxlength="50">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'contentTitle'">内容名称</nz-form-label>
+        <nz-form-control>
+          <input nz-input [formControlName]="'contentTitle'" [attr.id]="'contentTitle'" maxlength="150">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label>内容分类</nz-form-label>
+        <nz-form-control>
+          <nz-select [(ngModel)]="selectedCategory" nzMode="multiple" 
+            nzPlaceHolder="请选择" nzAllowClear 
+            [formControlName]="'selectedCategory'">
+            <nz-option *ngFor="let c of categoryList" [nzValue]="c.CategoryID" [nzLabel]="c.NameCn"></nz-option>
+            <nz-option *ngIf="isCategoryLoading" nzDisabled nzCustomContent>
+              <i class="anticon anticon-loading anticon-spin loading-icon"></i> 数据加载中...
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div nz-row [nzGutter]="24">
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'CommentTimeBegin'">评论时间</nz-form-label>
+        <nz-form-control>
+          <nz-date-picker [formControlName]="'CommentTimeBegin'" [attr.id]="'CommentTimeBegin'"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="8" [style.display]="'block'">
+      <nz-form-item nzFlex>
+        <nz-form-label [nzFor]="'CommentTimeEnd'">至</nz-form-label>
+        <nz-form-control>
+          <nz-date-picker [formControlName]="'CommentTimeEnd'" [attr.id]="'CommentTimeEnd'"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div nz-row>
+    <div nz-col [nzSpan]="8"></div>
+    <div nz-col [nzSpan]="16" style="text-align: right;">
+      <button nz-button [nzType]="'primary'" (click)="search()">搜索</button>
+      <button nz-button (click)="reset()">清空</button>
+    </div>
+  </div>
+</form>
+<nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading"
+  [nzTotal]="total" [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="getList()">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>内容名称</th>
+      <th>内容分类</th>
+      <th>评论</th>
+      <th>评论人</th>
+      <th>评论日期</th>
+      <th>状态</th>
+      <th>管理员回复</th>
+      <th style="min-width: 200px">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of ajaxTable.data">
+      <td class="id">{{data.CommentId}}</td>
+      <td class="CnContentTitle">{{data.Title}}</td>
+      <td class="StatusName">{{data.CategoryName}}</td>
+      <td class="CnContentTitle">{{data.Comment}}</td>
+      <td class="StatusName">{{data.Commentator}}</td>
+      <td class="Time">{{data.Time}}</td>
+      <td class="StatusName">{{data.IsApproved == 1 ? '未精选' : '已精选' }}</td>
+      <td class="CnContentTitle">{{data.AdminReplyContent}}</td>
+      <td [ngSwitch]="data.IsApproved">
+        <a *ngSwitchCase="1" (click)="updateState(data.CommentId, 2)">移入精选</a>
+        <a *ngSwitchCase="2" (click)="updateState(data.CommentId, 1)">取消精选</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a (click)="reply(data.CommentId, data.isAdminReply)" [style.color]="data.isAdminReply?'#C0C0C0':'#7ac143'">回复</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <!--
+        <nz-popconfirm [nzTitle]="'确认删除？'" (nzOnConfirm)="del(data.CommentId)">
+          <a nz-popconfirm>删除</a>
+        </nz-popconfirm>
+        -->
+        <a (click)="showConfirm(data.CommentId);">删除</a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+<nz-modal [(nzVisible)]="isReplyModalVisible" nzTitle="管理员回复" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()"
+  [nzOkLoading]="isOkLoading" nzMaskClosable="false">
+  <label>回复内容</label>
+  <textarea rows="4" nz-input [(ngModel)]="adminReplyContent" maxlength="200"
+    (keyup)="changeWords()"></textarea>
+  <span class="errorMsg">{{adminReplyContentError}}</span>
+  <label>当前输入字符数：{{adminReplyContentWords}}</label>
+  <br>
+</nz-modal>

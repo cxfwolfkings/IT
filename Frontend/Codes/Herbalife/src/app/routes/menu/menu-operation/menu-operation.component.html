@@ -1,0 +1,159 @@
+<!--二级菜单  *ngIf="GetParentId!=0"-->
+<div nz-row [nzGutter]="24" id="top">
+  <div nz-col [nzSpan]="16">
+    <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="SourceType">资源类型</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <nz-select id="SourceType" [(ngModel)]="selectedSourceValue" formControlName="SourceType" 
+            nzPlaceHolder="资源类型" (ngModelChange)="setControlValid()">
+            <nz-option nzLabel="模块类型" nzValue="1"></nz-option>
+            <nz-option nzLabel="菜单类型" nzValue="2"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="selectedSourceValue==2">
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="ParentId">父目录</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <!-- (ngModelChange)="changeStatus($event);" -->
+          <nz-select formControlName="ParentId" id="ParentId" [compareWith]="compareFn" [(ngModel)]="selectedValue"
+            nzPlaceHolder="父目录">
+            <nz-option *ngFor="let option of optionList" [nzValue]="option" [nzLabel]="option.label"></nz-option>
+          </nz-select>
+          <span class="errorMsg">{{selectParentError}}</span>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="Name">资源名称</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input formControlName="Name" [(ngModel)]="menuModel.Remark" id="Name" maxlength="50">
+          <nz-form-explain *ngIf="validateForm.get('Name').dirty && validateForm.get('Name').errors">
+            <ng-container *ngIf="validateForm.get('Name').hasError('required')">
+              菜单名称不为空！
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('Name').hasError('checkRepeatName')">
+              菜单名称已存在！
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="selectedSourceValue==2">
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="Url" nzRequired>拦截URL</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input id="Url" [(ngModel)]="menuModel.Url" formControlName="Url" placeholder="拦截URL" maxlength="50">
+          <nz-form-explain *ngIf="validateForm.get('Url').dirty && validateForm.get('Url').errors">
+            拦截URL不能为空！
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="selectedSourceValue==2">
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="PermissonString" nzRequired>权限字符串</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input id="PermissonString" [(ngModel)]="menuModel.PermissonString" formControlName="PermissonString"
+            maxlength="50">
+          <nz-form-explain *ngIf="validateForm.get('PermissonString').dirty && validateForm.get('PermissonString').errors">
+            <ng-container *ngIf="validateForm.get('PermissonString').hasError('required')">
+              权限字符串不为空！
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('PermissonString').hasError('maxlength')">
+              权限字符串长度不能超过50！
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="SortOf" nzRequired>排序</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input id="SortOf" [(ngModel)]="menuModel.SortOf" formControlName="SortOf" placeholder="排序"
+            maxlength="50">
+          <nz-form-explain *ngIf="validateForm.get('SortOf').dirty && validateForm.get('SortOf').errors">
+            <ng-container *ngIf="validateForm.get('SortOf').hasError('required')">
+              排序字段不能为空！
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('SortOf').hasError('pattern')">
+              排序字段必需为正整数！
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="Icon">图片Icon</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input id="Icon" [(ngModel)]="menuModel.Icon" formControlName="Icon" placeholder="图片Icon" maxlength="50">
+          <!-- <nz-form-explain *ngIf="validateForm.get('imgurl').dirty && validateForm.get('imgurl').errors">
+              <ng-container *ngIf="validateForm.get('imgurl').hasError('required')">
+                排序字段不能为空！
+              </ng-container>
+              <ng-container *ngIf="validateForm.get('imgurl').hasError('pattern')">
+                排序字段必需为正整数！
+              </ng-container>
+            </nz-form-explain> -->
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="Remark">备注</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <textarea rows="4" nz-input id="Note" [(ngModel)]="menuModel.Note" formControlName="Note" placeholder="备注"
+            maxlength="150"></textarea>
+          <!-- <nz-form-explain *ngIf="validateForm.get('Remark').dirty && validateForm.get('Remark').errors">
+                <ng-container *ngIf="validateForm.get('Remark').hasError('required')">
+                  排序字段不能为空！
+                </ng-container>
+                <ng-container *ngIf="validateForm.get('Remark').hasError('pattern')">
+                  排序字段必需为正整数！
+                </ng-container>
+              </nz-form-explain> -->
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item nz-row>
+        <nz-form-control [nzSpan]="14" [nzOffset]="6">
+          <button nz-button nzType="primary">提交</button>
+          <a nz-button [routerLink]="['/menu/list']">返回</a>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </div>
+</div>
+<!--一级菜单-->
+<!-- <div nz-row [nzGutter]="24" *ngIf="GetParentId==0" >
+    <div nz-col [nzSpan]="16">
+      <form nz-form [formGroup]="validateFirstForm" (ngSubmit)="submitFirstForm()">
+    
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="Name">名称</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input formControlName="Name" [(ngModel)]="menuModel.Remark" id="Name">
+            <nz-form-explain *ngIf="validateFirstForm.get('Name').dirty && validateFirstForm.get('Name').errors">
+              <ng-container *ngIf="validateFirstForm.get('Name').hasError('required')">
+                菜单名称不为空！
+              </ng-container>
+              <ng-container *ngIf="validateFirstForm.get('Name').hasError('checkRepeatName')">
+                菜单名称已存在！
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item> 
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="SortOf" nzRequired>排序</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input id="SortOf" [(ngModel)]="menuModel.SortOf" formControlName="SortOf" placeholder="排序">
+            <nz-form-explain *ngIf="validateFirstForm.get('SortOf').dirty && validateFirstForm.get('SortOf').errors">
+              <ng-container *ngIf="validateFirstForm.get('SortOf').hasError('required')">
+                排序字段不能为空！
+              </ng-container>
+              <ng-container *ngIf="validateFirstForm.get('SortOf').hasError('pattern')">
+                排序字段必需为正整数！
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+         <nz-form-item nz-row>
+          <nz-form-control [nzSpan]="14" [nzOffset]="6">
+            <button nz-button nzType="primary">提交</button>
+            <a nz-button [routerLink]="['/menu/list']">返回</a>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </div> 
+   -->

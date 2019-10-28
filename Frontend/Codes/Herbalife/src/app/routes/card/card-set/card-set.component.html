@@ -1,0 +1,195 @@
+
+ <div nz-row [nzGutter]="24">
+  <!-- <div nz-col [nzSpan]="8">
+    <nz-tabset>
+      <nz-tab nzTitle="组织架构">
+        <nz-tree #nzTree [(ngModel)]="nodes" [ngModelOptions]="{standalone: true}" [nzDefaultExpandAll]="true" (nzClick)="clickNode($event)">
+        </nz-tree>
+      </nz-tab>
+    </nz-tabset>
+  </div> -->
+  <!--区域Card列表-->
+  <div nz-col [nzSpan]="24">
+    <!-- <nz-tabset>
+      <nz-tab [nzTitle]="NodeText"> -->
+        <div nz-row>
+            <!-- <button nz-button [nzType]="'primary'" (click)="openCardRegionEdit()">编辑分类</button>
+            <button nz-button [nzType]="'primary'" (click)="deleteCardRegion()">删除分类</button> -->
+            <button nz-button [nzType]="'primary'" (click)="openCardAdd()">新增</button>
+            <a [href]="exportUrl" class="ant-btn ant-btn-primary">下载用户模板</a>
+        </div>
+
+          <nz-table #ajaxTable [nzData]="dataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading"
+          [nzTotal]="total" [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="GetPagedCards()">
+            <thead>
+              <tr>
+                <th>规则名称</th>
+                <th>打卡时间</th>
+                <th>打卡地点</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of ajaxTable.data">
+                <td class="CnContentTitle">{{data.Title}}</td>
+                <td class="work">上班 {{data.WorkStart}} - 下班 {{data.RestStart}}</td>
+                <td class="CnContentTitle">{{data.Address}}</td>
+                <td class="nzType">
+                  <a [routerLink]="['../setUpdate/'+data.Id]">规则编辑</a>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a [routerLink]="['../setUser/'+data.Id]">用户设置</a>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <!-- <a href="javascript:;" (click)="importUser(data.Id)">导入用户</a> -->
+                  
+                  <nz-upload 
+                    [nzRemove]="fdelete"  
+                    [nzShowUploadList]="false"   
+                    [nzAction]="[uploadUrl]+[data.Id]"
+                    [nzListType]="text"       
+                    [nzBeforeUpload]="beforeUploadtext"
+                    [nzData]="UploadData"
+                    [nzLimit]=1
+                    [(nzFileList)]="fjFileUrl"
+                    (nzChange)="handleChange(data.Id,$event)">
+                    <a href="javascript:;">导入用户</a>
+                  </nz-upload>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a href="javascript:;" (click)="deleteCard(data.Id)">删除</a>
+                </td>
+              </tr>
+            </tbody>
+        </nz-table>
+      <!-- </nz-tab>
+    </nz-tabset> -->
+  </div>
+
+  <!--未分配用户列表-->
+  <!-- <div nz-col [nzSpan]="16" *ngIf="selectKey==-1">
+    <nz-tabset>
+      <nz-tab nzTitle="未分配用户">
+        <nz-table #NoCardUserTable [nzData]="NoCardUserDataSet" nzShowSizeChanger="false" [nzFrontPagination]="false" [nzLoading]="loading"
+          [nzTotal]="total" [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="PageNoCardUserList()">
+          <thead>
+            <tr>
+              <th>用户名</th>
+              <th>部门</th>
+              <th>职位</th>
+              <th>邮箱</th>
+              <th>手机号码</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of NoCardUserTable.data">
+              <td>
+                <nz-avatar style="width: 30px; height: 30px" [nzSrc]="data.Photo" ></nz-avatar>
+                {{data.Name}}
+              </td>
+              <td>{{data.Department}}</td>
+              <td>{{data.Position}}</td>
+              <td>{{data.Email}}</td>
+              <td>{{data.Phone}}</td>
+              <td>{{data.State}}</td>
+              <td>
+                <a (click)="GetNoCardUserDetail(data.ID)">查看</a>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+    </nz-tabset>
+  </div> -->
+
+  <!--未分配用户详情-->
+  <!-- <nz-modal [(nzVisible)]="NoCardUserDetailIsVisible" nzTitle="详细资料" (nzOnCancel)="closeNoCardUserModal()" nzCancelText="关闭" [nzOkText]="null" nzMaskClosable="false">
+    <nz-table [nzData]="[1]">
+      <tr>
+        <td>
+          <nz-avatar style="width: 64px; height: 64px" [nzSrc]="NoCardUserDetail.Photo" >
+          </nz-avatar>
+        </td>
+        <td>{{NoCardUserDetail.Name}} {{NoCardUserDetail.EnglishName}}</td>
+      </tr>
+      <tr>
+        <td>区域：</td>
+        <td>{{NoCardUserDetail.Region}}</td>
+      </tr>
+      <tr>
+        <td>部门：</td>
+        <td>{{NoCardUserDetail.Department}}</td>
+      </tr>
+      <tr>
+        <td>职位：</td>
+        <td>{{NoCardUserDetail.Position}}</td>
+      </tr>
+      <tr>
+        <td>邮箱：</td>
+        <td>{{NoCardUserDetail.Email}}</td>
+      </tr>
+      <tr>
+        <td>手机号码：</td>
+        <td>{{NoCardUserDetail.Phone}}</td>
+      </tr>
+      <tr>
+        <td>手机号码：</td>
+        <td>{{NoCardUserDetail.Phone2}}</td>
+      </tr>
+      <tr>
+        <td>固定电话：</td>
+        <td>{{NoCardUserDetail.Telephone}}</td>
+      </tr>
+      <tr>
+        <td>状态：</td>
+        <td>{{NoCardUserDetail.State}}</td>
+      </tr>
+      <tr>
+        <td>打卡规则：</td>
+        <td>{{NoCardUserDetail.CardRules}}</td>
+      </tr>
+    </nz-table>
+  </nz-modal> -->
+
+  <!--添加新分类-->
+  <!-- <nz-modal [(nzVisible)]="IsAddVisible" nzTitle="规则名称" (nzOnCancel)="closeAdd()" (nzOnOk)="submitAddForm()" 
+   [nzOkLoading]="addIsLoading" nzMaskClosable="false">
+    <form nz-form [formGroup]="validateAddForm">
+      <nz-form-item>
+        <nz-form-control [nzSm]="24" [nzXs]="24">
+          <input nz-input formControlName="Name" [(ngModel)]="Name" id="Name">
+          <nz-form-explain *ngIf="validateAddForm.get('Name').dirty && validateAddForm.get('Name').errors">
+              <ng-container *ngIf="validateAddForm.get('Name').hasError('required')">
+                  名称不为空！
+              </ng-container>
+              <ng-container *ngIf="validateAddForm.get('Name').hasError('pattern')">
+                  名称必须为中文、字母、数字
+              </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-modal> -->
+
+  <!--添加新打卡规则-->
+  <nz-modal [(nzVisible)]="IsAddCardVisible" nzTitle="打卡规则名称" (nzOnCancel)="closeAddCard()" (nzOnOk)="submitAddCardForm()" 
+   [nzOkLoading]="addCardIsLoading" nzMaskClosable="false">
+    <form nz-form [formGroup]="validateAddCardForm">
+      <nz-form-item>
+        <nz-form-control [nzSm]="24" [nzXs]="24">
+          <input nz-input formControlName="CardName" [(ngModel)]="CardName" id="CardName">
+          <nz-form-explain *ngIf="validateAddCardForm.get('CardName').dirty && validateAddCardForm.get('CardName').errors">
+              <ng-container *ngIf="validateAddCardForm.get('CardName').hasError('required')">
+                  名称不为空！
+              </ng-container>
+              <ng-container *ngIf="validateAddCardForm.get('CardName').hasError('pattern')">
+                  名称必须为中文、字母、数字
+              </ng-container>
+              <ng-container *ngIf="validateAddCardForm.get('CardName').hasError('maxlength')">
+                名称字符串长度不能超过500！
+              </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-modal>
+</div> 
