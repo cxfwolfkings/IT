@@ -1,0 +1,56 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>居中</title>
+    <style type="text/css">
+        div {
+            width: 200px;
+            height: 117px;
+            border: 10px solid red;
+            margin: 0 auto; /* div居中 */
+        }
+        img {
+            width: 200px;
+            height: 117px;
+        }
+        /* 子绝父相 */
+    	.out{
+    		width:400px;
+    		height:234px;
+    		background-color:pink;
+  		    position:relative;
+    	}
+        /* 定位方法1 */
+    	/* .inner{
+    		width:200px;
+    		height:117px;
+    		background-color: red;
+    		position:absolute;
+    		top:50%;
+    		left:50%;
+    		margin-top:-58.5px;
+    		margin-left:-100px;	
+    	} */
+        /* 定位方法2 */
+        .inner{
+    		width:200px;
+    		height:117px;
+    		background-color: red;
+    		position:absolute;
+    		margin: auto;
+    		top:0;
+    		right:0;
+    		bottom:0;
+    		left:0;
+    	}
+    </style>
+</head>
+<body>
+    <div>
+        <img src="../ReadMe/Resource/1.jpg">
+    </div>
+    <div class="out">
+        <div class="inner"> </div>
+   </div>
+</body>
+</html>

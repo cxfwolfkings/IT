@@ -143,6 +143,12 @@
 
 ### 第6天：[.NETCore](./6.6_.NETCore.md)
 
+### 第7天：[写给.NET开发者看的Python3上手指南系列](./6.7_写给.NET开发者看的Python3上手指南系列.md)
+
+### 第8天：[C#刷遍Leetcode面试题系列](./6.8_C#刷遍Leetcode面试题系列.md)
+
+### 第9天：[C#画图](./6.9_C#画图.md)
+
 - 部署
 
 1. [Microsoft技术栈](#Microsoft技术栈)
