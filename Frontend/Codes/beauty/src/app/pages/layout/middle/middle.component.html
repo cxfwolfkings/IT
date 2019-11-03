@@ -1,0 +1,58 @@
+<nz-layout>
+  <nz-sider>
+    <ul nz-menu [nzMode]="'inline'" style="height:100%">
+      <li nz-menu-item *ngFor="let data of nodes" (click)="GoRouter(data)" class="parent{{data.ParentId}}"
+        id="menuItem{{data.ID}}" [attr.data-url]="data.Url">
+        <span title><i nz-icon class="anticon anticon-{{data.Icon}}"></i>{{data.Remark}}</span>
+        <span class="spanIcon" style="position: absolute; right: 15px;" *ngIf="data.isLeaf===0">∨</span>
+        <!--
+                <ul>
+                  <li nz-menu-item *ngFor="let child of GetChildMenus(data.ID)" 
+                      (click)="GoRouter(child.Url)" 
+                      [ngClass]="{'ant-menu-item-selected':curUrl.indexOf(child.Url)>=0}">
+                    {{child.Remark}}
+                  </li>
+                </ul>
+                -->
+      </li>
+      <!--        
+            <li nz-submenu *ngIf="data.ParentId==0">
+              <span title><i class="anticon anticon-user"></i>{{data.Remark}}</span>
+               <ul *ngFor="">
+                <li nz-menu-item>option1</li>
+                <li nz-menu-item>option2</li>
+                <li nz-menu-item>option3</li>
+                <li nz-menu-item>option4</li>
+              </ul>
+            </li> 
+            <li nz-submenu>
+              <span title><i class="anticon anticon-laptop"></i>subnav 2</span>
+              <ul>
+                <li nz-menu-item>option5</li>
+                <li nz-menu-item>option6</li>
+                <li nz-menu-item>option7</li>
+                <li nz-menu-item>option8</li>
+              </ul>
+            </li>
+            <li nz-submenu>
+              <span title><i class="anticon anticon-notification"></i>subnav 3</span>
+              <ul>
+                <li nz-menu-item>option9</li>
+                <li nz-menu-item>option10</li>
+                <li nz-menu-item>option11</li>
+                <li nz-menu-item>option12</li>
+              </ul>
+            </li>
+            -->
+    </ul>
+  </nz-sider>
+  <nz-content>
+    <!-- <nz-breadcrumb>
+            <nz-breadcrumb-item>Home</nz-breadcrumb-item>
+            <nz-breadcrumb-item>List</nz-breadcrumb-item>
+            <nz-breadcrumb-item>App</nz-breadcrumb-item>
+          </nz-breadcrumb>-->
+    <h3 class="page_title">{{Remark}}</h3>
+    <router-outlet></router-outlet>
+  </nz-content>
+</nz-layout>
