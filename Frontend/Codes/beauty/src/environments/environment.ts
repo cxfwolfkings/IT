@@ -2,8 +2,17 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+class ConfigModel {
+  ServerUrl: string;
+  FrontendUrl: string;
+}
+
+declare var herbalifeConfig: ConfigModel;
+
 export const environment = {
-  production: false
+  production: false,
+  SERVER_URL: herbalifeConfig.ServerUrl,
+  FRONTEND_URL: herbalifeConfig.FrontendUrl,
 };
 
 /*

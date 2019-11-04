@@ -6,7 +6,7 @@
 
 1. 起步
    - [SQL](./0.md)
-2. MySQL]
+2. MySQL
    - [简介](./MySQL/ReadMe/1.md#简介)
      - [MySQL最重要的特点](./MySQL/ReadMe/1.md#下面列出了MySQL最重要的特点)
      - [MySQL不足](./MySQL/ReadMe/1.md#MySQL不足)
