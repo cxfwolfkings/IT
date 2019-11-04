@@ -294,6 +294,10 @@
 
 ### 第15天：推荐系统
 
+## 第五部分 项目总结和附录
+
+### 第1天：[附录](./Resource/5.1_附录.md)
+
 ## 参考
 
 - [100天从新手到大师](https://github.com/jackfrued/Python-100-Days)

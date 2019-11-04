@@ -18,7 +18,7 @@
 
 ## 第二部分 Docker + K8s
 
-### 第1-5天：[Docker简介](./2.1_Docker简介.md)
+### 第1-5天：[Docker简介](./2.1_Docker.md)
 
 1. 简介
    - 什么是Docker / Windows容器 / 为什么使用Docker / 虚拟化与docker
@@ -33,6 +33,6 @@
 
 ## 第三部分 GitLab + Jenkins
 
-### 第1天：[GitLab简介](./3.1_Gitlab简介.md)
+### 第1天：[GitLab简介](./3.1_Gitlab.md)
 
 - 介绍 / 生命周期 / 安装 / 配置
