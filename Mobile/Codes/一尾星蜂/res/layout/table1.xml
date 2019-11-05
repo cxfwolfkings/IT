@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <TableRow>
+        <EditText
+            android:id="@+id/myinput"
+            android:inputType="text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请输入检索关键字..." />
+        <Button
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="检索" />
+    </TableRow>
+    <View
+        android:layout_height="2dp"
+        android:background="#FF909090" />
+    <TableRow>
+        <TextView
+            android:id="@+id/info1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请选择文字编码："
+            android:textSize="20dp" />
+        <RadioGroup
+            android:id="@+id/encoding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkedButton="@+id/gbk"
+            android:orientation="vertical" >
+            <RadioButton
+                android:id="@+id/urf"
+                android:text="UTF编码" />
+            <RadioButton
+                android:id="@+id/gbk"
+                android:text="GBK编码" />
+        </RadioGroup>
+    </TableRow>
+</TableLayout>

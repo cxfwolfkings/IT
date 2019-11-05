@@ -1,0 +1,7 @@
+start.sh
+
+# VIM
+*~
+*.swp
+*.log
+*.vscode

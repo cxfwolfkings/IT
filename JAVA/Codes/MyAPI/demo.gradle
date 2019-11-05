@@ -1,0 +1,17 @@
+task helloword << {
+   println 'Yiibai gradle qick start'
+}
+
+task upper << {
+   String expString = 'YiiBai gradle tutorials'
+   println "Original: " + expString
+   println "Upper case: " + expString.toUpperCase()
+}
+
+// 4 次打印隐式参数 ($it) 的值
+task count << {
+   4.times { 
+      print "$it " 
+   }
+}
+

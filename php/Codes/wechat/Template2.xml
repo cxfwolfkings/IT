@@ -1,0 +1,15 @@
+<xml>
+	<ToUserName><![CDATA[%s]]></ToUserName>
+	<FromUserName><![CDATA[%s]]></FromUserName>
+	<CreateTime>%s</CreateTime>
+	<MsgType><![CDATA[news]]></MsgType>
+	<ArticleCount>1</ArticleCount>
+	<Articles>
+		<item>
+			<Title><![CDATA[神殿]]></Title>
+			<Description><![CDATA[欢迎进入星辰之间]]></Description>
+			<PicUrl><![CDATA[http://www.wxdhhg.cn/public/images/wolfman.jpg]]></PicUrl>
+			<Url><![CDATA[http://www.wxdhhg.cn/star]]></Url>
+		</item>
+	</Articles>
+</xml>

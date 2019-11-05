@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLInterface</id>
+    <coordinates>
+      <x>100</x>
+      <y>60</y>
+      <w>80</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>Shape
+目标角色
+--
+Draw
+Border</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>40</x>
+      <y>510</y>
+      <w>210</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>_Text: Class_
+被适配角色
+--
++SetContent(str:String):void
++GetContent():String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>40</x>
+      <y>290</y>
+      <w>200</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>TextShapeClass: Class
+适配器角色
+(类适配模式：通过继承实现)
+--
++TextShapeClass()
+--
++Draw():void
++Border():void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>60</y>
+      <w>200</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>TextShapeObject: Class
+适配器角色
+(对象适配模式：通过组合实现)
+--
+-txt:Text
+--
++TextShapeClass(txt:Text)
+--
++Draw():void
++Border():void
++SetContent(str:String):void
++GetContent():void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>100</x>
+      <y>150</y>
+      <w>90</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+implements</panel_attributes>
+    <additional_attributes>40.0;10.0;40.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>170</x>
+      <y>110</y>
+      <w>280</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+implements</panel_attributes>
+    <additional_attributes>10.0;20.0;260.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>220</y>
+      <w>310</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=0..1
+include</panel_attributes>
+    <additional_attributes>10.0;330.0;290.0;330.0;290.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>400</y>
+      <w>70</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+extends</panel_attributes>
+    <additional_attributes>30.0;110.0;30.0;10.0</additional_attributes>
+  </element>
+</diagram>

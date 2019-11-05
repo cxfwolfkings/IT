@@ -1,0 +1,103 @@
+<?xml version = '1.0' encoding = 'MS936'?>
+<workspace xmlns="http://xmlns.oracle.com/jdeveloper/902rc/workspace" nselem="workspace" class="oracle.ide.model.Workspace">
+   <activeProjectURL path="FactoryMethod/FactoryMethod.jpr" id="1"/>
+   <listOfChildren class="oracle.ide.model.DataList">
+      <Item class="oracle.ide.model.Reference">
+         <URL path="JavaConsoleOutput/JavaConsoleOutput.jpr"/>
+         <nodeClass id="0">oracle.jdeveloper.model.JProject</nodeClass>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="patterns/abstract_factory/AbstractFactory.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Prototype/prototype.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Builder/Builder.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Singleton/Singleton.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Adapter/Adapter.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Bridge/Bridge.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Composite/Composite.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Decorator/Decorator.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Facade/Facade.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="FlyWeight/FlyWeight.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Proxy/Proxy.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="ChainOfResponsibility/ChainOfResponsibility.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Interpreter/Interpreter.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Iterator/Iterator.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Mediator/Mediator.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Memento/Memento.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Observer/Observer.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="State/State.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Strategy/Strategy.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="TemplateMethod/TemplateMethod.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Visitor/Visitor.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL idref="1"/>
+         <nodeClass idref="0"/>
+      </Item>
+      <Item class="oracle.ide.model.Reference">
+         <URL path="Command/Command.jpr"/>
+         <nodeClass idref="0"/>
+      </Item>
+   </listOfChildren>
+   <packageCounter>1</packageCounter>
+</workspace>

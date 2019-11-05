@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>90</x>
+      <y>90</y>
+      <w>210</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Text:AbstractClass
+(前端抽象角色)
+--
++DrawText(text:String):void
+GetTextImp(type:String):TextImp
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>380</y>
+      <w>180</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>_TextBold: Class_
+(前端精确抽象角色)
+--
+imp: TextImp
+--
++TextBold(type: String)
+--
++DrawText(text:String):void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>210</x>
+      <y>380</y>
+      <w>180</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>_TextItalic: Class_
+(前端精确抽象角色)
+--
+imp: TextImp
+--
++TextItalic(type: String)
+--
++DrawText(text:String):void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>180</x>
+      <y>160</y>
+      <w>140</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+extends</panel_attributes>
+    <additional_attributes>10.0;10.0;120.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLInterface</id>
+    <coordinates>
+      <x>490</x>
+      <y>80</y>
+      <w>140</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>TextImp: Interface
+(后端实现角色)
+--
++DrawTextImp()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>410</x>
+      <y>380</y>
+      <w>140</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>_TextImpLinux: Class_
+(后端具体实现角色)
+--
++TextImpLinux()
+--
++DrawTextImp(): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>570</x>
+      <y>380</y>
+      <w>140</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>_TextImpMac: Class_
+(后端具体实现角色)
+--
++TextImpMac()
+--
++DrawTextImp(): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>470</x>
+      <y>160</y>
+      <w>110</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+implements</panel_attributes>
+    <additional_attributes>90.0;10.0;10.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>160</y>
+      <w>110</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+implements</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>160</y>
+      <w>100</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+extends</panel_attributes>
+    <additional_attributes>80.0;10.0;10.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>290</x>
+      <y>130</y>
+      <w>220</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=0..1
+include</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>130</y>
+      <w>390</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=0..1
+include</panel_attributes>
+    <additional_attributes>370.0;10.0;10.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>290</x>
+      <y>110</y>
+      <w>210</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-&gt;
+polymerization</panel_attributes>
+    <additional_attributes>10.0;20.0;190.0;30.0</additional_attributes>
+  </element>
+</diagram>

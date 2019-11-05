@@ -1,0 +1,57 @@
+server:
+  servlet.contextpath: /
+  port: 8080
+
+spring:
+  profiles:
+    active: text
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useSSL=false
+    username: root
+    password: root
+    ##初始化连接数
+    initialSize: 5
+    ##最小连接数
+    minIdle: 5
+    ##最大连接数
+    maxActive: 20
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  redis:
+    #设置数据库索引
+    database: 0
+    #Redis服务器地址
+    host: 192.168.1.120
+    #Redis服务器连接端口
+    port: 6379
+    #Redis服务器连接密码（默认为空）
+    password: hcb13579
+    #连接池最大连接数（使用负值表示没有限制）
+    jedis.pool:
+      max-active: 10
+      #连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-wait: -1
+      #连接池中的最大空闲连接
+      max-idle: 10
+      #连接池中的最小空闲连接
+      min-idle: 0
+      #连接超时时间（毫秒）
+    timeout:  60000
+  data:
+    mongodb:
+      uri: mongodb://root:hcb13579@192.168.1.120:27017/students
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: root
+    password: hcb13579
+  elasticsearch:
+    jest:
+      url: http://192.168.1.120:9200
+      username: hcb
+      password: hcb13579
+      readTimeout: 20000
+      connectionTimeout: 20000

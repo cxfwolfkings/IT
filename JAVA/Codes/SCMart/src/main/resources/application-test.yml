@@ -1,0 +1,6 @@
+server:
+  port: 8100
+
+student:
+  name: test-winter
+  age: 40

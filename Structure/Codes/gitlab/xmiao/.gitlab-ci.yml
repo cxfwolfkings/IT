@@ -1,0 +1,57 @@
+image: node:4.2.2
+
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - build
+  - test
+  - deploy
+
+job 1:
+  stage: build
+  script: echo "job1" # make build dependencies
+
+job 2:
+  stage: build
+  script: echo "job2" # make build artifacts
+  # only: # 因为 @ 用于表示 ref 的存储库路径的开头，所以匹配原生@时需要使用十六进制 \x40 字符匹配。
+  #   - branches@gitlab-org/gitlab-ce
+  # except:
+  #   - master@gitlab-org/gitlab-ce
+  #   - release/.*@gitlab-org/gitlab-ce
+
+job 3:
+  stage: test
+  script: echo "job3" # make test
+  # only: # use special keywords
+  #   - tags
+  #   - triggers
+  #   - schedules
+
+job 4:
+  stage: deploy
+  script: echo "job4" # make deploy
+  # only:
+  #   - /^issue-.*$/i # use regexp
+  # except:
+  #   - branches # use special keyword
+
+test_async:
+  stage: test
+  script:
+   - npm install
+   - node ./SuperStar/server.js
+  tags:
+    - docker
+
+# test_db:
+#   stage: test
+#   services:
+#     - postgres:9.5.0
+#   script:
+#    - npm install
+#    - node ./specs/start.js ./specs/db-postgres.spec.js
+#   tags:
+#     - docker

@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Index</title>
+    <link rel="stylesheet" href="lib/css/index.css">
+    
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:ItemRetentionFormula msdt:dt="string">&lt;formula id=&quot;Roche.Common.Coremap.ExpirationFormula&quot; /&gt;</mso:ItemRetentionFormula>
+<mso:_dlc_policyId msdt:dt="string">/rdcn/CCWorkspace/CC SFFE/electronic_form</mso:_dlc_policyId>
+<mso:_dlc_DocId msdt:dt="string">7MSYDXZJYT4D-1843034521-155</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">cf53a499-060f-46d1-b619-787274a09851</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">http://ap.boost.roche.com/rdcn/CCWorkspace/CC SFFE/_layouts/DocIdRedir.aspx?ID=7MSYDXZJYT4D-1843034521-155, 7MSYDXZJYT4D-1843034521-155</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body class="bg">
+    <div class="wrap ">
+        <header>
+            <div class="inner">
+                <div class="brand-logo">
+                    <img src="lib/images/roche-logo.gif" alt="">
+                </div>
+                <div class="brand-title">
+                    <h2>电子化文档</h2>
+                </div>
+                <div class="brand-comments">
+                    <h2>By Customer Care I SFFE</h2>
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            <section class="clearfix">
+                <div class="inner half-container">
+                    <!--<h3>仪器升级：用户告知书/知情同意书/承知书</h3>-->
+                	<ul class="tabs">
+                		<li  title="tab1" class="on">
+                			<a href="#" ><span class="">用户告知书/知情同意书/承知书</span></a>
+                		</li>
+                		<li title="tab2">
+	                        <a href="#"><span class="">服务报告</span></a>
+                		</li>
+                	</ul>
+                    <div class="page" data-page="1">
+                       	<div id="tab1">
+	                       <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">1</span><span class="title">Sample Probe Check_exchange_V1.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">2</span><span class="title">HE600 SW1.9.1_V1.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">3</span><span class="title">HE600 SW1.9_V1.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">4</span><span class="title">DTU_V2.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+				            <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">5</span><span class="title">cobas<sup>®</sup> 4800 SW2.2 HPV AP2.1 Update_V1.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">6</span><span class="title">cobas<sup>®</sup> u 411 SW3.2.2 or 3.3.1_V1.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+	                        <div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">7</span><span class="title">cobas<sup>®</sup> 8000 CU 05-02，DM 1.05.01_V1.0</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+		                </div>	
+						
+		                <div id="tab2">
+		                	<div class="row">
+	                            <div class="body">
+	                                <a href="#"><span class="index">1</span><span class="title">Customer Service Report</span><span class="version">1.0</span></a>
+	                            </div>
+	                        </div>
+		                </div>
+                    </div>
+                    <div class="pagination">                       
+                        <a class="next">下一页</a>
+                        <a class="previous">上一页</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <input type="hidden" id="current" value="1" />
+        <input type="hidden" id="max" value="1" />
+    </div>
+    <script type="text/javascript" src="lib/js/jquery-3.1.1.min.js"></script>
+    <footer>
+        罗氏电子化文档
+    </footer>
+</body>
+</html>
+<script type="text/javascript">
+	$(function() {
+	$('#max').val($('.page').length);
+	if($('.page').length > 1) {
+		$('.pagination').show();
+		$('.page').hide();
+		$('.page:first').show();
+		$('.previous').hide();
+	} else {
+		$('.pagination').hide();
+	}
+	$('.next').click(function() {
+		var current = parseInt($('#current').val());
+		var next = current + 1;
+		var max = parseInt($('#max').val());
+		if(next <= max) {
+			HidePage(current);
+			ShowPage(next);
+			$('#current').val(next);
+			$('.next').show();
+			$('.previous').show();
+			//hide next button when reach max
+			if($('#current').val() == max) {
+				$('.next').hide();
+			}
+		}
+	});
+	$('.previous').click(function() {
+		var current = parseInt($('#current').val());
+		var previous = current - 1;
+		var max = parseInt($('#max').val());
+		if(previous > 0) {
+			HidePage(current);
+			ShowPage(previous);
+			$('#current').val(previous);
+			$('.next').show();
+			//hide previous button when reach first
+			if($('#current').val() == 1) {
+				$('.previous').hide();
+			}
+		}
+	});
+	$('.body a').click(function() {
+		//location.href = '../form/'+$('.title', $(this)).text()+'.html';
+		window.location.href='./form/'+$('.title', $(this)).text()+'.html';
+	});
+    $('.tabs li').click(function (){
+		$(this).addClass("on").siblings().removeClass("on"); 
+		var tab = $(this).attr("title"); 
+		$("#" + tab).show().siblings().hide(); 
+		$(".tabs").show();
+    });
+})
+
+
+function ShowPage(count) {
+	
+	$('.page[data-page=' + count + ']').show();
+}
+
+function HidePage(count) {
+	$('.page[data-page=' + count + ']').hide();
+}</script>

@@ -1,0 +1,61 @@
+﻿@page
+@model LoginModel
+@{
+    Layout = null;
+    var msg = ViewData["loginFail"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/css/easyui.css")">
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/css/icon.css")">
+</head>
+<body>
+    <div class="easyui-panel" title="登录" style="width:400px;">
+        <div style="padding:10px 60px 20px 60px" class="loginDiv">
+            <form id="ff" method="post">
+                <table cellpadding="5">
+                    <tr>
+                        <td>用户名:</td>
+                        <td><input class="easyui-textbox" type="text" asp-for="Admin.UserName" data-options="required:true" /></td>
+                    </tr>
+                    <tr>
+                        <td>密&nbsp;&nbsp;&nbsp;&nbsp;码:</td>
+                        <td><input class="easyui-textbox" type="password" asp-for="Admin.Password" data-options="required:true" /></td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">登录</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">取消</a>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="@Url.Content("~/js/jquery.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/jquery.easyui.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/site.js")"></script>
+    <script>
+        $(function () {
+            var $loginPanel = $('.loginDiv').parent().parent();
+            var top = ($(window).height() - $loginPanel.height()) / 2;
+            var left = ($(window).width() - $loginPanel.width()) / 2;
+            $loginPanel.css('margin-left', left);
+            $loginPanel.css('margin-top', top);
+            setTimeout(function () {
+                if ('@msg') {
+                    $.messager.alert('系统提示', '@msg', 'error');
+                }
+            }, 0);
+        });
+        function submitForm() {
+            //$('#ff').form('submit');
+            $('#ff').submit();
+        }
+        function clearForm() {
+            $('#ff').form('clear');
+        }
+    </script>
+</body>
+</html>

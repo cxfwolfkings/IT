@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<EditText
+		android:id="@+id/myed" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:text="请输入您的姓名" />
+	<Button
+		android:id="@+id/mybut" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:text="显示输入信息" />
+	<TextView
+		android:id="@+id/mytext" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:text="输入的信息是：" />
+</LinearLayout>

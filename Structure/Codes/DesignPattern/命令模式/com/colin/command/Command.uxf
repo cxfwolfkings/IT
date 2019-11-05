@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLInterface</id>
+    <coordinates>
+      <x>580</x>
+      <y>30</y>
+      <w>140</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>Command:Interface
+(命令角色)
+--
+execute()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>300</x>
+      <y>50</y>
+      <w>140</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Invoke: Class
+(请求者角色)
+--
+command:Command</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>430</x>
+      <y>60</y>
+      <w>180</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-&gt;
+polymerization</panel_attributes>
+    <additional_attributes>10.0;20.0;160.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>560</x>
+      <y>200</y>
+      <w>180</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>ConcreteCommand: Class
+(具体命令角色)
+--
+-receiver:Receiver
+--
++execute()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>610</x>
+      <y>110</y>
+      <w>90</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+implements</panel_attributes>
+    <additional_attributes>40.0;10.0;40.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>310</x>
+      <y>210</y>
+      <w>110</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Receiver: Class
+(接收者角色)
+--
+defaultAction()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>220</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-&gt;
+polymerization</panel_attributes>
+    <additional_attributes>150.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>210</y>
+      <w>260</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Client: Class
+(客户角色)
+--
+concreteCommand: ConcreteCommand
+invoke:Invoke</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>270</y>
+      <w>560</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-&gt;
+polymerization</panel_attributes>
+    <additional_attributes>10.0;20.0;10.0;90.0;540.0;90.0;540.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>70</x>
+      <y>70</y>
+      <w>250</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-&gt;
+polymerization</panel_attributes>
+    <additional_attributes>50.0;140.0;50.0;10.0;230.0;10.0</additional_attributes>
+  </element>
+</diagram>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <!--
+    	android:id  —— 为控件指定相应的ID
+    	android:text —— 指定控件当中显示的文字，需要注意的是，这里尽量使用strings.xml文件当中的字符串
+    	android:grivity —— 指定控件的基本位置，比如说居中，居右等位置
+    	android:textSize —— 指定控件当中字体的大小
+    	android:background —— 指定该控件所使用的背景色,RGB命名法 
+    	android:layout_width —— 指定控件的宽度
+    	android:layout_height —— 指定控件的高度
+    	android:layout_weight —— 根据width或height算比例
+    	android:padding* —— 指定控件的内边距，也就是说控件当中的内容
+    	android:sigleLine —— 如果设置为真的话，则将控件的内容在同一行当中进行显示
+    -->
+	<TextView 
+		android:id="@+id/myshowa"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="李兴华" />
+	<TextView 
+		android:id="@+id/myshowb"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="北京魔乐科技软件学院（MLDN）" />
+	<TextView 
+		android:id="@+id/myshowc"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="www.mldnjava.cn" />
+
+</LinearLayout>

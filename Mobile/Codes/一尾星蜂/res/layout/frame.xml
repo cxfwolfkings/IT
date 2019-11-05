@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <ImageView
+        android:id="@+id/myimg"
+        android:contentDescription="@string/jpg1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/mldn_3g" />
+    <EditText
+        android:id="@+id/myinput"
+        android:inputType="text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/frame_myinput" />
+    <Button
+        android:id="@+id/mybut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/frame_mybut" />
+
+</FrameLayout>

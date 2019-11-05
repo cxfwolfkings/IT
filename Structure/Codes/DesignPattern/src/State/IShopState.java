@@ -1,0 +1,14 @@
+package State;
+
+/**
+ *  A state interface
+ *  用户在网上购物的状态变化:
+ *  选择商品 --> 生成订单 --> 付款取货
+ *  状态角色
+ */
+public interface IShopState {
+    public void shop();
+    public void generateBill();
+    public void pay();
+    //protected void changeState(ShopContext c, IShopState);
+}

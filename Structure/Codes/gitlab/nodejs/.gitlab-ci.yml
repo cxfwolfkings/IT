@@ -1,0 +1,26 @@
+image: node:4.2.2
+
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - test
+
+test_async:
+  stage: test
+  script:
+   - npm install
+   - node ./specs/start.js ./specs/async.spec.js
+  tags:
+    - docker
+
+test_db:
+  stage: test
+  services:
+    - postgres:9.5.0
+  script:
+   - npm install
+   - node ./specs/start.js ./specs/db-postgres.spec.js
+  tags:
+    - docker

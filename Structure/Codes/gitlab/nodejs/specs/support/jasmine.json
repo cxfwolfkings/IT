@@ -1,0 +1,11 @@
+{
+  "spec_dir": "specs",
+  "spec_files": [
+    "async.spec.js",
+    "db-postgres.spec.js"
+  ],
+  "helpers": [
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": false
+}

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xml>
+  <ToUserName><![CDATA[{0}]]></ToUserName>
+  <FromUserName><![CDATA[{1}]]></FromUserName>
+  <CreateTime>{2}</CreateTime>
+  <MsgType><![CDATA[news]]></MsgType>
+  <ArticleCount>6</ArticleCount>
+  <Articles>
+    <item>
+      <Title><![CDATA[测试1]]></Title>
+      <Description><![CDATA[测试1]]></Description>
+      <PicUrl><![CDATA[picurl]]></PicUrl>
+      <Url><![CDATA[url]]></Url>
+    </item>
+    <item>
+      <Title><![CDATA[测试2]]></Title>
+      <Description><![CDATA[测试2]]></Description>
+      <PicUrl><![CDATA[picurl]]></PicUrl>
+      <Url><![CDATA[url]]></Url>
+    </item>
+    <item>
+      <Title><![CDATA[测试3]]></Title>
+      <Description><![CDATA[测试3]]></Description>
+      <PicUrl><![CDATA[picurl]]></PicUrl>
+      <Url><![CDATA[url]]></Url>
+    </item>
+    <item>
+      <Title><![CDATA[测试4]]></Title>
+      <Description><![CDATA[测试4]]></Description>
+      <PicUrl><![CDATA[picurl]]></PicUrl>
+      <Url><![CDATA[url]]></Url>
+    </item>
+    <item>
+      <Title><![CDATA[测试5]]></Title>
+      <Description><![CDATA[测试5]]></Description>
+      <PicUrl><![CDATA[picurl]]></PicUrl>
+      <Url><![CDATA[url]]></Url>
+    </item>
+    <item>
+      <Title><![CDATA[测试6]]></Title>
+      <Description><![CDATA[测试6]]></Description>
+      <PicUrl><![CDATA[picurl]]></PicUrl>
+      <Url><![CDATA[url]]></Url>
+    </item>
+  </Articles>
+</xml>

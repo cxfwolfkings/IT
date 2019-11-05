@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xml>
+  <ToUserName><![CDATA[{0}]]></ToUserName>
+  <FromUserName><![CDATA[{1}]]></FromUserName>
+  <CreateTime>{2}</CreateTime>
+  <MsgType><![CDATA[news]]></MsgType>
+  <ArticleCount>1</ArticleCount>
+  <Articles>
+    <item>
+      <Title><![CDATA[仙宫]]></Title>
+      <Description><![CDATA[欢迎大家进入星辰之间]]></Description>
+      <PicUrl><![CDATA[http://www.wxdhhg.cn/public/images/wolfman.jpg]]></PicUrl>
+      <Url><![CDATA[http://wxdhhg.cn/wordpress/]]></Url>
+    </item>
+  </Articles>
+</xml>
