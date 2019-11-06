@@ -145,11 +145,15 @@
 
 ### 第7天：[写给.NET开发者看的Python3上手指南系列](./6.7_写给.NET开发者看的Python3上手指南系列.md)
 
-### 第8天：[C#刷遍Leetcode面试题系列](./6.8_C#刷遍Leetcode面试题系列.md)
+### 第8天：[C#刷遍Leetcode面试题系列](./6.8_刷遍Leetcode面试题系列.md)
 
-### 第9天：[C#画图](./6.9_C#画图.md)
+### 第9天：[C#画图](./6.9_画图.md)
 
-### 第10天：[分布式框架](./Resource/6.10_分布式框架.md)
+### 第10天：[分布式框架](./6.10_分布式框架.md)
+
+### 第11天：[ABP框架](./6.11_ABP框架.md)
+
+### 第12天：[面向切面编程](./6.12_面向切面编程.md)
 
 - 部署
 
@@ -434,60 +438,3 @@ Microsoft 推荐使用所有的.NET 本地、Web 和通信框架，浏览器端�
 不出所料，Microsoft 继续强调了依赖注入，特别是它们与 ASP.NET MVC 及 Entity Framework 的结合。企业试图集成现场和云架构的趋势让 BizTalk 这个一度被认为已经死亡的技术看到了再度焕发生机的希望。
 
 ![x](./Resource/12.png)
-
-## 附录
-
-### Debug远程访问
-
-1. 打开并编辑解决方案目录（不是工程目录）下的文件： `\.vs\config\applicationhost.config`
-
-   增加行：`<binding protocol="http" bindingInformation="*:PORT:IP_ADDR" />`
-
-   示例：
-
-   ```xml
-   <sites>
-      <site name="WebSite1" id="1" serverAutoStart="true">
-        <application path="/">
-          <virtualDirectory path="/" physicalPath="%IIS_SITES_HOME%\WebSite1" />
-        </application>
-        <bindings>
-          <binding protocol="http" bindingInformation=":8080:localhost" />
-        </bindings>
-      </site>
-      <site name="LeadChina.Laboratory.Api" id="2">
-        <application path="/" applicationPool="LeadChina.Laboratory.Api AppPool">
-          <virtualDirectory path="/" physicalPath="E:\Laboratory\LeadChina.Laboratory.Api" />
-        </application>
-        <bindings>
-          <binding protocol="http" bindingInformation="*:51742:localhost" />
-            <!-- 远程访问 -->
-            <binding protocol="http" bindingInformation="*:51742:192.168.133.129" />
-        </bindings>
-      </site>
-      <siteDefaults>
-        <logFile logFormat="W3C" directory="%IIS_USER_HOME%\Logs" />
-        <traceFailedRequestsLogging directory="%IIS_USER_HOME%\TraceLogFiles" enabled="true" maxLogFileSizeKB="1024" />
-      </siteDefaults>
-      <applicationDefaults applicationPool="Clr4IntegratedAppPool" />
-      <virtualDirectoryDefaults allowSubDirConfig="true" />
-    </sites>
-   ```
-
-2. 管理员权限运行CMD，输入
-
-   ```cmd
-   netsh http add urlacl url=http://IP_ADDR:PORT/ user=everyone
-   netsh http add urlacl url=http://localhost:PORT/ user=everyone
-   ```
-
-   注意：不要忘记将 localhost 加进 urlacl 否则原有的 localhost 会发生 ERROR_CONNECTION_REFUSED 错误
-
-   回车，看到 URL reservation successfully added
-
-3. 确认防火墙打开
-4. 以管理员权限运行 VS2017，Ctrl+F5 运行之
-
-***Info：我自己测试时，只做了第一步就可以了。***
-
-### 远程Debug
