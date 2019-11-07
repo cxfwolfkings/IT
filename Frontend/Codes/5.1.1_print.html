@@ -1,0 +1,120 @@
+<!DOCTYPE>
+<HTML>
+
+<HEAD>
+    <style media=print>
+        .Noprint {
+            display: none;
+        }
+
+        .PageNext {
+            page-break-after: always;
+        }
+    </style>
+</HEAD>
+
+<BODY>
+    <OBJECT id="WebBrowser" classid="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2" height=0 width=0 VIEWASTEXT></OBJECT>
+    <a class="NOPRINT" href="#" style="cursor:hand" title="打印" onclick="document.all.WebBrowser.ExecWB(6,6);">打印表一</a>
+    <br /><br />
+    <table BORDER="1">
+        <tr>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>我将被打印啦！</td>
+        </tr>
+    </table>
+    <br />
+    <table class="NOPRINT" BORDER="1">
+        <tr>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>因为我的class='NOPRINT'所以我将不被打印</td>
+        </tr>
+    </table>
+
+    <OBJECT id="WebBrowser" classid="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2" height="0" width="0"
+        VIEWASTEXT></OBJECT>
+    <input type="button" value="打开" onclick="document.all.WebBrowser.ExecWB(1,1)">
+    <input type="button" value="另存为" onclick="document.all.WebBrowser.ExecWB(4,1)">
+    <input type="button" value="全选" onclick="document.all.WebBrowser.ExecWB(17,1)">
+    <input type="button" value="属性" onclick="document.all.WebBrowser.ExecWB(10,1)">
+    <input type="button" value="关闭窗口" onclick="document.all.WebBrowser.ExecWB(45,1)">
+    <input type="button" value="打印" onclick="document.all.WebBrowser.ExecWB(6,1)">
+    <input type="button" value="直接打印" onclick="document.all.WebBrowser.ExecWB(6,6)">
+    <input type="button" value="页面设置" onclick="document.all.WebBrowser.ExecWB(8,1)">
+    <input type="button" value="打印预览" onclick="document.all.WebBrowser.ExecWB(7,1)">
+    <OBJECT id="min" type="application/x-oleobject" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11" VIEWASTEXT>
+        <PARAM name="Command" value="Minimize">
+    </OBJECT>
+    <input type="button" value="Min" onclick="min.Click()">
+    <OBJECT id="max" type="application/x-oleobject" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11" VIEWASTEXT>
+        <PARAM name="Command" value="Maximize">
+    </OBJECT>
+    <input type="button" value="Max/Restore" onclick="max.Click()" id="button1" name="button1">
+    realplayer
+    <OBJECT id="RVOCX1" height="240" width="320" classid="clsid:CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA" name="player1">
+        <PARAM NAME="_ExtentX" VALUE="8467">
+        <PARAM NAME="_ExtentY" VALUE="6350">
+        <PARAM NAME="AUTOSTART" VALUE="-1">
+        <PARAM NAME="SHUFFLE" VALUE="0">
+        <PARAM NAME="PREFETCH" VALUE="0">
+        <PARAM NAME="NOLABELS" VALUE="0">
+        <PARAM NAME="SRC" VALUE="rtsp://11.20.49.27/7/film/fallinnewyorkB.rm">
+        <PARAM NAME="CONTROLS" VALUE="ImageWindow">
+        <PARAM NAME="CONSOLE" VALUE="Clip1">
+        <PARAM NAME="LOOP" VALUE="0">
+        <PARAM NAME="NUMLOOP" VALUE="0">
+        <PARAM NAME="CENTER" VALUE="0">
+        <PARAM NAME="MAINTAINASPECT" VALUE="0">
+        <PARAM NAME="BACKGROUNDCOLOR" VALUE="#ffffff">
+    </OBJECT>
+    <BR />
+    <OBJECT id="RVOCX1" height="20" width="320" classid="clsid:CFCDAA03-8BE4-11cf-B84B-0020AFBBCCFA" name="control">
+        <PARAM NAME="_ExtentX" VALUE="8467">
+        <PARAM NAME="_ExtentY" VALUE="529">
+        <PARAM NAME="AUTOSTART" VALUE="-1">
+        <PARAM NAME="SHUFFLE" VALUE="0">
+        <PARAM NAME="PREFETCH" VALUE="0">
+        <PARAM NAME="NOLABELS" VALUE="0">
+        <PARAM NAME="SRC" VALUE="rtsp://11.20.49.27/7/film/fallinnewyorkB.rm">
+        <PARAM NAME="CONTROLS" VALUE="ControlPanel">
+        <PARAM NAME="CONSOLE" VALUE="Clip1">
+        <PARAM NAME="LOOP" VALUE="0">
+        <PARAM NAME="NUMLOOP" VALUE="0">
+        <PARAM NAME="CENTER" VALUE="0">
+        <PARAM NAME="MAINTAINASPECT" VALUE="0">
+        <PARAM NAME="BACKGROUNDCOLOR" VALUE="#000000">
+    </OBJECT>
+    找到一个了时间的，绝对经典，没有重复吧！
+    <OBJECT classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" name="fccrq" width="145" height="22" updown="0">
+        <param name="CalendarTrailingForeColor" value="11184810">
+        <param name="CalendarTitleForeColor" value="15658734">
+        <param name="CalendarTitleBackColor" value="11141120">
+        <param name="CalendarForeColor" value="0">
+        <param name="CalendarBackColor" value="16777215">
+        <param name="format" value="0">
+        <param name="CurrentDate" value="2002/11/11">
+    </OBJECT>
+    flash
+    <OBJECT classid="clsid:3A2B370C-BA0A-11D1-B137-0000F8753F5D" id="mschart1" style="HEIGHT: 326px; WIDTH: 651px"
+        CODEBASE="mschart.cab"></OBJECT>
+    <OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"></OBJECT>
+    其它
+    <!-- 最小化 -->
+    <object id="min" classid="clsid:ADB880A6-D8FF-11CF-9377-00AA003B7A11">
+        <param name="Command" value="Minimize">
+    </object>
+    <!-- 最大化 -->
+    <object id="max" classid="clsid:ADB880A6-D8FF-11CF-9377-00AA003B7A11">
+        <param name="Command" value="Maximize">
+    </object>
+    <!-- 强制关闭 -->
+    <OBJECT id="cle" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11">
+        <PARAM NAME="Command" VALUE="Close">
+    </OBJECT>
+</BODY>
+
+</HTML>

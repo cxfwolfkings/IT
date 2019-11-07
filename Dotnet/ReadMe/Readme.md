@@ -107,6 +107,8 @@
 
 ### 第6天：[Windows Store](./4.6_WindowsStore.md)
 
+### 第7天：[Xamarin](./4.7_Xamarin.md)
+
 ## 第五部分 通信
 
 ### 第1天：[WCF](./5.1_WCF.md)
