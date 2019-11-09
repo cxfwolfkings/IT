@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--
+  这是一个Twitter搜索gadget，将它通过iframe的形式内嵌在任何Web页面中，
+  通过postMessage()方法将查询字符串传递给它来搜索tweet。由于它是内嵌在
+  <iframe>中而不是<script>中，因此它无法对内嵌它的页面造成破坏
+-->
+<html>
+
+<head>
+    <style>
+        body {
+            font: 9pt sans-serif;
+        }
+    </style>
+    <!--使用jQuery的jQuery.getJSON()工具函数-->
+    <script src="http://code.jquery.com/jquery-1.4.4.min.js" />
+    </script>
+    <script>
+        //原本只要能够使用window.onmessage就可以了，但是考虑到早期的浏览器(比如: Firefox 3)不支持它，因此，采用如下兼容方式实现
+        if (window.addEventListener)
+            window.addEventListener("message", handleMessage, false);
+        else
+            window.attachEvent("onmessage", handleMessage);  //  For IE8 
+        function handleMessage(e) {
+            // 不在意消息来源：愿意接受任何来源的Twitter搜索请求
+            // 但是，希望消息源自内嵌gadget的窗口
+            if (e.source !== window.parent) return;
+            var searchterm = e.data;  // 获取搜索内容
+            // 使用jQuery Ajax工具函数以及Twitter的搜索API来查找匹配消息的tweet
+            jQuery.getJSON("http://search.twitter.com/search.json?callback=?",
+                { q: searchterm },
+                function (data) {  // 使用请求结果调用
+                    var tweets = data.results;
+                    // 构造一个HTML文档来显示搜索结果
+                    var escaped = searchterm.replace("<", "&lt;");
+                    var html = "<h2>" + escaped + "</h2>";
+                    if (tweets.length == 0) {
+                        html += "No tweets found";
+                    }
+                    else {
+                        html += "<dl>"; //以<dl>列表形式呈现结果
+                        for (var i = 0; i < tweets.length; i++) {
+                            var tweet = tweets[i];
+                            var text = tweet.text;
+                            var from = tweet.from_user;
+                            var tweeturl = "http://twitter.com/#!/" +
+                                from + "/status/" + tweet.id_str;
+                            html += "<dt><a target='_blank' href='" +
+                                tweeturl + "'>" + tweet.from_user +
+                                "</a></dt><dd>" + tweet.text + "</dd>";
+                        }
+                        html += "</dl>";
+                    }
+                    // 设置<iframe>文档
+                    document.body.innerHTML = html;
+                });
+        }
+        $(function () {
+            // 通知内嵌gadget的页面
+            // 我们 (gadget) 已经准备就绪
+            // 容器在没有收到这条消息前，它不能发送任何消息
+            // 因为我们还没有准备好接收消息
+            // 通常，容器只需要等待onload事件的触发，以此来得知所有的<iframe>都已载入完毕
+            // 我们发送消息告诉容器已经准备就绪，甚至有可能在容器获得onload事件之前
+            // 我们并不知道容器的源，所以采用"*"来让浏览器把消息发送给任何窗口
+            window.parent.postMessage("Twitter Search v0.1", "*");
+        }); 
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
