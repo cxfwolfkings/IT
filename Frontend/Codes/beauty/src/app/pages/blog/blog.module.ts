@@ -11,7 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 
-// 定义的路由
+// 嵌套的路由，最好分离成单独的路由配置文件
 const routes: Routes = [
   { path: '', redirectTo: 'list' },
   { path: 'list', component: NoteListComponent },
