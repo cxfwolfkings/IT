@@ -2,6 +2,14 @@
 
 ## 目录
 
+## 第一部分 PHP简介
+
+## 第二部分 PHP框架
+
+## 第三部分 PHP开源项目
+
+### 3.1 [禅道](./3.1_zentao.md)
+
 1. [简介](简介)
    - [为什么使用PHP](#为什么使用PHP)
    - [变量](#变量)
@@ -294,6 +302,14 @@ function insertSort(&$arr){
 3. 进入到bin目录下，然后按住shift键不放单击鼠标的右键，选择“在此处打开命令窗口”，输入 httpd.exe -k install
 4. 若出现：“(OS 10048)通常每个套接字地址(协议/网络地址/端口)只允许使用一次。:AH00072: make_sock: could not bind to address [::]:443 。”，说明你的443端口被占用了，解决办法为：注释LoadModule ssl_module modules/mod_ssl.so
 5. 现在输入httpd.exe -k start命令就可以启动了。命令：httpd –k start[shutdown|restart]
+
+**问题列表：**
+
+```txt
+问题：no listening sockets available
+原因：端口被占用
+解决：1、改端口  2、关闭占端口的进程
+```
 
 ### MySQL
 
