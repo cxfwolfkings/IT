@@ -1,6 +1,7 @@
 from time import sleep
 from functools import wraps
-
+import asyncio
+import aiohttp
 
 # 倒计数生成器
 def countdown(n):
@@ -61,6 +62,24 @@ def coroutine(fn):
     return wrapper
 
 
+@asyncio.coroutine
+def countdown1(name, n):
+    while n > 0:
+        print(f'Countdown[{name}]: {n}')
+        yield from asyncio.sleep(1)
+        n -= 1
+
+
+async def download(url):
+    print('Fetch:', url)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            print(url, '--->', resp.status)
+            print(url, '--->', resp.cookies)
+            print('\n\n', await resp.text())
+
+
+
 '''
 1、生成器 - 数据的生产者。
 '''
@@ -74,7 +93,7 @@ def test1():
 '''
 生成器还可以叠加来组成生成器管道，代码如下所示。
 '''
-def test2():
+def test1_2():
     gen = even(fib())
     for _ in range(10):
         print(next(gen))
@@ -83,8 +102,41 @@ def test2():
 '''
 2、协程 - 数据的消费者。
 '''
-def test3():
+def test2():
     countdown_gen(5, countdown_con())
+
+
+'''
+3、异步I/O - 非阻塞式I/O操作。
+'''
+def test3():
+    loop = asyncio.get_event_loop()
+    tasks = [
+        countdown1("A", 10), countdown1("B", 5),
+    ]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+
+
+'''
+4、async 和 await
+
+下面的代码使用了 [AIOHTTP](https://github.com/aio-libs/aiohttp) 这个非常著名的第三方库，
+它实现了HTTP客户端和HTTP服务器的功能，对异步操作提供了非常好的支持，
+有兴趣可以阅读它的[官方文档](https://aiohttp.readthedocs.io/en/stable/)。
+'''
+def test4():
+    loop = asyncio.get_event_loop()
+    urls = [
+        'https://www.baidu.com',
+        'http://www.sohu.com/',
+        'http://www.sina.com.cn/',
+        'https://www.taobao.com/',
+        'https://www.jd.com/'
+    ]
+    tasks = [download(url) for url in urls]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
 
 
 if __name__ == '__main__':

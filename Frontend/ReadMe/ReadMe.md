@@ -144,15 +144,37 @@ Php 开源 php-open.com  模仿->()创新
 
 ## 第六部分 UI设计
 
-### 第1天：[css介绍](./6.1_css介绍.md)
+### [6.1 css介绍](./6.1_css介绍.md)
 
-### 第2天：[css常用样式](./6.2_css常用样式.md)
+### [6.2 css常用样式](./6.2_css常用样式.md)
 
 1. 布局
 2. 内容
    - 文字效果（超出一行、两行隐藏）
    - 图形效果（圆形、三角形、五角星、六芒星...）
 
-### [第3天：jQMobile](./6.3_jQMobile.md)
+### [6.3 jQMobile](./6.3_jQMobile.md)
 
-### [第4天：PhoneGap](./6.4_PhoneGap.md)
+### [6.4 PhoneGap](./6.4_PhoneGap.md)
+
+### [6.5 fabric.js](https://github.com/fabricjs/fabric.js/)
+
+### 6.6 WebGL
+
+### 6.7 Bootstrap
+
+github最值得收藏的Bootstrap3后台管理框架：
+
+- [AdminLTE](https://github.com/almasaeed2010/AdminLTE)：查看[演示](https://adminlte.io/themes/AdminLTE/index2.html)
+- [Gentelella Admin](https://github.com/puikinsh/gentelella)：查看[演示](https://colorlib.com/polygon/gentelella/index.html)
+- [Vali Admin](https://github.com/pratikborsadiya/vali-admin)：查看[演示](http://pratikborsadiya.in/vali-admin/)
+- [ModularAdmin](https://github.com/modularcode/modular-admin-html)：查看[演示](https://gurayyarar.github.io/AdminBSBMaterialDesign/index.html)
+- [Metis](https://github.com/puikinsh/Bootstrap-Admin-Template)：查看[演示](https://colorlib.com/polygon/metis/)
+- [Ace](https://github.com/bopoda/ace)：查看[演示](http://ace.jeka.by/)
+- [Light Bootstrap Dashboard](https://github.com/creativetimofficial/light-bootstrap-dashboard)：查看[演示](http://demos.creative-tim.com/light-bootstrap-dashboard)
+- [Material Dashboard](https://github.com/creativetimofficial/material-dashboard)：查看[演示](http://demos.creative-tim.com/material-dashboard/examples/dashboard.html)
+- [Clearmin](https://github.com/paomedia/clearmin)：查看[演示](http://cm.paomedia.com/)
+
+## 参考
+
+- [MDN](https://developer.mozilla.org/zh-CN/)：

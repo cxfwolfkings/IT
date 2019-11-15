@@ -24,8 +24,23 @@
 [BeautifulSoup 4.0文档](https://www.crummy.com/software/BeautifulSoup/bs4/doc/index.zh.html)
 [我的教程ppt](爬虫.pptx)
 
+```sh
+python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
 ## 1、天成医疗网
 
 静态页面，最简单的一个[示例](tecenet.py)
+
+```sh
+# 安装 requests 库
+pip install requests -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 安装 bs4 库
+pip install bs4 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 运行
+python ./tecenet.py
+```
 
 ## 2、淘宝联盟

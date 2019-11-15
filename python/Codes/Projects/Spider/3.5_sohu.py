@@ -1,73 +1,3 @@
-# 存储数据和并发下载
-
-### 3、异步I/O - 非阻塞式I/O操作。
-
-```py
-import asyncio
-
-
-@asyncio.coroutine
-def countdown(name, n):
-    while n > 0:
-        print(f'Countdown[{name}]: {n}')
-        yield from asyncio.sleep(1)
-        n -= 1
-
-
-def main():
-    loop = asyncio.get_event_loop()
-    tasks = [
-        countdown("A", 10), countdown("B", 5),
-    ]
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
-
-
-if __name__ == '__main__':
-    main()
-```
-
-### 4、async 和 await
-
-```py
-import asyncio
-import aiohttp
-
-
-async def download(url):
-    print('Fetch:', url)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            print(url, '--->', resp.status)
-            print(url, '--->', resp.cookies)
-            print('\n\n', await resp.text())
-
-
-def main():
-    loop = asyncio.get_event_loop()
-    urls = [
-        'https://www.baidu.com',
-        'http://www.sohu.com/',
-        'http://www.sina.com.cn/',
-        'https://www.taobao.com/',
-        'https://www.jd.com/'
-    ]
-    tasks = [download(url) for url in urls]
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
-
-
-if __name__ == '__main__':
-    main()
-```
-
-上面的代码使用了 [AIOHTTP](https://github.com/aio-libs/aiohttp) 这个非常著名的第三方库，它实现了HTTP客户端和HTTP服务器的功能，对异步操作提供了非常好的支持，有兴趣可以阅读它的[官方文档](https://aiohttp.readthedocs.io/en/stable/)。
-
-## 实例 - 多线程爬取“手机搜狐网”所有页面
-
-下面我们把之前讲的所有知识结合起来，用面向对象的方式实现一个爬取“手机搜狐网”的多线程爬虫。
-
-```py
 import pickle
 import zlib
 from enum import Enum, unique
@@ -169,10 +99,11 @@ class SpiderThread(Thread):
         self.spider = spider
 
     def run(self):
-        redis_client = redis.Redis(host='1.2.3.4', port=6379, password='1qaz2wsx')
+        redis_client = redis.Redis(
+            host='1.2.3.4', port=6379, password='1qaz2wsx')
         mongo_client = pymongo.MongoClient(host='1.2.3.4', port=27017)
         thread_local.redis_client = redis_client
-        thread_local.mongo_db = mongo_client.msohu 
+        thread_local.mongo_db = mongo_client.msohu
         while True:
             current_url = redis_client.lpop('m_sohu_task')
             while not current_url:
@@ -206,6 +137,9 @@ thread_local = local()
 hasher_proto = sha1()
 
 
+'''
+实例 - 多线程爬取“手机搜狐网”所有页面
+'''
 def main():
     redis_client = redis.Redis(host='1.2.3.4', port=6379, password='1qaz2wsx')
     if not redis_client.exists('m_sohu_task'):
@@ -224,4 +158,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-```
