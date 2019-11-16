@@ -86,20 +86,20 @@
 - 动画 / 混入
 - 项目总结与参考
 
-### 第9-15天：[Angular](./3.9_Angular.md)
+### 第9-15天：[Angular](./3.2_Angular.md)
 
 - 禅道理念 / 运行条件 / Angular架构 / 核心概念模型 / 浏览器兼容性
 - 模块 & 组件 & 模板 & 元数据 & 数据绑定 & 指令 & 服务 & 依赖注入
 - 项目实战 & 总结 & 附录 & 参考
 
-### 第15-24天：[React](./3.10_React.md)
+### 第15-24天：[React](./3.3_React.md)
 
 - 安装 & 元素渲染
 - JSX 简介
 - 组件 & Props
 - State & 生命周期
 
-### 第25-30天：[Knockout](./3.11_Knockout.md)
+### 第25-30天：[Knockout](./3.4_Knockout.md)
 
 ## 第四部分 微信小程序 + Flutter
 
