@@ -11,31 +11,28 @@
 
 ## 第一部分 javascript + jQuery
 
-### 第1天：概述
+### 第1-6天：[javascript核心](./1.1_javascript核心.md)
 
-### 第2天：词法结构
+- 概述
+- 词法结构
+- 类型、值和变量
+- 表达式、运算符和语句
+- 对象、数组和函数
+- 类、模块、子集和扩展
 
-### 第3天：类型、值和变量
-
-### 第4天：表达式、运算符和语句
-
-### 第5天：对象、数组和函数
-
-### 第6天：类、模块、子集和扩展
-
-### 第7天：客户端javascript
+### 第7-8天：[客户端javascript](./1.2_客户端javascript.md)
 
 1. web中的js简介
 2. dom操作
 3. 样式设置
 4. 事件处理
 5. 示例
+6. 客户端存储
+7. 多媒体和图形
 
-### 第8天：客户端存储、多媒体和图形
+### 第9天：[html5](./1.3_html5.md)
 
-### 第9天：[html5](./1.9_html5.md)
-
-### 第10天：[jQuery类库](./1.10_jQuery类库.md)
+### 第10天：[jQuery类库](./1.4_jQuery类库.md)
 
 1. jQuery简介
 2. 选择器
@@ -45,12 +42,11 @@
 6. 动画效果
 7. 示例
    - 输入框输入限制
+8. jQuery常用插件库
 
-### 第11天：[jQuery常用插件库](./1.11_jQuery常用插件库.md)
+### 第12天：[require](./1.5_require.md)
 
-### 第12天：[require](./1.12_require.md)
-
-### 第13天：[Bootstrap](./1.13_Bootstrap.md)
+### 第13天：[Bootstrap](./1.6_Bootstrap.md)
 
 ## 第二部分 node + npm + es6 + typescript
 
