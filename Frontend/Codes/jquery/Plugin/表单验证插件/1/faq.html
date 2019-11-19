@@ -1,0 +1,193 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title> jQuery formValidator表单验证插件</title>
+<meta name="Author" content="猫冬">
+<meta name="description" content="jQuery formValidator表单验证插件" />
+<meta name="keywords" content="jQuery,formValidator,插件,表单,验证,插件,javascript,表单验证,提示层" />
+<link rel="stylesheet" type="text/css" href="style.css">
+<SCRIPT LANGUAGE="JavaScript" src="site.js"></SCRIPT>
+</head>
+
+<body>
+
+<SCRIPT LANGUAGE="JavaScript">writeTop();</SCRIPT>
+
+<table cellpadding="10" width="760" cellspacing="0" align="center" class="ContentTable">
+  <tr>
+    <td valign="top" class="Nav"> 
+      <SCRIPT LANGUAGE="JavaScript">writeNav();</SCRIPT>
+    </td>
+    <td valign="top"><b>FAQ</b> <p><b>常见问题</b></p>
+      <ol>
+        <li><a href="#1">如何实现一个控件，根据不同的情况，实现不同的控制？</a></li>
+        <li><a href="#2">一个页面上我有几个tab页，如何实现每个Tab页上的控件单独校验？</a></li>
+        <li><a href="#3">我采用的页面上文字问题的方式，点提交的时候，有校验未通过的，除了文字提示外，还可以再弹出窗口提示吗？</a></li>
+        <li><a href="#4">所有校验通过后，我还要再做别的判断可以吗？我自己的判断没有通过可以中断提交吗？</a></li>
+        <li><a href="#5">我有一组的checkbox（radiobutton）如何设置校验？</a></li>
+        <li><a href="#6">我有2个表单元素，任意一个元素输入东西就算验证通过，如何写代码？比如要求输入中文名字和英文名字任意一个即算校验通过。</a></li>
+        <li><a href="#7">一个表单元素校验通过了，但是我想额外再进行其它的校验，出错要自定义错误，如何写代码？</a></li>
+        <li><a href="#8">如何让赋了初始值的表单元素默认校验通过<b>？</b></a></li>
+        <li><a href="#9">ajaxValidator校验，离开焦点的时候，马上点击提交按钮，这个时候服务器还没有返回怎么办？</a></li>
+        <li><a href="#10">我想在表单没有校验通过的时候，弹出第一个没有校验通过元素的错误信息，如何实现？</a></li>
+        <li><a href="#11">刚打开页面的时候我不想显示onshow的状态，如何实现这种功能<b>?</b></a></li>
+        <li><a href="#12">在A条件下，某个控件是不检验的，在B条件下，这个控件又是检验的，如何实现？</a></li>
+        <li><a href="#13">inputValidator校验方式，我想进行更精确的提示，如何写？也就是比最小值小，比最大值大，分开提示。</a></li>
+        <li><a href="#14">如何实现自动注册pageIsValid函数？每次都要自己写太麻烦了。</a></li>
+        <li><a href="#15">在使用ajaxValidator的时候，服务器端无法获得控件的值，每次都是空，怎么回事？</a></li>
+        <li><a href="#16">自动构建提示层功能开启后，发现定位不准确这么办？</a></li>
+        <li><a href="#17">为什么报$.formValidator无效的脚本错误。</a></li>
+        <li><a href="#18">inputValidator除了判断长度外，能不能再对左边空格、右边空格进行判断？</a></li>
+        <li><a href="#19">inputValidator验证长度的时候，能把全角字符当做一个长度来验证吗？</a></li>
+        <li><a href="#20">用户输入正确才能离开焦点，如何设置？</a></li>
+        <li><a href="#21">如何设置成调试模式？即验证成功后，不提交数据。</a></li>
+      </ol>
+      <p><b><a name="1"></a>1. 如何实现一个控件，根据不同的情况，实现不同的控制？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; 你只需要在你的不同种情况下，重新设置你的【一行代码】<b>。例如：</b></p>
+      <p> if(条件)<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $(&quot;#id&quot;).formValidator({配置1}).inputValidator({配1});<br>
+        else<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $(&quot;#id&quot;).formValidator({配置2}).inputValidator({配2}); 
+      </p>
+      <p><b><a name="2"></a>2. 一个页面上我有几个tab页，如何实现每个Tab页上的控件单独校验？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; 每个Tab页上需要校验的控件，你在写【一行代码】的时候，显式的声明组号<b>。<br>
+        </b>&nbsp;&nbsp;&nbsp; $.formValidator.initConfig({validatorgroup:&quot;1&quot;});<br>
+        &nbsp;&nbsp;&nbsp; $.formValidator.initConfig({validatorgroup:&quot;2&quot;});<br>
+        &nbsp;&nbsp;&nbsp; 再在formValidator里显式的声明组号validatorgroup，例如：<br>
+        &nbsp;&nbsp;&nbsp; $(&quot;#id&quot;).formValidator({validatorgroup:&quot;2&quot;...}).inputValidator({...}); 
+      </p>
+      <p><b><a name="3"></a>3. 我采用的页面上文字问题的方式，点提交的时候，有校验未通过的，除了文字提示外，还可以再弹出窗口提示吗？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; 这个问题很简单，你只要设置改组的全局配置，<br>
+        jQuery.formValidator.initConfig({onerror:function(){alert(&quot;有部分校验没有通过，请看页面具体提示&quot;);}})<b>。</b> 
+      <p><b><a name="4"></a>4. 所有校验通过后，我还要再做别的判断可以吗？我自己的判断没有通过可以中断提交吗？[<a href="#">top</a>]</b></p>
+      <p>同样很简单，你页只需设置该组的全局配置，<br>
+        jQuery.formValidator.initConfig({onsuccess:function()<br>
+        {<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(你的额外判断失败)<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+        return false;<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; else<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+        return true;<br>
+        }})</p>
+      <p><b><a name="5"></a>5. 我有一组的checkbox（radiobutton）如何设置校验？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; 你只需在该组的第一个checkbox上设置校验信息即可，具体请参考demo1里的范例<br>
+        1、如果你该组的第一个控件的ID ，你可以这么写:<br>
+        $(&quot;sex_1&quot;).inputValidator({...})<br>
+        2、如果你只知道该组的name，你可以这么写:<br>
+        $(&quot;input:check[@name='sex']&quot;).inputValidator({...})</p>
+      <p><b><a name="6"></a>6. 我有2个表单元素，任意一个元素输入东西就算验证通过，如何写代码？比如要求输入中文名字和英文名字任意一个即算校验通过。[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; $(&quot;#name_cn,#name_en&quot;).formValidator({tipid:&quot;IMTip&quot;,onshow:&quot;请填写任一种名字)&quot;,onfocus:&quot;请请填写任一种名字。&quot;,oncorrect:&quot;输入正确！&quot;}).functionValidator({fun:allEmpty}); 
+      </p>
+      <p>function allEmpty(val,elem) <br>
+        { <br>
+        return ($(&quot;#name_cn&quot;).val()==&quot;&quot; &amp;&amp; $(&quot;#name_cn&quot;).val()==&quot;&quot;)?'如果想和客户在线洽谈，请至少填写一种IM软件帐号！':true; 
+        <br>
+        } <br>
+      </p>
+      <p><b><a name="7"></a>7. 一个校验组校验通过了，但是我想额外再进行其它校验，出错要自定义错误，如何写代码？[<a href="#">top</a>]</b></p>
+      <p>$(&quot;#ewjy&quot;).formValidator({<br>
+        &nbsp;&nbsp;&nbsp; onshow:&quot;无论你输入什么，都会提示你额外校验出错，错误信息自定义&quot;,<br>
+        &nbsp;&nbsp;&nbsp; onfocus:&quot;至少输入一个字符&quot;,<br>
+        &nbsp;&nbsp;&nbsp; oncorrect:&quot;你怎么可能输入正确了，难道是bug?&quot;,<br>
+        &nbsp;&nbsp;&nbsp; ).inputValidator({min:1,onerror:&quot;这里至少要一个字符,请确认&quot;}).functionValidator({<br>
+        if(额外校验失败) <br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; return &quot;额外校验失败的错误信息&quot;;<br>
+        else <br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; return true;<br>
+        });</p>
+      <p><b><a name="8"></a>8. 如何让赋了初始值的表单元素默认校验通过<b>？</b>[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; $(&quot;#xueli&quot;).formValidator({onshow:&quot;请选择你的学历&quot;,onfocus:&quot;学历必须选择&quot;,oncorrect:&quot;谢谢你的配合&quot;,defaultvalue:&quot;b&quot;}).inputValidator({onerror: 
+        &quot;你是不是忘记选择学历了!&quot;}).<strong>DefaultPassed()</strong>;</p>
+      <p><a name="9"></a>9.<b> </b><strong>ajaxValidator校验，离开焦点马上点击提交按钮，这个时候如果服务器还没有返回数据怎么办？<b>[<a href="#">top</a>]</b></strong></p>
+      <p>&nbsp;&nbsp;&nbsp; 新版本的ajaxValidator提供了一个配置参数buttons（你点提交的按钮(组)jQuery对象），如果你触发了ajax校验，buttons里对应的按钮就会灰掉，一直等待服务器返回数据为止。例如：<br>
+        $(&quot;#test1&quot;).formValidator({...}).inputValidator({...}).ajaxValidator({<br>
+        &nbsp;&nbsp;&nbsp; url : &quot;Default.aspx&quot;,<br>
+        &nbsp;&nbsp;&nbsp; datatype : &quot;json&quot;,<br>
+        &nbsp;&nbsp;&nbsp; success : function(data){...},<br>
+        &nbsp;&nbsp;&nbsp; buttons: $(&quot;#button_id&quot;),<br>
+        &nbsp;&nbsp;&nbsp; error: function(){alert(&quot;服务器没有返回数据，可能服务器忙，请重试&quot;);},<br>
+        &nbsp;&nbsp;&nbsp; onerror : &quot;该用户名不可用，请更换用户名重新&quot;,<br>
+        &nbsp;&nbsp;&nbsp; onwait : &quot;正在对用户名进行合法性校验，请稍候...&quot;<br>
+        }); </p>
+      <p><a name="10"></a><b>10. 我想在表单没有校验通过的时候，弹出第一个没有校验通过元素的错误信息，如何实现？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; onerror有2个参数：第一个“第一个没有校验通过元素的错误信息”;第二个“第一个没有校验通过元素对象”；代码如下设置：<br>
+        jQuery.formValidator.initConfig({onerror:function(msg){alert(msg);}})<b>。</b> 
+      <p><a name="11" id="11"></a><b>11. 刚打开页面的时候我不想显示onshow的状态，如何实现这种功能？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; 如果onshow,onfocus,oncorrect,onerror的内容为空，将不显示该提示内容<b>。</b> 
+      <p><a name="12" id="12"></a><b>12. </b><strong>在A条件下，某个控件是不检验的，在B条件下，这个控件又是检验的，如何实现</strong><b>？[<a href="#">top</a>]</b></p>
+      <p>&nbsp;&nbsp;&nbsp; if(A条件)<br>
+        &nbsp;&nbsp;&nbsp; {<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $(&quot;#sfzh&quot;).attr(&quot;disabled&quot;,true).unFormValidator(true); 
+        //解除校验<br>
+        &nbsp;&nbsp;&nbsp; }<br>
+        &nbsp;&nbsp;&nbsp; else<br>
+        &nbsp;&nbsp;&nbsp; {<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $(&quot;#sfzh&quot;).attr(&quot;disabled&quot;,false).unFormValidator(false);//恢复校验<br>
+        &nbsp;&nbsp;&nbsp; } 
+      <p><a name="13" id="13"></a><b>13. </b><b>inputValidator校验方式，我想进行更精确的提示，如何写？[<a href="#">top</a>]</b> 
+      <p>&nbsp;&nbsp;&nbsp; inputValidator校验方式提供了2个属性，分别为onerrormin和onerrormax.<br>
+        &nbsp;&nbsp;&nbsp; onerrormin:当用户输入的值比min属性小的时候的错误提示<br>
+        &nbsp;&nbsp;&nbsp; onerrormax:当用户输入的值比max属性大的时候的错误提示<br>
+        &nbsp;&nbsp;&nbsp; 原onerror属性:当onerrormin或onerrormax不存在的时候,用该属性来提示错误 
+      <p><a name="14" id="14"></a><b>14. </b><b>如何实现自动注册pageIsValid函数？每次都要自己写太麻烦了？[<a href="#">top</a>]</b> 
+      <p>&nbsp;&nbsp;&nbsp; 自动注册$.formValidator.pageIsValid()函数，为initConfig添加formid属性，表示表单ID号。<br>
+        &nbsp;&nbsp;&nbsp; 如果formid为空，必须按照老的方法自行判断。<br>
+        &nbsp;&nbsp;&nbsp; 适用环境：如果你只有一个校验组，而且利用表单的submit来提交，你可以配置这个formid参数。<br>
+        &nbsp;&nbsp;&nbsp; 例如：$.formValidator.initConfig({formid:&quot;form1&quot;,onerror:function(msg){alert(msg)}}); 
+      <p><a name="15" id="15"></a><b>15. </b><b>在使用ajaxValidator的时候，服务器端无法获得控件的值，每次都是空，怎么回事？[<a href="#">top</a>]</b> 
+      <p>&nbsp;&nbsp;&nbsp; 请看更新记录<br>
+        &nbsp;&nbsp;&nbsp; 2008/1/22 23:58:57 jQuery formValidator 1.1.2 ver<br>
+        &nbsp;&nbsp;&nbsp; 1、为AjaxValidator添加一个addidvalue属性(是否自动添加id和值到url参数后面)<br>
+        &nbsp;&nbsp;&nbsp; 为了修复AjaxValidator在配置信息的时候,取不到运行时候值的bug<br>
+        &nbsp;&nbsp;&nbsp; 插件将自动在url后面自动添加,形式为&quot;id=value&quot;的网页参数<br>
+        &nbsp;&nbsp;&nbsp; 在服务器端,你可以通过Request.querystring[&quot;id&quot;]来取值<br>
+        &nbsp;&nbsp;&nbsp; 具体演示请看demo1里的用户名输入和Default.aspx 
+      <p>&nbsp;&nbsp;&nbsp; 2008/3/14 12:16:00 jQuery formValidator 2.2 ver<br>
+        &nbsp;&nbsp;&nbsp; 2、AjaxValidator校验方式，将自动再增加一个参数到请求的地址后面&quot;clientid=触发校验的表单ID&quot;。<br>
+        &nbsp;&nbsp;&nbsp; 如果你是一个jQuery集合做校验，如果用到了AjaxValidator校验方式,在服务器端，你无法知道触发校验的是哪个 
+        &nbsp;&nbsp;&nbsp; 表单元素，所以在请求的地址后面追加&quot;clientid=触发校验的表单ID&quot;。</p>
+      <p>&nbsp;&nbsp;&nbsp; 你说的问题就是&quot;在配置信息的时候,取不到运行时候值的bug&quot;,你可以参考demo1里用户名的写法<br>
+      </p>
+      <p><a name="16" id="16"></a><b>16. </b><b>自动构建提示层功能开启后，发现定位不准确这么办？[<a href="#">top</a>]</b> 
+      <p>&nbsp;&nbsp;&nbsp; 为formValidator函数添加属性：tipcss，用于定位自动提示层。该属性为标准的css属性申明。<br>
+        &nbsp;&nbsp;&nbsp; 例如： tipcss:{&quot;top&quot;:&quot;1px&quot;,&quot;left&quot;:&quot;20px&quot;}。请注意属性名和值都必须带引号 
+      <p>&nbsp;&nbsp;&nbsp; 开启自动构建提示层的情况下，原tipid属性表示相对定位的目标控件的ID号<br>
+        &nbsp;&nbsp;&nbsp; 关闭自动构建提示层的情况下，原tipid属性的意义不变，表示提示层的ID号</p>
+      <p><a name="17" id="17"></a><b>17. </b><b>为什么报$.formValidator无效的脚本错误？[<a href="#">top</a>]</b> 
+      </p>
+      <ol>
+        <li>请先检查是否正确引用了插件的脚本</li>
+        <li>插件脚本是UTF-8编码的，如果你的页面用其它的编码方式，则在引用脚本的时候要显式指明脚本编码方式<br>
+          &lt;script src=&quot;formValidator.js&quot; type=&quot;text/javascript&quot; 
+          charset=&quot;UTF-8&quot; &gt;&lt;/script&gt; </li>
+      </ol>
+      <p><a name="18" id="18"></a><b>18. </b><b>inputValidator除了判断长度外，能不能再对左边空格、右边空格进行判断？[<a href="#">top</a>]</b> 
+      </p>
+      <ol>
+        <li>在新的版本3.1里，为inputValidator设置了empty属性,用于设置控件文本值是否允许两边为空</li>
+        <li>看参看demo1里的密码控件。<br>
+          <br>
+        $(&quot;#password1&quot;).formValidator({onshow:&quot;请输入密码&quot;,onfocus:&quot;密码不能为空&quot;,oncorrect:&quot;密码合法&quot;}).inputValidator({min:1,empty:{leftempty:false,rightempty:false,emptyerror:&quot;密码两边不能有空符号&quot;},onerror:&quot;密码不能为空,请确认&quot;});</li>
+      </ol>
+      <p><a name="19" id="19"></a><b>19. </b><b>inputValidator验证长度的时候，能把全角字符当做一个长度来验证吗？[<a href="#">top</a>]</b></p>
+      <p>initConfig有个属性:wideword，表示是否把全角字符当做2个长度处理，默认为true。 </p>
+      <p>&nbsp;</p>
+      <p><a name="20" id="20"></a><b>20. </b><b>用户输入正确才能离开焦点，如何设置？[<a href="#">top</a>]</b> </p>
+      <p>为initConfig增加forcevalid属性;formValidator增加forcevalid属性，表示是否一直输入正确为止才允许离开焦点。
+initConfig的forcevalid优先等级最高，即全局配置；而formValidator里的forcevalid是局部设置。<br>
+        请见demo1邮箱字段的验证。</p>
+      <p><a name="21" id="21"></a><b>21. </b><b>如何设置成调试模式？即验证成功后，不提交数据。[<a href="#">top</a>]</b></p>
+      <p>initConfig里有个属性叫debug，默认false。如果你要调试代码，你可以设置debug为true，校验成功了，也不会提交表单。</p>
+      <p><br>
+      </p>
+      <p><br>
+    
+  </tr>
+</table>
+<SCRIPT LANGUAGE="JavaScript">writeBottom();</SCRIPT>
+</body>
+
+</html>

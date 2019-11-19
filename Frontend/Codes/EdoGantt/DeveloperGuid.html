@@ -1,0 +1,224 @@
+﻿<html>
+<head>
+    <title>开发指南 - EdoGantt易度甘特图 </title>
+    <style type="text/css">
+        h3{
+            margin:0;
+            margin-top:10px;
+        }
+        p{
+            margin:0;margin-left:25px;
+        }
+    </style>
+</head>
+<body>    
+    <h1>EdoGantt易度甘特图 - 开发指南</h1>
+    <ul>
+        <li>甘特图显示和布局
+            <ul>
+                <li><a href="#1">基本甘特图视图</a></li>
+                <li><a href="#2">跟踪甘特图视图</a></li>
+                <li><a href="#3">10种日期模式</a></li>
+                <li><a href="#4">调整表格区与条形图区大小</a></li>
+                <li><a href="#5">隐藏显示表格区和条形图区</a></li>
+                <li><a href="#6">只显示任务树或条形图</a></li>
+                <li><a href="#7">调整甘特图区域大小</a></li>
+            </ul>
+        </li>
+        <li>任务树区域操作
+            <ul>
+                <li><a href="#11">添加,修改,删除任务</a></li>
+                <li><a href="#12">任务升级/降级</a></li>
+                <li><a href="#13">任务层次/顺序调整</a></li>
+                <li><a href="#14">建立取消任务相关性</a></li>
+                <li><a href="#15">任务树形分级伸缩</a></li>
+                <li><a href="#16">任务条形图定位</a></li>
+                <li><a href="#17">水平拖动调整表格列表列宽度</a></li>
+                <li><a href="#18">水平拖拽调整表格列顺序</a></li>
+                <li><a href="#19">自定义任务行的样式</a></li>
+                <li><a href="#20">自定义列</a></li>
+            </ul>
+        </li>
+        <li>条形图区域操作
+            <ul>
+                <li><a href="#21">拖动条形图调整任务开始,完成日期</a></li>
+                <li><a href="#22">拖动进度条更新任务进度</a></li>
+                <li><a href="#23">链接信息提示ToolTip</a></li>
+                <li><a href="#24">扩展条形图图标(自定义条形图周边的HTML)</a></li>
+                <li><a href="#25">禁止条形图拖拽调节功能(日期/完成日期/完成百分比)</a></li>
+            </ul>
+        </li>
+        <li>其他
+            <ul>
+                <li><a href="#31">自定义右键菜单</a></li>
+                <li><a href="#32">创建和清除比较基准</a></li>
+                <li><a href="#33">控制甘特图整体不可编辑</a></li>
+                <li><a href="#34">设置部分任务不可编辑</a></li>
+                <li><a href="#35">控制任务树单元格可编辑性</a></li>
+                <li><a href="#36">控制条形图区域任务是否可以拖拽调节</a></li>
+                <li><a href="#37">筛选显示任务</a></li>
+            </ul>
+        </li>
+    </ul>
+    <hr />
+    <h3 id="1">基本甘特图视图</h3>
+    <div style="padding-left:25px;">
+        1.	显示一个按日历数据的背景<br />
+            <p>可以控制日历背景, <a href="http://www.edogantt.com/examples/calendar.html" target="_blank">参考这里</a></p>
+        2.	显示一个按日期定位的任务条形图<br />
+            <p>任务的开始时间Start和完成时间Finish决定条形图的定位, <a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a></p>
+        3.	显示任务关联性的箭头连线<br />
+            <p>任务的前置任务属性PredecessorLink决定任务箭头连线, <a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a></p>
+        4.	显示摘要任务<br />
+            <p>任务的Summary, <a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a></p>
+        5.	显示关键任务和路径<br />
+            <p>任务的Critical, <a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a></p>
+        6.	显示里程碑,0工时任务<br />
+            <p>任务的0工期, 以及Milestone, <a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a></p>
+    </div>
+    <h3 id="2">跟踪甘特图视图</h3>
+    <div style="padding-left:25px;">
+        跟踪甘特图其实是显示上下两行条形图, 用于计划与实际的任务对比<br />
+        我们将"计划信息"放在Baseline数组中, 里面放的也是任务的一些时间信息<br />
+        要显示跟踪甘特图, 我们需要满足如下两个条件<br />
+        1.给任务对象设置Baseline比较基准信息,可以存放多个比较基准信息<br />
+        2.将甘特图对象设置成跟踪甘特图视图模式:gantt.set('viewMode', 'track');//默认是'gantt'<br />
+        比较基准Baseline的数据结构信息请<a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a><br />
+        跟踪甘特图的示例请<a href="http://www.edogantt.com/examples/base.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="3">10种日期模式</h3>
+    <div style="padding-left:25px;">
+        日期模式是指"周/日","年/月"的日期视图, 用于显示不同范围大小的日期<br />
+        <a href="http://www.edogantt.com/examples/base.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="4">调整表格区与条形图区大小</h3>
+    <div style="padding-left:25px;">
+        标准甘特图是由"任务树"和"条形图"组成.我们提供的示例一般是1:1的宽度比例.<br />
+        事实上这其实是edojs的一个基本横向布局模型, 我们可以<a href="http://edojs.com/demo/#horizontal" target="_blank">参考这里</a>, 可以实现任意的尺寸显示比例<br />
+        有关edojs布局逻辑的介绍, 可以<a href="http://edojs.com/tutorial/gettingstarted/layout.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="5">隐藏显示表格区和条形图区</h3>    
+    <h3 id="6">只显示任务树或条形图</h3>
+    <div style="padding-left:25px;">
+        这两个功能其实是大同小异。我们可以由两种做法<br />
+        1. 设置组件的visible为false<br />
+        2. 如果不需要某组件显示, 干脆不创建<br />
+    </div>
+    <h3 id="7">调整甘特图区域大小 </h3>
+    <div style="padding-left:25px;">
+        我们使用ResizeManager尺寸管理器对象来操作, <br />
+        //使甘特图可拖拽调节大小<br />
+        Edo.managers.ResizeManager.reg({target: gantt});<br />
+        ResizeManager尺寸管理器的更多示例, <a href="http://edojs.com/demo/#resizemanager" target="_blank">参考这里</a>
+    </div>
+    <h3 id="11">添加,修改,删除任务 </h3>
+    <div style="padding-left:25px;">
+        要说明的是, 甘特图数据对象Edo.data.DataGantt是从Edo.data.DataTree->Edo.data.DataTable派生的, 所以它具备它们的所有功能。<br />
+        关于edojs数据对象API介绍, 请<a href="http://edojs.com/api/#Edo.data.DataGantt" target="_blank">参考这里</a><br />
+        易度甘特图的数据操作示例, <a href="http://www.edogantt.com/examples/event.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="12">任务升级/降级 </h3>
+    <div style="padding-left:25px;">
+        易度甘特图的数据操作示例, <a href="http://www.edogantt.com/examples/event.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="13">任务层次/顺序调整 </h3>
+    <div style="padding-left:25px;">
+        这个其实是任务树的行拖拽处理, <a href="http://edojs.com/demo/#dragdroptree" target="_blank">参考这里</a><br />
+        甘特图的示例,<a href="http://www.edogantt.com/examples/event.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="14">建立取消任务相关性 </h3>
+    <div style="padding-left:25px;">
+        我们找到任务对象后, 可以操作任务的前置任务属性PredecessorLink(它是一个数组)<br />
+        当我们修改了前置任务关系后, 我们可以这样刷新视图界面: gantt.data.endChange();
+    </div>
+    <h3 id="15">任务树形分级伸缩 </h3>
+    <div style="padding-left:25px;">
+        <a href="http://edojs.com/api/#Edo.data.DataTree" target="_blank">请参考Edo.data.DataTree的collapse和expand方法</a>
+    </div>
+    <h3 id="16">任务条形图定位 </h3>
+    <div style="padding-left:25px;">
+        <a href="http://www.edogantt.com/examples/event.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="17">水平拖动调整表格列表列宽度</h3>
+    <div style="padding-left:25px;">        
+        <a href="http://edojs.com/demo/#dragcolumn" target="_blank">参考这里</a>
+    </div>
+    <h3 id="18">水平拖拽调整表格列顺序 </h3>
+    <div style="padding-left:25px;">
+        <a href="http://edojs.com/demo/#dragcolumn" target="_blank">参考这里</a>
+    </div>
+    <h3 id="19">自定义任务行的样式</h3>
+    <div style="padding-left:25px;">
+        <a href="http://www.edogantt.com/examples/standard.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="20">自定义列 </h3>
+    <div style="padding-left:25px;">
+        <a href="http://edojs.com/tutorial/gettingstarted/table.html#renderer" target="_blank">教程参考</a>
+        <a href="http://edojs.com/demo/#renderer" target="_blank">示例参考</a>
+    </div>
+    <h3 id="21">拖动条形图调整任务开始,完成日期</h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/editable.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="22">拖动进度条更新任务进度 </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/editable.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="23">链接信息提示ToolTip </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/tips.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="24">扩展条形图图标(自定义条形图周边的HTML) </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/diy.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="25">禁止条形图拖拽调节功能(日期/完成日期/完成百分比) </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/editable.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="31">自定义右键菜单 </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/menu.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="32">创建和清除比较基准 </h3>
+    <div style="padding-left:25px;">   
+        比较基准Baseline的数据结构信息请<a href="http://www.edogantt.com/tutorials/gantt-data.html" target="_blank">参考这里</a><br />
+        跟踪甘特图的示例请<a href="http://www.edogantt.com/examples/base.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="33">控制甘特图整体不可编辑 </h3>
+    <div style="padding-left:25px;">        
+        1.显示任务树不可编辑: tree.set('enableCellEdit', false);<br />
+        2.设置条形图不可拖拽操作, <a href="http://www.edogantt.com/examples/editable.html" target="_blank">参考这里</a>        
+    </div>
+    <h3 id="34">设置部分任务不可编辑 </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://www.edogantt.com/examples/project-edit.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="35">控制任务树单元格可编辑性 </h3>
+    <div style="padding-left:25px;">      
+        1.不设置列配置的编辑器  <br />
+        2.监听tree的beforecelledit事件, 返回false控制不弹出编辑器编辑<br />
+<pre>
+tree.on('beforecelledit', function(e){
+    var r = e.record;
+    var c = e.column;
+    
+    if(r.Summary ) {                                        
+        if(['Start', 'Finish', 'Duration', 'Work'].indexOf(c.dataIndex) != -1){
+            return false;
+        }
+    }
+});
+</pre>        
+    </div>
+    <h3 id="36">控制条形图区域任务是否可以拖拽调节 </h3>
+    <div style="padding-left:25px;">
+        <a href="http://www.edogantt.com/examples/editable.html" target="_blank">参考这里</a>
+    </div>
+    <h3 id="37">筛选显示任务 </h3>
+    <div style="padding-left:25px;">        
+        <a href="http://edojs.com/demo/#table" target="_blank">示例参考</a>
+        <a href="http://edojs.com/api/#Edo.data.DataTree" target="_blank">参考Edo.data.DataTree的filter方法</a>
+    </div>
+</body>
+</html>

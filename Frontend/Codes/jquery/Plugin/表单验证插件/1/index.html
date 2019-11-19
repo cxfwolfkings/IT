@@ -1,0 +1,58 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title> jQuery formValidator表单验证插件</title>
+<meta name="Author" content="猫冬">
+<meta name="description" content="jQuery formValidator表单验证插件" />
+<meta name="keywords" content="jQuery,formValidator,插件,表单,验证,插件,javascript,表单验证,提示层" />
+<link rel="stylesheet" type="text/css" href="style.css">
+<SCRIPT LANGUAGE="JavaScript" src="site.js"></SCRIPT>
+</head>
+
+<body>
+
+<SCRIPT LANGUAGE="JavaScript">writeTop();</SCRIPT>
+
+<table cellpadding="10" width="760" cellspacing="0" align="center" class="ContentTable">
+<tr>
+    <td valign="top" class="Nav" align="left"> 
+      <SCRIPT LANGUAGE="JavaScript">writeNav();</SCRIPT>
+    </td>
+    <td valign="top"> <p><b> </b><b><font size="5"><br>
+        jQuery formValidator表单验证插件是什么?</font></b><br>
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jQuery formValidator表单验证插件，它是基于jQuery类库，实现了js脚本于页面html代码的分离。你可以划分多个校验组，每个组的校验都是互不影响。对一个表单对象，<strong><font color="#FF0000">你只需要写一行代码就可以轻松实现无数种（理论上）脚本控制</font></strong><font color="#FF0000">。</font>目前支持5种大的校验方式，分别是：inputValidator（针对input、textarea、select控件的字符长度、值范围、选择个数的控制）、compareValidator（提供2个对象的比较，目前可以比较字符串和数值型）、ajaxValidator（通过ajax到服务器上做数据校验）、regexValidator（提供可扩展的正则表达式库） 
+        、functionValidator （可使用外部函数来做校验）</p>
+      <p><font size="5"><br>
+        <strong>本插件于其他校验控件最大的区别有3点：</strong></font><br>
+        <br>
+        <strong>1、校验功能可以扩展。</strong><br>
+        <b> </b><b> </b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对中文、英文、数字、整数、实数、Email地址格式、基于HTTP协议的网址格式、电话号码格式、手机号码格式、货币格式、邮政编码、身份证号码、QQ号码、日期等等这些控制，别的表单校验控件是代码里写死的，而formValidator是通过外部js文件来扩展的，<font color="#FF0000"><em>你可以通过写正则表达式和函数来无限的扩展这些功能</em></font>。 
+      <p><strong>2、实现了校验代码于html代码的完全分离。</strong><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;你的所有信息都无需配置在校验表单元素上，你只要在js上配置你的信息。使美工（界面）和javascript工程师的工作不交织在一起 
+      <p><strong>3、你只需写一行代码就能完成一个表单元素的所有校验。你只需要写一行代码就能完成一下所有的控制</strong>
+      <ul>
+        <li>支持所有类型客户端控件的校验 </li>
+        <li>支持jQuery所有的选择器语法，只要控件有唯一ID和type属性</li>
+        <li>支持函数和正则表达式的扩展。提供扩展库formValidatorReg.js，你可以自由的添加、修改里面的内容。</li>
+        <li>支持2种校验模式。第一种：文字提示(showword模式)；第二种：弹出窗口提示(showalert模式) </li>
+        <li>支持多个校验组。如果一个页面有多个提交按钮，分别做不同得提交，提交前要做不同的校验，所以你得用到校验组的功能。 </li>
+        <li>支持4种状态的信息提示功能，可以灵活的控制4种状态是否显示。第一种：刚打开网页的时候进行提示；第二种：获得焦点的时候进行提示；第三种：失去焦点时，校验成功时候的提示；第四种：失去焦点时，校验失败的错误提示。 
+        </li>
+        <li>支持自动构建提示层。可以进行精确的定位。</li>
+        <li>支持自定义错误提示信息。 </li>
+        <li>支持控件的字符长度、值范围、选择个数的控制。值范围支持数值型和字符型；选择的个数支持radio/checkbox/select三种控件 
+        </li>
+        <li>支持2个控件值的比较。目前可以比较字符串和数值型。 </li>
+        <li>支持服务器端校验。 </li>
+        <li>支持输入格式的校验。</li>
+      </ul></td>
+</tr>
+</table>
+<SCRIPT LANGUAGE="JavaScript">writeBottom();</SCRIPT>
+
+</body>
+
+</html>

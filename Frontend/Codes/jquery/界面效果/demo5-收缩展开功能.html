@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>可伸缩块</title>
+    <script type="text/javascript" src="http://www.cssrain.cn/demo/jquery.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#head").click(function () {
+                $("#content").slideToggle("slow", function () { alert("Hello,cssrain.."); });
+            });
+        });
+    </script>
+    <style type="text/css">
+        p, div {
+            margin: 0;
+            padding: 0;
+        }
+        /*设置p,div之间的间距*/
+        #head {
+            width: 280px;
+            background: #ddd;
+            height: 20px;
+            border-top: 1px solid #aaa;
+            border-right: 1px solid #aaa;
+            border-left: 1px solid #aaa;
+        }
+
+        #content {
+            width: 280px;
+            background: #adf;
+            height: 350px;
+            border-left: 1px solid #aaa;
+            border-right: 1px solid #aaa;
+            border-bottom: 1px solid #aaa;
+            margin-top: 0px;
+        }
+    </style>
+</head>
+<body>
+    <p id="head">单击这里测试(一个收缩展开功能)</p>
+    <div id="content">
+        1,首先把JQ导入.
+        2,然后开始写函数了。$(document).ready(function(){});
+        3,前面说过了，获取标签能直接 $("标签")。给标签注册 onclick事件直接可以 click.
+        4,核心代码:
+        $("head").click(function(){$("content").slideToggle("slow");});
+        5,slideToggle(speed, callback)
+        通过高度变化来切换所有匹配元素的可见性，并在切换完成后可选地触发一个回调函数。
+        这个动画效果只调整元素的高度，可以使匹配的元素以“滑动”的方式隐藏或显示。
+
+        返回值
+        jQuery
+
+        参数
+        speed (String|Number): (可选) 三种预定速度之一的字符串("slow", "normal", or "fast")或表示动画时长的毫秒数值(如：1000)
+        callback (Function): (可选) 在动画完成时执行的函数
+        示例
+        jQuery 代码:
+        $("p").slideToggle("slow");
+
+        --------------------------------------------------------------------------------
+
+        jQuery 代码:
+        $("p").slideToggle("slow",function(){ alert("Animation Done."); });
+
+    </div>
+
+</body>
+</html>

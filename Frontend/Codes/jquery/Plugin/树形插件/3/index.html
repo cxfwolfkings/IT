@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=gbk"/>
+	<title>jQuery treeView</title>
+	
+	<link rel="stylesheet" href="jquery.treeview.css" />
+    <link rel="stylesheet" href="red-treeview.css" />
+	<link rel="stylesheet" href="screen.css" />
+	<script src="jquery.js" type="text/javascript"></script>
+	<script src="jquery.cookie.js" type="text/javascript"></script>
+	<script src="jquery.treeview.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		
+		// first example
+		$("#navigation").treeview({
+			persist: "location",
+			collapsed: true,
+			unique: true
+		});
+		
+		// second example
+		$("#browser").treeview();
+		$("#add").click(function() {
+			var branches = $("<li><span class='folder'>New Sublist</span><ul>" + 
+				"<li><span class='file'>Item1</span></li>" + 
+				"<li><span class='file'>Item2</span></li></ul></li>").appendTo("#browser");
+			$("#browser").treeview({
+				add: branches
+			});
+			branches = $("<li class='closed'><span class='folder'>New Sublist</span><ul><li><span class='file'>Item1</span></li><li><span class='file'>Item2</span></li></ul></li>").prependTo("#folder21");
+			$("#browser").treeview({
+				add: branches
+			});
+		});
+		
+		// third example
+		$("#red").treeview({
+			animated: "fast",
+			collapsed: true,
+			unique: true,
+			toggle: function() {
+				window.console && console.log("%o was toggled", this);
+			}
+		});
+		
+		// fourth example
+		$("#black, #gray").treeview({
+			control: "#treecontrol",
+			persist: "cookie"
+		});
+
+	});
+	</script>
+	<style type="text/css">
+	  	#black.treeview li { background: url(images/black/tv-item.gif) 0 0 no-repeat; }
+	  	#black.treeview .collapsable { background-image: url(images/black/tv-collapsable.gif); }
+	  	#black.treeview .expandable { background-image: url(images/black/tv-expandable.gif); }
+	  	#black.treeview .last { background-image: url(images/black/tv-item-last.gif); }
+	  	#black.treeview .lastCollapsable { background-image: url(images/black/tv-collapsable-last.gif); }
+	  	#black.treeview .lastExpandable { background-image: url(images/black/tv-expandable-last.gif); }
+	  	
+	  	#gray.treeview li { background: url(images/gray/tv-item.gif) 0 0 no-repeat; }
+	  	#gray.treeview .collapsable { background-image: url(images/gray/tv-collapsable.gif); }
+	  	#gray.treeview .expandable { background-image: url(images/gray/tv-expandable.gif); }
+	  	#gray.treeview .last { background-image: url(images/gray/tv-item-last.gif); }
+	  	#gray.treeview .lastCollapsable { background-image: url(images/gray/tv-collapsable-last.gif); }
+	  	#gray.treeview .lastExpandable { background-image: url(images/gray/tv-expandable-last.gif); }
+
+	</style>
+	</head>
+	<body>
+	
+
+	<div id="main">
+		
+	<h4>Sample 0 -只打开一个</h4>
+	
+	<ul id="navigation">
+		<li><a href="?1">Item 1</a>
+			<ul>
+				<li><a href="?1.0">Item 1.0</a>
+					<ul>
+						<li><a href="?1.0.0">Item 1.0.0</a></li>
+					</ul>
+				</li>
+				<li><a href="?1.1">Item 1.1</a></li>
+				<li><a href="?1.2">Item 1.2</a>
+					<ul>
+						<li><a href="?1.2.0">Item 1.2.0</a>
+					
+					</li>
+						<li><a href="?1.2.1">Item 1.2.1</a>
+					</li>
+						<li><a href="?1.2.2">Item 1.2.2</a>
+						
+					</li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+
+		<li><a href="?1">Item 2</a>
+			<ul>
+				<li><a href="?1.0">Item 2.0</a>
+					<ul>
+						<li><a href="?1.0.0">Item 2.0.0</a></li>
+					</ul>
+				</li>
+				<li><a href="?1.1">Item 2.1</a></li>
+				<li><a href="?1.2">Item 2.2</a>
+					<ul>
+						<li><a href="?1.2.0">Item 2.2.0</a>
+					
+					</li>
+						<li><a href="?1.2.1">Item 2.2.1</a>
+					</li>
+						<li><a href="?1.2.2">Item 2.2.2</a>
+						
+					</li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+
+		
+	</ul>
+</div>
+</body></html>

@@ -1,0 +1,179 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<meta name="keywords" content="关键词1,关键词2,关键词3" />
+		<meta name="description" content="对网站的描述" />
+		<title>标题</title>
+		<style type="text/css">
+			*{
+				margin:0;
+				padding:0;
+			}
+			 #box{
+			 	margin: 150px;
+			 	width: 310px;
+			 	height: 263px;
+			 }
+			 #box .hd{
+			 	height: 30px;
+			 	border-top: 2px solid #206F96;
+			 	text-align: center;
+			 	font: 14px/30px "宋体";
+			 }
+			 #box  .hd .s1{
+			 	width: 102px;
+			 	height: 29px;
+			 	border-left:1px solid #CFCFCF;
+			 	border-right: 1px solid #CFCFCF;
+			 	float: left;
+			 }
+			 #box  .hd .s2{
+			 	width: 102px;
+			 	height: 29px;
+			 	border-right: 1px solid #CFCFCF;
+			 	border-bottom: 1px solid #CFCFCF;
+			 	background:url(images/1.jpg) repeat-x;
+			 	float: left;
+			 }
+			  #box  .hd .s3{
+			 	width: 102px;
+			 	height: 29px;
+			 	border-right: 1px solid #CFCFCF;
+			 	border-bottom: 1px solid #CFCFCF;
+			 	background:url(images/1.jpg) repeat-x;
+			 	float: left;
+			 }
+			 #box .bd ul{
+			 	list-style: none;
+			 }
+			  #box .bd ul li{
+			  	line-height: 30px;
+			  }
+			  #box .bd ul li a:link,#box .bd ul li a:visited{
+			  	text-decoration: none;
+			  	color: #666;
+			  	font-size: 14px;
+			  }
+			  #tupian,#junshi{
+			  	display: none;
+			  }
+		</style>
+		<script type="text/javascript">
+			function xianshitupian(){
+				//让图片列表显示出来
+				document.getElementById("tupian").style.display = "block";
+				//让新闻列表隐藏
+				document.getElementById("xinwen").style.display = "none";
+				//让军事列表隐藏
+				document.getElementById("junshi").style.display = "none";
+
+				//让图片span去掉背景
+				document.getElementById("span_tupian").style.background = "none";
+				//让新闻span加上灰色背景
+				document.getElementById("span_xinwen").style.background = "url(images/1.jpg) repeat-x";
+				//让军事span加上灰色背景
+				document.getElementById("span_junshi").style.background = "url(images/1.jpg) repeat-x";
+
+				//让图片span去掉下边框线
+				document.getElementById("span_tupian").style.borderBottom = "none";
+				//让新闻span加上下边框线
+				document.getElementById("span_xinwen").style.borderBottom = "1px solid #CFCFCF";
+				//让军事span加上下边框线
+				document.getElementById("span_junshi").style.borderBottom = "1px solid #CFCFCF";
+			}
+
+			function xianshixinwen(){
+				//让新闻列表显示出来
+				document.getElementById("xinwen").style.display = "block";
+				//让图片列表隐藏
+				document.getElementById("tupian").style.display = "none";
+				//让军事列表隐藏
+				document.getElementById("junshi").style.display = "none";
+
+				//让新闻span去掉背景
+				document.getElementById("span_xinwen").style.background = "none";
+				//让图片span加上灰色背景
+				document.getElementById("span_tupian").style.background = "url(images/1.jpg) repeat-x";
+				//让军事span加上灰色背景
+				document.getElementById("span_junshi").style.background = "url(images/1.jpg) repeat-x";
+
+				//让新闻span去掉下边框线
+				document.getElementById("span_xinwen").style.borderBottom = "none";
+				//让图片span加上下边框线
+				document.getElementById("span_tupian").style.borderBottom = "1px solid #CFCFCF";
+				//让军事span加上下边框线
+				document.getElementById("span_junshi").style.borderBottom = "1px solid #CFCFCF";
+			}
+
+			function xianshijunshi(){
+				//让军事列表显示出来
+				document.getElementById("junshi").style.display = "block";
+				//让图片列表隐藏
+				document.getElementById("tupian").style.display = "none";
+				//让新闻列表隐藏
+				document.getElementById("xinwen").style.display = "none";
+
+				//让军事span去掉背景
+				document.getElementById("span_junshi").style.background = "none";
+				//让图片span加上灰色背景
+				document.getElementById("span_tupian").style.background = "url(images/1.jpg) repeat-x";
+				//让新闻span加上灰色背景
+				document.getElementById("span_xinwen").style.background = "url(images/1.jpg) repeat-x";
+
+				//让军事span去掉下边框线
+				document.getElementById("span_junshi").style.borderBottom = "none";
+				//让图片span加上下边框线
+				document.getElementById("span_tupian").style.borderBottom = "1px solid #CFCFCF";
+				//让新闻span加上下边框线
+				document.getElementById("span_xinwen").style.borderBottom = "1px solid #CFCFCF";
+			}
+		</script>
+	</head>
+	<body>
+		 <div id="box">
+		 	<div class="hd">
+		 		<span id="span_xinwen" class="s1" onmouseover="xianshixinwen()">新闻</span>
+		 		<span id="span_tupian" class="s2" onmouseover="xianshitupian()">图片</span>
+		 		<span id="span_junshi" class="s3" onmouseover="xianshijunshi()">军事</span>
+		 	</div>
+		 	<div class="bd">
+		 		<div id="xinwen" class="info">
+		 			<ul>	
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 				<li><a href="#">新闻新闻新闻新闻新闻新闻新闻新闻</a></li>
+		 			</ul>
+		 		</div>
+		 		<div id="tupian" class="info">
+		 			<ul>	
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 				<li><a href="#">图片图片图片图片图片图片图片图片</a></li>
+		 			</ul>
+		 		</div>
+		 		<div id="junshi" class="info">
+		 			<ul>	
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 				<li><a href="#">军事军事军事军事军事军事军事军事</a></li>
+		 			</ul>
+		 		</div>
+		 	</div>
+		 </div>
+	</body>
+</html>

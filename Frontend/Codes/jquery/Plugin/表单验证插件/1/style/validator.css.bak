@@ -1,0 +1,73 @@
+.onShow
+{
+    background:url(../images/onShow.gif) no-repeat; 
+    padding-left:25px; 
+	font-size: 12px;
+	line-height:22px; 
+	vertical-align:middle;
+}
+.onFocus
+{
+    background:#E9F0FF url(../images/onFocus.gif) no-repeat; 
+    padding-left:25px; 
+	font-size: 12px;
+	line-height:22px; 
+	vertical-align:middle;
+}
+.onError
+{
+    background:#FFF2E9 url(../images/onError.gif) no-repeat;
+    padding-left:25px;
+	font-size: 12px;
+	line-height:22px; 
+	vertical-align:middle;
+}
+.onCorrect:
+{
+    background:#E9FFEB url(../images/onCorrect.gif) no-repeat;
+    padding-left:25px;
+	font-size: 12px;
+	line-height:22px; 
+	vertical-align:middle;
+}
+.onLoad
+{
+    background:#E9FFEB url(../images/onLoad.gif) no-repeat 3px 3px;
+    padding-left:25px;
+	font-size: 12px;
+	line-height:22px; 
+	vertical-align:middle;
+} 
+
+.aaaa
+{
+	border-right: #a3bfa8 1px solid;
+	border-top: #a3bfa8 1px solid;
+	border-left: #a3bfa8 1px solid;
+	border-bottom: #a3bfa8 1px solid;
+	background-color: #fff;
+}
+.bbbb
+{
+	border-right: #99e300 1px solid;
+	border-top: #99e300 1px solid;
+	border-left: #99e300 1px solid;
+	border-bottom: #99e300 1px solid;
+	background-color: #fff;
+}
+.cccc
+{
+	border-right: red 1px solid;
+	border-top: red 1px solid;
+	border-left: red 1px solid;
+	border-bottom: red 1px solid;
+	background-color: #fff;
+}
+
+select {
+	border-right: #a3bfa8 1px solid;
+	border-top: #a3bfa8 1px solid;
+	border-left: #a3bfa8 1px solid;
+	border-bottom: #a3bfa8 1px solid;
+	background-color: #fff
+}

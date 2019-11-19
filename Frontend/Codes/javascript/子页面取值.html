@@ -1,0 +1,18 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>father</title>
+</head>
+<body>
+    <iframe src="子页面.html"></iframe>
+    <input type="button" value="获取子页面元素" onclick="getChildElem()" />
+</body>
+</html>
+<script type="text/javascript">
+    function getChildElem() {
+        var iframes = document.getElementsByTagName('iframe');
+        var win = iframes[0].contentWindow;
+        var textElem = win.document.getElementById("_0_10_my:方舟型号");
+        alert(textElem ? textElem.innerHTML : "");
+    }
+</script>

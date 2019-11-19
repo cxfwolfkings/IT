@@ -1,0 +1,27 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>next的用法</title>
+    <script type="text/javascript" src="http://www.cssrain.cn/demo/jquery.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("span").click(function () { alert($("p").next(".selected").html()); })
+            // $("p").next().html()  也可以
+
+        });
+    </script>
+
+</head>
+<body>
+    <p>Hello</p><p class="selected">Hello cssrain.</p><div><span>点我测试</span></div>
+
+    <!--取得一个包含匹配的元素集合中每一个元素紧邻的后面同辈元素的元素集合。
+
+    这个函数只返回后面那个紧邻的同辈元素，而不是后面所有的同辈元素。
+
+    可以用一个可选的表达式进行筛选。
+    -->
+</body>
+</html> 

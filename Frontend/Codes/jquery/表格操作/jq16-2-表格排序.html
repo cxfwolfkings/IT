@@ -1,0 +1,61 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>animate</title>
+    <script type="text/javascript" src="jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#large").tableSorter({
+                // 为table 的tr供应一个数组
+                stripingRowClass: ['odd', 'even'],
+                // 初始值
+                stripeRowsOnStartUp: false
+            });
+        });
+    </script>
+    <style>
+        .odd {
+            color: red;
+        }
+
+        .even {
+            color: blue;
+        }
+    </style>
+
+</head>
+<body>
+    只做了一个简单的例子：
+    <table id="large">
+        <tr>
+            <td>demo1</td>
+            <td>22</td>
+            <td>张三</td>
+        </tr>
+        <tr>
+            <td>demo2</td>
+            <td>23</td>
+            <td>李四</td>
+        </tr>
+        <tr>
+            <td>demo3</td>
+            <td>24</td>
+            <td>王五</td>
+        </tr>
+        <tr>
+            <td>demo4</td>
+            <td>24</td>
+            <td>王五</td>
+        </tr>
+        <tr>
+            <td>demo5</td>
+            <td>24</td>
+            <td>王五</td>
+        </tr>
+
+    </table>
+</body>
+</html> 

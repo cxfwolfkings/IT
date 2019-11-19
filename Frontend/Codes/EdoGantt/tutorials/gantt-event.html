@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>监听事件和数据操作 | 开发手册 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">监听事件和数据操作</h1>
+    <div id="view" class="example-content">
+<h1>监听处理甘特图事件</h1>
+<p>当我们创建并显示一个甘特图组件后，我们需要进行操作，比如，拖拽调节开始日期、完成日期，调节完成百分比等。</p>
+<p>Edo.lists.Gantt其实只有一个操作事件"itemdragcomplete"，根据此事件对象action属性的不同，可以区分为是开始日期、完成百分比操作等类型。</p>
+<p>如下代码所示：</p><pre class="code"><span style="color: green">//监听gantt的拖拽操作事件
+</span>gantt.on(<span style="color: #a31515">'itemdragcomplete'</span>, <span style="color: blue">function</span>(e){    
+    <span style="color: blue">var </span>task = e.item;    
+    <span style="color: green">//获得操作后的值,将其覆盖掉任务原来的值,就修改了任务属性
+    </span><span style="color: blue">var </span>value = e[e.action];    
+    <span style="color: green">//设置后,不会因为任务多次操作,而不断引发视图刷新
+    </span>dataGantt.beginChange();    
+    <span style="color: blue">switch</span>(e.action){
+    <span style="color: blue">case </span><span style="color: #a31515">'Start'</span>:               <span style="color: green">//调节开始日期
+        </span>task.Start = value;
+    <span style="color: blue">break</span>;
+    <span style="color: blue">case </span><span style="color: #a31515">'Finish'</span>:              <span style="color: green">//调节完成日期
+        </span>task.Finish = value;
+    <span style="color: blue">break</span>;
+    <span style="color: blue">case </span><span style="color: #a31515">'PercentComplete'</span>:     <span style="color: green">//调节完成百分比
+        </span>task.PercentComplete = value;
+    <span style="color: blue">break</span>;
+    <span style="color: blue">case </span><span style="color: #a31515">'Item'</span>:        <span style="color: green">//拖拽整个ganttItem, 这里用来移动任务整个日期
+         </span>value = e.Start;        
+        <span style="color: blue">var </span>time = task.Finish.getTime() - task.Start.getTime();
+        task.Start = e.Start;
+        task.Finish = <span style="color: blue">new </span>Date(task.Start.getTime() + time);
+    <span style="color: blue">break</span>;
+    }
+    <span style="color: green">//在最后,只进行一次视图刷新, 提升操作性能和体验
+    </span>dataGantt.endChange();
+});</pre>
+<p>我们通过监听Edo.lists.Gantt对象的itemdragcomplete事件，对不同的操作类型进行不同的任务属性修改处理。</p>
+<p>下面是各种界面拖拽操作，对应的itemdragcomplete事件对象的action操作类型：</p>
+<div class="code">
+<p>Start：<img src="images/gantt3.png" /></p>
+<p>Finish：<img src="images/gantt5.png" /></p>
+<p>PercentComplete：<img src="images/gantt6.png" /></p>
+<p>Item：<img src="images/gantt4.png" /></p>
+</div>
+<p>注意，本例是简单的任务属性修改处理，只修改任务本身的属性。实际情况是，当一个任务的属性修改后，根据任务相关性和父子关系，会对其他任务造成“数据联动修改”，这就是复杂的项目管理功能逻辑了。</p>
+<p>总之，不管是简单还是复杂处理数据修改，itemdragcomplete事件是甘特图界面操作的数据修改入口点。</p>
+<h1>监听处理任务树事件</h1>
+<p>以上只说明了Edo.lists.Gantt对象的事件，事实上我们必须对Edo.lists.Tree树形组件也作出事件监听，因为一个标准的甘特图，不仅仅只有条形图，还有一个任务树。</p>
+<p>下面是Edo.lists.Tree的事件监听和处理代码：</p><pre class="code">tree.on(<span style="color: #a31515">'beforesubmitedit'</span>, <span style="color: blue">function</span>(e){
+    <span style="color: blue">var </span>task = <span style="color: blue">this</span>.data.getAt(e.row); <span style="color: green">//获得当前行任务对象
+    </span><span style="color: blue">var </span>column = <span style="color: blue">this</span>.columns[e.column]; <span style="color: green">//获得当前编辑的列对象
+    </span>dataGantt.beginChange();   
+    <span style="color: blue">switch</span>(column.dataIndex){
+    <span style="color: blue">case </span><span style="color: #a31515">'Name'</span>:        
+        task.Name = e.value;
+    <span style="color: blue">break</span>;
+    <span style="color: blue">case </span><span style="color: #a31515">'Start'</span>:        
+        task.Start = e.value;
+    <span style="color: blue">break</span>;
+    <span style="color: blue">case </span><span style="color: #a31515">'Finish'</span>:        
+        task.Finish = e.value;
+    <span style="color: blue">break</span>;
+    <span style="color: blue">case </span><span style="color: #a31515">'PercentComplete'</span>:        
+        task.PercentComplete = e.value;
+    <span style="color: blue">break</span>;
+    }
+    dataGantt.endChange();    
+    <span style="color: blue">return false</span>;       <span style="color: green">//这一行代码很重要, 表示本次单元格编辑, 不进行默认操作
+</span>});</pre>
+<p>以上这段Edo.lists.Tree的事件处理逻辑，跟Edo.lists.Gantt是十分类似的，这里同样进行了简单的任务修改处理，也可以进行复杂的项目管理功能逻辑处理。</p>
+<h1>Edo.data.DataGantt的任务操作方法</h1>
+<p>对任务的操作，还有很多其他逻辑，如新增、删除、修改、升级、降级等。这些操作方法，由Edo.data.DataGantt甘特图数据对象提供：</p>
+<p>下面来一一例举这些方法如何使用：</p>
+<p>新增任务</p><pre class="code"><span style="color: blue">var </span>p = dataGantt.findParent(task);        
+<span style="color: blue">var </span>index = p.children.indexOf(task);
+dataGantt.insert(index, {
+    UID: <span style="color: blue">new </span>Date().getTime(),
+    Name: <span style="color: #a31515">'&lt;新任务&gt;'</span>,
+    Start: <span style="color: blue">new </span>Date(2009, 0, 28),
+    Finish: <span style="color: blue">new </span>Date(2009, 0, 29),
+    PercentComplete: 0
+}, p);</pre>
+<p><a href="http://11011.net/software/vspaste"></a>删除任务</p><pre class="code">dataGantt.remove(task);</pre>
+<p><a href="http://11011.net/software/vspaste"></a>修改任务</p><pre class="code"><span style="color: green">//任意修改任务对象属性
+</span>task.Name = <span style="color: blue">new </span>Date(); 
+task.Start = task.Start.add(Date.DAY, 1);
+
+<span style="color: green">//...
+
+</span>dataGantt.endChange();</pre><a href="http://11011.net/software/vspaste"></a>
+<p>升级任务</p><pre class="code">dataGantt.upgrade(task);
+dataGantt.endChange();</pre>
+<p><a href="http://11011.net/software/vspaste"></a>降级任务</p><pre class="code">dataGantt.downgrade(task);
+dataGantt.endChange();</pre>
+<p>移动任务</p><pre class="code"><span style="color: blue">var </span>task = gantt.getSelected();
+<span style="color: blue">var </span>movetask = gantt.data.getAt(0);            
+<span style="color: green">//移动任务:add, append, preend三种方式
+</span>gantt.data.move(movetask, task, <span style="color: #a31515">'add'</span>);</pre><a href="http://11011.net/software/vspaste"></a>
+
+<p class="ttexamples">相关示例：<a href="../examples/event.html">事件监听和操作</a></p>
+<div class="toppage">
+    <a href="#">Top of this page</a>
+</div>
+    </div>        
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>
+<!--
+    scrollIntoTask
+    viewMode
+    dataView
+    
+    可编辑性控制
+    这些构思下怎么组织内容
+-->

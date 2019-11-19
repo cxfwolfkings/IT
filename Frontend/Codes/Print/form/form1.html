@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>表单页</title>
+    <meta charset="utf-8" />
+    <link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <object classid="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2" height="0" id="webrowser" name="webrowser" width="0"></object>
+    <div id="printArea" class="formbody">
+        <table style="width: 100%" class="printTable">
+            <tr>
+                <td>
+                    <div class="formtitle mainTitle"><span>药品配送单</span></div>
+                </td>
+            </tr>
+            <tr class="printTr">
+                <td>
+                    <div class="toolsli">
+                        <table id="tbBasic" class="sixfont" width="100%" border="0">
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px; width: 10%;"><strong>配送单号：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; width: 20%;"></td>
+                                <td align="right" valign="top" style="line-height: 35px; width: 10%;"><strong>操作人：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; width: 20%;"></td>
+                                <td align="right" valign="top" style="line-height: 35px; width: 10%;"><strong>状态：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; width: 10%; white-space: nowrap"></td>
+                                <td align="left" valign="top" style="line-height: 35px; width: 10%"></td>
+                                <td align="left" valign="top" style="line-height: 35px; width: 10%"></td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>发货药店：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>地址：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>联系人：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                                <td align="right" valign="top" style="line-height: 35px; white-space: nowrap"><strong>电话：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>收货方：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>地址：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>联系人：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                                <td align="right" valign="top" style="line-height: 35px; white-space: nowrap"><strong>电话：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px; white-space: nowrap"><strong>创建日期：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                                <td align="right" valign="top" style="line-height: 35px; white-space: nowrap"><strong>开始配送日期：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                                <td align="right" valign="top" style="line-height: 35px; white-space: nowrap"><strong>最晚送达日期：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px; white-space: nowrap"></td>
+                                <td align="right" valign="top" style="line-height: 35px;"></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>配送员：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>电话：</strong></td>
+                                <td align="left" valign="top" style="line-height: 35px;"></td>
+                                <td colspan="4" valign="top" rowspan="3" align="right" style="line-height: 35px;"></td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>证件号：</strong></td>
+                                <td colspan="3" valign="top" align="left" style="line-height: 35px;"></td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="top" style="line-height: 35px;"><strong>配送要求：</strong></td>
+                                <td colspan="3" valign="top" align="left" style="line-height: 35px;"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="formtitle">
+                        <span>药品信息</span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="printTr">
+                <td>
+                    <div class="toolsli">
+                        <table id="tbDrugs" class="tablelist" style="margin: 6px auto">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th style="white-space: nowrap">药品名称</th>
+                                    <th style="white-space: nowrap">品牌</th>
+                                    <th style="white-space: nowrap">规格</th>
+                                    <th style="white-space: nowrap">数量</th>
+                                    <th style="white-space: nowrap">单位</th>
+                                    <th style="white-space: nowrap">订单号</th>
+                                    <th style="white-space: nowrap">用药人</th>
+                                    <th style="white-space: nowrap">序列号</th>
+                                    <th style="white-space: nowrap">批号</th>
+                                    <th style="white-space: nowrap">有效期</th>
+                                    <th style="white-space: nowrap">来源</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="formtitle">
+                        <span>发货图片</span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="printTr">
+                <td>
+                    <div class="toolsli">
+                        <ul style="padding-left: 5px; overflow: hidden;">
+                            <table width="100%" border="0" cellspacing="3" cellpadding="3">
+                                <tr>
+                                    <td>
+                                        <div id="tbPhotos" class="picture1">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="footTitle">
+                        <span>收发货确认</span>
+                    </div>
+                    <div class="toolsli">
+                        <table id="tbSendInfo" width="100%" border="0" class="footTable">
+                            <tr>
+                                <td style="width: 50%; text-align: left">发货人：</td>
+                                <td style="width: 50%; text-align: left">收货人：</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%; text-align: left">发货时间：</td>
+                                <td style="width: 50%; text-align: left">收货时间：</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%; text-align: left">发货温度:</td>
+                                <td style="width: 50%; text-align: left">收货温度:</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
+<script type="text/javascript" src="../js/printPage.js"></script>
+<script type="text/javascript">
+    var hkey_root = "HKEY_CURRENT_USER";
+    var hkey_path = "\\Software\\Microsoft\\Internet Explorer\\PageSetup\\";
+    var hkey_key;
+    function doPrint() {
+        try {
+            // 设置打印页的边距和页眉页脚
+            //setupPage();
+            doPrintView();
+        } catch (e) {
+            alert("打印失败!");
+        }
+    }
+</script>

@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" /> 
+<title>hello world</title> 
+<script type="text/javascript" src="../JS_Library/jquery/jquery-1.11.3.min.js"></script> 
+<script type="text/javascript"> 
+$(document).ready(function(){
+	var btn = document.getElementById("btn");
+	var btnRect = btn.getBoundingClientRect();//获得在视口坐标中位置
+	var offsets = getScrollOffsets();
+	console.log(getViewportSize());
+	var x = btnRect.left+offsets.x;//转换为文档坐标
+	var y = btnRect.top+offsets.y;
+	var w = btnRect.width||(btnRect.right-btnRect.left);
+	var h = btnRect.height||(btnRect.bottom-btnRect.top);
+	console.log({x:x,y:y,w:w,h:h});
+	var objs = document.elementFromPoint(8,8);//返回那个点的最里面的和最上面的元素(视口坐标)
+	$(window).scroll(function(){
+		var offsets = getScrollOffsets();
+		var leftX = 8+offsets.x;
+		$("#btn").offset({top:8,left:leftX});
+	});
+}); 
+//以一个对象的x和y属性的方式返回滚动条的偏移量
+function getScrollOffsets(w){
+	//使用指定的窗口，如果不带参数就是用当前窗口
+	w = w || window;
+	//除了IE8及更早的版本外，其它浏览器都能用
+	if(w.pageXOffset != null)
+		return {x:w.pageXOffset,y:w.pageYOffset};
+	//对标准模式下的IE(或任何浏览器)
+	var d = w.document;
+	if(document.compatMode == "CSS1Compat")//IE的渲染模式
+		return {x:d.documentElement.scrollLeft,y:d.documentElement.scrollTop};
+	//对怪异模式下的浏览器
+	return {x:d.body.scrollLeft,y:d.body.scrollTop};
+}
+
+//作为一个对象的w和h属性返回窗口尺寸
+function getViewportSize(w){
+	//使用指定的窗口，如果不带参数就使用当前窗口
+	w = w || window;
+	//除了IE8及更早的版本外，其它浏览器都能用
+	if(w.innerWidth != null)
+		return {w:w.innerWidth,h:w.innerHeight};
+	//对标准模式下的IE(或任何浏览器)
+	var d = w.document;
+	if(document.compatMode == "CSS1Compat")
+		return {w:d.documentElement.clientWidth,h:d.documentElement.clientHeight};
+	//对怪异模式下的浏览器
+	return {w:d.body.clientWidth,h:d.body.clientHeight};
+}
+</script> 
+</head> 
+<body> 
+	<input type="button" id="btn" value="Move"/>
+	<div style="width:2000px;border:thin solid">
+			Buttons moveby scroll demo!
+	</div>
+</body> 
+</html> 

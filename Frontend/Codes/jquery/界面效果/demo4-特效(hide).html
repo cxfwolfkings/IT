@@ -1,0 +1,28 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>hello world</title>
+    <script type="text/javascript" src="http://www.cssrain.cn/demo/jquery.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").click(function () {
+                $(this).hide("slow");
+                return false;
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    <a href="http://www.cssrain.cn">
+        Effects Module(效果模块)
+        现在，只要你点击超链接，超链接就会慢慢的消失。
+        “return false"表示保留默认行为，因此页面不会跳转。
+    </a>
+    <hr />
+    <a href="http://www.cssrain.cn">我也是一个段落文本,单击我也弹出hello world  .---单击我</a>
+</body>
+</html> 

@@ -1,0 +1,36 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>选择器--组</title>
+    <script type="text/javascript" src="../js/jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btn1").click(function () { $("p,#cssrain_id,.cssrain_class").addClass("cssrain_a"); });
+        });
+    </script>
+
+    <style type="text/css">
+        .cssrain_a {
+            background: #daf;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="button" id="btn1" value="测试-组" />
+
+    <p> cssrain--$("标签名") </p>
+
+    <div class="cssrain_class">--$(".class名")</div>
+
+    <div id="cssrain_id">--$("#id名")</div>
+
+    <!-- 下面还是现做一个约定:把"标签名或#id名或.class名"记作mix,则mix表示一个标签名,或一个#id或一个.class.
+    $("mix,mix,mix,..."),如:$("div,#test1,p,.test2,#test3")  -->
+
+
+
+</body>
+</html> 

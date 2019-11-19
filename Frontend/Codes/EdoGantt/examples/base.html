@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>基础甘特图 | 在线示例 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">在线演示: 基础甘特图</h1>
+    <div id="view" class="example-content">
+        日期模式: 
+        <select id="dateview" onchange="changeDateView()">
+            <option value="year-quarter">年/季</option>
+            <option value="year-month">年/月</option>
+            <option value="year-week">年/周</option>
+            <option value="year-day">年/日</option>                    
+            <option value="quarter-month">季/月</option>
+            <option value="year-week">季/周</option>
+            <option value="year-day">季/日</option>            
+            <option value="month-week">月/周</option>
+            <option value="month-day">月/日</option>
+            <option selected value="week-day">周/日</option>
+            <option value="week-hour">周/时</option>
+        </select>&nbsp;&nbsp;&nbsp;&nbsp;
+        视图模式:
+        <select id="viewmode" onchange="changeViewMode()">
+            <option value="gantt">甘特图</option>
+            <option value="track">跟踪甘特图</option>
+        </select>
+        <br /><br />
+    </div>
+    
+    <h1 class="example-title2">范例说明</h1>
+    <div class="example-content">
+        
+    </div>
+    <p class="ttexamples">相关教程：         
+        <a href="../tutorials/gantt-data.html">甘特图数据结构</a>
+        <a href="../tutorials/gantt-class.html">甘特图组件和数据对象</a>
+    </p>
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>
+
+<!--edo css-->
+<link href="../scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="../scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+<!--edo js-->
+<script src="../scripts/edo/edo.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+//创建易度甘特图, 只需要一个简单的树形结构.
+var ganttData = 
+[
+    {
+        UID: 1,                                 //唯一标识符
+        Name: 'task1',                          //任务名称
+        Start: new Date(2009, 1, 2),            //开始日期
+        Finish: new Date(2009, 1, 5),           //完成日期
+        Critical: 1,                            //关键任务
+        PercentComplete: 80,                    //完成百分比                
+        Baseline: [                             //比较基准
+            {
+                Start: new Date(2009, 1, 2),
+                Finish: new Date(2009, 1, 3),
+                Duration: 123
+            }            
+        ]
+    },
+    {
+        UID: 2,                                 //唯一标识符
+        Name: 'task2',                          //任务名称
+        Start: new Date(2009, 1, 2),            //开始日期
+        Finish: new Date(2009, 1, 3),           //完成日期
+        Critical: 1,                            //关键任务
+        PercentComplete: 80,                    //完成百分比
+        Summary: 1,                             //摘要        
+        children: [
+            {
+                UID: 3,
+                Name: 'task3',
+                Milestone: 1,                   //里程碑
+                PercentComplete: 100,
+                Start: new Date(2009, 1, 3),
+                Finish: new Date(2009, 1, 3),
+                PredecessorLink: [              //前置任务
+                    {
+                        PredecessorUID: 1,      //前置任务UID
+                        Type: 1                 //任务相关性类型
+                    }
+                ]
+            }
+        ]
+    }    
+]
+
+//创建一个Edo.data.DataGantt甘特图数据对象
+var dataGantt = new Edo.data.DataGantt(ganttData);
+Edo.build({
+    id: 'gantt',
+    type: 'gantt',                      //甘特图显示组件
+    width: 700,                         //宽度
+    height: 350,                        //高度    
+    startDate: new Date(2009, 0, 28),   //甘特图显示开始日期
+    finishDate: new Date(2009, 1, 30),  //甘特图显示截止日期     
+    data: dataGantt,                    //将甘特图数据对象,设置给甘特图显示组件    
+    render: document.getElementById('view')
+});
+
+gantt.set('startDate', new Date(2009, 0, 28));
+gantt.set('finishDate', new Date(2010, 1, 1));
+
+//使甘特图可拖拽调节大小
+Edo.managers.ResizeManager.reg({
+    target: gantt
+});
+
+//改变甘特图日期视图模式
+function changeDateView(){
+    gantt.set('dateView', Edo.getDom('dateview').value);
+}
+function changeViewMode(){
+    gantt.set('viewMode', Edo.getDom('viewMode').value);
+}
+</script>

@@ -1,0 +1,76 @@
+﻿/*
+	基础样式:
+1.浏览器元素重置 reset
+2.配合Edo.util命名空间下的基础跨浏览器层操作
+*/
+html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}img,body,html{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}ol,ul {list-style:none;}caption,th {text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;}q:before,q:after{content:'';}
+
+.e-repaint {
+    zoom: 1;
+    background-color: transparent;
+    -moz-outline: none;
+}
+
+.e-clear {
+    clear:both;
+    height:0;
+    overflow:hidden;
+    line-height:0;
+    font-size:0;
+}
+
+.e-disabled {
+    color: gray;
+    cursor: default;
+    opacity: .7;
+    -moz-opacity: .7;
+    filter: alpha(opacity=70);
+}
+
+.e-disabled * {
+    color: gray !important;
+    cursor: default !important;
+}
+
+.e-unselectable, .e-unselectable * 
+{
+    -moz-user-select: none;
+    -khtml-user-select: none;
+}
+
+.e-mask
+{
+	position:absolute;left:0px;top:0px;width:100%;height:100%;z-index: 10000;overflow:hidden;
+}
+.e-mask-cover {
+    position: absolute;top:0;left:0;-moz-opacity: 0.3;opacity: .30;filter: alpha(opacity=30);background-color:#777;width: 100%;height: 100%;zoom: 1;
+    height: 3000px;
+}
+.e-mask-cover-zero
+{
+	-moz-opacity: 0.1;opacity: .0;filter: alpha(opacity=0);
+}
+.e-mask-loading
+{
+	background:url(../images/icons/large-loading.gif) center center no-repeat;	
+	width:32px;height:32px;position:absolute;left:50%;top:50%;margin-left:-16px;margin-top:-16px;
+}
+
+.ie .e-masked select, .ie .e-masked object, .ie .e-masked embed {
+    visibility: hidden;
+}
+body.e-masked
+{
+	height:auto;
+}
+
+.e-shadow {
+    -moz-box-shadow:2px 2px 4px 0px #666666;
+    -webkit-box-shadow:2px 2px 4px 0px #666666;
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#888888,direction=135,strength=3);   
+}   
+
+body
+{
+	background:white;
+}

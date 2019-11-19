@@ -1,0 +1,94 @@
+<html>    
+<head>    
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Rect</title>       
+<script type="text/javascript">
+	var Rect = { 
+        obj: null,//当前正在画的矩形对象
+        container: null,//画布
+		init: function(containerId){ //初始化函数
+			Rect.container = document.getElementById(containerId); 
+            if(Rect.container){
+                Rect.container.onmousedown = Rect.start;//鼠标按下时开始画
+            }else{
+				alert('You should specify a valid container!');
+            }
+        },
+        start: function(e){
+			var o = Rect.obj = document.createElement('div');
+			o.style.position = "absolute";
+            // mouseBeginX，mouseBeginY是辅助变量，记录下鼠标按下时的位置
+            o.style.left = o.mouseBeginX = Rect.getEvent(e).x;
+            o.style.top = o.mouseBeginY = Rect.getEvent(e).y;
+            o.style.height = 0;
+            o.style.width = 0;
+            o.style.border = "dotted black 1px";
+            //向o添加一个叉叉，点击叉叉可以删除这个矩形
+            var deleteLink = document.createElement('a');
+            deleteLink.href="#";
+            deleteLink.onclick = function(){
+				Rect.container.removeChild(this.parentNode);
+				//this.parentNode.style.display = "none";
+                //alert(this.tagName);
+            }
+            deleteLink.innerText = "x";    
+            o.appendChild(deleteLink);
+            //把当前画出的对象加入到画布中
+            Rect.container.appendChild(o);
+            //处理onmousemove事件
+            Rect.container.onmousemove = Rect.move;
+            //处理onmouseup事件
+            Rect.container.onmouseup = Rect.end;
+        },
+        move: function(e){
+            var o = Rect.obj;
+            //dx，dy是鼠标移动的距离
+            var dx = Rect.getEvent(e).x - o.mouseBeginX;
+            var dy = Rect.getEvent(e).y - o.mouseBeginY;
+            //如果dx，dy <0,说明鼠标朝左上角移动，需要做特别的处理
+            if(dx<0){
+                o.style.left = Rect.getEvent(e).x;
+            }
+            if(dy<0){
+                o.style.top = Rect.getEvent(e).y;
+            }
+            o.style.height = Math.abs(dy);
+            o.style.width = Math.abs(dx);
+        },
+        end: function(e){
+            //onmouseup时释放onmousemove，onmouseup事件句柄
+            Rect.container.onmousemove = null;
+            Rect.container.onmouseup = null;
+            Rect.obj = null;
+        },
+        //辅助方法，处理IE和FF不同的事件模型
+        getEvent: function(e){
+			if (typeof e == 'undefined'){
+				e = window.event;
+			}
+			//alert(e.x?e.x : e.layerX);
+			if(typeof e.x == 'undefined'){
+				e.x = e.layerX;
+			}
+			if(typeof e.y == 'undefined'){
+				e.y = e.layerY;
+			}
+			return e;
+		}
+   };
+</script>   
+</head>   
+<body>   
+<div id="main" style="border: solid red 1px; height:90%; width:60%; curssor: default;"></div>
+增加一个按钮，可以关闭绘画效果，用来配合测试删除功能
+<input type="button" value="停止绘画" id="t"/>
+</body>   
+<script type="text/javascript"> 
+    //测试代码开始
+    //初始化
+    Rect.init("main");   
+    document.getElementById('t').onclick = function(){
+		Rect.container.onmousedown = null;
+    };
+</script>
+</html>

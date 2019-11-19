@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>可编辑性控制 | 在线示例 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<div id="top" style="height:50px;border:solid 1px black;padding:10px;">
+    页面头部
+</div>
+<div id="view">
+    
+</div>
+</body>
+</html>
+
+<!--edo css-->
+<link href="../scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="../scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+<!--edo js-->
+<script src="../scripts/edo/edo.js" type="text/javascript"></script>
+
+<script src="../data/ganttdata.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+var dataGantt = new Edo.data.DataGantt(ganttData);
+
+Edo.build({
+    id: 'gantt',
+    type: 'gantt',
+    
+    //开始日期  (startDate和finishDate控制甘特图的日期显示范围)
+    startDate: new Date(2009, 0, 28),
+    //截止日期 
+    finishDate: new Date(2011, 1, 30),
+    
+    data: dataGantt,
+    
+    render: document.getElementById('view')
+});
+
+//将甘特图撑满页面
+function onWindowResize(){    
+    var size = Edo.util.Dom.getViewSize(document);
+    var hdSize = Edo.util.Dom.getSize(document.getElementById('top'));
+    
+    gantt.set({
+        width: size.width,
+        height: size.height - hdSize.height
+    });
+    
+}
+Edo.util.Dom.on(window, 'resize', onWindowResize);
+
+onWindowResize();
+
+</script>

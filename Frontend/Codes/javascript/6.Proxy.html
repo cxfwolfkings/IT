@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+
+</body>
+</html>
+<script type="text/javascript" src="js/helper.js"></script>
+<script type="text/javascript">
+    var Button = new Class;
+    Button.include({
+        init: function (element) {
+            this.element = jQuery(element);
+            // 代理了这个click 函数
+            this.element.click(this.proxy(this.click));
+        },
+        click: function () { /* ... */ }
+    });
+    // 如果我们没有使用proxy将click()的回调包装起来，它就会基于上下文this.element来调用，而不是Button 
+
+    /*
+        在新版本的JavaScript——ECMAScript 5（ES5）中同样加入了bind() 函数用以控制调用的作用域。bind() 是基于函数进行调用的，
+        用来确保函数是在指定的this 值所在的上下文中调用。
+    */
+    Button = new Class;
+    Button.include({
+        init: function (element) {
+            this.element = jQuery(element);
+            // 绑定这个click 函数
+            this.element.click(this.click.bind(this));
+        },
+        click: function () { /* ... */ }
+    });
+
+    // 老版本的浏览器不支持bind()，幸运的是，如果需要的话可以手动实现它。
+    if (!Function.prototype.bind) {
+        Function.prototype.bind = function (obj) {
+            var slice = [].slice,
+            args = slice.call(arguments, 1),
+            self = this,
+            nop = function () { },
+            bound = function () {
+                return self.apply(this instanceof nop ? this : (obj || {}),
+                    args.concat(slice.call(arguments)));
+            };
+            nop.prototype = self.prototype;
+            bound.prototype = new nop();
+            return bound;
+        };
+    }
+</script>

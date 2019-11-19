@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>photoswipe 插件应用程序</title>
+    <meta name="viewport" content="width=device-width, 
+          initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" /> 
+    <link  href="Css/jquery.mobile-1.0.1.min.css" 
+           rel="Stylesheet" type="text/css" />
+    <link  href="Css/Css6.1/photoswipe.css" 
+           rel="Stylesheet" type="text/css" />
+    <script src="Js/Js6.1/klass.min.js" 
+           type="text/javascript"></script>
+    <script src="Js/jquery-1.6.4.js" 
+           type="text/javascript"></script>
+    <script src="Js/jquery.mobile-1.0.1.js" 
+           type="text/javascript"></script>
+    <script src="Js/Js6.1/photoswipe.js" 
+           type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#bookpic").live("pageshow", function(e) {
+                //实例化滑动图片对象
+                var currentPage = $(e.target),
+					options = {},
+					photoSwipeInstance = $("ul.gallery a", e.target).photoSwipe(options, currentPage.attr("id"));
+                return true;
+            }).live("pagehide", function(e) {
+                var currentPage = $(e.target),
+					photoSwipeInstance = PhotoSwipe.getInstance(currentPage.attr("id"));
+                //分离图片列表与单个图片效果
+                if (typeof photoSwipeInstance != "undefined" && photoSwipeInstance != null) {
+                    PhotoSwipe.detatch(photoSwipeInstance);
+                }
+                return true;
+            })
+        })
+	</script>
+</head>
+<body>
+<div data-role="page">
+   <div data-role="header"><h1>相册集</h1></div>
+   <div data-role="content">
+     <ul data-role="listview" data-inset="true">
+       <li data-role="list-divider">请选择所属专题</li>
+	   <li><a href="#bookpic">图书作品集</a></li> 
+	   <li><a href="#">个人生活集</a></li> 
+	 </ul> 
+   </div>
+   <div data-role="footer"><h4>phonegap100中文网</h4></div>
+</div>
+<div data-role="page" id="bookpic" data-add-back-btn="true">
+   <div data-role="header"><h1>图书作品</h1></div>
+   <div data-role="content">
+      <ul class="gallery">
+        <li><a href="Images/Img6.1/pic08.jpg" rel="external">
+              <img src="Images/Img6.1/pic08.jpg" alt="2008年图书作品" title=""/>
+        </a></li>
+        <li><a href="Images/Img6.1/pic09.jpg" rel="external">
+              <img src="Images/Img6.1/pic09.jpg" alt="2009年图书作品" title=""/>
+        </a></li>
+        <li><a href="Images/Img6.1/pic10.jpg" rel="external">
+              <img src="Images/Img6.1/pic10.jpg" alt="2010年图书作品" title=""/>
+        </a></li>
+        <li><a href="Images/Img6.1/pic11.jpg" rel="external">
+              <img src="Images/Img6.1/pic11.jpg" alt="2011年图书作品" title=""/>
+        </a></li>
+    </ul>  
+   </div>
+   <div data-role="footer"><h4>phonegap100中文网</h4></div>
+</div>
+</body>
+</html>

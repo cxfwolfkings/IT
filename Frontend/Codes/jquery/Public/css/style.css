@@ -1,0 +1,206 @@
+.clearfix {
+  zoom: 1;
+}
+.clearfix:before, .clearfix:after {
+  content: "";
+  display: table;
+}
+.clearfix:after {
+  clear: both;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  background: #1d1d1f;
+  font-family: 'lato', helvetica, arial, sans-serif;
+  color: white;
+}
+
+#wrapper {
+  display: block;
+  width: 90%;
+  margin: 50px auto;
+}
+
+.slider-outer {
+  display: block;
+  width: 100%;
+  height: 250px;
+  position: relative;
+  -webkit-perspective: 1600px;
+  -moz-perspective: 1600px;
+  -o-perspective: 1600px;
+  -ms-perspective: 1600px;
+}
+.slider-outer .slider-inner {
+  display: block;
+  width: 100%;
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  -o-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  -webkit-transition: all 0.3s linear;
+  -moz-transition: all 0.3s linear;
+  -o-transition: all 0.3s linear;
+  -ms-transition: all 0.3s linear;
+  -webkit-transform-origin: 50% 100%;
+  -moz-transform-origin: 50% 100%;
+  -o-transform-origin: 50% 100%;
+  -ms-transform-origin: 50% 100%;
+}
+.slider-outer .slider-inner.rotate.two {
+  -webkit-transform: rotateX(-90deg) translateZ(250px);
+  -moz-transform: rotateX(-90deg) translateZ(250px);
+  -o-transform: rotateX(-90deg) translateZ(250px);
+  -ms-transform: rotateX(-90deg) translateZ(250px);
+}
+.slider-outer .slider-inner.rotate.three {
+  -webkit-transform: rotateX(-180deg) translateY(-250px) translateZ(250px);
+  -moz-transform: rotateX(-180deg) translateY(-250px) translateZ(250px);
+  -o-transform: rotateX(-180deg) translateY(-250px) translateZ(250px);
+  -ms-transform: rotateX(-180deg) translateY(-250px) translateZ(250px);
+}
+.slider-outer .slider-inner.rotate.four {
+  -webkit-transform: rotateX(-270deg) translateY(-250px);
+  -moz-transform: rotateX(-270deg) translateY(-250px);
+  -o-transform: rotateX(-270deg) translateY(-250px);
+  -ms-transform: rotateX(-270deg) translateY(-250px);
+}
+.slider-outer .slide {
+  display: block;
+  width: 100%;
+  height: 250px;
+  position: absolute;
+  background: white;
+  background-color: #ededed;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(#ededed));
+  background-image: -webkit-linear-gradient(top, white, #ededed);
+  background-image: -moz-linear-gradient(top, white, #ededed);
+  background-image: -o-linear-gradient(top, white, #ededed);
+  background-image: linear-gradient(to bottom, white, #ededed);
+  padding: 27px;
+  color: #4ecdc4;
+  overflow: hidden;
+  -webkit-transform-origin: 0% 0%;
+  -moz-transform-origin: 0% 0%;
+  -o-transform-origin: 0% 0%;
+  -ms-transform-origin: 0% 0%;
+}
+.slider-outer .slide .slide-title {
+  display: block;
+  position: relative;
+  font-size: 70px;
+  font-weight: 100;
+  z-index: 12;
+}
+.slider-outer .slide i {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: -10px;
+  font-size: 300px;
+  color: #c7f464;
+  z-index: 11;
+  text-shadow: 1px 2px 1px rgba(0, 0, 0, 0.1);
+}
+.slider-outer .slide.top {
+  background: #556270;
+  background-color: #46505c;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#556270), to(#46505c));
+  background-image: -webkit-linear-gradient(top, #556270, #46505c);
+  background-image: -moz-linear-gradient(top, #556270, #46505c);
+  background-image: -o-linear-gradient(top, #556270, #46505c);
+  background-image: linear-gradient(to bottom, #556270, #46505c);
+  -webkit-transform: rotateX(90deg) translateY(-250px);
+  -moz-transform: rotateX(90deg) translateY(-250px);
+  -o-transform: rotateX(90deg) translateY(-250px);
+  -ms-transform: rotateX(90deg) translateY(-250px);
+}
+.slider-outer .slide.back {
+  background: #ff6b6b;
+  color: white;
+  background-color: #ff4747;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ff6b6b), to(#ff4747));
+  background-image: -webkit-linear-gradient(top, #ff6b6b, #ff4747);
+  background-image: -moz-linear-gradient(top, #ff6b6b, #ff4747);
+  background-image: -o-linear-gradient(top, #ff6b6b, #ff4747);
+  background-image: linear-gradient(to bottom, #ff6b6b, #ff4747);
+  -webkit-transform: rotateX(180deg) translateY(-250px) translateZ(250px);
+  -moz-transform: rotateX(180deg) translateY(-250px) translateZ(250px);
+  -o-transform: rotateX(180deg) translateY(-250px) translateZ(250px);
+  -ms-transform: rotateX(180deg) translateY(-250px) translateZ(250px);
+}
+.slider-outer .slide.bottom {
+  background: #4ecdc4;
+  background-color: #36c1b7;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#4ecdc4), to(#36c1b7));
+  background-image: -webkit-linear-gradient(top, #4ecdc4, #36c1b7);
+  background-image: -moz-linear-gradient(top, #4ecdc4, #36c1b7);
+  background-image: -o-linear-gradient(top, #4ecdc4, #36c1b7);
+  background-image: linear-gradient(to bottom, #4ecdc4, #36c1b7);
+  color: white;
+  -webkit-transform: rotateX(-90deg) translateZ(250px);
+  -moz-transform: rotateX(-90deg) translateZ(250px);
+  -o-transform: rotateX(-90deg) translateZ(250px);
+  -ms-transform: rotateX(-90deg) translateZ(250px);
+}
+
+#nav {
+  display: block;
+  position: relative;
+  width: 100%;
+  margin-top: 27px;
+  z-index: 10;
+}
+#nav ul {
+  display: block;
+  padding: 0;
+  margin: 0 0 0;
+  list-style: none;
+  width: 190px;
+  margin: 0 auto;
+  text-align: left;
+}
+#nav ul li {
+  display: block;
+  float: left;
+  margin-right: 10px;
+  font-size: 18px;
+}
+#nav ul li:nth-of-type(4) {
+  margin-right: 0;
+}
+#nav ul li a.btn {
+  display: block;
+  width: 40px;
+  height: 40px;
+  color: white;
+  border: 3px solid white;
+  border-radius: 30px;
+  font-weight: 300;
+  line-height: 35px;
+  text-align: center;
+  text-decoration: none;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  -o-transition: all 0.2s linear;
+  -ms-transition: all 0.2s linear;
+}
+#nav ul li a.btn:focus, #nav ul li a.btn:hover {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+#nav ul li a.btn:active {
+  color: #c44d58;
+  border-color: #c44d58;
+}
+#nav ul li a.btn.focus {
+  color: #c7f464;
+  border-color: #c7f464;
+}

@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+
+</body>
+</html>
+<script type="text/javascript" src="js/helper.js"></script>
+<script type="text/javascript">
+    var Person = function (name) {
+        this.name = name;
+    };
+    // 实例化一个Person
+    var alice = new Person('alice');
+    console.log(alice);
+    // 检查这个实例
+    assert(alice instanceof Person);
+    // 不要这么做!
+    var bob = Person('bob'); //=> undefined
+    // 这个函数执行上下文是window（全局）对象，你无意间创建了一个全局变量name。调用构造函数时不要丢掉 new 关键字。
+    console.log(bob);
+    // 当使用 new 关键字来调用构造函数时，执行上下文从全局对象（window）变成一个空的上下文，这个上下文代表了新生成的实例。
+    // 因此，this 关键字指向当前创建的实例。
+
+    var Person1 = new Class;
+    Person1.prototype.init = function () {
+        // 基于Person 的实例做初始化
+    };
+    // 用法：
+    var person = new Person1;
+
+    // 在JavaScript 中，在构造函数中给类添加函数和给对象添加属性是一模一样的
+    Person1.find = function (id) { /*...*/ };
+    person = Person1.find(1);
+</script>

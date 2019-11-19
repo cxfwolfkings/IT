@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>加载显示MS Project XML文件 | 在线示例 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">在线演示: 加载显示MS Project XML文件</h1>
+    <div id="view" class="example-content">
+        
+    </div>
+    
+    <h1 class="example-title2">范例说明</h1>
+    <div class="example-content">
+        
+    </div>
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>
+
+<!--edo css-->
+<link href="../scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="../scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+<!--edo js-->
+<script src="../scripts/edo/edo.js" type="text/javascript"></script>
+
+<script src="../data/baseganttdata.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+Edo.build({
+    id: 'gantt',
+    type: 'gantt',
+    width: 700,
+    height: 350,
+    
+    startDate: new Date(2009, 0, 28),    
+    finishDate: new Date(2011, 1, 30),
+    
+    render: document.getElementById('view')
+});
+
+Edo.managers.ResizeManager.reg({
+    target: gantt
+});
+
+Edo.util.Ajax.request({
+    url: '../data/soft.xml',
+    type: 'get',
+    onSuccess: function(text){
+        //将ms project xml转换成json格式
+        var data = fromMSProject(text);
+        
+        gantt.set('startDate', data.StartDate);
+        gantt.set('finishDate', data.FinishDate);
+        gantt.set('data', data.Tasks); 
+    }
+});
+
+//将MS Project的XML数据, 转换成JSON
+function fromMSProject(xml){
+    var data = Edo.util.XmlToJson(xml);
+    var tasks = data.Tasks.Task;
+    delete data.Tasks;
+    
+    var format = 'Y-m-dTH:i:s';
+    function covertDate(v){
+        
+        return parseDate(v, format);
+    }
+    function convertBool(v){
+        return v == 1 ? 1 : 0;
+    }
+    
+    var projectCvt = new Edo.data.Convertor().set({
+        fields: [
+            {name: 'StartDate',convert: covertDate},
+            {name: 'FinishDate', convert: covertDate}
+        ]
+    });  
+    var taskCvt = new Edo.data.Convertor().set({
+        fields: [
+            {name: 'Start', mapping: 'Start', convert: covertDate},
+            {name: 'Finish', mapping: 'Finish', convert: covertDate},
+                        
+            {name: 'Summary', convert: convertBool},
+            {name: 'Milestone', convert: convertBool},
+            {name: 'Critical', convert: convertBool},
+            
+            {name: 'ID', type: 'int'},
+            {name: 'Duration', type: 'int'},
+            {name: 'PercentComplete', type: 'int'},
+            
+            {name: 'PredecessorLink', type: 'array'},
+            {name: 'Baseline', type: 'array'}
+        ]
+    });  
+    
+    data = projectCvt.convertObject(data);
+    
+    tasks = taskCvt.convert(tasks);
+    if(tasks[0].ID == 0) tasks.removeAt(0);
+    
+    data.Tasks = tasks;        
+    
+    return data;
+    
+}
+function parseDate(input, format) {
+    if(!input) return;
+    if(input.format) return input;
+    var p = Date.parseFunctions;
+    if (p[format] == null) {
+        Date.createParser(format);
+    }
+    var func = p[format];
+    return Date[func](input);
+}
+</script>

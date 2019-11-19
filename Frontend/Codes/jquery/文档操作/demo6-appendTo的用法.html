@@ -1,0 +1,39 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>appendTo的用法</title>
+    <script type="text/javascript" src="jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#head2").click(function () {
+                $("<input type='text' name='ddd' id='ddd' value='hello ,cssrain..' ><br>").appendTo("#ccc");
+            });
+
+            $("#head1").click(function () {
+                $("#rain").append("<input type='text' name='ddd' id='ddd' value='hello ,cssrain..' ><br>");
+            });
+
+        });
+    </script>
+
+</head>
+<body>
+
+    <input type="button" name="head2" id="head2" value="appendTo" /><br />
+
+    <input type="button" name="head1" id="head1" value="appendTo" /><br />
+
+
+    <div name="ccc" id="ccc">看这里的变化</div><br />
+    <!--这里我们必须知道一点：
+    就是 append和appendTo的区别：
+    append 单纯的内容
+    appendTo要把内容传给某个元素
+    -->
+
+    <div name="rain" id="rain">看这里的变化</div><br />
+</body>
+</html> 

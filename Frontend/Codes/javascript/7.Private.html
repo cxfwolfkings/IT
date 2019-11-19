@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+
+</body>
+</html>
+<script type="text/javascript" src="js/helper.js"></script>
+<script type="text/javascript">
+    /*
+        JavaScript 的确支持不可变属性，然而在主流浏览器中并未实现，我们还没办法直接利用这个特性。
+        相反，我们可以利用JavaScript 匿名函数来创建私有作用域，这些私有作用域只能在内部访问。
+        我们将类的属性都包装进一个匿名函数中，然后创建了局部变量（findById），这些局部变量只能在当前作用域中被访问到。
+        Person 变量是在全局作用域中定义的，因此可以在任何地方都能访问到。
+    */
+    var Person = function () { };
+    (function () {
+        var findById = function () { /* ... */ };
+        Person.find = function (id) {
+            if (typeof id == "integer")
+                return findById(id);
+        };
+    })();
+    // 定义变量的时候不要丢掉var 运算符，因为如果丢掉var 就会创建全局变量。如果你需要定义全局变量，在全局作用域中定义它或者定义为window 的属性
+    (function (exports) {
+        var foo = "bar";
+        // 将变量暴露出去
+        exports.foo = foo;
+    })(window);
+    assertEqual(foo, "bar");
+</script>

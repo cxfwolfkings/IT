@@ -1,0 +1,37 @@
+﻿<link rel="stylesheet" href="../Public/css/jquery.datepick.css" type="text/css">
+<script type="text/javascript" src="../Public/js/jquery-1.4.2.js"></script>
+<script type="text/javascript" src="../Public/js/jquery.datepick.js"></script>
+<script type="text/javascript" src="../Public/js/jquery.datepick-zh-CN.js"></script>
+<div>jQuery插件datePicker日期选择器</div>
+出生日期:<input type="text" name="time" class="biuuu" /><br>
+工作日期:<input type="text" name="time" class="biuuu" /><br>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.biuuu').datepick({ dateFormat: 'yy-mm-dd' });
+    });
+</script>
+
+<!--
+如何使用jquery的日期插件
+   * 引入jquery的js文件
+     <script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
+
+   * 引入日期插件的文件
+      * 日期插件的js文件
+        <script type="text/javascript" src="./jquery.datepick.js"></script>
+      * 日期插件的css文件
+        <link rel="stylesheet" href="./jquery.datepick.css" type="text/css">
+      * 日期插件的c汉化文件
+        <script type="text/javascript" src="./jquery.datepick-zh-CN.js"></script>
+
+   * 在jsp页如何使用
+      * 定义文本框
+         出生日期:<input type="text" name="time" value="2009-2-9"  class="biuuu" /><br>
+         工作日期:<input type="text" name="time" value="2009-2-9"  class="biuuu" /><br>
+
+     * 代码如下
+      $(document).ready(function(){
+          $('.biuuu').datepick({dateFormat: 'yy-mm-dd'});
+       });
+
+-->

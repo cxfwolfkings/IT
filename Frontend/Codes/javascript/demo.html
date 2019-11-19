@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+
+</body>
+</html>
+<script type="text/javascript">
+    var Class = function () {
+        var klass = function () {
+            this.init.apply(this, arguments);
+        };
+        klass.prototype.init = function () { };
+        return klass;
+    };
+
+    var Person = new Class;
+    Person.prototype.init = function () {
+        // 基于Person 的实例做初始化
+    };
+    // 用法：
+    var person = new Person;
+</script>

@@ -1,0 +1,637 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>formvalidate帮助文档</title>
+<style type="text/css" media="all">
+body,div{font-size:12px; margin:10px;}
+table {
+	font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+<form name="form1" method="post" action="">
+  <p><font color="#000000" size="6"><strong>jQuery formvalidator插件 API帮助文档</strong></font></p>
+  <table width="610" border="0" cellspacing="0" cellpadding="2">
+    <tr valign="top"> 
+      <td colspan="4"> <p>目前支持4种大的校验方式，分别是：InputValidator（针对input、textarea、select控件）、CompareValidator、AjaxValidator、RegexValidator、FunctionValidator<br>
+          每种格式支持的控件类型如下：</p>
+        <table width="600" border="1" cellspacing="0" cellpadding="2">
+          <tr> 
+            <td>&nbsp;</td>
+            <td colspan="5" align="center">input</td>
+            <td align="center">textarea</td>
+            <td align="center">select</td>
+          </tr>
+          <tr> 
+            <td width="133">校验方式</td>
+            <td width="62" align="center">text</td>
+            <td width="72" align="center">radio</td>
+            <td width="67" align="center">checkbox</td>
+            <td width="77" align="center">file</td>
+            <td width="77" align="center">password</td>
+            <td width="75" align="center">textarea</td>
+            <td width="86" align="center">select-one</td>
+          </tr>
+          <tr> 
+            <td>InputValidator</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+          </tr>
+          <tr> 
+            <td>CompareValidator</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td>AjaxValidator</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+          </tr>
+          <tr> 
+            <td>RegexValidator</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>FunctionValidator</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+            <td>√</td>
+          </tr>
+        </table>
+        如果你用了不支持的校验功能，插件将忽略这个校验功能。 </td>
+    </tr>
+    <tr> 
+      <td colspan="4"><br>
+        <font color="#FF0000" size="2">插件目前提示错误，有两种模式：showword和showalert,即文字提示和窗口提示</font><font size="2">，下面的5大验证方式，针对<font color="#FF0000">showalert</font>这种方式不是都必须的，有些配置是没有作用的</font><br>
+        下面分别罗列全局初始化和5种校验方式公开的属性<br> </td>
+    </tr>
+    <tr> 
+      <td width="128">formValidator:</td>
+      <td colspan="3">用来做初始化的类型，必须先执行</td>
+    </tr>
+    <tr> 
+      <td colspan="4"><table width="600" border="1" cellspacing="0" cellpadding="2">
+          <tr> 
+            <td>属性</td>
+            <td>属性名称</td>
+            <td>默认值</td>
+            <td align="center">showword</td>
+            <td align="center">showalert</td>
+            <td>详细解释</td>
+          </tr>
+          <tr> 
+            <td width="84">validatorGroup</td>
+            <td width="133">校验组</td>
+            <td width="99">&quot;1&quot;</td>
+            <td width="58">√</td>
+            <td width="58">√</td>
+            <td width="100">一个页面的控件可以分成多个组，分开校验</td>
+          </tr>
+          <tr valign="top"> 
+            <td>empty</td>
+            <td>是否可以为空</td>
+            <td>false</td>
+            <td>√</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr valign="top"> 
+            <td>automodify</td>
+            <td>输入错误离开焦点的时候，自动修复错误</td>
+            <td>false</td>
+            <td>√</td>
+            <td>√</td>
+            <td>先给出提示然后，自动修复，目前只支持text、file、textarea三种类型</td>
+          </tr>
+          <tr valign="top"> 
+            <td>onempty</td>
+            <td>空时候的提示</td>
+            <td>&quot;输入内容为空&quot;</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>可以为空，为空时候的提示</td>
+          </tr>
+          <tr valign="top"> 
+            <td>onshow</td>
+            <td>显示时候的提示</td>
+            <td>&quot;请输入内容&quot;</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr valign="top"> 
+            <td>onfocus</td>
+            <td>获得焦点的提示</td>
+            <td>&quot;请输入内容&quot;</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr valign="top"> 
+            <td>oncorrect</td>
+            <td>输入正确后的提示</td>
+            <td>&quot;输入正确&quot;</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>当你焦点离开控件的时候，如果输入正确将出现该提示</td>
+          </tr>
+          <tr valign="top"> 
+            <td>onvalid</td>
+            <td>校验通过后的回调函数</td>
+            <td>null</td>
+            <td>√</td>
+            <td>√</td>
+            <td>参数1：对象本身 参数2：值 校验通过后，你还希望执行一些操作，你可以通过这个属性来执行。</td>
+          </tr>
+          <tr valign="top"> 
+            <td>onfocusevent</td>
+            <td>获得焦点后要追加的回调函数</td>
+            <td>null</td>
+            <td>√</td>
+            <td>√</td>
+            <td>参数1：对象本身</td>
+          </tr>
+          <tr valign="top"> 
+            <td>onblurevent</td>
+            <td>失去焦点后要追加的回调函数</td>
+            <td>null</td>
+            <td>√</td>
+            <td>√</td>
+            <td>参数1：对象本身</td>
+          </tr>
+          <tr valign="top"> 
+            <td>tipid</td>
+            <td>显示错误的容器ID</td>
+            <td>表单ID+&quot;Tip&quot;</td>
+            <td>√</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr valign="top"> 
+            <td>defaultvalue</td>
+            <td>默认值</td>
+            <td>null</td>
+            <td>√</td>
+            <td>√</td>
+            <td>所有input和select表单。如果你不设置就保持原值，一旦设置就设为默认值。</td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td width="166">&nbsp;</td>
+      <td width="135">&nbsp;</td>
+      <td width="100">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>InputValidator：</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4"><table width="600" border="1" cellspacing="0" cellpadding="2">
+          <tr> 
+            <td width="72">属性</td>
+            <td width="144">属性名称</td>
+            <td width="98">默认值</td>
+            <td width="451">详细解释</td>
+          </tr>
+          <tr> 
+            <td>type</td>
+            <td>比较类型</td>
+            <td>&quot;size&quot;</td>
+            <td>(对select无效)&quot;size&quot;:表示比较长度 &quot;value&quot;:比较值。</td>
+          </tr>
+          <tr> 
+            <td>min</td>
+            <td>最小长度/值</td>
+            <td>0</td>
+            <td>(对select无效)</td>
+          </tr>
+          <tr> 
+            <td>max</td>
+            <td>最大长度/值</td>
+            <td>99999999999999</td>
+            <td>(对select无效)</td>
+          </tr>
+          <tr> 
+            <td>onerror</td>
+            <td>发生错误的提示</td>
+            <td>&quot;输入错误&quot;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td>defaultvalue</td>
+            <td>默认值</td>
+            <td>null</td>
+            <td>能满足预设默认值的需求</td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>CompareValidator：</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4"><table width="600" border="1" cellspacing="0" cellpadding="2">
+          <tr> 
+            <td>属性</td>
+            <td>属性名称</td>
+            <td>默认值</td>
+            <td>详细解释</td>
+          </tr>
+          <tr> 
+            <td>desID</td>
+            <td>要比较控件的ID</td>
+            <td>&quot;&quot;</td>
+            <td>要跟源目标进行比较的目标ID</td>
+          </tr>
+          <tr> 
+            <td>operateor</td>
+            <td>比较符号</td>
+            <td>&quot;=&quot;</td>
+            <td>一共有如下几种类型:=、!=、&gt;、&gt;=、&lt;、&lt;=</td>
+          </tr>
+          <tr> 
+            <td>datatype</td>
+            <td>数据类型</td>
+            <td>&quot;string&quot;</td>
+            <td>目前只支持2种:&quot;string&quot;、&quot;number&quot;</td>
+          </tr>
+          <tr> 
+            <td>onerror</td>
+            <td>发生错误的提示</td>
+            <td>&quot;输入错误&quot;</td>
+            <td>&nbsp;</td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>RegexValidator:</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4"> <table width="600" height="0%" border="1" cellpadding="2" cellspacing="0">
+          <tr> 
+            <td width="48" height="16%">属性</td>
+            <td width="112">属性名称</td>
+            <td width="112">默认值</td>
+            <td width="300">详细解释</td>
+          </tr>
+          <tr valign="top"> 
+            <td height="23%"><font color="#000000">regexp</font></td>
+            <td><font color="#000000">正则表达式</font></td>
+            <td><font color="#000000">&quot;&quot;</font></td>
+            <td><font color="#FF0000">采用的是显式构造函数new RegExp(&quot;pattern&quot;[,&quot;flags&quot;]); 
+              由于Javascript 中'\' 被用作转义字符，所以在使用显示构造函数构造实例对象的时候，需要使用'\\' 代替'\' </font></td>
+          </tr>
+          <tr> 
+            <td height="30%" valign="top">param</td>
+            <td valign="top">附加参数</td>
+            <td valign="top">&quot;i&quot;</td>
+            <td valign="top">g：代表可以进行全局匹配。<br>
+              i：代表不区分大小写匹配。<br>
+              m：代表可以进行多行匹配。<br>
+              可以任意组合,当然也可以不加参数 </td>
+          </tr>
+          <tr valign="top"> 
+            <td height="31%">datatype</td>
+            <td>数据类型</td>
+            <td>&quot;string&quot;</td>
+            <td>&quot;string&quot;:自己写的表达式，&quot;enum&quot;:枚举名。具体请见demo3.htm，你可以自己修改附加pageValidatorRegex.js里的枚举项目名和表达式。</td>
+          </tr>
+          <tr valign="top"> 
+            <td height="31%">onerror:</td>
+            <td>发生错误的提示</td>
+            <td>&quot;输入错误&quot;</td>
+            <td>&nbsp;</td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>AjaxValidator:</td>
+      <td colspan="3">几乎所有的属性跟$.ajax()的属性一样，请参考$.ajax()函数的帮助</td>
+    </tr>
+    <tr> 
+      <td colspan="4"><table width="600" border="1" cellspacing="0" cellpadding="2">
+          <tr> 
+            <td width="66">属性</td>
+            <td width="208">属性名称</td>
+            <td width="95">默认值</td>
+            <td width="356">详细解释</td>
+          </tr>
+          <tr> 
+            <td>type</td>
+            <td> 请求的类型</td>
+            <td>&quot;GET&quot;</td>
+            <td>&quot;POST&quot; 或 &quot;GET&quot;</td>
+          </tr>
+          <tr> 
+            <td>url</td>
+            <td>发送到的URL地址</td>
+            <td>&quot;&quot;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td>datatype</td>
+            <td>返回的数据类型</td>
+            <td>&quot;html&quot;</td>
+            <td>xml、html、script、json</td>
+          </tr>
+          <tr> 
+            <td>data</td>
+            <td>数据</td>
+            <td>&quot;&quot;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td>async</td>
+            <td>是否以异步的方式发送</td>
+            <td>true</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td>success</td>
+            <td>当请求成功时调用的函数</td>
+            <td>null</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td valign="top">processdata</td>
+            <td valign="top">自动处理返回的数据为字符串</td>
+            <td valign="top">true</td>
+            <td>在默认的情况下，如果data选项传进的数据是一个对象而不是字符串，将会自动地被处理和转换成一个查询字符串</td>
+          </tr>
+          <tr> 
+            <td>complete</td>
+            <td>当请求完成时调用的函数</td>
+            <td>null</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr> 
+            <td>beforesend</td>
+            <td>当请求前时调用的函数</td>
+            <td>null</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr valign="top"> 
+            <td>error</td>
+            <td>当请求失败时调用的函数</td>
+            <td>&quot;请求失败&quot;</td>
+            <td>你可以自己定义这个错误，在error里自动打出</td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>公共函数:</td>
+      <td colspan="3">主要是设置全局参数和判断是否通过校验</td>
+    </tr>
+    <tr> 
+      <td colspan="4"><table width="600" border="1" cellspacing="0" cellpadding="2">
+          <tr> 
+            <td width="192">函数名</td>
+            <td width="600">函数说明</td>
+          </tr>
+          <tr> 
+            <td valign="top">jQuery.formValidator.initConfig</td>
+            <td>参数：配置类型 
+              <table width="413" border="1" cellspacing="0" cellpadding="2">
+                <tr> 
+                  <td width="97">属性</td>
+                  <td width="121">默认值</td>
+                  <td width="362">说明</td>
+                </tr>
+                <tr> 
+                  <td>validatorGroup</td>
+                  <td>&quot;1&quot;</td>
+                  <td>你要针对哪个组进行配置</td>
+                </tr>
+                <tr> 
+                  <td>alertMessage</td>
+                  <td>false</td>
+                  <td>是否弹出窗口</td>
+                </tr>
+                <tr> 
+                  <td valign="top">onSuccess</td>
+                  <td valign="top">null</td>
+                  <td>该组校验通过后的回调函数,返回false，阻止表单的提交</td>
+                </tr>
+                <tr> 
+                  <td>submitOnce</td>
+                  <td>false</td>
+                  <td>校验通过后，是否灰掉所有的提交按钮</td>
+                </tr>
+                <tr> 
+                  <td>onError</td>
+                  <td>null</td>
+                  <td>该组校验失败后的回调函数</td>
+                </tr>
+              </table></td>
+          </tr>
+          <tr> 
+            <td valign="top">jQuery.formValidator.PageIsValid</td>
+            <td> 一个参数： 不是配置类型 
+              <table width="413" border="1" cellspacing="0" cellpadding="2">
+                <tr> 
+                  <td width="97">validatorGroup</td>
+                  <td width="121">&quot;1&quot;</td>
+                  <td width="362">你要针对哪个组进行验证</td>
+                </tr>
+              </table></td>
+          </tr>
+          <tr> 
+            <td valign="top">jQuery.formValidator.IsOneValid</td>
+            <td>一个参数： 当时设置验证的表单元素ID。<br>
+              返回是否校验成功的信息。 </td>
+          </tr>
+          <tr> 
+            <td valign="top">jQuery.formValidator.SetFailState</td>
+            <td>function("tipid","显示的信息")<br>
+              在showword模式下，如果你的额外校验没有通过，你可以通过它来设置成失败信息和状态 </td>
+          </tr>
+          <tr> 
+            <td valign="top">jQuery.formValidator.GetLength</td>
+            <td>function("表单元素id")<br>
+              判断表单元素的选择长度(个数)<br>
+              checkbox或radiobutton表示选择的个数。<br>
+              select表示选择的selectedIndex值。<br>
+              其它的表示字符长度。 </td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>问答：</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">1、如何实现一个控件，根据不同的情况，实现不同的控制？</td>
+    </tr>
+    <tr> 
+      <td colspan="4"> 你只需要在你的不同种情况下，重新设置你的【一行代码】</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">2、一个页面上我有几个tab页，如何实现每个Tab页上的控件单独校验？</td>
+    </tr>
+    <tr> 
+      <td colspan="4">每个Tab页上需要校验的控件，你在写【一行代码】的时候，显示的声明组号</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">3、我采用的页面上文字问题的方式，点提交的时候，有校验未通过的，除了文字提示外，还可以再弹出窗口提示吗？</td>
+    </tr>
+    <tr> 
+      <td colspan="4">这个问题很简单，你只要设置改组的全局配置，<br>
+        jQuery.formValidator.initConfig({onError:function(){alert(&quot;有部分校验没有通过，请看页面具体提示&quot;);}})</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">4、所有校验通过后，我还要再做别的判断可以吗？我自己的判断没有通过可以中断提交吗？</td>
+    </tr>
+    <tr> 
+      <td colspan="4"><p>同样很简单，你页只需设置该组的全局配置，<br>
+          jQuery.formValidator.initConfig({onSuccess:function()<br>
+          {<br>
+          if(你的额外判断失败)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;return false;<br>
+          else<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;return true;<br>
+          }})</p></td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">5、我有一组的checkbox（radiobutton）如何设置校验？ </td>
+    </tr>
+    <tr> 
+      <td colspan="4">你只需在该组的第一个checkbox上设置校验信息即可，具体请参考demo1里的范例<br>
+        如果你该组的第一个控件的ID ，你可以这么写:$(&quot;sex_1&quot;).InputValidator({...})<br>
+        如果你只知道该组的name，你可以这么写:$(&quot;input:check[@name='sex']&quot;).slice(0,1).InputValidator({...})</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">6、我有2个表单元素，任意一个元素输入东西就算验证通过，如何写代码？比如要求输入中文名字和英文名字任意一个即算校验通过。</td>
+    </tr>
+    <tr> 
+      <td colspan="4">正在开发这个功能</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">7、一个表单元素校验通过了，但是我想额外再进行其它的校验，出错要自定义错误，如何写代码？</td>
+    </tr>
+    <tr> 
+      <td colspan="4">$("#ewjy").formValidator({onshow:"无论你输入什么，都会提示你额外校验出错，错误信息自定义",onfocus:"至少输入一个字符",oncorrect:"你怎么可能输入正确了，难道是bug?",onvalid:function(){$.formValidator.SetFailState("ewjyTip","额外校验失败");alert("额外校验失败");return 
+        false;}}).InputValidator({min:1,onerror:"这里至少要一个字符,请确认"});</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">8、如何让赋了初始值的表单元素默认校验通过</td>
+    </tr>
+    <tr> 
+      <td colspan="4">$(&quot;#xueli&quot;).formValidator({onshow:&quot;请选择你的学历&quot;,onfocus:&quot;学历必须选择&quot;,oncorrect:&quot;谢谢你的配合&quot;,defaultvalue:&quot;b&quot;}).InputValidator({onerror: 
+        &quot;你是不是忘记选择学历了!&quot;})<strong>.DefaultPassed()</strong>;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="4">&nbsp;</td>
+    </tr>
+  </table>
+
+</form>
+</body>
+</html>

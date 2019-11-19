@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <title>Rainy Day – 逼真的雨滴效果</title>
+    <style media="screen">
+        body {
+            overflow: hidden;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script src="http://libs.useso.com/js/jquery/1.8.3/jquery.min.js"></script>
+    <script src="js/rainyday.js"></script>
+    <script>
+        function run() {
+            var image = document.getElementById('background');
+            image.onload = function () {
+                var engine = new RainyDay({
+                    image: this
+                });
+                engine.rain([[3, 2, 2]], 100);
+            };
+            image.crossOrigin = 'anonymous';
+            image.src = 'img/U1Tqqdw.jpg';
+        }
+    </script>
+</head>
+<body onload="run();">
+    <img id="background" alt="background" src="" />
+    <div style="position:fixed;bottom:30px;width:100%;height:90px;z-index:999">
+        <div class="footer-banner" style="width:728px; margin:0 auto"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>jQuery formValidator表单验证插件 -- by:猫冬，email:wzmaodong@126.com</title>
+<meta name="Author" content="猫冬">
+<meta name="description" content="jQuery formValidator表单验证插件" />
+<meta name="keywords" content="jQuery,formValidator,插件,表单,验证,插件,javascript,表单验证,提示层" />
+<script src="jquery_last.js" type="text/javascript"></script>
+<link type="text/css" rel="stylesheet" href="style/validator.css"></link>
+<script src="formValidator.js" type="text/javascript" charset="UTF-8"></script>
+<script src="formValidatorRegex.js" type="text/javascript" charset="UTF-8"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$.formValidator.initConfig({formid:"form1",onerror:function(){alert("校验没有通过，具体错误请看错误提示")}});
+	$("#sfz").formValidator({onshow:"请输入15或18位的身份证",onfocus:"输入15或18位的身份证",oncorrect:"输入正确"}).regexValidator({regexp:"idcard",datatype:"enum",onerror:"你输入的身份证格式不正确"});;
+    $("#sfz1").formValidator({onshow:"请输入15或18位的身份证",onfocus:"输入15或18位的身份证",oncorrect:"输入正确"}).functionValidator({fun:isCardID});
+
+	$("#zs").formValidator({onshow:"请输入整数",oncorrect:"谢谢你的合作，你的整数正确"}).regexValidator({regexp:"intege",datatype:"enum",onerror:"整数格式不正确"});
+	$("#zzs").formValidator({onshow:"请输入正整数",oncorrect:"谢谢你的合作，你的正整数正确"}).regexValidator({regexp:"intege1",datatype:"enum",onerror:"正整数格式不正确"});
+	$("#fzs").formValidator({onshow:"请输入负整数",oncorrect:"谢谢你的合作，你的负整数正确"}).regexValidator({regexp:"intege2",datatype:"enum",onerror:"负整数格式不正确"});
+	$("#sz").formValidator({onshow:"请输入数字",oncorrect:"谢谢你的合作，你的数字正确"}).regexValidator({regexp:"num",datatype:"enum",onerror:"数字格式不正确"});
+	$("#zs1").formValidator({onshow:"请输入正数",oncorrect:"谢谢你的合作，你的正数正确"}).regexValidator({regexp:"num1",datatype:"enum",onerror:"正数格式不正确"});
+	$("#fs").formValidator({onshow:"请输入负数",oncorrect:"谢谢你的合作，你的负数正确"}).regexValidator({regexp:"num2",datatype:"enum",onerror:"负数格式不正确"});
+
+	$("#sj").formValidator({onshow:"请输入你的手机号码",onfocus:"必须是13或15打头哦",oncorrect:"谢谢你的合作，你的手机号码正确"}).regexValidator({regexp:"mobile",datatype:"enum",onerror:"手机号码格式不正确"});
+	//$("#").formValidator({onshow:"",onfocus:"请输入",oncorrect:"谢谢你的合作，你的正确"}).regexValidator({regexp:"",datatype:"enum",onerror:"格式不正确"});
+	$("#email").formValidator({onshow:"请输入你的email",onfocus:"请注意你输入的email格式，例如:wzmaodong@126.com",oncorrect:"谢谢你的合作，你的email正确"}).regexValidator({regexp:"email",datatype:"enum",onerror:"email格式不正确"});
+	$("#fds").formValidator({onshow:"请输入浮点数",oncorrect:"谢谢你的合作，你的浮点数正确"}).regexValidator({regexp:"decmal",datatype:"enum",onerror:"浮点数格式不正确"});
+	$("#zfds").formValidator({onshow:"请输入正浮点数",oncorrect:"谢谢你的合作，你的正浮点数正确"}).regexValidator({regexp:"decmal1",datatype:"enum",onerror:"正浮点数格式不正确"});
+	$("#ffds").formValidator({onshow:"请输入负浮点数",oncorrect:"谢谢你的合作，你的负浮点数正确"}).regexValidator({regexp:"decmal2",datatype:"enum",onerror:"负浮点数格式不正确"});
+	$("#fffds").formValidator({onshow:"请输入非负浮点数",oncorrect:"谢谢你的合作，你的非负浮点数正确"}).regexValidator({regexp:"decmal4",datatype:"enum",onerror:"非负浮点数格式不正确"});
+	$("#fzfds").formValidator({onshow:"请输入非正浮点数",oncorrect:"谢谢你的合作，你的非正浮点数正确"}).regexValidator({regexp:"decmal5",datatype:"enum",onerror:"非正浮点数格式不正确"});
+	$("#ys").formValidator({onshow:"请输入16进制颜色",oncorrect:"谢谢你的合作，你的16进制颜色正确"}).regexValidator({regexp:"color",datatype:"enum",onerror:"16进制颜色格式不正确"});
+	$("#yb").formValidator({onshow:"请输入邮编",onfocus:"6位数字组成的哦",oncorrect:"谢谢你的合作，你的邮编正确"}).regexValidator({regexp:"zipcode",datatype:"enum",onerror:"邮编格式不正确"});
+	$("#ip4").formValidator({onshow:"请输入ip4",onfocus:"例如：172.16.201.18",oncorrect:"谢谢你的合作，你的ip4正确"}).regexValidator({regexp:"ip4",datatype:"enum",onerror:"ip4格式不正确"});
+	$("#fk").formValidator({onshow:"请输入非空字符",oncorrect:"谢谢你的合作，你的非空字符正确"}).regexValidator({regexp:"notempty",datatype:"enum",onerror:"非空字符格式不正确"});
+	$("#tp").formValidator({onshow:"请输入图片名",oncorrect:"谢谢你的合作，你的图片名正确"}).regexValidator({regexp:"picture",datatype:"enum",onerror:"图片名格式不正确"});
+	$("#rar").formValidator({onshow:"请输入压缩文件名",oncorrect:"谢谢你的合作，你的压缩文件名正确"}).regexValidator({regexp:"rar",datatype:"enum",onerror:"压缩文件名格式不正确"});
+	$("#qq").formValidator({onshow:"请输入QQ号码",oncorrect:"谢谢你的合作，你的QQ号码正确"}).regexValidator({regexp:"qq",datatype:"enum",onerror:"QQ号码格式不正确"});
+	$("#dh").formValidator({onshow:"请输入国内电话",onfocus:"例如：0577-88888888或省略区号88888888",oncorrect:"谢谢你的合作，你的国内电话正确"}).regexValidator({regexp:"tel",datatype:"enum",onerror:"国内电话格式不正确"});
+	$("#yhm").formValidator({onshow:"请输入用户名",oncorrect:"谢谢你的合作，你的用户名正确"}).regexValidator({regexp:"username",datatype:"enum",onerror:"用户名格式不正确"});
+	$("#zm").formValidator({onshow:"请输入字母",oncorrect:"谢谢你的合作，你的字母正确"}).regexValidator({regexp:"letter",datatype:"enum",onerror:"字母格式不正确"});
+	$("#dxzm").formValidator({onshow:"请输入大写字母",oncorrect:"谢谢你的合作，你的大写字母正确"}).regexValidator({regexp:"letter_u",datatype:"enum",onerror:"大写字母格式不正确"});
+	$("#xxzm").formValidator({onshow:"请输入小写字母",oncorrect:"谢谢你的合作，你的小写字母正确"}).regexValidator({regexp:"letter_l",datatype:"enum",onerror:"小写字母格式不正确"});
+	$("#sfz").formValidator({onshow:"请输入身份证",oncorrect:"谢谢你的合作，你的身份证正确"}).regexValidator({regexp:"idcard",datatype:"enum",onerror:"身份证格式不正确"});
+});
+</script>
+<style type="text/css" media="all">
+body,div{font-size:12px; margin:10px;}
+</style>
+</head>
+<body>
+<h2>如何调用扩展库</h2>
+<p>正则表达式示例</p>
+<p><a href="http://wzmaodong.cnblogs.com">猫冬的博客</a></p>
+<form action="" method="post" name="form1" id="form1">
+	
+  <table border="0px" style="font-size:12px">
+  <tr> 
+      <td colpan="3"><input type="submit" name="button" id="button" value="提交" /></td>
+    </tr>
+    <tr> 
+      <td align="right">身份证(正则表达式库):</td>
+      <td><input name="sfz" type="text" id="sfz" /></td>
+      <td><div id="sfzTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">身份证(外部函数):</td>
+      <td><input type="text" id="sfz1" style="width:120px" /></td>
+      <td><div id="sfz1Tip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">整数:</td>
+      <td><input type="text" id="zs" style="width:120px" /></td>
+      <td><div id="zsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">正整数:</td>
+      <td><input type="text" id="zzs" style="width:120px" /></td>
+      <td><div id="zzsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">负整数:</td>
+      <td><input type="text" id="fzs" style="width:120px" /></td>
+      <td><div id="fzsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">数字:</td>
+      <td><input type="text" id="sz" style="width:120px" /></td>
+      <td><div id="szTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">正数（正整数 + 0）:</td>
+      <td><input type="text" id="zs1" style="width:120px" /></td>
+      <td><div id="zs1Tip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">负数（负整数 + 0）:</td>
+      <td><input type="text" id="fs" style="width:120px" /></td>
+      <td><div id="fsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">浮点数:</td>
+      <td><input type="text" id="fds" style="width:120px" /></td>
+      <td><div id="fdsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">正浮点数:</td>
+      <td><input type="text" id="zfds" style="width:120px" /></td>
+      <td><div id="zfdsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">负浮点数:</td>
+      <td><input type="text" id="ffds" style="width:120px" /></td>
+      <td><div id="ffdsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">非负浮点数（正浮点数 + 0）:</td>
+      <td><input type="text" id="fffds" style="width:120px" /></td>
+      <td><div id="fffdsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">非正浮点数（负浮点数 + 0）:</td>
+      <td><input type="text" id="fzfds" style="width:120px" /></td>
+      <td><div id="fzfdsTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">颜色:</td>
+      <td><input type="text" id="ys" style="width:120px" /></td>
+      <td><div id="ysTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">你的EMAIL:</td>
+      <td><input type="text" id="email" style="width:120px" /></td>
+      <td><div id="emailTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">手机:</td>
+      <td><input type="text" id="sj" style="width:120px" /></td>
+      <td><div id="sjTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">邮编:</td>
+      <td><input type="text" id="yb" style="width:120px" /></td>
+      <td><div id="ybTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">非空:</td>
+      <td><input type="text" id="fk" style="width:120px" /></td>
+      <td><div id="fkTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">图片:</td>
+      <td><input type="text" id="tp" style="width:120px" /></td>
+      <td><div id="tpTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">压缩文件:</td>
+      <td><input type="text" id="rar" style="width:120px" /></td>
+      <td><div id="rarTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">ip4:</td>
+      <td><input type="text" id="ip4" style="width:120px" /></td>
+      <td><div id="ip4Tip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">QQ号码:</td>
+      <td><input type="text" id="qq" style="width:120px" /></td>
+      <td><div id="qqTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">国内电话:</td>
+      <td><input type="text" id="dh" style="width:120px" /></td>
+      <td><div id="dhTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">用户名:</td>
+      <td><input type="text" id="yhm" style="width:120px" /></td>
+      <td><div id="yhmTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">字母:</td>
+      <td><input type="text" id="zm" style="width:120px" /></td>
+      <td><div id="zmTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">大写字母:</td>
+      <td><input type="text" id="dxzm" style="width:120px" /></td>
+      <td><div id="dxzmTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">小写字母:</td>
+      <td><input type="text" id="xxzm" style="width:120px" /></td>
+      <td><div id="xxzmTip" style="width:300px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">身份证:</td>
+      <td><input type="text" id="sfz" style="width:120px" /></td>
+      <td><div id="sfzTip" style="width:300px"></div></td>
+    </tr>
+	<tr>
+
+  </table>
+</form>
+</body>
+</html>

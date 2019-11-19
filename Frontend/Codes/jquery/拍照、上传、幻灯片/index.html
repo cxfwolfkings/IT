@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>UploadiFive Test</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="../Public/css/uploadify.css" />
+    <link rel="stylesheet" type="text/css" href="../Public/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../Public/css/layer.css" />
+    <style type="text/css">
+        body {
+            font: 13px Arial, Helvetica, Sans-serif;
+        }
+
+        #webcam {
+            border: 1px solid #666666;
+            width: auto;
+            height: auto;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Uploadify Demo</h1>
+    <form>
+        <input type="button" class="btn" value="点此上传" onclick="showUploadLayer(this)">
+    </form>
+</body>
+</html>
+<div id="LayOutPhoto" style="width: 100%; height: 100%; display: none;">
+    <div id="divUpload">
+        <span id="spanCamera" style="cursor: pointer">点击这里直接照相>></span>
+        <table id="tbImg" style="width: 100%; height: 100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="height: 360px; text-align: center"></td>
+            </tr>
+            <tr>
+                <td style="text-align: center">
+                    <input id="fileUpload" type="file" multiple>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="divCamera" style="display: none">
+        <span id="spanUpload" style="cursor: pointer">点击这里选择本地图片上传>></span>
+        <div id="h5Camera">
+            <video id="video" width="600" height="400" autoplay></video>
+            <canvas style="display: none" id="canvas" width="600" height="400"></canvas>
+        </div>
+        <div id="flashCamera"></div>
+        <input type="button" value="拍照" onclick="webcam.capture()"/>
+    </div>
+</div>
+<input type="hidden" id="hidDelFiles" />
+<script type="text/javascript" src="../Public/js/jquery-2.2.3.min.js"></script>
+<script type="text/javascript" src="../Public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../Public/js/jquery.uploadify.min.js"></script>
+<script type="text/javascript" src="../Public/js/jquery.webcam.js"></script>
+<script type="text/javascript" src="../Public/js/layer.js"></script>
+<script type="text/javascript">
+    var pageCache = {
+        pos: 0,
+        image: new Array(),
+        w: 600,
+        h: 400
+    };
+    $(function () {
+        $('#fileUpload').uploadify({
+            'multy': true,
+            'buttonText': '选择图片',
+            'fileTypeDesc': 'Image Files',
+            'fileTypeExts': '*.gif; *.jpg; *.png',
+            'uploader': 'UploadHandler.ashx?op=upload',
+            'onUploadError': function (file, errorCode, errorMsg, errorString) {
+                base.simpleAlert('The file ' + file.name + ' could not be uploaded: ' + errorString, 2);
+            },
+            'onUploadSuccess': function (file, data, response) {
+                var fileName = data;
+                if (fileName) {
+                    $('#tbImg tr:first td').empty();
+                    $('#tbImg tr:first td').html('<img src="../Upload/' + fileName + '" style="height:100%"/>');
+                    var hidValue = $('#hidDelFiles').val();
+                    if (hidValue) {
+                        hidValue += ',' + result.fileName;
+                    } else {
+                        hidValue = result.fileName;
+                    }
+                    $('#hidDelFiles').val(hidValue);
+                }
+            },
+            'formData': {
+                'timestamp': new Date().toLocaleString(),
+                'token': ''
+            },
+            'swf': '../Public/res/uploadify.swf',
+        });
+
+        $('#flashCamera').webcam({
+                width: pageCache.w,
+                height: pageCache.h,
+                mode: 'callback',
+                quality: 100,
+                swffile: "../Public/res/jscam.swf", // canvas only doesn't implement a jpeg encoder, so the file is much smaller
+                onSave: function (data) {
+                    var canvas = document.createElement("canvas");
+                    canvas.setAttribute('width', pageCache.w);
+                    canvas.setAttribute('height', pageCache.h);
+                    if (canvas.toDataURL) {
+                        ctx = canvas.getContext("2d");
+                        pageCache.image = ctx.getImageData(0, 0, pageCache.w, pageCache.h);
+                        var col = data.split(";");
+                        var img = image;
+                        for (var i = 0; i < pageCache.w; i++) {
+                            var tmp = parseInt(col[i]);
+                            img.data[pos + 0] = (tmp >> 16) & 0xff;
+                            img.data[pos + 1] = (tmp >> 8) & 0xff;
+                            img.data[pos + 2] = tmp & 0xff;
+                            img.data[pos + 3] = 0xff;
+                            pageCache.pos += 4;
+                        }
+                        if (pageCache.pos >= 4 * pageCache.w * pageCache.h) {
+                            ctx.putImageData(img, 0, 0);
+                            $.post("UploadHandler.ashx?op=webcam", { type: "data", image: canvas.toDataURL("image/png") });
+                            pageCache.pos = 0;
+                        }
+                    } else {
+                        pageCache.image.push(data);
+                        pageCache.pos += 4 * pageCache.w;
+                        if (pageCache.pos >= 4 * pageCache.w * pageCache.h) {
+                            $.post("UploadHandler.ashx?op=webcam", {
+                                type: "pixel",
+                                image: pageCache.image.join('|')
+                            }, function (msg) {
+                                pageCache.pos = 0;
+                                pageCache.image = new Array();
+                            });
+                        }
+                    }
+                    // Work with the picture. Picture-data is encoded as an array of arrays... Not really nice, though =/
+                },
+                onCapture: function () {
+                    webcam.save();
+                    // Show a flash for example
+                },
+                onLoad: function () {
+                    // Page load
+                    var cams = webcam.getCameraList();
+                    for (var i in cams) {
+                        jQuery("#cams").append("<li>" + cams[i] + "</li>");
+                    }
+                },
+                debug: function (type, string) {
+                    console.log(type + ": " + string);
+                }
+            });
+
+        $('#spanCamera').click(function () {
+            $('#divCamera').show();
+            $('#divUpload').hide();
+            $('#video').attr('src', '#');
+            initVideo();
+        });
+
+        $('#spanUpload').click(function () {
+            $('#divCamera').hide();
+            $('#divUpload').show();
+        });
+    });
+
+    function showUploadLayer(x) {
+        //先把模态框中的数据清除
+        $('#tbImg tr:first td').empty();
+        $('#txtImageTitle').val('');
+        $('#txtImageTitle2').val('');
+        var btnArr = ['确认', '删除'];
+        var curFileName = $(x).data('name');
+        var curTitle = $(x).data('title');
+        if (curFileName) {
+            $('#tbImg tr:first td').html('<img src="../Upload/' + curFileName + '" style="height:100%"/>');
+            var hidValue = $('#hidDelFiles').val();
+            if (hidValue) {
+                hidValue += ',' + curFileName;
+            } else {
+                hidValue = curFileName;
+            }
+            $('#hidDelFiles').val(hidValue);
+            $('#txtImageTitle').val(curTitle);
+        }
+        if ($('#divCamera').length && $('#divCamera').css('display') != 'none') {
+            $('#video').attr('src', '#');
+            initVideo();
+        }
+        layer.open({
+            type: 1,
+            title: '上传照片',
+            area: ['600px', '600px'],
+            shadeClose: false,
+            content: $("#LayOutPhoto"),
+            btn: btnArr,
+            yes: function () {
+                layer.closeAll();
+                var hidValue = $('#hidDelFiles').val();
+                if (!$('#divCamera').length || $('#divCamera').css('display') == 'none') {
+                    var imgPath = $('#tbImg tr:first td').children('img').attr('src');
+                    var fileName = imgPath.substring(imgPath.lastIndexOf('/') + 1);
+                    var txtTitle = $('#txtImageTitle').val();
+                    console.log(txtTitle + "=>" + fileName);
+                    delPhoto(hidValue, fileName);
+                } else {
+                    if (pageCache && pageCache.doPhoto) {
+                        pageCache.doPhoto(x);
+                    }
+                    //delPhoto(hidValue);
+                }
+            },
+            btn2: function () {
+                var hidValue = $('#hidDelFiles').val();
+                delPhoto(hidValue, '');
+            },
+            cancel: function () {
+                var hidValue = $('#hidDelFiles').val();
+                delPhoto(hidValue, curFileName);
+                //关闭摄像头
+                if (pageCache.stream) {
+                    if (pageCache.stream.stop) {
+                        pageCache.stream.stop();
+                    }
+                }
+                if (pageCache.track) {
+                    if (pageCache.track.stop) {
+                        pageCache.track.stop();
+                    }
+                }
+            }
+        });
+    }
+
+    function initVideo() {
+        try {
+            //动态创建一个canvas元，并获取他2Dcontext。如果出现异常则表示不支持
+            document.createElement("canvas").getContext("2d");
+        } catch (e) {
+            layer.closeAll();
+            simpleAlert('当前浏览器不支持！', 2);
+            return;
+        }
+        var canvas = document.getElementById("canvas"),
+            context = canvas.getContext("2d"),
+            video = document.getElementById("video");
+        var getMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+        if (getMedia) {//页面支持H5摄像头，IE不支持
+            $('#h5Camera').show();
+            $('#flashCamera').hide();
+            getMedia.call(navigator, {
+                video: true,
+                audio: true
+            }, function (stream) {
+                video.src = window.URL.createObjectURL(stream);
+                pageCache.stream = stream;
+                pageCache.track = stream.getTracks()[0];
+            }, function (error) {
+                console.log("Video capture error: ", error.code);
+            });
+        } else {//使用flash摄像头
+            $('#h5Camera').hide();
+            $('#flashCamera').show();
+        }
+        pageCache = pageCache || {};
+        pageCache.doPhoto = function (x) {
+            if (pageCache.stream) { //h5拍照
+                context.drawImage(video, 0, 0, 600, 400);
+                //以下开始编数据
+                var imgData = canvas.toDataURL();
+                //将图像转换为base64数据，将前端截取22位之后的字符串作为图像数据
+                //"data:image/png;base64,"
+                var base64Data = imgData.substr(22);
+                //开始异步上传
+                $.post("UploadHandler.ashx?op=Camera",
+                    { "image": base64Data },
+                    function (data) {
+                        var result = JSON.parse(data);
+                        if (result && result.fileName) {
+                            console.log(fileName)
+                        }
+                    });
+            } else { //flash拍照
+                webcam.capture();
+            }
+        };
+    }
+
+    function delPhoto(hidValue, curFileName) {
+        callByAjax(
+                    "UploadHandler.ashx?op=delImg",
+                    {
+                        hidValue: hidValue,
+                        fileName: curFileName
+                    },
+                    function () {
+                        $('#hidDelFiles').val('');
+                    }
+                );
+    }
+
+    function callByAjax(url, data, callback, isAsync) {
+        if (isAsync !== false) {
+            isAsync = true;
+        }
+        $.ajax({
+            url: url,
+            data: data,
+            async: isAsync,
+            dataType: 'json',
+            type: 'POST',
+            success: function (result) {
+                if (callback && typeof callback == 'function') {
+                    callback(result);
+                }
+            },
+            error: function (xhr, msg, ex) {
+                simpleAlert('操作失败，可能是网络不通，请稍后再试！', 2);
+            }
+        });
+    }
+
+    function simpleAlert(msg, icon, callback) {
+        layer.closeAll();
+        layer.msg(msg, {
+            icon: icon,
+            time: 1500,
+            shade: [0.1, '#FFF'],
+            scrollbar: false,
+            offset: 200
+            //shift: 6//抖动
+        }, function () {
+            if (callback && typeof callback == 'function') {
+                callback();
+            }
+        });
+    }
+</script>

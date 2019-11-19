@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+  <title></title>
+</head>
+<body>
+  <input type="button" value="测试" onclick="testAlert()"/>
+</body>
+</html>
+<script type="text/javascript" src="../JS_Library/jquery/jquery-1.8.3.min.js"></script> 
+<script type="text/javascript">
+//Alert
+(function ($) {
+	if (!$ || $.alertDialog) return;
+  function AlertDialog(options) {
+  	console.log(this);// this指代AlertDialog函数对象本身
+  	this.options = options;
+    this.funs = [];// 数组对象，第一个元素存储方法，第二个元素存储调用方法的参数
+    this._isshow = false;
+    AlertDialog.prototype.init.call(this);
+  }
+  AlertDialog.prototype = {
+  	constructor: AlertDialog, 
+    init: function () {
+      			if (!this.$el) {
+      				var op = this.options;
+              this.$body = $(document.body);
+              this.$el = $(op.templ).hide().appendTo(this.$body);
+            	op.titleid = '#' + op.titleid;
+              op.contentid = '#' + op.contentid;
+              op.btnok = '#' + op.btnok;
+              op.btncancel = '#' + op.btncancel;
+              // click事件同时定义在命名空间是'dismiss'、'modal'下,所以在命名空间'dismiss'、'modal'下都会被触发
+              // 不要和其它命名空间概念混淆，这里的'.'可以看成链式调用函数的一种特例
+              this.$el.off('click.dismiss.modal', '[data-dismiss="modal"]');//清除之前的事件
+              // 满足data-dismiss="modal"的元素可以触发事件
+              this.$el.on('click.dismiss.modal', '[data-dismiss="modal"]', $.proxy(function (e) { 
+              	// $.proxy()改变调用函数的上下文环境(也就是其中的this)
+              	this.close(e);
+              }, this));//上一行函数中的this被替换为外部的'this',这里是指代AlertDialog函数对象
+           	}
+      		}, 
+      Alert: function () {
+            		this.funs.push(this.alert);
+            		this.funs.push(arguments);
+            		this.run();
+        		}, 
+      Prompt: function () {
+            		this.funs.push(this.prompt);
+            		this.funs.push(arguments);
+            		this.run();
+        		}, 
+      run: function () {
+           	if (!this._isshow) {
+           		// shift()取出数组中第一项
+            	var func = this.funs.shift(), args = this.funs.shift();
+              if (func) {
+              	this._isshow = true;
+                func.apply(this, args);
+              }
+            }
+        	}, 
+      alert: function (msg, title) {            
+            		this._show(msg, title, function () {
+                	var op = this.options, el = this.$el;
+                	el.trigger('show');
+                	el.show();
+                	el.find(op.btncancel).hide();
+                	el.find(op.btnok).attr('data-dismiss', 'modal').off('click');
+                	el.trigger('shown');
+            		});
+        		}, 
+      prompt: function (msg, title, cb) {
+            		if ($.isFunction(title)) {
+                	cb = title;
+                	title = null;
+            		}
+            		this._show(msg, title, function () {
+                	var op = this.options, el = this.$el, btnok = el.find(op.btnok), close = $.proxy(this.close, this);
+                	el.trigger('show');
+                	el.show();
+                	el.find(op.btncancel).show();
+                	el.trigger('shown');                
+                	btnok.attr('data-dismiss', '');
+                	btnok.off('click').on('click', function () {
+                  	cb && cb();
+                    setTimeout(function () { close(); close = null; }, 0);
+                	});
+            		});
+        			}, 
+      _show: function (msg, title, cb) {
+            title = title || this.options.title;
+            var op = this.options, el = this.$el;
+            var $backdrop = this.$backdrop = $('<div class="modal-backdrop" />')
+                    .appendTo(this.$body);
+            $backdrop.click($.proxy(el[0].focus, el[0]));
+
+            var $cwin = $(window), $cdoc = $(window.document),
+            seheight = $cwin.height(), srheight = $cdoc.scrollTop(),
+            sewidth = $cwin.width(), srwidth = $cdoc.scrollLeft(), css = {
+                width: op.width,
+                height: parseInt(op.height, 10) + op.headHeight,
+                position: 'absolute',
+                marginLeft: 0,
+                marginTop: 0
+            };
+            css.top = srheight + parseInt((seheight - parseInt(css.height, 10)) / 2, 10);
+            css.left = srwidth + parseInt((sewidth - parseInt(css.width, 10)) / 2, 10);
+            el.css(css);
+
+            el.find('.modal-header').css('height', op.headHeight + 'px');
+            el.find('.modal-footer').css('height', op.footHeight + 'px');
+            el.find(op.titleid).text(title);
+            var h = (parseInt(op.height, 10) - op.footOuterHeight) + 'px';
+            el.find(op.contentid).css({ height: h }).find('>span').text(msg);
+            cb.call(this);
+        	}, 
+  	close: function () {
+           	this._isshow = false;
+           	this.$el.trigger('hide').hide().trigger('hiden');
+            this.$backdrop && this.$backdrop.remove();
+            this.$backdrop = null;
+            this._isshow = false;
+            this.run();
+        	}
+  }
+	$.alertDialog = function (option) {
+  	var o = $.extend({}, $.alertDialog.defaults, option), 
+  	    $this = $(document), 
+  	    data = $this.data('alertDialog'), 
+  	    options = typeof o == 'object' && o;
+    if (!data){ 
+    	console.log("begin");
+    	$this.data('alertDialog', (data = new AlertDialog(options)));
+    	console.log("end");
+    }
+    return data;
+  }
+ 	$.alertDialog.Constructor = AlertDialog;
+  $.alertDialog.defaults = {
+  	titleid: 'plm-alertdialog-title',
+    contentid: 'plm-alertdialog-body',
+    btnok: 'plm-alertdialog-ok',
+    btncancel: 'plm-alertdialog-cancle',
+    width: 400,
+    height: 100,
+    headHeight: 30,
+    footHeight: 30,
+    footOuterHeight : 37,
+    templ: '<div id="plm-AlertDialog" class="modal" aria-hidden="true" tabindex="-1" role="dialog" > \
+							<table width="100%" border="0" cellpadding="0" cellspacing="0"> \
+								<tbody> \
+									<tr> \
+    								<td class="modal-header" style="border-bottom:#eee 1px solid;padding:0;"> \
+    									<a class="close modal-close" data-dismiss="modal" aria-hidden="true">&times;</a> \
+    									<h3 id="plm-alertdialog-title" style="font-size: 20px;text-indent: 0.5em;font-weight: 500;color: #3078C0;"> </h3> \
+    								</td> \
+    							</tr> \
+    							<tr> \
+    								<td id="plm-alertdialog-body" style="max-height:none;padding:0;"> \
+    									<span style="display:inline-block;text-indent:2em;font-size:16px; vertical-align:middle;"></span> \
+    								</td> \
+    							</tr> \
+    							<tr> \
+    								<td class="modal-footer" style="padding:3px 10px;"> \
+    									<span id="plm-alertdialog-ok" class="btn btn-primary" data-dismiss="modal">确定</span> \
+    									<span id="plm-alertdialog-cancle" class="btn" data-dismiss="modal">取消</span> \
+    								</td> \
+    							</tr> \
+								</tbody> \
+							</table> \
+						</div>',
+    title: 'Star Wind'
+  };
+})(jQuery);
+window.alert = function (text) {
+	$.alertDialog().Alert(text);
+};
+function testAlert(){
+	alert("Good");	
+}
+</script>

@@ -1,0 +1,309 @@
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0032)http://www.ie-zone.com/index.php -->
+<HTML>
+<!-- #BeginTemplate "/Templates/Js.dwt" --> 
+<HEAD>
+<!-- #BeginEditable "doctitle" --> 
+<TITLE>模拟进度条</TITLE>
+<!-- #EndEditable --> 
+<META http-equiv=Content-Type content="text/html; charset=gb2312">
+<LINK  href="../../fav.ico" rel="shortcut icon">
+<STYLE type=text/css>BODY {
+	MARGIN: 25px 25px 25px
+}
+#all TD {
+	FONT-SIZE: 12px; LINE-HEIGHT: 15px; FONT-FAMILY: "Verdana", "Arial","新宋体", "宋体"
+}
+INPUT {
+	FONT-SIZE: 12px; LINE-HEIGHT: 15px; FONT-FAMILY: "Verdana", "Arial","新宋体", "宋体"
+}
+SELECT {
+	FONT-SIZE: 12px; LINE-HEIGHT: 15px; FONT-FAMILY: "Verdana", "Arial","新宋体", "宋体"
+}
+P {
+	FONT-SIZE: 12px; LINE-HEIGHT: 15px; FONT-FAMILY: "Verdana", "Arial","新宋体", "宋体"
+}
+TEXTAREA {
+	FONT-SIZE: 12px; LINE-HEIGHT: 15px; FONT-FAMILY: "Verdana", "Arial","新宋体", "宋体"
+}
+
+#all A:active {
+	COLOR: #7d070c
+}
+#all A:visited {
+	COLOR: #7d070c
+}
+
+#all A:hover {
+	COLOR: #336699
+}
+#all A:link {
+	COLOR: #7d070c
+}
+</STYLE>
+<SCRIPT language=JavaScript>
+<!--
+
+function MM_goToURL() { //v3.0
+  var i, args=MM_goToURL.arguments; document.MM_returnValue = false;
+  for (i=0; i<(args.length-1); i+=2) eval(args[i]+".location='"+args[i+1]+"'");
+}
+function JM_cc(ob){
+var obj=MM_findObj(ob); if (obj) { 
+obj.select();js=obj.createTextRange();js.execCommand("Copy");}
+}
+
+function MM_findObj(n, d) { //v4.0
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && document.getElementById) x=document.getElementById(n); return x;
+}
+//-->
+</SCRIPT>
+<META content="MSHTML 5.50.4134.600" name=GENERATOR>
+</HEAD>
+<BODY id=all text=#000000 bgColor=#336699>
+<TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>
+  <TR bgColor=#ffffff> 
+    <TD><IMG src="../images/sq_1.gif" width=11 height="14"></TD>
+    <TD width="100%"></TD>
+    <TD><IMG src="../images/sq_2.gif"    width=11 height="14"></TD>
+  </TR>
+</TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>
+  <TR bgColor=#ffffff> 
+    <TD><IMG src="../../images/space.gif" width=11 height="1"></TD>
+    <TD width="100%"> 
+      <table width="100%" border="0" cellpadding="8">
+        <tr> 
+          <td align="center"> 
+            <script language="JavaScript">
+document.write("<font color=#7d070c style=\"font-size: 14px\">"+document.title+"</font>");
+</script>
+          </td>
+        </tr>
+        <tr> 
+          <td bgcolor="#f7f7f7"><!-- #BeginEditable "example" --> 
+            <style>
+<!--
+#bar, #barbackground{
+position:absolute;
+left:0;
+top:0;
+background-color:blue;
+}
+
+#barbackground{
+background-color:black;
+}
+
+-->
+</style>
+            <script language="JavaScript1.2">
+
+/*
+Dynamic Progress Bar- By Dynamicdrive.com
+For full source, Terms of service, and 100s DTHML scripts
+Visit http://www.dynamicdrive.com
+*/
+
+//1) Set the duration for the progress bar to complete loading (in seconds)
+var duration=5
+
+//2) Set post action to carry out inside function below:
+function postaction(){
+//Example action could be to navigate to a URL, like following:
+//window.location="http://www.dynamicdrive.com"
+}
+
+
+///Done Editing/////////////
+var clipright=0
+var widthIE=0
+var widthNS=0
+
+function initializebar(){
+if (document.all){
+baranchor.style.visibility="visible"
+widthIE=bar.style.pixelWidth
+startIE=setInterval("increaseIE()",50)
+}
+if (document.layers){
+widthNS=document.baranchorNS.document.barbackgroundNS.clip.width
+document.baranchorNS.document.barNS.clip.right=0
+document.baranchorNS.visibility="show"
+
+startNS=setInterval("increaseNS()",50)
+}
+}
+
+function increaseIE(){
+bar.style.clip="rect(0 "+clipright+" auto 0)"
+window.status="Loading..."
+if (clipright<widthIE)
+clipright=clipright+(widthIE/(duration*20))
+else{
+window.status=''
+clearInterval(startIE)
+postaction()
+}
+}
+
+function increaseNS(){
+if (clipright<202){
+window.status="Loading..."
+document.baranchorNS.document.barNS.clip.right=clipright
+clipright=clipright+(widthNS/(duration*20))
+}
+else{
+window.status=''
+clearInterval(startNS)
+postaction()
+}
+}
+
+
+window.onload=initializebar
+</script>
+            <script language="JavaScript1.2">
+if (document.all){
+document.write('<div id="baranchor" style="position:relative;width:200px;height:20px;visibility:hidden;">')
+document.write('<div id="barbackground" style="width:200px;height:20px;z-index:9"></div>')
+document.write('<div id="bar" style="width:200px;height:20px;z-index:10"></div>')
+document.write('</div>')
+}
+
+</script>
+            <ilayer name="baranchorNS" visibility="hide" width=200 height=20> 
+            <layer name="barbackgroundNS" bgcolor=black width=200 height=20 z-index=10 left=0 top=0></layer>
+            <layer name="barNS" bgcolor=blue width=200 height=20 z-index=11 left=0 top=0></layer>
+            </ilayer>
+            提示:如果你看不到效果，请刷新页面<!-- #EndEditable --></td>
+        </tr>
+        <tr> 
+          <td><!-- #BeginEditable "code" -->1.将下面的代码复制到 &lt;head&gt; 内 
+            <input type="button" name="Button" value="复制到我的剪贴板" onClick="JM_cc('js_1')">
+            <br>
+            <form name="form1" method="post" action="">
+              <textarea name="js_1" wrap="VIRTUAL" cols="80" rows="10">&lt;style&gt;
+<!--
+#bar, #barbackground{
+position:absolute;
+left:0;
+top:0;
+background-color:blue;
+}
+
+#barbackground{
+background-color:black;
+}
+
+-->
+&lt;/style&gt;
+
+&lt;script language=&quot;JavaScript1.2&quot;&gt;
+
+/*
+Dynamic Progress Bar- By Dynamicdrive.com
+For full source, Terms of service, and 100s DTHML scripts
+Visit http://www.dynamicdrive.com
+*/
+
+//1) Set the duration for the progress bar to complete loading (in seconds)
+var duration=5
+
+//2) Set post action to carry out inside function below:
+function postaction(){
+//Example action could be to navigate to a URL, like following:
+//window.location=&quot;http://www.dynamicdrive.com&quot;
+}
+
+
+///Done Editing/////////////
+var clipright=0
+var widthIE=0
+var widthNS=0
+
+function initializebar(){
+if (document.all){
+baranchor.style.visibility=&quot;visible&quot;
+widthIE=bar.style.pixelWidth
+startIE=setInterval(&quot;increaseIE()&quot;,50)
+}
+if (document.layers){
+widthNS=document.baranchorNS.document.barbackgroundNS.clip.width
+document.baranchorNS.document.barNS.clip.right=0
+document.baranchorNS.visibility=&quot;show&quot;
+
+startNS=setInterval(&quot;increaseNS()&quot;,50)
+}
+}
+
+function increaseIE(){
+bar.style.clip=&quot;rect(0 &quot;+clipright+&quot; auto 0)&quot;
+window.status=&quot;Loading...&quot;
+if (clipright&lt;widthIE)
+clipright=clipright+(widthIE/(duration*20))
+else{
+window.status=''
+clearInterval(startIE)
+postaction()
+}
+}
+
+function increaseNS(){
+if (clipright&lt;202){
+window.status=&quot;Loading...&quot;
+document.baranchorNS.document.barNS.clip.right=clipright
+clipright=clipright+(widthNS/(duration*20))
+}
+else{
+window.status=''
+clearInterval(startNS)
+postaction()
+}
+}
+
+
+window.onload=initializebar
+&lt;/script&gt;</textarea>
+            </form>
+            <br>
+            2.将下面的代码复制到 &lt;body&gt; 内 
+            <input type="button" name="Button2" value="复制到我的剪贴板" onClick="JM_cc('js_2')">
+            <br>
+            <form name="form1" method="post" action="">
+              <textarea name="js_2" wrap="VIRTUAL" cols="80" rows="10">&lt;script language=&quot;JavaScript1.2&quot;&gt;
+if (document.all){
+document.write('&lt;div id=&quot;baranchor&quot; style=&quot;position:relative;width:200px;height:20px;visibility:hidden;&quot;&gt;')
+document.write('&lt;div id=&quot;barbackground&quot; style=&quot;width:200px;height:20px;z-index:9&quot;&gt;&lt;/div&gt;')
+document.write('&lt;div id=&quot;bar&quot; style=&quot;width:200px;height:20px;z-index:10&quot;&gt;&lt;/div&gt;')
+document.write('&lt;/div&gt;')
+}
+
+&lt;/script&gt;
+&lt;ilayer name=&quot;baranchorNS&quot; visibility=&quot;hide&quot; width=200 height=20&gt;
+&lt;layer name=&quot;barbackgroundNS&quot; bgcolor=black width=200 height=20 z-index=10 left=0 top=0&gt;&lt;/layer&gt;
+&lt;layer name=&quot;barNS&quot; bgcolor=blue width=200 height=20 z-index=11 left=0 top=0&gt;&lt;/layer&gt;
+&lt;/ilayer&gt;</textarea>
+            </form>
+            <!-- #EndEditable --></td>
+        </tr>
+      </table>
+    </TD>
+    <TD><IMG src="../../images/space.gif"    width=11 height="1"></TD>
+  </TR>
+</TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>
+  <TR bgColor=#ffffff> 
+    <TD><IMG src="../images/sq_3.gif" width=11 height="14"></TD>
+    <TD width="100%"></TD>
+    <TD><IMG src="../images/sq_4.gif"    width=11 height="14"></TD>
+  </TR>
+</TABLE>
+</BODY>
+<!-- #EndTemplate -->
+</HTML>

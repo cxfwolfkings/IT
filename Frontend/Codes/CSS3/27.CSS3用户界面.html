@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        div.resize {
+            border: 2px solid;
+            padding: 10px 40px;
+            width: 300px;
+            resize: both;
+            overflow: auto;
+        } /* 规定 div 元素可由用户调整大小 */
+        div.container {
+            width: 30em;
+            border: 1em solid;
+        }
+        div.box {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box; /* Firefox */
+            -webkit-box-sizing: border-box; /* Safari */
+            width: 50%;
+            border: 1em solid red;
+            float: left;
+        } /* 规定两个并排的带边框方框 */
+        div.offset {
+            margin: 20px;
+            width: 150px;
+            padding: 10px;
+            height: 70px;
+            border: 2px solid black;
+            outline: 2px solid red;
+            outline-offset: 15px;
+        } /* 规定边框边缘之外 15 像素处的轮廓 */
+    </style>
+</head>
+<body>
+    <div class="resize">resize 属性规定是否可由用户调整元素尺寸。</div>
+    <p><b>注释：</b> Firefox 4+、Safari 以及 Chrome 支持 resize 属性。</p>
+    <br />
+    <div class="container">
+        <div class="box">这个 div 占据左半部分。</div>
+        <div class="box">这个 div 占据右半部分。</div>
+    </div>
+    <p><b>注释：</b>Internet Explorer 和 Opera 不支持 support outline-offset 属性。</p>
+    <div class="offset">这个 div 在边框边缘之外 15 像素处有一个轮廓。</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<html>
+<head>
+
+</head>
+<body>
+	<!-- <embed> 标签被所有主流的浏览器支持，并允许使用脚本。
+	当在 HTML 页面中嵌入 SVG 时使用 <embed> 标签是 Adobe SVG Viewer 推荐的方法！
+	然而，如果需要创建合法的 XHTML，就不能使用 <embed>。任何 HTML 规范中都没有 <embed> 标签。	
+	pluginspage 属性指向下载插件的 URL。-->
+	<embed src="circle1.svg" width="300" height="100" 
+		type="image/svg+xml" 
+		pluginspage="http://www.adobe.com/svg/viewer/install/" /> 
+	<!-- <object> 标签是 HTML 4 的标准标签，被所有较新的浏览器支持。它的缺点是不允许使用脚本。
+	假如您安装了最新版本的 Adobe SVG Viewer，那么当使用 <object> 标签时 SVG 文件无法工作（至少不能在 IE 中工作）！
+	codebase 属性指向下载插件的 URL。-->
+	<object data="circle1.svg" width="300" height="100" 
+		type="image/svg+xml"
+		codebase="http://www.adobe.com/svg/viewer/install/" />
+	<!-- <iframe> 标签可工作在大部分的浏览器中。 -->
+	<iframe src="circle1.svg" width="300" height="100"></iframe>
+</body>
+</html>

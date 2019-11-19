@@ -1,0 +1,236 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>jQuery formValidator表单验证插件 -- by:猫冬，email:wzmaodong@126.com</title>
+<meta name="Author" content="猫冬">
+<meta name="description" content="jQuery formValidator表单验证插件" />
+<meta name="keywords" content="jQuery,formValidator,插件,表单,验证,插件,javascript,表单验证,提示层" />
+<script src="jquery_last.js" type="text/javascript"></script>
+<link type="text/css" rel="stylesheet" href="style/validator.css"></link>
+<script src="formValidator.js" type="text/javascript" charset="UTF-8"></script>
+<script src="formValidatorRegex.js" type="text/javascript" charset="UTF-8"></script>
+<script language="javascript" src="DateTimeMask.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	//$.formValidator.initConfig({onerror:function(){alert("校验没有通过，具体错误请看错误提示")}});
+	$.formValidator.initConfig({formid:"form1",alertmessage:true,onerror:function(msg){alert(msg)}});
+	$("#test1").formValidator({onshow:"请输入用户名,只有输入\"maodong\"才是对的",onfocus:"用户名至少6个字符,最多10个字符",oncorrect:"该用户名可以注册"}).inputValidator({min:6,max:10,onerror:"你输入的用户名非法,请确认"}).regexValidator({regexp:"username",datatype:"enum",onerror:"用户名格式不正确"})
+	    .ajaxValidator({
+	    type : "get",
+		url : "Default.aspx",
+		datatype : "json",
+		success : function(data){	
+            if( data == "1" )
+			{
+                return true;
+			}
+            else
+			{
+                return false;
+			}
+		},
+		buttons: $("#button"),
+		error: function(){alert("服务器没有返回数据，可能服务器忙，请重试");},
+		onerror : "该用户名不可用，请更换用户名",
+		onwait : "正在对用户名进行合法性校验，请稍候..."
+	}).defaultPassed();
+	$("#password1").formValidator().inputValidator({min:1,onerror:"密码不能为空,请确认"});
+	$("#password2").formValidator().inputValidator({min:1,onerror:"重复密码不能为空,请确认"}).compareValidator({desid:"password1",operateor:"=",onerror:"2次密码不一致,请确认"});
+	$("input:radio[name='sex']").formValidator({defaultvalue:"2"}).inputValidator({min:1,max:1,onerror:"性别忘记选了,请确认"});
+	$("#nl").formValidator().inputValidator({min:1,max:99,type:"value",onerror:"年龄必须在1-99之间，请确认"});
+	$("#csny").DateTimeMask({"lawlessmessage":"你输入的出生日期格式错误"}).formValidator().inputValidator({min:"1900-01-01",max:"2000-01-01",type:"value",onerror:"日期必须在\"1900-01-01\"和\"2000-01-01\"之间"});
+	$("#sfzh").formValidator().functionValidator({fun:isCardID});
+	$("#email").formValidator({defaultvalue:"@"}).inputValidator({min:6,max:100,onerror:"你输入的邮箱长度非法,请确认"}).regexValidator({regexp:"^([\\w-.]+)@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.)|(([\\w-]+.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(]?)$",onerror:"你输入的邮箱格式不正确"});
+	$("#xueli").formValidator({defaultvalue:"a"}).inputValidator({min:1,onerror: "你是不是忘记选择学历了!"});
+	$("#ewjy").formValidator().inputValidator({min:1,onerror:"这里至少要一个字符,请确认"}).functionValidator({
+	    fun:function(val,elem){
+	        if(val=="猫冬"){
+			    return true;
+		    }else{
+			    return "额外校验失败,想额外校验通过，请输入\"猫冬\""
+		    }
+		}
+	});
+	$("#Tel_country").formValidator({defaultvalue:"86"}).regexValidator({regexp:"^\\d{2}$",onerror:"国家区号不正确"});
+	$("#Tel_area").formValidator().regexValidator({regexp:"^\\d{3,4}$",onerror:"地区区号不正确"});
+	$("#Tel_number").formValidator().regexValidator({regexp:"^\\d{7,8}$",onerror:"电话号码不正确"});
+	$("#Tel_ext").formValidator().regexValidator({regexp:"^\\d{1,5}$",onerror:"分机号码不正确"});
+	$("input:checkbox[@name='checkbox1']").formValidator().inputValidator({min:1,onerror:"你选的个数不对"});
+	$("input:checkbox[@name='checkbox8']").formValidator().inputValidator({min:2,max:3,onerror:"你选的个数不对(至少选择2个,最多选择3个)"});
+	$("input:radio[@name='radio']").formValidator({defaultvalue:"4"}).inputValidator({min:1,max:1,onerror:"难道你不爱国？你给我选！！！！"});
+	$("#shouji").formValidator({empty:true}).inputValidator({min:11,max:11,onerror:"手机号码必须是11位的,请确认"}).regexValidator({regexp:"mobile",datatype:"enum",onerror:"你输入的手机号码格式不正确"});;
+	$("#lxdh").formValidator({empty:true}).regexValidator({regexp:"^[[0-9]{3}-|\[0-9]{4}-]?([0-9]{8}|[0-9]{7})?$",onerror:"你输入的联系电话格式不正确"});
+	$("#ms").formValidator({defaultvalue:"这家伙很懒，什么都没有留下。"}).inputValidator({min:20,onerror:"你输入的描述长度不正确,请确认"});
+});
+function test(obj)
+{
+	if(obj.value=="不校验身份证")
+	{
+		$("#sfzh").attr("disabled",true).unFormValidator(true);
+		obj.value = "校验身份证";
+	}
+	else
+	{
+		$("#sfzh").attr("disabled",false).unFormValidator(false);
+		obj.value = "不校验身份证";
+	}
+}
+</script>
+<style type="text/css" media="all">
+body,div{font-size:12px;}
+</style>
+</head>
+
+<body>
+<h3>jQuery formValidator表单验证插件示例</h3>
+<p>只有一个校验组的示例</p>
+<p><a href="http://wzmaodong.cnblogs.com">猫冬的博客</a></p>
+<input type="button" onclick="test(this)" value="不校验身份证"  />
+<form action="" method="post" name="form1" id="form1">
+  <table border="0px" style="font-size:12px" width="630px">
+    <tr> 
+      <td align="right">用户名:</td>
+      <td><input type="text" id="test1" style="width:120px" value="maodong" /></td>
+      <td><div id="test1Tip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">密码:</td>
+      <td><input type="password" id="password1" class="sz" style="width:120px" /></td>
+      <td><div id="password1Tip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">重复密码:</td>
+      <td><input type="password" id="password2" class="sz" style="width:120px" /></td>
+      <td><div id="password2Tip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">你的性别:</td>
+      <td><input type="radio" id="sex" value="1" name="sex" />
+        男&nbsp;&nbsp;&nbsp;&nbsp; <input type="radio" id="sex1" value="2" name="sex" />
+        女</td>
+      <td><div id="sexTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">你的年龄:</td>
+      <td><input type="text" id="nl" style="width:120px" value="26" /></td>
+      <td><div id="nlTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">出生日期:</td>
+      <td><input type="text" id="csny" style="width:120px" value="1982-09-21" /></td>
+      <td><div id="csnyTip" style="width:250px"></div></td>
+    </tr>
+    <tr>
+      <td align="right">身份证号</td>
+      <td><input name="text2" type="text" id="sfzh" style="width:150px" value="" /></td>
+      <td><div id="sfzhTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">电子邮箱:</td>
+      <td><input type="text" id="email" style="width:120px" /></td>
+      <td><div id="emailTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">你的学历:</td>
+      <td> <select name="select" id="xueli">
+          <option value="">－－请选择你的学历－－</option>
+          <option value="a">专科</option>
+          <option value="b">本科</option>
+          <option value="c">研究生</option>
+          <option value="e">硕士</option>
+          <option value="d">博士</option>
+        </select> </td>
+      <td><div id="xueliTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">额外校验:</td>
+      <td><input name="text" type="text" id="ewjy" style="width:120px" /></td>
+      <td><div id="ewjyTip" style="width:270px"></div></td>
+    </tr>
+    <tr> 
+      <td colspan="3"> 国家区号 
+        <input id="Tel_country" style="width: 20px;" value="" />
+        -地区区号 
+        <input id="Tel_area" style="width: 35px;" />
+        -电话号码 
+        <input id="Tel_number" style="width: 60px;" />
+        -分机号码 
+        <input id="Tel_ext" style="width: 30px;" /> </td>
+    </tr>
+    <tr>
+      <td colspan="3"><div id="teltip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">兴趣爱好1:</td>
+      <td colspan="2"> <input type="checkbox" name="checkbox1" id="qq1"/>
+        乒乓球 
+        <input type="checkbox" name="checkbox1" id="qq2" />
+        羽毛球 
+        <input type="checkbox" name="checkbox1" id="qq3" />
+        上网 
+        <input type="checkbox" name="checkbox1" id="qq4" />
+        旅游 
+        <input type="checkbox" name="checkbox1" id="qq5" />
+        购物 </td>
+    </tr>
+    <tr> 
+      <td colspan="3"><div id="test3Tip" style="width:350px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">兴趣爱好2:</td>
+      <td colspan="2"> <input type="checkbox" name="checkbox8" id="pp1"/>
+        乒乓球 
+        <input type="checkbox" name="checkbox8" id="pp2" />
+        羽毛球 
+        <input type="checkbox" name="checkbox8" id="pp3" />
+        上网 
+        <input type="checkbox" name="checkbox8" id="pp4" />
+        旅游 
+        <input type="checkbox" name="checkbox8" id="pp5" />
+        购物 
+        <input type="checkbox" name="checkbox8" id="pp6" />
+        睡觉 </td>
+    </tr>
+    <tr> 
+      <td colspan="3"><div id="test2Tip" style="width:350px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">你爱国吗:</td>
+      <td colspan="2"> <input type="radio" name="radio" value="1" id="bb1"  />
+        不爱 
+        <input type="radio" name="radio" id="bb2" value="2" />
+        不发表意见 
+        <input type="radio" name="radio" id="nn3" value="3" />
+        爱 
+        <input type="radio" name="radio" id="nn4" value="4" />
+        爱死它了 </td>
+    </tr>
+    <tr> 
+      <td colspan="3"><div id="aiguoTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">手机号码:</td>
+      <td><input type="text" id="shouji" style="width:120px" /></td>
+      <td><div id="shoujiTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right">联系电话:</td>
+      <td><input type="text" id="lxdh" style="width:120px" /></td>
+      <td><div id="lxdhTip" style="width:250px"></div></td>
+    </tr>
+    <tr> 
+      <td align="right" valign="top">你的描述:</td>
+      <td colspan="2" valign="top"> <textarea id="ms" cols="50" rows="10"></textarea> 
+      </td>
+    </tr>
+    <tr> 
+      <td colspan="3"><div id="msTip" style="width:250px"></div></td>
+    </tr>
+  </table>
+  <br />
+  
+    <input type="submit" name="button" id="button" value="提交" />
+  
+</form>
+</body>
+</html>

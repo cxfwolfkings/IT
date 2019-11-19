@@ -1,0 +1,47 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Insert title here</title>
+		<script type="text/javascript" src="../js/prototype-1.6.0.3.js"></script>
+		<script type="text/javascript" src="../js/jquery-1.4.3.js"></script>
+		<script type="text/javascript">
+			function f1(){
+				alert('hello');
+			}
+			function f1(abc){
+				alert('hello ' + abc);
+			}
+			function f2(){
+				//此时，jQuery的$函数会覆盖prototype的$函数
+				var obj = $('d1');//取不到element
+				obj.innerHTML = 'hello java';//不会输出
+			}
+			function f3(){
+				//此时，可以使用jQuery的$函数
+				var $obj = $('#d1');
+				$obj.html('hello java');
+			}
+			function f4(){
+				//可以将jQuery的$函数改名，这样，两个框架的$函数就能同时使用了
+				var $a = jQuery.noConflict();
+				var $obj = $a('#d1');
+				$obj.html('hello java');
+			}
+			function f5(){
+				//可以将jQuery的$函数改名，这样，两个框架的$函数就能同时使用了
+				var $a = jQuery.noConflict();
+				var obj = $('d1');
+				obj.innerHTML = 'hello java';
+			}
+		</script>
+	</head>
+	<body style="font-size:30px;">
+		<div id="d1">hello jQuery</div>
+		<input type="button" value="f1" onclick="f1();"/>
+		<input type="button" value="f1" onclick="f1('java');"/>
+		<input type="button" value="f2" onclick="f2();"/>
+		<input type="button" value="f3" onclick="f3();"/>
+		<input type="button" value="f4" onclick="f4();"/>
+		<input type="button" value="f5" onclick="f5();"/>
+	</body>
+</html>

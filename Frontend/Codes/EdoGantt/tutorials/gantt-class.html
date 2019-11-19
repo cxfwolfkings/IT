@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>甘特图组件和数据对象 | 开发手册 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">甘特图组件和数据对象</h1>
+    <div id="view" class="example-content">
+<h1>引用CSS和JS</h1>
+<p>使用EdoGantt是一件简单轻松的事，首先我们在HTML页面内引用CSS和JS：</p><pre class="code"><span style="color: green">&lt;!--edo css--&gt;
+</span><span style="color: blue">&lt;</span><span style="color: #a31515">link </span><span style="color: red">href</span><span style="color: blue">="../../scripts/edo/res/css/edo-all.css" </span><span style="color: red">rel</span><span style="color: blue">="stylesheet" </span><span style="color: red">type</span><span style="color: blue">="text/css" /&gt;
+&lt;</span><span style="color: #a31515">link </span><span style="color: red">href</span><span style="color: blue">="../../scripts/edo/res/product/project/css/project.css" </span><span style="color: red">rel</span><span style="color: blue">="stylesheet" </span><br><span style="color: red">type</span><span style="color: blue">="text/css" /&gt;
+</span><span style="color: green">&lt;!--edo js--&gt;
+</span><span style="color: blue">&lt;</span><span style="color: #a31515">script </span><span style="color: red">src</span><span style="color: blue">="../../scripts/edo/edo.js" </span><span style="color: red">type</span><span style="color: blue">="text/javascript"&gt;&lt;/</span><span style="color: #a31515">script</span><span style="color: blue">&gt;</span></pre>
+<p>注意，请仔细检查css和js的路径是否正确。很多错误都只是CSS或JS路径不对造成的。</p>
+<h1>创建EdoGantt</h1>
+<p>创建一个EdoGantt，需要两大对象：</p>
+<p>1.Edo.lists.Gantt&nbsp; ：甘特图显示组件。负责界面显示和操作。 
+<p>2.Edo.data.DataGantt&nbsp; ：甘特图数据组件。负责数据修改。</p>
+<p>我们在网页上创建一个web gantt，来说明如何使用这两个对象：</p><pre class="code"><span style="color: green">//创建一个Edo.data.DataGantt甘特图数据对象
+</span><span style="color: blue">var </span>dataGantt = <span style="color: blue">new </span>Edo.data.DataGantt(ganttData);
+Edo.build({
+    id: <span style="color: #a31515">'gantt'</span>,
+    type: <span style="color: #a31515">'gantt'</span>,                      <span style="color: green">//甘特图显示组件
+    </span>width: 700,                         <span style="color: green">//宽度
+    </span>height: 350,                        <span style="color: green">//高度    
+    </span>startDate: <span style="color: blue">new </span>Date(2009, 0, 28),   <span style="color: green">//甘特图显示开始日期
+    </span>finishDate: <span style="color: blue">new </span>Date(2009, 1, 30),  <span style="color: green">//甘特图显示截止日期     
+    </span>data: dataGantt,                    <span style="color: green">//将甘特图数据对象,设置给甘特图显示组件    
+    </span>render: document.getElementById(<span style="color: #a31515">'view'</span>)
+});</pre>
+<p>这里的ganttData数据对象，就是我们上一节教程“<a href="gantt-data.html">甘特图数据结构</a>”中的甘特图基础数据对象，是一个普通的JS Array。</p>
+<p>创建的甘特图视图如下：</p>
+<p style="text-align:center;margin-bottom:15px;">
+    <img src="images/gantt1.png" /></p>
+<h1>创建标准甘特图</h1>
+<p>使用Edo.lists.Gantt创建的甘特图组件，只是一个条形图视图。</p>
+<p>一般人们需要的甘特图，是一个左侧树，右侧条形图的视图。</p>
+<p>EdoJS提供了一个强大的树形组件:Edo.lists.Tree，来帮助我们实现一个标准的甘特图。</p>
+<p>标准甘特图视图如下：</p>
+<p style="text-align:center;margin-bottom:15px;">
+    <img src="images/gantt2.png" /></p>
+<p>关于如何使用Edo.lists.Tree，超出了本篇教程讲述的范畴，您可以去<a href="http://www.edojs.com" target="_blank">EdoJS官方网站</a>的教程中心学习了解。</p>
+<p>这里有一个<a href="../examples/standard.html" target="_blank">标准甘特图</a>的甘特图例子可供参考。</p>
+<h1>调整甘特图视图日期范围</h1>
+<p>Edo.lists.Gantt除data属性外，还有两个非常重要的属性：startDate和finishDate。这两个日期属性，用来控制甘特图的日期显示范围，如果任务的日期超出这个日期范围，将不会显示在甘特图界面上。所以，如果想将所有任务显示在甘特图界面上，请将这两个值，设置为所有任务的最小开始日期和最大完成日期。</p>
+<p>用户可以在创建甘特图的时候，给startDate和finishDate赋值，也可以在创建甘特图之后，参考如下代码重新设置，便于实时调整甘特图显示日期范围：</p><pre class="code">gantt.<span style="color: blue">set</span>(<span style="color: #a31515">'startDate'</span>, <span style="color: blue">new </span>Date(2009, 0, 28));
+gantt.<span style="color: blue">set</span>(<span style="color: #a31515">'finishDate'</span>, <span style="color: blue">new </span>Date(2009, 1, 30));</pre>
+<p>用户也可以在任何时刻重新设置甘特图的数据对象，不断刷新甘特图数据内容。</p>
+<h1>使用AJAX获取数据</h1>
+<p>在实际使用中，用户的甘特图数据不会存放在静态页面内，而是请求服务端的一个页面服务，返回项目数据，这就需要使用一个数据交互组件：AJAX。</p>
+<p>用户可以使用自己属性的AJAX组件，如果有需要，我们也提供了一个<a href="#">EdoJS AJAX组件</a>，帮助用户更方便进行数据交互操作。</p>
+<p>这里有一个<a href="../examples/ajax.html" target="_blank">使用Ajax加载Json数据</a>的甘特图例子可供参考。</p>
+<h1>监听事件和数据操作</h1>
+<p>在“<a href="gantt-event.html">监听事件和数据操作</a>”教程中，您可以学习怎么用EdoGantt来实现自己的项目管理功能逻辑。</p>
+<h1>自定义甘特图外观</h1>
+<p>在“<a href="gantt-diy.html">自定义显示外观</a>”教程中，您可以学习到如何将EdoGant修改成符合自己项目或产品需要的外观。</p>
+<p class="ttexamples">相关示例： <a href="../examples/base.html">基础甘特图</a> <a href="../examples/standard.html">标准甘特图</a> <a href="../examples/ajax.html">使用Ajax加载Json数据</a></p>
+<div class="toppage">
+    <a href="#">Top of this page</a>
+</div>
+    </div>        
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>

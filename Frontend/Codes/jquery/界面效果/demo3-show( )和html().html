@@ -1,0 +1,40 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>hello world</title>
+    <script type="text/javascript" src="http://www.cssrain.cn/demo/jquery.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").addClass("test").show().html("cssrain");
+            //对比：$("a").addClass("test").html("cssrain");
+        });
+    </script>
+    <style>
+        .test {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="http://www.cssrain.cn">
+        测试测试
+    </a>
+
+    <br />
+
+    <a href="http://www.cssrain.cn" style="display:none;">
+        测试测试
+    </a>
+    <!--
+    首先增加样式，
+    然后
+    show( ):显示隐藏的匹配元素。
+    html("foo"):设置每一个匹配元素的html内容
+    我们发现 超连接里面的内容 已经被替换了.
+
+    -->
+</body>
+</html> 

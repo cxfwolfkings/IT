@@ -1,0 +1,122 @@
+﻿/* split */
+.e-split-inner
+{
+	background-image:url(images/split/split.gif);
+}
+.e-split-v .e-split-inner
+{
+	background:#e0e0e0;
+}
+/*text*/
+.e-text
+{
+	border:1px solid #b5b8c8;
+}
+body .e-text-focus{
+	border: 1px solid #7eadd9;	
+}
+
+/* box */
+.e-box{
+	border:solid 1px #99bbe8;	
+	background:#dfe8f6;
+}
+/*  panel  */
+.e-panel-header
+{
+	background:url(images/panel/top-bottom.gif) 0 -1px;
+	border-bottom:solid 1px #99bbe8;
+}
+/*	menu	*/
+.e-menu
+{	
+	background:#fff;
+}
+
+/*	fieldset	*/
+.e-fieldset-fieldset
+{
+	border-color:#b5b8c8;		
+}
+.e-fieldset-legend
+{
+	color:#15428b;
+}
+/* toolbar */
+.e-toolbar{    
+    background:#d0def0 url(images/toolbar/bg.gif) repeat-x top left;
+	/*border-color:#a9bfd3;*/    
+}
+/*group*/
+.e-group-tl, .e-group-tr, .e-group-bl, .e-group-br
+{
+	background-image:url(images/group/group-cs.gif);
+}
+.e-group-tc, .e-group-bc
+{
+	background-image:url(images/group/group-tb.gif);
+}
+.e-group-ml, .e-group-mr
+{
+	background-image:url(images/group/group-lr.gif);
+}
+/*table*/
+.e-table-header
+{
+	background-image:url(images/table/grid3-hrow.gif);
+}
+.e-table-header-row
+{
+	border-bottom:solid 1px #ccc;
+}
+.e-table-horizontalline .e-table-table td
+{	
+	border-bottom-color:#cfcfcf;
+}
+.e-table-verticalline .e-table-table td
+{	
+	border-right-color:#ccc;
+}
+.e-table-horizontalline .e-table-header .e-table-table td
+{	
+	border-bottom-color:#ccc;
+}
+.e-table-verticalline .e-table-header .e-table-table td
+{	
+	border-right-color:#ccc;
+}
+.e-table-stripe
+{
+	background-color:#f5f5f5;
+}
+.e-table-row-selected
+{	
+	/*background:#dfebfb url(../images/table/row-sel.gif) repeat-x;*/
+	background:#dfebfb;
+}
+.e-table-cell-selected
+{
+	background:#b8cfee;	
+}
+/*tabbar*/
+.e-tabbar .e-btn
+{	
+    background:#E0EDFF url(images/tabbar/tab.gif) repeat-x 0 -51px;  
+}
+.e-tabbar a:hover.e-btn{		
+	background:#E0EDFF url(images/tabbar/tab.gif) repeat-x 0 -101px;  
+	border-color:#9ec0ec;color:#2c4d79;
+}
+.e-tabbar .e-btn-pressed, .e-tabbar a:hover.e-btn-pressed{	
+	background:white url(images/tabbar/tab.gif);
+	color:#2c4d79;
+}
+.e-tabbar-top .e-btn-pressed, .e-tabbar-top a:hover.e-btn-pressed{
+	background-position:0 -1px;
+	background-repeat:repeat-x;
+	border-top-color:#9ec0ec;
+}
+.e-tabbar-top .e-tabbar-line-strip
+{
+	border-top:solid 1px #deecfd;
+}

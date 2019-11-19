@@ -1,0 +1,43 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>选择器--后代选择器</title>
+    <script type="text/javascript" src="../js/jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () { $("#head").click(function () { $("div .test").addClass("c_style"); }); });
+    </script>
+    <style type="text/css">
+        .c_style {
+            background: #daf;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="button" name="head" id="head" value="选择器--后代选择器" />
+
+    <div>
+        这里没反应.
+        <span class="test"><span class="test">选择器--后代选择器11</span>选择器--后代选择器11</span>
+        <span class="test">选择器--后代选择器22</span>
+        <span class="test">选择器--后代选择器33</span>
+    </div>
+
+    <div>
+        这里没反应.
+        <span class="test">选择器--后代选择器11</span>
+        <span class="test">选择器--后代选择器22</span>
+        <span class="test">选择器--后代选择器33</span>
+    </div>
+
+
+
+    <!--$("mix mix"),当然可以是多个嵌套,但后代选择器可以是深层子代,所以$("mix mix mix ...")这种写法作用不大.
+    例子:$("div .test"):在div标签内的所有具有test的class的后代元素(就是被div嵌套的class属性为test的标签)
+    -->
+
+
+</body>
+</html> 

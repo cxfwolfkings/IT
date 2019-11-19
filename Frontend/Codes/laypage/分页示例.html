@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>分页示例</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+    <style type="text/css">
+        .page_total {
+            padding: 0;
+            margin: 0 5px;
+            height: 30px;
+        }
+
+            .page_total input {
+                margin: 0 3px;
+                width: 35px;
+                text-align: center;
+                vertical-align: middle;
+                margin-top: -2px;
+                height: 30px;
+                line-height: 28px;
+                outline: none;
+                max-height: 30px;
+            }
+
+            .page_total label {
+                color: #666;
+                font-weight: inherit;
+                height: 30px;
+                line-height: 30px;
+                vertical-align: middle;
+                margin: 0;
+                padding: 0;
+            }
+    </style>
+</head>
+<body>
+    <nav class="text-right table-report-pager nav-page">
+        <ul id="pagination">
+            <li>
+                <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+                <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</body>
+</html>
+<script type="text/javascript" src="jquery-2.2.3.min.js"></script>
+<script type="text/javascript" src="bootstrap.min.js"></script>
+<script type="text/javascript" src="laypage.js"></script>

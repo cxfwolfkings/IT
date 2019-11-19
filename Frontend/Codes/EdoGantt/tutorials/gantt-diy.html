@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>自定义显示外观 | 开发手册 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">自定义显示外观</h1>
+    <div id="view" class="example-content">
+       
+<p>EdoGantt官方提供了一套甘特图界面皮肤，很多情况下，用户想将EdoGantt的显示外观，修改成自己需要的。</p>
+<p>EdoGantt的外观自定义，有如下三个方面：</p>
+<h1>1.条形图修改</h1>
+<p>基于EdoGantt的ganttItem结构和样式，通过修改样式的边框线、背景图片和背景色，达到修改外观的目的。</p>
+<p>如下所示，通过样式类修改：</p><pre class="code"><span style="color: blue">&lt;</span><span style="color: #a31515">style </span><span style="color: red">type</span><span style="color: blue">="text/css"&gt;
+</span><span style="color: green">/*ganttitem样式*/
+</span><span style="color: #a31515">.e-gantt-item
+</span>{
+    <span style="color: red">background</span>:<span style="color: blue">none</span>;
+    <span style="color: red">border</span>:<span style="color: blue">solid 1px black</span>;        
+}
+<span style="color: green">/*关键任务ganttitem样式*/
+</span><span style="color: #a31515">.e-gantt-critical .e-gantt-item
+</span>{
+    <span style="color: red">background</span>:<span style="color: blue">none</span>;
+    <span style="color: red">border</span>:<span style="color: blue">solid 1px red</span>;
+}
+<span style="color: green">/*完成百分比横条样式*/
+</span><span style="color: #a31515">.e-gantt-percentcomplete
+</span>{
+    <span style="color: red">background-color</span>:<span style="color: blue">red</span>;
+}    
+<span style="color: blue">&lt;/</span><span style="color: #a31515">style</span><span style="color: blue">&gt;</span></pre>
+<h1>2.取消默认显示和增加新的显示元素</h1>
+<p>比如，默认的EdoGantt显示的时候，条形图右侧会有一个任务名显示，我们可以将这个去掉；我们也可以增加新的条形图周边显示元素，达到仿P6左右侧都是日期显示的效果，代码如下：</p><pre class="code">gantt.<span style="color: blue">set</span>({
+    taskNameVisible: <span style="color: blue">false</span>,          <span style="color: green">//隐藏taskname
+    </span>itemRenderer: <span style="color: blue">function</span>(task, left, top, w, h, gantt){
+        <span style="color: green">//显示一前一后两个日期, 仿P6界面
+        </span><span style="color: blue">var </span>startHTML = <span style="color: #a31515">'&lt;div style="left:'</span>+(left-80)+<span style="color: #a31515">'px;top:3px;width:100px;height:18px;position:absolute;"&gt;'
+                </span>+ task.Start.format(<span style="color: #a31515">'Y-m-d'</span>)+<span style="color: #a31515">'&lt;/div&gt;'</span>;
+        <span style="color: blue">var </span>finishHTML = <span style="color: #a31515">'&lt;div style="left:'</span>+(left+w+10)+<span style="color: #a31515">'px;top:3px;width:100px;height:18px;position:absolute;"&gt;'
+                </span>+ task.Finish.format(<span style="color: #a31515">'Y-m-d'</span>)+<span style="color: #a31515">'&lt;/div&gt;'</span>;
+        <span style="color: blue">return </span>startHTML + finishHTML;
+    }
+});</pre>
+<p>尤其是“增加新的显示元素”方式，在itemRenderer方法中，可以根据一些特定的任务属性，显示更多丰富内容，比如对于里程碑任务，我们可以通过itemRenderer方法，在条形图左上角放置一面红色小旗，诸如此类。</p>
+<h1>3. 自定义提示框tips</h1>
+<p>EdoGantt有很多提示框效果，当鼠标移上，或进行某些操作的时候，提供更多丰富的信息帮助用户更好的操作。</p>
+<p>参考如下代码和注释，可以了解有哪些tips场景和激发的时机：</p><pre class="code"><span style="color: green">//鼠标移动到ganttitem上提示:有两种情况,一种是普通的任务条形图,一种是比较基准条形图,通过isTrack区分
+</span>gantt.taskTipRenderer = <span style="color: blue">function</span>(task, gantt, isTrack){
+    <span style="color: green">//是否移动到"比较基准"下方的条形图上        
+    </span><span style="color: blue">if</span>(isTrack){
+        <span style="color: green">//获得任务的当前比较基准数据
+        </span><span style="color: blue">var </span>bl = task.Baseline ? task.Baseline[gantt.baselineIndex] : <span style="color: blue">null</span>;
+        <span style="color: blue">return </span>task.Name+<span style="color: #a31515">"&lt;br/&gt;比较基准开始日期:"</span>+bl.Start.format(<span style="color: #a31515">'Y-m-d'</span>)+<span style="color: #a31515">"&lt;br /&gt;比较基准完成日期:"</span>+bl.Finish.format(<span style="color: #a31515">'Y-m-d'</span>);
+    }<span style="color: blue">else</span>{            
+        <span style="color: blue">return </span>task.Name+<span style="color: #a31515">"&lt;br/&gt;开始日期:"</span>+task.Start.format(<span style="color: #a31515">'Y-m-d'</span>)+<span style="color: #a31515">"&lt;br /&gt;完成日期:"</span>+task.Finish.format(<span style="color: #a31515">'Y-m-d'</span>);
+    }
+}
+<span style="color: green">//鼠标移动到箭头连线上提示
+</span>gantt.predecessorLinkTipRenderer = <span style="color: blue">function</span>(task, gantt){
+    <span style="color: blue">return </span>task.Name;
+}
+gantt.predecessorLinkTipRenderer = <span style="color: blue">function</span>(task, link, gantt, e){        
+    preTask = gantt.data.getTask(link.PredecessorUID);
+    <span style="color: blue">var </span>html = <span style="color: #a31515">'&lt;div&gt;相关性类型：'</span>+Edo.data.DataGantt.PredecessorLinkType[link.Type].Name+<span style="color: #a31515">'&lt;/div&gt;&lt;div&gt;从： '</span>+preTask.Name+<span style="color: #a31515">'&lt;/div&gt;&lt;div&gt;到： '</span>+task.Name+<span style="color: #a31515">'&lt;/div&gt;'</span>;
+    <span style="color: blue">return </span>html;
+}
+<span style="color: green">//拖拽整个ganttitem时提示
+</span>gantt.itemDragTipRenderer= <span style="color: blue">function</span>(e){        
+    <span style="color: blue">return </span><span style="color: #a31515">'&lt;b&gt;开始日期:&lt;/b&gt;'</span>+e.Start.format(<span style="color: #a31515">'Y-m-d'</span>)+<span style="color: #a31515">'&lt;br/&gt;&lt;b&gt;截止日期:&lt;/b&gt;'</span>+e.Finish.format(<span style="color: #a31515">'Y-m-d'</span>);
+}
+gantt.percentCompleteDragTipRenderer= <span style="color: blue">function</span>(e){
+    <span style="color: blue">return </span><span style="color: #a31515">'&lt;b&gt;完成百分比:&lt;/b&gt;'</span>+e.PercentComplete + <span style="color: #a31515">'%'</span>;
+}
+gantt.startDragTipRenderer= <span style="color: blue">function</span>(e){
+    <span style="color: blue">return </span><span style="color: #a31515">'&lt;b&gt;开始日期:&lt;/b&gt;'</span>+e.Start.format(<span style="color: #a31515">'Y-m-d'</span>);
+}
+gantt.finishDragTipRenderer= <span style="color: blue">function</span>(e){
+    <span style="color: blue">return </span><span style="color: #a31515">'&lt;b&gt;完成日期:&lt;/b&gt;'</span>+e.Finish.format(<span style="color: #a31515">'Y-m-d'</span>); 
+}
+<span style="color: green">//竖向滚动条提示
+</span>gantt.verticalScrollTipRenderer= <span style="color: blue">function</span>(r, gantt, e){
+    <span style="color: blue">return </span><span style="color: #a31515">'&lt;div style="width:150px;overflow:hidden;white-space:nowrap;"&gt;当前任务：'</span>+r.Name+<span style="color: #a31515">'&lt;/div&gt;'</span>;
+}
+<span style="color: green">//横向滚动条提示
+</span>gantt.horizontalScrollTipRenderer= <span style="color: blue">function</span>(date, gantt, e){
+    <span style="color: blue">return </span><span style="color: #a31515">'&lt;div style="width:115px;overflow:hidden;"&gt;当前日期:'</span>+date.format(<span style="color: #a31515">'Y-m-d'</span>)+<span style="color: #a31515">'&lt;/div&gt;'</span>;
+}</pre>
+<p>自定义后的EdoGantt效果图如下：</p>
+<p style="text-align:center;margin-bottom:15px;">
+    <img src="images/gantt7.png" /></p>
+<h1>任务树的自定义</h1>
+<p>以上介绍了Edo.lists.Gantt组件的外观自定义，作为一个标准甘特图，还有一个Edo.lists.Tree任务树需要自定义。</p>
+<p>有关于Edo.lists.Tree的更多信息，请访问<a href="http://www.edojs.com" target="_blank">EdoJS官方网站</a>查看。</p>
+
+<p class="ttexamples">相关示例：<a href="../examples/diy.html">自定义甘特图</a> <a href="../examples/tips.html">自定义Tips</a></p>
+<div class="toppage">
+    <a href="#">Top of this page</a>
+</div>
+    </div>        
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>

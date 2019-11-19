@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>自定义右键菜单 | 在线示例 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">在线演示: 自定义右键菜单</h1>
+    <div id="view" class="example-content">
+        
+    </div>
+    
+    <h1 class="example-title2">范例说明</h1>
+    <div class="example-content">
+        
+    </div>
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>
+
+<!--edo css-->
+<link href="../scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="../scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+<!--edo js-->
+<script src="../scripts/edo/edo.js" type="text/javascript"></script>
+
+<script src="../data/baseganttdata.js" type="text/javascript"></script>
+
+<script src="js/GanttMenu.js" type="text/javascript"></script>
+<script type="text/javascript">
+var dataGantt = new Edo.data.DataGantt(ganttData);
+
+Edo.build({
+    id: 'gantt',
+    type: 'gantt',
+    width: 700,
+    height: 350,
+    
+    //开始日期  (startDate和finishDate控制甘特图的日期显示范围)
+    startDate: new Date(2009, 0, 28),
+    //截止日期 
+    finishDate: new Date(2011, 1, 30),
+    
+    data: dataGantt,
+    
+    render: document.getElementById('view')
+});
+
+//使甘特图可拖拽调节大小
+Edo.managers.ResizeManager.reg({
+    target: gantt
+});
+
+gantt.addPlugin(new GanttMenu());
+</script>

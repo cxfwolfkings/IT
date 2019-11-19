@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>选择器--基本</title>
+    <script type="text/javascript" src="../js/jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#btn1").click(function () { alert($("p").html()); })
+            $("#btn2").click(function () { alert($(".cssrain_class").html()); })
+            $("#btn3").click(function () { alert($("#cssrain_id").html()); })
+
+        });
+    </script>
+
+</head>
+<body>
+
+    <input type="button" id="btn1" value="测试标签名" />
+    <input type="button" id="btn2" value="测试class名" />
+    <input type="button" id="btn3" value="测试id名" />
+
+    <p> cssrain--$("标签名") </p>
+
+    <div class="cssrain_class">--$(".class名")</div>
+
+    <div id="cssrain_id">--$("#id名")</div>
+
+    <!--
+    $("标签名"),如$("p")是选取了所有的p标签节点
+    $("#id名"),如$("#test")是选取了id为test的标签节点
+    $(".class名"),如$(".test")是选取了所有class为test的标签节点
+    上面的$("标签名")和$(".class名")返回的都是所有满足的节点,至于进一步筛选可以添加一些函数,如eq,gt,lt等等.
+
+    .html()相当于 innerHTML()
+    -->
+</body>
+</html> 

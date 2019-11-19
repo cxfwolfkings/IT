@@ -1,0 +1,43 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>用法</title>
+    <script type="text/javascript" src="jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").toggle(function () {
+                $(".stuff").hide('slow');
+            }, function () {
+                $(".stuff").show('fast');
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <a>点我测试</a>
+
+    <div class="stuff">
+        This is probably the most common mishap. The remedy is simple--yank! It's most easily done
+        with two people. One to restrain the bird and the This is a link. Hover me to
+        highlight the parent paragraph.other to pull the feather. Use pliers, or a hemostat. Tweezers won't
+        work on primaries. Make certain that the wing bones are firmly supported or you can break the wing.
+        Clamp onto the feather and give a sharp tug in the direction of the feather. The feather will come
+        out. Next, apply gentle, direct pressure to the follicle where the feather was to stop the bleeding.
+        Dab some styptic powder on it, as it will help stop the bleeding as well. Let the bird rest. Ask
+        your vet or breeder to demonstrate exactly how to pull a blood feather if you're apprehensive about
+        doing it.
+    </div>
+    <!--
+    toggle是轮换的意思
+    相当于hide or show
+    也就是说如果p是隐藏的就让它显示 如果是显示的就让它隐藏
+    当然这个显示与隐藏是相对hidden的属性的
+    是通过调整元素的hidden属性来显示和隐藏元素
+    -->
+
+
+</body>
+</html> 

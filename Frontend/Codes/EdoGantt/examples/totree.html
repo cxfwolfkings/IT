@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>数组转成树形数据 | 在线示例 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">在线演示: 数组转成树形数据</h1>
+    <div id="view" class="example-content">
+        
+    </div>
+    
+    <h1 class="example-title2">范例说明</h1>
+    <div class="example-content">
+        本例提供一个标准的JS方法, 将数组数据转换为甘特图/树形组件需要的树状结构数据。<br />
+        开发者只需要在服务端组织好一个数组任务，在客户端使用我们提供的方法转换为树状结构即可，减少工作量。
+    </div>
+    <p class="ttexamples">相关教程：         
+        <a href="../tutorials/gantt-data.html">甘特图数据结构</a>
+        <a href="../tutorials/gantt-class.html">甘特图组件和数据对象</a>
+    </p>
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>
+
+<!--edo css-->
+<link href="../scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="../scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+<!--edo js-->
+<script src="../scripts/edo/edo.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+//任务数组
+var ganttArray = 
+[
+    {
+        UID: 1,Name: 'task1',Start: new Date(2009, 1, 2),Finish: new Date(2009, 1, 5),Critical: 1,PercentComplete: 80
+    },
+    {
+        UID: 2,Name: 'task2',Start: new Date(2009, 1, 2),Finish: new Date(2009, 1, 3),Critical: 1,PercentComplete: 80
+    },
+    {
+        PID: 2, UID: 3,Name: 'task3',Milestone: 1,PercentComplete: 100,Start: new Date(2009, 1, 3),Finish: new Date(2009, 1, 3),
+        PredecessorLink: [
+            {
+                PredecessorUID: 1,
+                Type: 1
+            }
+        ]
+    },
+    {
+        PID: 1, UID: 4,Name: 'task4',Start: new Date(2009, 1, 2),Finish: new Date(2009, 1, 3),Critical: 1,PercentComplete: 80
+    }
+]
+//数组转树形
+var ganttData = ArrayToTree(ganttArray, 'UID', 'PID');
+//创建一个Edo.data.DataGantt甘特图数据对象
+var dataGantt = new Edo.data.DataGantt(ganttData);
+Edo.build({
+    id: 'gantt',
+    type: 'gantt',                      //甘特图显示组件
+    width: 700,                         //宽度
+    height: 350,                        //高度        
+    data: dataGantt,                    //将甘特图数据对象,设置给甘特图显示组件    
+    render: document.getElementById('view')
+});
+
+gantt.set('startDate', new Date(2009, 0, 28));
+gantt.set('finishDate', new Date(2009, 1, 30));
+
+//使甘特图可拖拽调节大小
+Edo.managers.ResizeManager.reg({
+    target: gantt
+});
+
+/*
+    数组转树形函数
+    @author http://www.edogantt.com
+    @date 2010-7-13
+    @param {Array} data 数组
+    @param {String} id 元素id名, 如"ID"
+    @param {String} pid 父元素关联名, 如"ParentID"
+    @return {Array} 树形结构的数组
+*/    
+function ArrayToTree(data, id, pid){
+    var tree = [];
+    
+    //建立快速索引
+    var idHash = {};
+    for(var i=0,l=data.length; i<l; i++){
+        var o = data[i];
+        idHash[o[id]] = o;
+    }
+        
+    //数组转树形
+    for(var i=0,l=data.length; i<l; i++){
+        var o = data[i];
+        var p = idHash[o[pid]];
+        if(!p){
+            tree.push(o);
+            continue;
+        }
+        if(!p.children){
+            p.children = [];
+        }
+        p.Summary = 1;
+        p.children.push(o);
+    }
+    return tree;
+}
+</script>

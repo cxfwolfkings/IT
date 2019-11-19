@@ -1,0 +1,30 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title></title>
+    <script type="text/javascript" src="jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").toggle(function () {
+                $(".stuff").hide('slow');
+            }, function () {
+                $(".stuff").show('fast');
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <a href="http://www.cssrain.cn">
+        text
+    </a>
+    <div class="stuff">
+        testtesttesttesttest
+        testtesttest
+        toggle( Function even, Function odd )每次点击时切换要调用的函数每次点击时切换要调用的函数
+    </div>
+
+</body>
+</html> 

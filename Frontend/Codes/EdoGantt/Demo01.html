@@ -1,0 +1,122 @@
+﻿<html>
+<head>
+<!--edo css-->
+<link href="scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="view" style="border: solid 1 #4fa9f6; padding: 5px; width: 100%"></div>
+<!--edo js-->
+<script src="scripts/edo/edo.js"></script>
+<script src="data/ganttdata.js"></script>
+<script src="scripts/thirdlib/excanvas/excanvas.js"></script>
+<script src="examples/js/EdoGantt.js"></script>
+<script src="examples/js/GanttMenu.js"></script>
+<script src="examples/js/GanttSchedule.js"></script>
+<script type="text/javascript">
+var edogantt = new EdoGantt();
+    edogantt.set({
+         width: 1024,
+         height: 600,
+         render: document.getElementById('view')
+    });
+    //使甘特图可拖拽调节尺寸
+    Edo.managers.ResizeManager.reg({target: edogantt});
+    //增加右键菜单插件
+    edogantt.addPlugin(new GanttMenu());
+    //增加数据处理插件
+    edogantt.addPlugin(new GanttSchedule());
+    var text = '[\
+    {\
+        "UID": "1",\
+        "Start": "2007-01-01T08: 00: 00",\
+        "PercentComplete": "14",\
+        "Finish": "2007-01-04T12: 00: 00",\
+        "Summary": "1",\
+        "Critical": "1",\
+        "Name": "项目范围规划",\
+        "PredecessorLink": [],\
+        "children": [\
+            {\
+                "UID": "2",\
+                "Start": "2007-01-01T08: 00: 00",\
+                "PercentComplete": "100",\
+                "Finish": "2007-01-01T12: 00: 00",\
+                "Summary": "0",\
+                "Critical": "1",\
+                "Name": "确定项目范围",\
+                "PredecessorLink": []\
+            },\
+            {\
+                "UID": "3",\
+                "Start": "2007-01-01T13: 00: 00",\
+                "PercentComplete": "0",\
+                "Finish": "2007-01-02T12: 00: 00",\
+                "Summary": "0",\
+                "Critical": "1",\
+                "Name": "获得项目所需资金",\
+                "PredecessorLink": [\
+                    {\
+                        "TaskUID": "3",\
+                        "PredecessorUID": "2",\
+                        "Type": "1"\
+                    }\
+                ]\
+            },\
+            {\
+                "UID": "4",\
+                "Start": "2007-01-02T13: 00: 00",\
+                "PercentComplete": "0",\
+                "Finish": "2007-01-03T12: 00: 00",\
+                "Summary": "0",\
+                "Critical": "1",\
+                "Name": "定义预备资源",\
+                "PredecessorLink": [\
+                    {\
+                        "TaskUID": "4",\
+                        "PredecessorUID": "3",\
+                        "Type": "1"\
+                    }\
+                ]\
+            },\
+            {\
+                "UID": "5",\
+                "Start": "2007-01-03T13: 00: 00",\
+                "PercentComplete": "0",\
+                "Finish": "2007-01-04T12: 00: 00",\
+                "Summary": "0",\
+                "Critical": "1",\
+                "Name": "获得核心资源",\
+                "PredecessorLink": [\
+                    {\
+                        "TaskUID": "5",\
+                        "PredecessorUID": "4",\
+                        "Type": "1"\
+                    }\
+                ]\
+            },\
+            {\
+                "UID": "6",\
+                "Start": "2007-01-04T12: 00: 00",\
+                "PercentComplete": "0",\
+                "Finish": "2007-01-04T12: 00: 00",\
+                "Summary": "0",\
+                "Critical": "1",\
+                "Name": "完成项目范围规划",\
+                "PredecessorLink": [\
+                    {\
+                        "TaskUID": "6",\
+                        "PredecessorUID": "5",\
+                        "Type": "1"\
+                    }\
+                ]\
+            }\
+        ]\
+    }\
+]';
+    var data = Edo.util.JSON.decode(text);        
+    var dataGantt = new Edo.data.DataGantt(data);                                
+    edogantt.set('data', dataGantt);                
+    var tree = edogantt.tree, gantt = edogantt.gantt;
+</script>
+</body>

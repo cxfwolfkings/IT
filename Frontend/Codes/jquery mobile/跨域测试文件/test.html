@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<script src="js/jquery.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript" src="http://www.phonegap100.com/test.php?name=John&time=2pm"></script>
+
+<body>
+<script type="text/javascript">
+
+
+//alert(json.name)
+/*
+ $(function(){
+	$.get("http://www.phonegap100.com/test.php", { name: "John", time: "2pm" } );
+
+})
+*/
+
+$(function(){
+	 $.ajax({
+	             type: "get",
+	             async: false,
+	             url: "http://www.57lehuo.com/index.php?a=index&m=api&method=itemsSearchGet&keyword=连衣裙&sign=5cb85c3eed22c1908e05c584813c8dd2",
+	             dataType: "jsonp",
+	             jsonp: "callback",//传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(一般默认为:callback)
+	             jsonpCallback:"itemsSearchGet",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名，也可以写"?"，jQuery会自动为你处理数据
+	             success: function(json){	
+					alert(json['result'][0].title);	
+					
+	             },
+	             error: function(){
+	                 alert('fail');
+	             }
+	})
+})
+
+</script>
+
+
+</body>
+</html>

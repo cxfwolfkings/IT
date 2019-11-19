@@ -1,0 +1,49 @@
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>jQuery formValidator表单验证插件 -- by:猫冬，email:wzmaodong@126.com</title>
+<meta name="Author" content="猫冬">
+<meta name="description" content="jQuery formValidator表单验证插件" />
+<meta name="keywords" content="jQuery,formValidator,插件,表单,验证,插件,javascript,表单验证,提示层" />
+    <script src="jquery_last.js" type="text/javascript"></script>
+	<link type="text/css" rel="stylesheet" href="style/validator.css"></link>
+	<script src="formValidator.js" type="text/javascript" charset="UTF-8"></script>
+    <script>
+    $(document).ready(function(){
+        $.formValidator.initConfig({onsuccess:function(){alert("额外验证出错");return false;},onerror:function(){alert("具体错误，请看网页上的提示")}});
+        $("#min").formValidator({onshow:"请输入最小值和最大值",onfocus:"最小值和最大值要输入正确哦",oncorrect:"恭喜你,你输对了"}).inputValidator({min:1}).compareValidator({desid:"max",operateor:"<",onerror:"大小不对",datatype:"number"});
+        $.formValidator.initConfig({validatorgroup:"2",onsuccess:function(){alert("校验组2通过验证，不过我不给它提交");return false;}});
+        $("#shouji").formValidator({validatorgroup:"2",onshow:"请输入手机号码",onfocus:"手机号码要符合格式哦",oncorrect:"恭喜你,你输对了"}).inputValidator({min:11,max:11,onerror:"长度不正确"}).regexValidator({regexp:"^[1][3][0-9]{9}$"});
+    })
+function Button1_onclick() {
+    return jQuery.formValidator.pageIsValid('1');
+}
+
+function Submit1_onclick() {
+    return jQuery.formValidator.pageIsValid("2");
+}
+
+    </script>
+</head>
+<body style="font-size:12px">
+    <form name="form1" method="post" action="Default2.aspx" id="form1">
+
+<h2>两个校验组是分开校验的,互不影响</h2><br />
+<p><a href="http://wzmaodong.cnblogs.com">猫冬的博客</a></p>
+	<FIELDSET style="width:520px;">
+                <LEGEND><SPAN id="help_topic_icon" style="font-weight:bold;font-size:12px">校验组1</SPAN></LEGEND>
+        最小值：<input name="min" type="text" id="min" /><div id="minTip"></div>
+        <br />
+        最大值：<input name="max" type="text" id="max" /><div id="maxTip">
+            <input id="Button1" type="submit" value="提交" language="javascript" onclick="return Button1_onclick()" /></div>
+ </FIELDSET>
+		<FIELDSET style="width:520px;">
+                <LEGEND><SPAN id="help_topic_icon" style="font-weight:bold;font-size:12px">校验组2</SPAN></LEGEND>
+        手机号码：<input name="shouji" type="text" id="shouji" /><div id="shoujiTip"></div>
+        <input id="Submit1" type="submit" value="提交" language="javascript" onclick="return Submit1_onclick()"  />
+		</FIELDSET>
+   
+
+</form>
+</body>
+</html>

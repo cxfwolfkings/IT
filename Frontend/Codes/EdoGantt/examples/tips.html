@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name="keywords" content="甘特图 横道图 gantt webgantt" />
+    <meta name="description" content="易度甘特图是当前WEB开发中领先的甘特图解决方案。它是使用Javascript开发的，实现了与微软 Project 甘特图一致的界面和功能，可广泛应用于 项目管理系统、 ERP 系统、MES系统或其它的任务资源分配相关领域。" />
+    <title>自定义Tips | 在线示例 | 产品 | 首页 - 易度甘特图</title>
+    
+</head>
+<body>
+<!--header-->
+<script src="header.js" type="text/javascript"></script>
+
+<div class="bd">
+  
+    <h1 class="example-title">在线演示: 自定义Tips</h1>
+    <div id="view" class="example-content">
+        
+    </div>
+    
+    <h1 class="example-title2">范例说明</h1>
+    <div class="example-content">
+        
+    </div>
+    <p class="ttexamples">相关教程：         
+        <a href="../tutorials/gantt-diy.html">自定义显示外观</a>        
+    </p>
+</div>
+
+<!--footer-->
+<script src="footer.js" type="text/javascript"></script>
+</body>
+</html>
+
+<!--edo css-->
+<link href="../scripts/edo/res/css/edo-all.css" rel="stylesheet" type="text/css" />
+<link href="../scripts/edo/res/product/project/css/project.css" rel="stylesheet" type="text/css" />
+<!--edo js-->
+<script src="../scripts/edo/edo.js" type="text/javascript"></script>
+
+<script src="../data/ganttdata.js" type="text/javascript"></script>
+<script type="text/javascript">
+var dataGantt = new Edo.data.DataGantt(ganttData);
+
+Edo.build({
+    id: 'gantt',
+    type: 'gantt',
+    width: 700,
+    height: 350,
+    
+    viewMode: 'track',
+    scrollTipVisible: true,
+    
+    //开始日期  (startDate和finishDate控制甘特图的日期显示范围)
+    startDate: new Date(2009, 0, 28),
+    //截止日期 
+    finishDate: new Date(2011, 1, 30),
+    
+    data: dataGantt,
+    
+    render: document.getElementById('view')
+});
+
+dataGantt.createBaseline();//创建比较基准,以便在界面上显示,鼠标移上显示tips
+
+//使甘特图可拖拽调节大小
+Edo.managers.ResizeManager.reg({
+    target: gantt
+});
+
+//自定义甘特图tips
+//鼠标移动到ganttitem上提示:有两种情况,一种是普通的任务条形图,一种是比较基准条形图,通过isTrack区分
+gantt.taskTipRenderer = function(task, gantt, isTrack){
+    //是否移动到"比较基准"下方的条形图上        
+    if(isTrack){
+        //获得任务的当前比较基准数据
+        var bl = task.Baseline ? task.Baseline[gantt.baselineIndex] : null;
+        return task.Name+"<br/>比较基准开始日期:"+bl.Start.format('Y-m-d')+"<br />比较基准完成日期:"+bl.Finish.format('Y-m-d');
+    }else{            
+        return task.Name+"<br/>开始日期:"+task.Start.format('Y-m-d')+"<br />完成日期:"+task.Finish.format('Y-m-d');
+    }
+}
+//鼠标移动到箭头连线上提示
+gantt.predecessorLinkTipRenderer = function(task, gantt){
+    return task.Name;
+}
+gantt.predecessorLinkTipRenderer = function(task, link, gantt, e){        
+    preTask = gantt.data.getTask(link.PredecessorUID);
+    var html = '<div>相关性类型：'+Edo.data.DataGantt.PredecessorLinkType[link.Type].Name+'</div><div>从： '+preTask.Name+'</div><div>到： '+task.Name+'</div>';
+    return html;
+}
+//拖拽整个ganttitem时提示
+gantt.itemDragTipRenderer= function(e){        
+    return '<b>开始日期:</b>'+e.Start.format('Y-m-d')+'<br/><b>截止日期:</b>'+e.Finish.format('Y-m-d');
+}
+gantt.percentCompleteDragTipRenderer= function(e){
+    return '<b>完成百分比:</b>'+e.PercentComplete + '%';
+}
+gantt.startDragTipRenderer= function(e){
+    return '<b>开始日期:</b>'+e.Start.format('Y-m-d');
+}
+gantt.finishDragTipRenderer= function(e){
+    return '<b>完成日期:</b>'+e.Finish.format('Y-m-d'); 
+}
+//竖向滚动条提示
+gantt.verticalScrollTipRenderer= function(r, gantt, e){
+    return '<div style="width:150px;overflow:hidden;white-space:nowrap;">当前任务：'+r.Name+'</div>';
+}
+//横向滚动条提示
+gantt.horizontalScrollTipRenderer= function(date, gantt, e){
+    return '<div style="width:115px;overflow:hidden;">当前日期:'+date.format('Y-m-d')+'</div>';
+}
+</script>

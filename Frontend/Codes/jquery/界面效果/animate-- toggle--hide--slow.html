@@ -1,0 +1,55 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>用法</title>
+    <script type="text/javascript" src="jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").toggle(function () {
+                $(".stuff").animate({
+                    height: 'hide',
+                    opacity: 'hide'
+                }, 'fast');
+            }, function () {
+                $(".stuff").animate({
+                    height: 'show',
+                    opacity: 'show'
+                }, 'fast');
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <a>点我测试</a>
+
+    <div class="stuff">
+        英文详解
+        用于创建自定义动画的函数。这个函数的关键在于指定动画形式及结果样式属性对象
+        。这个对象中每个属性都表示一个可以变化的样式属性（如“height”、“top”或“opacity”）。
+
+        而每个属性的值表示这个样式属性到多少时动画结束。如果是一个数值，样式属性就会从当前的值渐变到指定的值。如果使用的是“hide”、“show”或“toggle”这样的字符串值，则会为该属性调用默认的动画形式。
+
+        [示例]:
+        $("p").animate({
+        height: 'toggle', opacity: 'toggle'
+        }, "slow");
+        [示例]:
+        $("p").animate({
+        left: 50, opacity: 'show'
+        }, 500);
+        [示例]:
+        一个使用“擦除”函数提供不同动画样式的例子。只有在一个插件可以提供这个“擦除”函数（jQuery库中默认只提供“linear”函数）的情况下才有效。
+
+        $("p").animate({
+        opacity: 'show'
+        }, "slow", "easein");
+
+    </div>
+
+
+
+</body>
+</html> 

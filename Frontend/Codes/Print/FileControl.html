@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body style="text-align:center">
+    <iframe style="width: 22cm;" src="form/form1.html" onload="setFrameHeight()"></iframe>
+    <div class="footer">
+        <input id="btnSign" type="button" class="btn btn-info" value="签章" />
+        <input id="btnClear" type="button" class="btn btn-info" value="清除" />
+        <input id="btnPrint" type="button" class="btn btn-info" value="打印" />
+    </div>
+</body>
+</html>
+<script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+<script type="text/javascript">
+    var childWin = $('iframe')[0].contentWindow;
+
+    function setFrameHeight() {
+        $('iframe').height($(childWin.document.body).height());
+    }
+
+    $(function () {
+        $('#btnPrint').click(function () {
+            $('.footer').hide();
+            childWin.doPrint();
+            $('.footer').show();
+        });
+    });
+</script>

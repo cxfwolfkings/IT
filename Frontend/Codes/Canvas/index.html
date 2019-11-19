@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <button onclick="test()">测试</button>
+    <div id="divContent">
+        测试一下
+    </div>
+</body>
+</html>
+<script type="text/javascript" src="js/htmlToCanvas.js"></script>
+<script type="text/javascript">
+    function test() {
+        htmlToCanvas(document.getElementById('divContent'));
+    }
+</script>

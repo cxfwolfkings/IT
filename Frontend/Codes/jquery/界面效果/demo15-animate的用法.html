@@ -1,0 +1,28 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>animate</title>
+    <script type="text/javascript" src="jquery-1.1.3.pack.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a").toggle(function () {
+                $(".stuff").animate({ height: 'hide', opacity: 'hide' }, 'slow');
+            }, function () {
+                $(".stuff").animate({ height: 'show', opacity: 'show' }, 'slow');
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <a href="http://www.cssrain.cn">
+        text
+    </a>
+    <div class="stuff">
+        animate( Hash params, String|NumberJavascript 字符串或数字值 speed, String easing , Function callback(可选) 在动画完成时执行的函数 )
+        用于创建自定义动画的函数。
+    </div>
+</body>
+</html> 
