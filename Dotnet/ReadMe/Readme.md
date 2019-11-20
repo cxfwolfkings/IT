@@ -442,3 +442,10 @@ Microsoft 推荐使用所有的.NET 本地、Web 和通信框架，浏览器端�
 不出所料，Microsoft 继续强调了依赖注入，特别是它们与 ASP.NET MVC 及 Entity Framework 的结合。企业试图集成现场和云架构的趋势让 BizTalk 这个一度被认为已经死亡的技术看到了再度焕发生机的希望。
 
 ![x](./Resource/12.png)
+
+## 参考
+
+- [Microsoft](https://github.com/microsoft)
+- [.NET Platform](https://github.com/dotnet)
+- [OmniSharp](https://github.com/OmniSharp)
+- [https://github.com/aelij](https://github.com/aelij)
