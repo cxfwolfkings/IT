@@ -17,9 +17,9 @@
 
 ## 第三部分 Ant/Maven/Gradle + SSH/SSM
 
-### 第1天：[Ant](./3.1_Ant.md)
+### 3.1 [Ant](./3.1_Ant.md)
 
-### 第2天：[Maven](./3.2_Maven.md)
+### 3.2 [Maven](./3.2_Maven.md)
 
 - Maven介绍 / 依赖管理 / 为什么使用？
 - Maven安装 / Maven仓库 / Maven项目工程目录约定
@@ -31,12 +31,16 @@
 - 分模块构建工程
 - 私服搭建
 
-### 第3天：[Gradle](./3.3_Gradle.md)
+### 3.3 [Gradle](./3.3_Gradle.md)
 
 - 什么是Gradle
 - Gradle的基本组成
 - 常见配置
 - 延伸阅读
+
+### 3.4 SSH
+
+### 3.5 [SSM](./3.5_SSM.md)
 
 ## 第四部分
 

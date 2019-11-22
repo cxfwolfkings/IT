@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.maven.plugins:maven-resources-plugin:2.2">
+    <CLASSES>
+      <root url="jar://D:/MavenRepo/org/apache/maven/plugins/maven-resources-plugin/2.2/maven-resources-plugin-2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/MavenRepo/org/apache/maven/plugins/maven-resources-plugin/2.2/maven-resources-plugin-2.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/MavenRepo/org/apache/maven/plugins/maven-resources-plugin/2.2/maven-resources-plugin-2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
