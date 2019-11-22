@@ -38,10 +38,13 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // 应用包名
         applicationId "com.example.wind_eim"
         minSdkVersion 16
         targetSdkVersion 28
+        // 版本号
         versionCode flutterVersionCode.toInteger()
+        // 版本名称
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

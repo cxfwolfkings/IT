@@ -1,3 +1,21 @@
+-- 安全模式
+show variables like 'sql_safe_updates';
+set sql_safe_updates=1; --安全模式打开状态
+set sql_safe_updates=0; --安全模式关闭状态
+
+1. 复制表结构及其数据：
+create table table_name_new as select * from table_name_old
+2. 只复制表结构：
+create table table_name_new as select * from table_name_old where 1=2;
+或者：
+create table table_name_new like table_name_old
+3. 只复制表数据：
+如果两个表结构一样：
+insert into table_name_new select * from table_name_old
+如果两个表结构不一样：
+insert into table_name_new(column1,column2...) select column1,column2... from table_name_old
+
+
 -- 分页
 /**
  * 获取门店列表

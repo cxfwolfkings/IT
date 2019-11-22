@@ -1,0 +1,383 @@
+html,
+body {
+  background-color: #fff;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  color: #464C5B;
+  font-size: 14px;
+  line-height: 1.4;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  /*font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol", "Microsoft YaHei";*/
+  /*font-family: Roboto, Segoe UI, "Microsoft YaHei", Helvetica Neue For Number,-apple-system,BlinkMacSystemFont,PingFang SC,Hiragino Sans GB, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "WenQuanYi Micro Hei", sans-serif;*/
+}
+
+div {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: #0366d6;
+}
+
+pre,
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace, "Microsoft YaHei";
+}
+
+code {
+  color: #d03bc8;
+  padding: 0.1em 0.4em;
+  margin: 0;
+  background-color: rgba(111, 66, 193, 0.07);
+  border-radius: 3px;
+}
+
+::selection {
+  background: #CBD1DE;
+}
+
+.f-left {
+  float: left;
+}
+
+.f-right {
+  float: right;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.priview-box {
+  margin-bottom: 50px;
+}
+
+.priview-box .description {
+  color: #62676C;
+}
+
+.page-body {
+  padding: 15px;
+}
+
+.page-body .page-header {
+  background: #fff;
+  padding: 15px;
+  margin: -15px -15px 15px -15px;
+}
+
+.page-body .page-header .page-title {
+  font-size: 18px;
+  margin: 0;
+  margin-bottom: 15px;
+  color: #585A5F;
+}
+
+.page-body h1 {
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 20px 0;
+}
+
+.page-body h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.box {
+  background: #fff;
+  border-radius: 3px;
+  padding: 15px;
+}
+
+.box .box-header:before,
+.box .box-header:after,
+.box .box-footer:before,
+.box .box-footer:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.box .box-header {
+  padding-bottom: 15px;
+}
+
+.box .box-footer {
+  padding: 15px 0;
+}
+
+.box .box-header .box-title {
+  font-size: 18px;
+  font-weight: 100;
+  margin: 0;
+}
+
+.progress-bg {
+  margin: 0 auto;
+  width: 60%;
+  height: 4px;
+  background: rgba(245, 245, 245, 0.2);
+  overflow: hidden;
+}
+
+.progress-bg .progress {
+  width: 50%;
+  height: 4px;
+  margin-left: -50%;
+  background: #19a05e;
+  float: left;
+  animation: progress 1s linear infinite;
+}
+
+@keyframes progress {
+  0% {
+    margin-left: -50%;
+  }
+
+  100% {
+    margin-left: 100%;
+  }
+}
+
+.el-divider--horizontal {
+  margin: 9px 0px;
+}
+
+.el-tabs__header {
+  margin: 0px;
+  line-height: 1ex;
+}
+
+.el-tabs__item {
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 30px;
+  line-height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 12em;
+}
+
+.el-form-item--mini.el-form-item,
+.el-form-item--small.el-form-item {
+  margin-bottom: 15px;
+}
+
+.el-tab-pane {
+  padding-top: 15px;
+}
+
+.el-table td {
+  padding: 6px 0px;
+}
+
+.el-table th {
+  padding: 9px 0px;
+}
+
+.lab-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #67c23a;
+}
+
+.el-table__empty-block {
+  min-height: 30px;
+  padding: 6px 0px;
+}
+
+.el-table__empty-text {
+  line-height: 30px;
+}
+
+.el-collapse-item .el-collapse-item__header {
+  font-size: 14px;
+  color: #606266;
+}
+
+.demo-table-expand {
+  font-size: 0;
+}
+
+.demo-table-expand label {
+  width: 120px;
+  color: #99a9bf;
+}
+
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* .el-tabs__active-bar {
+  max-width: 90px;
+} */
+
+/* disabled状态下单选框的颜色 */
+.el-radio__input.is-disabled+span.el-radio__label {
+  color: #C0C4CC
+}
+
+.el-menu-item.is-active,
+.el-menu-item:hover,
+.el-submenu:hover,
+.el-submenu__title:hover,
+.el-submenu .el-menu-item:hover {
+  background-color: #3c4f61
+}
+
+/* 按钮focus状态和普通状态颜色相同  */
+.el-button--danger:focus {
+  background-color: #F56C6C;
+  border-color: #F56C6C;
+}
+
+.el-button--success:focus {
+  background-color: #67C23A;
+  border-color: #67C23A;
+}
+
+.el-table .cell {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/*
+.el-table .cell {
+  position: relative;
+  line-height: 20px;
+  max-height: 40px;
+  overflow: hidden;
+}
+
+.el-table .cell::after {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding-left: 40px;
+  background: -webkit-linear-gradient(left, transparent, #fff 55%);
+  background: -o-linear-gradient(right, transparent, #fff 55%);
+  background: -moz-linear-gradient(right, transparent, #fff 55%);
+  background: linear-gradient(to right, transparent, #fff 55%);
+}
+
+.tableCell::after {
+  content: "...";
+}
+*/
+
+.el-select-dropdown__item {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.el-cascader-node__label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.el-select-dropdown,
+.el-cascader-menu {
+  max-width: 300px;
+}
+
+.el-tag.el-tag--info {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 15em;
+}
+
+.el-input.is-disabled .el-input__inner,
+.el-textarea.is-disabled .el-textarea__inner,
+.el-radio__input.is-disabled+span.el-radio__label {
+  color: darkslategray
+}
+
+.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner,
+.el-radio__input.is-disabled.is-checked .el-radio__inner {
+  background-color: #409EFF;
+  border-color: #409EFF;
+}
+
+.el-card__header {
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.el-menu-item {
+  height: 45px;
+  line-height: 45px;
+}
+
+.el-card__body {
+  padding: 0px;
+}
+
+.el-menu-item,
+.el-submenu__title,
+.el-submenu .el-menu-item {
+  height: 42px;
+  line-height: 42px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+}
+
+.el-menu-item.is-active,
+.el-submenu__title i,
+.el-menu-item i {
+  color: white;
+}
+
+.el-menu {
+  background-color: #556b80
+}
+
+.el-menu--inline {
+  background-color: #4d6174
+}
+
+.text-left {
+  text-align: left;
+}
+
+.el-carousel__container {
+  height: 200px;
+}
+
+.el-picker-panel .el-button--text {
+  display: none;
+}
+
+.el-pagination {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.mainContent {
+  margin-left: 14.5%;
+  height: 100%
+}
+
+.fix {
+  position: fixed;
+}

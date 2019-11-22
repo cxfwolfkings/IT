@@ -1,4 +1,7 @@
+# 项目名称：要用英文，类似于Android中的包名，
+# 如果它修改了整个项目的引入的路径都要修改，所以一般确定了就不要修改
 name: wind_eim
+# 项目描述
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -11,18 +14,29 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+
+# 版本号，这个会覆盖对应Android和IOS的应用版本号
+# +号前对应Android的versionCode，+号后对应Android的versionName
+# +号前对应IOS的CFBundleVersion，+号后对应IOS的CFBundleShortVersionString
 version: 1.0.0+1
 
+# 表示项目的编译环境要求为dart sdk版本号在2.1.0和3.0.0之间
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
+# 项目的依赖插件库
+# Flutter插件库在这里查找引用：https://pub.dartlang.org/flutter
 dependencies:
   flutter:
     sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  # 我们可以在这里引入插件库
   cupertino_icons: ^0.1.2
+  # 这里再多说一句，如果我们在配置文件里引入了一个插件库后，比如 sharedpreferences，
+  # 我们再用 Android Studio 打开 Android 项目后，可以看到目录的依赖项里增加了 sharedpreferences
+  # 然后 Android 项目主工程 GeneratedPluginRegistrant 类里增加了注册方法
 
 dev_dependencies:
   flutter_test:
@@ -33,14 +47,18 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
+# flutter相关配置
 flutter:
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  # 是否使用material图标，建议为true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
+  # 配置项目文件里的图片路径
+  # 如果需要使用项目目录内附带的图片、音视频等资源，必须在这里配置定义
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
@@ -56,6 +74,7 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  # 字体文件资源相关配置
   # fonts:
   #   - family: Schyler
   #     fonts:
@@ -70,3 +89,15 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+# 下面这几项一般只有在编写插件库发布到Dart Pub时才写，一般不用写  
+# 作者
+# authors:
+# - Natalie Weizenbaum <nweiz@google.com>
+# - Bob Nystrom <rnystrom@google.com>
+# 主页
+# homepage: https://example-pet-store.com/newtify
+# 文档地址
+# documentation: https://example-pet-store.com/newtify/docs
+# 发布到
+# publish_to: none

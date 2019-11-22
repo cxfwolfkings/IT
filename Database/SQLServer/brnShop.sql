@@ -1,1 +1,0 @@
-select * from bsp_adverts

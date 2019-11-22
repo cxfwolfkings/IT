@@ -101,3 +101,5 @@ https://github.com/2014fighting/CodeFrame.Web
 # 第一个ASP.NET MVC（WebApi） + Entity FrameWork+ Unity+Redis+Sql Server/Other架构的web开发架构设计
 
 https://github.com/zpc870921/EFMvcFrameApp
+
+- [alibaba](https://github.com/alibaba)

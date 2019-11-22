@@ -119,3 +119,5 @@ TIOBE 编程语言排行：[https://www.tiobe.com/tiobe-index/](https://www.tiob
 全球最大的 IT 咨询公司高德纳提出了一个“技术热门度曲线”模型，把一门技术的发展过程分为启动期、泡沫期、低谷期、爬升期和高原期5个阶段。[https://stateofdev.com/](https://stateofdev.com/) 这个网站根据高德纳的模型，做了各种开发技术的曲线
 
 GitHub 也有一些统计数据，说明各种语言、技术在 GitHub 上的活跃程度，可以登录这里查看：[https://octoverse.github.com/](https://octoverse.github.com/)。另外，你也可以自己在 GitHub 上按关键字（比如 Qt）来搜索，看某种技术是否有很多的项目，以此来判断技术的活跃度
+
+A站、B站、P站

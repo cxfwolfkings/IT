@@ -36,7 +36,7 @@
 
 ## 第一部分 SQL
 
-### 第1天：[SQL总结](./1.1_SQL.md)
+### 第1天：[SQL](./1.1_SQL.md)
 
 ## 第二部分 关系型数据库
 
@@ -52,9 +52,9 @@
 - SQL99标准
 - 数据库范式
 
-### 第2天：[MySQL介绍](./2.2_MySQL介绍.md)
+### 第2天：[MySQL](./2.2_MySQL.md)
 
-### 第3天：[SQLServer介绍](./2.3_SQLServer介绍.md)
+### 第3天：[SQLServer](./2.3_SQLServer.md)
 
 ## 第三部分 NoSQL数据库
 

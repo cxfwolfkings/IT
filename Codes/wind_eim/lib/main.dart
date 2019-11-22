@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import './ui/button_samples.dart';
 
+// 入口方法，main.dart文件独有
 void main() => runApp(MyApp());
 
+// 入口文件，不可修改名称
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // 这里使用了MaterialApp脚手架，当然也可以使用WidgetApp，
+    // 建议入口使用MaterialApp，直接定义一个容器布局也可以
     return MaterialApp(
-      title: 'Flutter Demo',
+      // 标题
+      title: 'Wind EIM',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -18,13 +24,16 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
+        // 可以自定义配置主题色调
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      // 页面
+      home: MyHomePage(title: 'EIM Home Page'),
     );
   }
 }
 
+// 使用StatefulWidget有状态Widget
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -39,22 +48,156 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+  // 创建State状态
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  List<Widget> _bodies;
+  List<TabBar> _tabs;
 
-  void _incrementCounter() {
+  // 默认选中第一项
+  int _selectedIndex = 0;
+
+  TabController _tabController;
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //initialIndex为初始选中第几个，length为数量
+    _tabController = TabController(initialIndex: 0, length: 5, vsync: this);
+    _tabController.addListener(() {
+      switch (_tabController.index) {
+        case 0:
+          break;
+        case 1:
+          break;
+      }
+    });
+    _tabs = [
+      null,
+      TabBar(controller: _tabController, tabs: <Widget>[
+        Tab(
+          icon: Icon(Icons.directions_bus),
+          text: "Tab1",
+        ),
+        Tab(
+          icon: Icon(Icons.directions_railway),
+          text: "Tab2",
+        ),
+        Tab(
+          icon: Icon(Icons.directions_boat),
+          text: "Tab3",
+        ),
+        Tab(
+          icon: Icon(Icons.directions_car),
+          text: "Tab4",
+        ),
+        Tab(
+          icon: Icon(Icons.directions_walk),
+          text: "Tab5",
+        ),
+      ]),
+      null
+    ];
+    _bodies = [
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      Center(child: Text('Index 0: Home')),
+      TabBarView(
+        controller: _tabController,
+        children: <Widget>[
+          Center(
+            child: Text("TabBarView data1"),
+          ),
+          Center(
+            child: Text("TabBarView data2"),
+          ),
+          Center(
+            child: Text("TabBarView data3"),
+          ),
+          Center(
+            child: Text("TabBarView data4"),
+          ),
+          Center(
+            child: Text("TabBarView data5"),
+          ),
+        ],
+      ),
+      Column(
+        children: <Widget>[
+          Row(
+            verticalDirection: VerticalDirection.up,
+            textBaseline: TextBaseline.ideographic,
+            children: <Widget>[
+              RaisedButton(
+                color: Colors.blue,
+                child: Text(
+                  '按钮示例',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (BuildContext context) {
+                    return ButtonSamples();
+                  }));
+                },
+              ),
+              RaisedButton(
+                color: Colors.grey,
+                child: Text(
+                  '   我是按钮二  ',
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {},
+              ),
+              RaisedButton(
+                color: Colors.orange,
+                child: Text(
+                  '      我是按钮三    ',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: <Widget>[
+              const FlutterLogo(),
+              const Expanded(
+                child: Text(
+                    'Flutter\'s hot reload helps you quickly and easily experiment, build UIs, add features, and fix bug faster. Experience sub-second reload times, without losing state, on emulators, simulators, and hardware for iOS and Android.'),
+              ),
+              const Icon(Icons.sentiment_very_satisfied),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                " 我们居中显示 |",
+                style: TextStyle(color: Colors.teal),
+              ),
+              Text(" Flutter的Row布局组件 "),
+            ],
+          ),
+        ],
+      )
+    ];
   }
 
   @override
@@ -65,47 +208,34 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    // Scaffold布局脚手架组件
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+        // 标题栏Widget组件
+        appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text(widget.title),
+            primary: true,
+            bottom: _tabs.elementAt(_selectedIndex)),
+        body: _bodies.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home), title: Text('Home')),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.business), title: Text('Business')),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.school), title: Text('测试用例')),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+          currentIndex: _selectedIndex,
+          fixedColor: Colors.deepPurple,
+          onTap: _onItemTapped,
+        ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
   }
 }
