@@ -6,7 +6,6 @@
    - 快速入门
      - 创建单页
      - 创建多页
-     - 本地数据存储
    - [布局](#布局)
      - [StackLayout](#StackLayout)
      - [Grid](#Grid)
@@ -20,6 +19,7 @@
    - [应用基础](#应用基础)
      - [DisplayAlert](#DisplayAlert)
      - [生命周期](#生命周期)
+   - [本地数据存储](#本地数据存储)
 2. [设置](#设置)
 3. [参考](#参考)
 
@@ -93,6 +93,8 @@ ListView是一个非常常见的控件，用于展现一组数据，每一个条
 
 ### 本地数据存储
 
+- 创建sqlite数据库：`sqlite3 xxx.db` 或 `sqlite3 xxx.db3`
+- 查看已创建数据库：`.database`
 - 安装 `sqlite-net-pcl` NuGet 包
 - [数据库处理类](./Bow.Enter/Models/Database.cs)
 

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Bow.Enter.Services;
+using Bow.Enter.Views;
+using System;
+using System.IO;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-using Bow.Enter.Services;
-using Bow.Enter.Views;
 
 namespace Bow.Enter
 {
@@ -23,7 +23,7 @@ namespace Bow.Enter
             {
                 if (database == null)
                 {
-                    database = new Database(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "people.db3"));
+                    database = new Database(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "BowIn.db3"));
                 }
                 return database;
             }

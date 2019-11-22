@@ -1,8 +1,9 @@
+using Bow.Enter.Models;
+using SQLite;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SQLite;
 
-namespace LocalDatabaseTutorial
+namespace Bow.Enter
 {
     public class Database
     {
