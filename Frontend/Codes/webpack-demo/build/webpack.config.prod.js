@@ -1,6 +1,8 @@
 const merge = require("webpack-merge");
 const baseConf = require("./webpack.config.base");
 const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const {
     configureBabelLoader,
     configureURLLoader,
@@ -29,12 +31,26 @@ module.exports = function (
     if (!Array.isArray(browserslist)) {
         browserslist = null;
     }
-    let plugins = [];
+    // 文件压缩
+    let plugins = [new TerserPlugin()];
     let rules = [
         configureCSSLoader(env),
         configureBabelLoader(modern, browserslist),
         ...configureURLLoader(env)
     ];
+
+    /**
+     * 根据不同的构建环境，添加不同的ExtractTextPlugin
+     * 这里，将生产环境分成了测试环境和线上环境。
+     * 当构建的目标是线上环境时，我们为 css 文件都加上了 hash。
+     * 当构建目标是测试环境时，css 不加 hash。
+     * 与入口文件中的变量类似，ExtractTextPlugin 中使用的 [name] 和 [hash:8] 是会自动被 css 的名字和 hash 值替换。
+     */ 
+    if (env === "prod") {
+        plugins.push(new ExtractTextPlugin("css/[name].[hash:8].css"));
+    } else {
+        plugins.push(new ExtractTextPlugin("css/[name].css"));
+    }
 
     // 生产环境特定配置
     const prodConf = {

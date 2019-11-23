@@ -8,10 +8,10 @@ import Todo from './Todo';
  * 每当界面当中的列表元素发生改变时，React 就必须遍历所有的列表项才能够准确找到改变发生的位置，那样就会白白损耗许多性能。
  * @param {*} param0 
  */
-const TodoList = ({ todos }) => (
-    <ul>
+const TodoList = ({ todos, onTodoClick }) => (
+    <ul className="todo-list">
         {todos.map((todo) => (
-            <Todo key={todo.id} content={todo.content} />
+            <Todo key={todo.id} onClick={() => onTodoClick(todo.id)} {...todo} content={todo.content} />
         ))}
     </ul>
 );
