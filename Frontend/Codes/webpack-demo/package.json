@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --inline --progress --config build/webpack.config.dev.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
