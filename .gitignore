@@ -22,3 +22,4 @@
 *.pptx
 *.ppt
 /Private
+/Dotnet/Project/xamarin

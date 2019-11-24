@@ -6,20 +6,7 @@
    - 快速入门
      - 创建单页
      - 创建多页
-   - [布局](#布局)
-     - [StackLayout](#StackLayout)
-     - [Grid](#Grid)
-   - [视图](#视图)
-     - [Label](#Label)
-     - [Button](#Button)
-     - [Entry](#Entry)
-     - [Editor](#Editor)
-     - [Image](#Image)
-     - [ListView](#ListView)
-   - [应用基础](#应用基础)
-     - [DisplayAlert](#DisplayAlert)
-     - [生命周期](#生命周期)
-   - [本地数据存储](#本地数据存储)
+     - [本地数据存储](#本地数据存储)
 2. [设置](#设置)
 3. [参考](#参考)
 
@@ -39,59 +26,7 @@ Xamarin.Forms有两种不同类型的容器控件：
 - Managed Layout - 与CSS的盒模型类似，通过设定子控件的位置和大小来进行布局，应用程序不再直接设定子控件的位置，最常见的例子就是 StackLayout。
 - Unmanaged Layouts - 与Managed Layout不同，开发人员需要直接设定子控件的位置和大小，常见的例子就是 AbsoluteLayout。
 
-## 布局
-
-### StackLayout
-
-堆栈式布局是一种非常常用的布局方式，可以极大地的简化跨平台用户界面的搭建。堆栈式布局的子元素会按照添加到容器中的顺序一个接一个被摆放，堆栈式布局有两个方向：竖直与水平方向。
-
-在StackLayout中我们可以通过 HeightRequest 和 WidthRequest 指定子元素的高度和宽度。
-
-### Grid
-
-绝对布局类似于Windows Forms布局，需要指定每一个子元素的位置。
-
-子元素添加到容器中的顺序会影响子元素的Z-Order。先添加的元素可能会被后面添加的元素遮住。
-
-## 视图
-
-### Label
-
-只读的文本展示控件
-
-### Button
-
-按钮
-
-### Entry
-
-单行的文本输入框
-
-### Editor
-
-多行的文本输入框
-
-### Image
-
-图片
-
-### ListView
-
-ListView是一个非常常见的控件，用于展现一组数据，每一个条目都会被包含在一个单元格内部。默认情况下ListView使用了一个 TextCell 作为模板来展现每一个条目数据。
-
-## 应用基础
-
-### DisplayAlert
-
-弹出窗口
-
-### 生命周期
-
-- 应用程序启动时调用 OnStart 方法。
-- 应用程序转到后台时调用 OnSleep 方法。
-- 应用程序从后台恢复时调用 OnResume 方法。
-
-### 本地数据存储
+## 本地数据存储
 
 - 创建sqlite数据库：`sqlite3 xxx.db` 或 `sqlite3 xxx.db3`
 - 查看已创建数据库：`.database`
