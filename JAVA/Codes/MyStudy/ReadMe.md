@@ -23,6 +23,8 @@ ssm-demo                                ——项目名称
      ├── src/main/webapp                ——网站 Web 资源
      └── pom.xml                        ——pom文件
 ``````
+项目构建：`mvn clean package`
+
 
 ## RPC框架
 
