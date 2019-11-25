@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--  指定页面编码格式  -->
+    <meta charset="UTF-8">
+    <!--  指定页头信息 -->
+    <title>Movies</title>
+    <script src="event.js"></script>
+</head>
+
+<body>
+    <h1>这是第一个Electron应用</h1>
+    <button onclick="onClick_OpenWindow()">打开子窗口</button>
+    <br>
+    <br>
+    <button onclick="onClick_Message()">向子窗口发送消息</button>
+    <br>
+    <br>
+    <button onclick="onClick_Eval()">向子eval方法窗口发送消息</button>
+    <br>
+    <br>
+    <button onclick="onClick_OpenFile()">打开文件对话框</button>
+    <br>
+    <br>
+    <button onclick="onClick_CustomOpenFile()">定制打开对话框</button>
+    <br>
+    <br>
+    <button onclick="onClick_FileType()">指定文件类型</button>
+    <br>
+    <br>
+    <button onclick="onClick_OpenAndCreateDirectory()">打开和创建目录</button>
+    <br>
+    <br>
+    <button onclick="onClick_MultiSelection()">选择多个文件或目录</button>
+    <br>
+    <br>
+    <button onclick="onClick_Callback()">通过回调函数返回选择的文件和目录</button>
+    <br>
+    <br>
+    <button onclick="onClick_Save()">保存文件对话框</button>
+    <br>
+    <br>
+    <button onclick="onClick_SaveCallback()">保存文件对话框（回调函数）</button>
+    <br>
+    <br>
+
+    <label id="label" style="font-size: large"></label>
+
+    <!--
+        使用 <webview> 标签装载的页面在默认情况下是不能调用 Node.js API 的，
+        但 <webview> 标签添加 nodeintegration 属性后，页面就可以使用 Node.js API 了
+    -->
+    <webview id="geekori" src="https://geekori.com" style="height:700px" autosize minwidth="576" minheight="400">
+    </webview>
+</body>
+
+</html>
+<script>
+    onload = () => {
+        const webview = document.getElementById('geekori');
+        const loadstart = () => {
+            console.log('loadstart');
+        }
+        const loadstop = () => {
+            console.log('loadstop');
+        }
+        webview.addEventListener('did-start-loading', loadstart)
+        webview.addEventListener('did-stop-loading', loadstop)
+
+        /**
+         * console.log 方法只是在当前窗口的调试工具中输出日志，
+         * 而不会在 webview.openDevTools 方法打开的调试工具中输出任何日志，
+         * 除非使用 webview.executeJavaScript 方法在 <webview> 标签打开的页面中执行日志输出代码。
+         */
+
+        webview = document.getElementById('geekori');
+        //装载新的页面
+        webview.loadURL('https://www.baidu.com');
+        //重新装载当前页面
+        webview.reload();
+        //获取当前页面的标题
+        console.log(webview.getTitle());
+        //获取当前页面对应的 URL
+        console.log(webview.getURL());
+        const title = webview.getTitle();
+        //在装载的页面执行 JavaScript 代码
+        webview.executeJavaScript('console.log("' + title + '");')
+        //打开调试工具
+        webview.openDevTools()
+    }
+</script>

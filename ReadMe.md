@@ -13,6 +13,7 @@
 1. [学习路线](#学习路线)
 2. [自由职业攻略](#自由职业攻略)
 3. [事业发展](#事业发展)
+4. [知识整理](#知识整理)
 
 ## 学习路线
 
@@ -126,4 +127,20 @@ TIOBE 编程语言排行：[https://www.tiobe.com/tiobe-index/](https://www.tiob
 
 GitHub 也有一些统计数据，说明各种语言、技术在 GitHub 上的活跃程度，可以登录这里查看：[https://octoverse.github.com/](https://octoverse.github.com/)。另外，你也可以自己在 GitHub 上按关键字（比如 Qt）来搜索，看某种技术是否有很多的项目，以此来判断技术的活跃度
 
-A站、B站、P站
+## 知识整理
+
+断舍离
+
+- A站、B站、P站
+- [https://github.com/fyuanfen/note](#https://github.com/fyuanfen/note)
+- [https://github.com/jiangxiayun/flow-editor-vue](#https://github.com/jiangxiayun/flow-editor-vue)
+- [https://github.com/Decalogue/AlgorithmMap](#https://github.com/Decalogue/AlgorithmMap)
+- [https://github.com/xiaoshuaishuai319/weixinxiaochengxu](https://github.com/xiaoshuaishuai319/weixinxiaochengxu)
+- [https://github.com/nimoat/photo-edit](https://github.com/nimoat/photo-edit)
+- [https://github.com/jones2000/HQChart](https://github.com/jones2000/HQChart)
+- [https://github.com/ZFSNYJ/VFD](#https://github.com/ZFSNYJ/VFD)
+- [https://github.com/qianguyihao/Web](https://github.com/qianguyihao/Web)
+- [https://github.com/QianMo/Game-Programmer-Study-Notes](https://github.com/QianMo/Game-Programmer-Study-Notes)
+- [https://github.com/xiaojiwei/strawberry](https://github.com/xiaojiwei/strawberry)
+- [https://github.com/zklblackman/FlowDiagram](https://github.com/zklblackman/FlowDiagram)
+- [https://github.com/jobbole/awesome-design-cn](https://github.com/jobbole/awesome-design-cn)

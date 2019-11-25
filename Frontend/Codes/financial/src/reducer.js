@@ -1,4 +1,4 @@
-import todo from './pages/task/todo';
+import todo from './components/Todo';
 
 export const todos = (state = [], action) => {
     switch (action.type) {

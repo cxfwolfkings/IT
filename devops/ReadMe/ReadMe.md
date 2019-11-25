@@ -2,7 +2,7 @@
 
 ## 目录
 
-1. 第一部分 DevOps概述
+1. 第一部分 DevOps详解
 2. 第二部分 Docker + K8s
 3. 第三部分 GitLab + Jenkins
 4. 第四部分 测试

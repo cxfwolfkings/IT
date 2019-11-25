@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <div style="width: 90%; float: left;">
+        <canvas id="demo" width="1000px" height="660px" style="width:90%; height:100%"></canvas>
+    </div>
+    <div style="width: 10%; float: left;">
+        <div class="box box-info">
+            <div class="box-header">
+                <h3 class="box-title">操作的测试面板</h3>
+            </div>
+            <!-- /.box-header -->
+            <div>
+                <div>
+                    <button onclick="Fan1()">风扇一</button>
+                    <button onclick="Fan2()">风扇二</button>
+                    <button onclick="LoadMaterial()">装载物料</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="js/jquery-1.4.2.js"></script>
+<script type="text/javascript" src="js/DrawRealTimeMonitor.js"></script>
+<script type="text/javascript">
+    var drawRealTimeMonitor = new DrawRealTimeMonitor(document.getElementById('demo'));
+    $(window).resize(function () {
+        $("#demo").attr("width", $("#demo").width());
+        drawRealTimeMonitor.RefreshUI();
+    })
+
+    $("#demo").attr("width", $("#demo").width());
+    setInterval(function () {
+        drawRealTimeMonitor.TimerCheck();
+        drawRealTimeMonitor.RefreshUI();
+    }, 100);
+
+    function Fan1() {
+        if (this.drawRealTimeMonitor.bottleValue.Fan1) {
+            this.drawRealTimeMonitor.bottleValue.Fan1 = false;
+        }
+        else {
+            this.drawRealTimeMonitor.bottleValue.Fan1 = true;
+        }
+    }
+    function Fan2() {
+        if (this.drawRealTimeMonitor.bottleValue.Fan2) {
+            this.drawRealTimeMonitor.bottleValue.Fan2 = false;
+        }
+        else {
+            this.drawRealTimeMonitor.bottleValue.Fan2 = true;
+        }
+    }
+
+    function LoadMaterial() {
+        for (var i = 0; i < 40; i++) {
+            this.drawRealTimeMonitor.bottleValue.Values[i].Value = 0;
+            this.drawRealTimeMonitor.bottleValue.Values[i].IsOpen = false;
+        }
+        for (var i = 0; i < 40; i++) {
+            if (Math.ceil(Math.random() * 10) < 5) {
+                this.drawRealTimeMonitor.bottleValue.Values[i].Value = Math.floor(Math.random() * 100);
+                this.drawRealTimeMonitor.bottleValue.Values[i].IsOpen = true;
+            }
+        }
+    }
+
+    setInterval(function () {
+        for (var i = 0; i < 40; i++) {
+            if (this.drawRealTimeMonitor.bottleValue.Values[i].Value > 0) {
+                this.drawRealTimeMonitor.bottleValue.Values[i].Value--;
+                if (this.drawRealTimeMonitor.bottleValue.Values[i].Value <= 0) {
+                    this.drawRealTimeMonitor.bottleValue.Values[i].IsOpen = false;
+                }
+            }
+        }
+    }, 1000);
+</script>
