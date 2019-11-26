@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wind_eim/samples/ps_001.dart';
 import './ui/button_samples.dart';
 
 // 入口方法，main.dart文件独有
@@ -154,10 +155,15 @@ class _MyHomePageState extends State<MyHomePage>
               RaisedButton(
                 color: Colors.grey,
                 child: Text(
-                  '   我是按钮二  ',
+                  '   商品展示页  ',
                   style: TextStyle(color: Colors.black),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (BuildContext context) {
+                    return Practice001Sample();
+                  }));
+                },
               ),
               RaisedButton(
                 color: Colors.orange,

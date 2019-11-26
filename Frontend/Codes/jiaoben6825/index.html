@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>js大图淡出淡现图片切换代码 - 站长素材</title>
+
+<style>
+*{padding: 0px;margin: 0px;}
+#flash{width:1200px;height: 535px;margin: 50px auto;position: relative;}
+#flash #play{width:1200px;height: 535px;list-style: none;position:absolute;top:0px;left:0px;}
+#flash #play li{display: none;position:absolute;top:0px;left:0px;}
+#flash #play li img{float: left;}
+#button{position: absolute;bottom:20px;left:470px;list-style: none;}
+#button li{margin-left: 10px;float: left;}
+#button li div{width:12px;height: 12px;background:#DDDDDD;border-radius: 6px;cursor: pointer;}
+#prev{width:40px;height:63px;background:url(images/beijing.png) 0px 0px;position: absolute;top:205px;left:10px;z-index: 1000;}
+#next{width:40px;height:63px;background:url(images/beijing.png) -40px 0px;position: absolute;top:205px;right:10px;z-index: 1000;}
+#prev:hover{background:url(images/beijing.png) 0px -62px;}
+#next:hover{background:url(images/beijing.png) -40px -62px;}
+</style>
+
+<script type="text/javascript" src="js/script.js"></script>
+
+</head>
+<body>
+
+ <div id="flash">
+     <div id="prev"></div>
+     <div id="next"></div>
+	 <ul id="play">
+	 	<li style="display: block;"><img src="images/1.jpg" alt="" /></li>
+	 	<li><img src="images/2.jpg" alt="" /></li>
+	 	<li><img src="images/3.jpg" alt="" /></li>
+	 	<li><img src="images/4.jpg" alt="" /></li>
+	 	<li><img src="images/5.jpg" alt="" /></li>
+	 	<li><img src="images/6.jpg" alt="" /></li>
+	 	<li><img src="images/7.jpg" alt="" /></li>
+	 	<li><img src="images/8.jpg" alt="" /></li>
+	 </ul>
+	 <ul id="button">
+	 	<li><div style="background: #A10000;"></div></li>
+	 	<li><div></div></li>
+	 	<li><div></div></li>
+	 	<li><div></div></li>
+	 	<li><div></div></li>
+	 	<li><div></div></li>
+	 	<li><div></div></li>
+	 	<li><div></div></li>
+	 </ul>
+ </div>
+<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+<p>适用浏览器：IE8、360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗.</p>
+<p>来源：<a href="http://sc.chinaz.com/" target="_blank">站长素材</a></p>
+</div>
+</body>
+</html>

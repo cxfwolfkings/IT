@@ -10,7 +10,7 @@
    - [Dart的类和函数](#Dart的类和函数)
    - [Dart的泛型和限制域](#Dart的泛型和限制域)
    - [Dart的异步处理](#Dart的异步处理)
-2. 基本操作
+2. [基本操作](#基本操作)
 3. 配置文件讲解
    - [pubspec.yaml](#pubspec.yaml)
    - [pubspec.lock](#pubspec.lock)
@@ -34,6 +34,7 @@
 6. [项目总结](#项目总结)
 7. 附录
    - [命令行](#命令行)
+   - [参考](#参考)
 
 A new Flutter project.
 
@@ -1062,3 +1063,7 @@ flutter upgrade;            //升级Flutter SDK和依赖包
 flutter channel;            //查看Flutter官方分支列表和当前项目使用的Flutter分支
 flutter channel <分支名>;   //切换分支
 ```
+
+### 参考
+
+- Dart Pub插件库：[https://pub.dev/flutter](https://pub.dev/flutter)

@@ -6,11 +6,14 @@
     <meta charset="UTF-8">
     <!--  指定页头信息 -->
     <title>Movies</title>
+    <link rel="stylesheet" href="index.css" />
     <script src="event.js"></script>
 </head>
 
-<body>
+<body onload="onLoad()">
     <h1>这是第一个Electron应用</h1>
+    <div>Hello World!</div>
+    <h1>子窗口</h1>
     <button onclick="onClick_OpenWindow()">打开子窗口</button>
     <br>
     <br>
@@ -20,6 +23,7 @@
     <button onclick="onClick_Eval()">向子eval方法窗口发送消息</button>
     <br>
     <br>
+    <h1>对话框</h1>
     <button onclick="onClick_OpenFile()">打开文件对话框</button>
     <br>
     <br>
@@ -44,49 +48,200 @@
     <button onclick="onClick_SaveCallback()">保存文件对话框（回调函数）</button>
     <br>
     <br>
+    <h1>应用菜单</h1>
+    <button onclick="onClick_AllOriginMenu()">添加最初的菜单</button>
+    <p />
+    菜单文本：<input id="menuitem" />
+    <p><input id="radio" name="radio" type="radio" /> 单选<br><input id="checkbox" name="radio" type="radio" /> 多选</p>
+    <p />
+    <button onclick="onClick_AddMenuItem()">动态添加菜单项目</button>
 
     <label id="label" style="font-size: large"></label>
 
+    <textarea style="width:400px;height:300px"></textarea>
+
+    <h1>上下文菜单</h1>
+    <div id="panel" style="background-color: brown; width: 300px;height:200px"></div>
+
+    <h1>托盘事件</h1>
+    <textarea id="textarea" style="width:600px;height:200px"></textarea>
+    <p />
+    <button onclick="onClick_AddTray()">添加托盘图标</button>
+    <p />
+    <button onclick="onClick_SetImage()">设置托盘图标</button>
+    <p />
+    <button onclick="onClick_SetTitle()">设置托盘标题</button>
+    <p />
+    <button onclick="onClick_SetPressedImage()">设置托盘按下图标</button>
+    <p />
+    <button onclick="onClick_SetTooltip()">设置托盘提示文本</button>
+    <p />
+    <button onclick="onClick_RemoveTray()">移除托盘图标</button>
+    <p />
+    <textarea id="log" style="width:300px;height:200px"></textarea>
+    <p />
+    <button onclick="onClick_DisplayBalloon()">显示气泡消息</button>
+    <br>
+    <h1>拖拽操作</h1>
+    <!--  红色背景区域，用于接收拖拽的图像文件 -->
+    <div id="panel" style="background: red;width: 50px;height: 50px;"></div>
+    <p />
+    <label>请将图像文件拖动到这个红色区域</label>
+    <p />
+    <!--  用于显示图像文件 -->
+    <img id="image" style="width: auto;height: auto; max-width: 300px;max-height: 300px" />
+    <!--  需要将图像拖动到这个 div 上  -->
+    <div id="load-icon-holder">
+        <h1>将图像文件拖放到此处</h1>
+        <img src="images/drop-here.png" />
+    </div>
+    <!--  下面的多个 img 标签用于显示不同尺寸的图像  -->
+    <div id="icons">
+        <div class="icon-holder">
+            <label>16x16</label>
+            <img class="icon sixteen" />
+        </div>
+        <div class="icon-holder">
+            <label>32x32</label>
+            <img class="icon thirtytwo" />
+        </div>
+        <div class="icon-holder">
+            <label>64x64</label>
+            <img class="icon sixtyfour" />
+        </div>
+        <div class="icon-holder">
+            <label>128x128</label>
+            <img class="icon onetwoeight" />
+        </div>
+        <div class="icon-holder">
+            <label>256x256</label>
+            <img class="icon twofivesix" />
+        </div>
+
+    </div>
+
+    <h1>摄像头</h1>
+    <!--用于实时显示摄像头拍到的影像-->
+    <canvas width="800" height="600"></canvas>
+    <!--真正的播放摄像头排到的影像-->
+    <video autoplay></video>
+    <!-- 保存按钮 -->
+    <div id="takePhoto" onclick="takePhoto()">
+        <i class="fa fa-camera"></i>
+    </div>
+
+    <h1>检测当前操作系统</h1>
+    <p>您当前运行的操作系统是 <span id="os-label"></span></p>
+
+    <h1>localStorage</h1>
+    <div id="close" onclick="quit();">x</div>
+    <textarea id="textarea1" onKeyUp="saveNotes();"></textarea>
+
+    <h1>sql.js操作SQLLite数据库</h1>
+    <!--
+        虽然 sql.js 在操作 SQLite 数据库方面没什么问题，
+        但由于 sql.js 是基于 JavaScript 的，因而效率较低，
+        而且操作都是在内存中完成的，如果要保存修改，需要将整个数据库写到文件中，
+        比较费事，而且写数据的效率不高，因此在遇到大量数据的情况下，
+        建议使用 Node.js 中的 sqlite 3 模块操作 SQLite 数据库。
+    -->
+    <button id="button_create" onclick="onClick_CreateDatabase()">创建SQLite数据库</button>
+    <p />
+    <button id="button_insert" onclick="onClick_Insert()" disabled>插入记录</button>
+    <p />
+    <button id="button_query" onclick="onClick_Query()" disabled>查询记录</button>
+    <p />
+    <button id="button_update" onclick="onClick_Update()" disabled>更新记录</button>
+    <p />
+    <button id="button_delete" onclick="onClick_Delete()" disabled>删除记录</button>
+    <p />
+    <label id="label_rows"></label>
+
+    <h1>sqlite3操作SQLLite数据库</h1>
+    <button id="button_create1" onclick="onClick_CreateDatabase1()">创建SQLite数据库</button>
+    <p />
+    <button id="button_insert1" onclick="onClick_Insert1()" disabled>插入记录</button>
+    <p />
+    <button id="button_query1" onclick="onClick_Query1()" disabled>查询记录</button>
+    <p />
+    <button id="button_update1" onclick="onClick_Update1()" disabled>更新记录</button>
+    <p />
+    <button id="button_delete1" onclick="onClick_Delete1()" disabled>删除记录</button>
+    <p />
+    <label id="label_rows1"></label>
+
+    <h1>操作MySQL数据库</h1>
+    <!--
+        mysql 模块是纯的 JavaScript 实现的，不存在兼容性问题，在 Node.js 和 Electron 中都可以使用。
+        而且 mysql 模块操作 MySQL 数据库执行的是网络操作，用任何编程语言实现的效率差不多，
+        并不会因为是用 JavaScript 实现的而降低操作 MySQL 数据库的效率。
+    -->
+    <button id="button_create2" onclick="onClick_OpenDatabase2()">打开MySQL数据库</button>
+    <p />
+    <button id="button_insert2" onclick="onClick_Insert2()" disabled>插入记录</button>
+    <p />
+    <button id="button_query2" onclick="onClick_Query2()" disabled>查询记录</button>
+    <p />
+    <button id="button_update2" onclick="onClick_Update2()" disabled>更新记录</button>
+    <p />
+    <button id="button_delete2" onclick="onClick_Delete2()" disabled>删除记录</button>
+    <p />
+    <label id="label_rows2"></label>
+
+    <h1>剪切板演示</h1>
+    <button id="button_read_text" onclick="onClick_WriteText()">复制文本</button>
+    <p />
+    <button id="button_write_text" onclick="onClick_ReadText()">粘贴文本</button>
+    <p />
+    <button id="button_read_html" onclick="onClick_WriteHTML()">复制HTML</button>
+    <p />
+    <button id="button_write_html" onclick="onClick_ReadHTML()">粘贴HTML</button>
+    <p />
+    <button id="button_read_rtf" onclick="onClick_WriteRTF()">复制RTF</button>
+    <p />
+    <button id="button_write_rtf" onclick="onClick_ReadRTF()">粘贴RTF</button>
+    <p />
+    <button id="button_read_image" onclick="onClick_WriteImage()">复制图像</button>
+    <p />
+    <button id="button_write_image" onclick="onClick_ReadImage()">粘贴图像</button>
+    <p />
+    <!--可编辑的 div 标签，用于复制和粘贴文本-->
+    <div id="text" contenteditable="true" style="width: 500px;height: 500px; border: 1px solid #ccc; padding: 5px;">
+    </div>
+
+    <!-- <h1>内嵌网页</h1> -->
+    <!-- electron >= 5 禁用了 webview标签 -->
+    <!-- 
+    <webview src="https://geekori.com" style="width:400px; height:300px"></webview>
+    <webview src="https://geekori.com" style="height:700px" autosize minwidth="576" minheight="400"></webview> 
+    -->
     <!--
         使用 <webview> 标签装载的页面在默认情况下是不能调用 Node.js API 的，
         但 <webview> 标签添加 nodeintegration 属性后，页面就可以使用 Node.js API 了
     -->
-    <webview id="geekori" src="https://geekori.com" style="height:700px" autosize minwidth="576" minheight="400">
-    </webview>
+    <!-- 
+    <webview id="other" src="./other.html" style="width:400px; height:300px"></webview>
+    <webview id="other1" src="./other1.html" style="width:400px; height:300px" nodeintegration></webview> 
+    -->
 </body>
 
 </html>
-<script>
-    onload = () => {
-        const webview = document.getElementById('geekori');
-        const loadstart = () => {
-            console.log('loadstart');
+<script type="text/javascript">
+    const panel = document.getElementById('panel')
+    // 必须设置 ondragover 事件，而且要返回 false，这样才会交由我们自己的代码处理，否则系统会自己处理放下事件（ondrop），也就是说不会再触发 ondrop 事件
+    panel.ondragover = () => {
+        return false;
+    }
+    // 放下事件
+    panel.ondrop = (e) => {
+        e.preventDefault()
+        // 循环扫描所有拖过来的文件
+        for (let f of e.dataTransfer.files) {
+            alert(f.path)
+            image.src = f.path;
+            // 只取第一个文件，然后退出 for 循环
+            break;
         }
-        const loadstop = () => {
-            console.log('loadstop');
-        }
-        webview.addEventListener('did-start-loading', loadstart)
-        webview.addEventListener('did-stop-loading', loadstop)
-
-        /**
-         * console.log 方法只是在当前窗口的调试工具中输出日志，
-         * 而不会在 webview.openDevTools 方法打开的调试工具中输出任何日志，
-         * 除非使用 webview.executeJavaScript 方法在 <webview> 标签打开的页面中执行日志输出代码。
-         */
-
-        webview = document.getElementById('geekori');
-        //装载新的页面
-        webview.loadURL('https://www.baidu.com');
-        //重新装载当前页面
-        webview.reload();
-        //获取当前页面的标题
-        console.log(webview.getTitle());
-        //获取当前页面对应的 URL
-        console.log(webview.getURL());
-        const title = webview.getTitle();
-        //在装载的页面执行 JavaScript 代码
-        webview.executeJavaScript('console.log("' + title + '");')
-        //打开调试工具
-        webview.openDevTools()
+        return false;
     }
 </script>
