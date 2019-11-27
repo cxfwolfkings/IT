@@ -9,7 +9,7 @@
 
 ## 第一部分 DevOps概述
 
-### 第1天：[DevOps详解](1.1_DevOps详解.md)
+### 1.1 [DevOps详解](1.1_DevOps详解.md)
 
 - 简介
 - 基础架构即代码
@@ -19,7 +19,7 @@
 
 ## 第二部分 Docker + K8s
 
-### 第1-5天：[Docker简介](./2.1_Docker.md)
+### 2.1 [Docker](./2.1_Docker.md)
 
 1. 简介
    - 什么是Docker / Windows容器 / 为什么使用Docker / 虚拟化与docker
@@ -29,6 +29,8 @@
    - Docker子命令分类
    - 镜像命令
    - Dockerfile命令
+
+### 2.2 [平台](./2.2_平台.md)
 
 - 附录
 

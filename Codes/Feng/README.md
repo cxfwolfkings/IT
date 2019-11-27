@@ -1,4 +1,8 @@
-# 云开发 quickstart
+# OA小程序
+
+## taro框架
+
+## 云开发 quickstart
 
 这是云开发的快速启动指引，其中演示了如何上手使用云开发的三大基础能力：
 
@@ -8,4 +12,7 @@
 
 ## 参考文档
 
+- [Taro 官方网站](https://taro.aotu.io/)
+- [Taro-UI 官方网站](https://taro-ui.aotu.io/)
+- [taro-sample-weapp](https://github.com/NervJS/taro-sample-weapp)
 - [云开发文档](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/basis/getting-started.html)

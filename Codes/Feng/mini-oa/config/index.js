@@ -1,6 +1,6 @@
 const config = {
   projectName: 'mini-oa',
-  date: '2019-11-26',
+  date: '2019-11-27',
   designWidth: 750,
   deviceRatio: {
     '640': 2.34 / 2,
