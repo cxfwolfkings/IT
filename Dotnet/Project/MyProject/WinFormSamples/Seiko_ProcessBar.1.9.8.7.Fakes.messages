@@ -1,0 +1,4 @@
+D:\Charles\C#代码\LearnLife\自定义控件开发\自定义控件开发Form\Fakes\Seiko_ProcessBar.fakes : warning : 无法为 Seiko_ProcessBar.MyProcessBar+FinishEventHandler 生成填充码: 类型是一个委托。
+D:\Charles\C#代码\LearnLife\自定义控件开发\自定义控件开发Form\Fakes\Seiko_ProcessBar.fakes : warning : 无法为 Seiko_ProcessBar.MyProcessBar+MyEnum1 生成填充码: 类型是一个枚举。
+D:\Charles\C#代码\LearnLife\自定义控件开发\自定义控件开发Form\Fakes\Seiko_ProcessBar.fakes : warning : 无法为 Seiko_ProcessBar.MyProcessBar+MyEnum2 生成填充码: 类型是一个枚举。
+D:\Charles\C#代码\LearnLife\自定义控件开发\自定义控件开发Form\Fakes\Seiko_ProcessBar.fakes : warning : 无法为 Seiko_ProcessBar.MyProcessBar+ValueChanged 生成填充码: 类型是一个委托。

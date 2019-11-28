@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
-import { Label, Radio, RadioGroup } from '@tarojs/components'
-import { AtForm, AtInput, AtButton } from 'taro-ui'
+import { View, Text, Label, Radio, RadioGroup } from '@tarojs/components'
+import { AtForm, AtInput, AtButton, AtNavBar } from 'taro-ui'
 
 export default class Apply extends Component {
 
@@ -43,21 +43,26 @@ export default class Apply extends Component {
     })
   }
 
-  onSubmit() {
+  handleSubmit() {
     console.log(this.state.value)
   }
 
-  onReset() {
-    this.setState({
-      value: '',
+  handleCancel() {
+    Taro.redirectTo({
+      url: '/components/business/index'
+    })
+  }
+
+  handleClickRgIconSt() {
+    Taro.redirectTo({
+      url: '/components/business/companies'
     })
   }
 
   render() {
     return (
       <AtForm
-        onSubmit={this.onSubmit.bind(this)}
-        onReset={this.onReset.bind(this)}
+        onSubmit={this.handleSubmit.bind(this)}
       >
         <AtInput
           name='txt-name'
@@ -68,13 +73,25 @@ export default class Apply extends Component {
           onChange={this.handleChange.bind(this, 'value')}
         />
         <AtInput
-          name='txt-name'
+          name='txt-busiDate'
           title='出差日期'
           type='text'
           placeholder='请选择...'
           value={this.state.value}
           onChange={this.handleChange.bind(this, 'value')}
         />
+        <View className='at-row' style='padding:24rpx 0;font-size: 32rpx;line-height:1.5'>
+          <Text style='margin-left:32rpx;margin-right:16rpx;width:172rpx'>出差时段</Text>
+          <RadioGroup>
+            {this.state.dayTypes.map((item, i) => {
+              return (
+                <Label className='radio-list__label' for={i} key={i}>
+                  <Radio className='radio-list__radio' value={item.value} checked={item.checked}>{item.text}</Radio>
+                </Label>
+              )
+            })}
+          </RadioGroup>
+        </View>
         <AtInput
           name='txt-name'
           title='出差时间'
@@ -83,18 +100,28 @@ export default class Apply extends Component {
           value={this.state.value}
           onChange={this.handleChange.bind(this, 'value')}
         />
-        <RadioGroup>
-          {this.state.dayTypes.map((item, i) => {
-            return (
-              <Label className='radio-list__label' for={i} key={i}>
-                <Radio className='radio-list__radio' value={item.value} checked={item.checked}>{item.text}</Radio>
-              </Label>
-            )
-          })}
-        </RadioGroup>
-        <AtButton formType='submit'>提交</AtButton>
-        <AtButton formType='reset'>重置</AtButton>
-      </AtForm>
+        <AtInput
+          name='txt-srcPlace'
+          title='出发地'
+          type='text'
+          placeholder='请选择...'
+          value={this.state.value}
+          onChange={this.handleChange.bind(this, 'value')}
+        />
+        <AtInput
+          name='txt-busiPlace'
+          title='目的地'
+          type='text'
+          placeholder='请选择...'
+          value={this.state.value}
+          onChange={this.handleChange.bind(this, 'value')}
+        />
+        <View className='at-row' style='padding:24rpx 0;font-size: 32rpx;line-height:1.5'>
+          <Text style='margin-left:32rpx;margin-right:16rpx;width:172rpx'>同行人</Text>
+        </View>
+        <AtButton type='primary' formType='submit'>提交</AtButton>
+        <AtButton type='secondary' onClick={this.handleCancel.bind(this)}>取消</AtButton>
+      </AtForm >
     )
   }
 }

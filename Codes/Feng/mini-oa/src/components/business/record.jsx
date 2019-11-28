@@ -25,7 +25,42 @@ export default class Record extends Component {
     navigationBarTitleText: '出差记录'
   }
 
-  onClick(tag) {
+  list = [
+    {
+      key: 1,
+      name: '电气研发部(12)',
+      children: [
+        {
+          key: 1.1,
+          name: '电气一组(3)'
+        },
+        {
+          key: 1.2,
+          name: '电气二组(3)'
+        },
+        {
+          key: 1.3,
+          name: '电气三组(3)'
+        }
+      ]
+    },
+    {
+      key: 2,
+      name: '机械研发部'
+    },
+    {
+      key: 3,
+      name: '项目管理部'
+    }
+  ]
+
+  handleClickLeftIcon() {
+    Taro.redirectTo({
+      url: '/components/business/index'
+    })
+  }
+
+  handleClickDateType(tag) {
     switch (tag.name) {
       case 'tag-day':
         this.setState({
@@ -45,10 +80,14 @@ export default class Record extends Component {
     }
   }
 
-  onDateChange = e => {
+  handleChangeDate = e => {
     this.setState({
       dateSel: e.detail.value
     })
+  }
+
+  handleClickRow(row) {
+    console.log(row)
   }
 
   render() {
@@ -60,31 +99,37 @@ export default class Record extends Component {
               type='primary'
               name='tag-day'
               active={this.state.current == 0}
-              onClick={this.onClick.bind(this)}
+              onClick={this.handleClickDateType.bind(this)}
             >日</AtTag>
             <AtTag
               type='primary'
               name='tag-week'
               active={this.state.current == 1}
-              onClick={this.onClick.bind(this)}
+              onClick={this.handleClickDateType.bind(this)}
             >周</AtTag>
             <AtTag
               type='primary'
               name='tag-month'
               active={this.state.current == 2}
-              onClick={this.onClick.bind(this)}
+              onClick={this.handleClickDateType.bind(this)}
             >月</AtTag></View>
           <View className='at-col'>
-            <Picker mode='date' onChange={this.onDateChange}>
-              <View className='picker'>
+            <Picker mode='date' onChange={this.handleChangeDate} style='font-size:32rpx;'>
+              <View className='picker' style='font-size:32rpx;'>
                 当前选择：{this.state.dateSel}
               </View>
             </Picker></View>
         </View>
         <AtList>
-          <AtListItem title='电气研发部(12)' arrow='right' />
-          <AtListItem title='机械研发部' arrow='right' />
-          <AtListItem title='项目管理部' arrow='right' />
+          {
+            this.list.map(function (item) {
+              if (item.children) {
+                return <AtListItem key={item.key} title={item.name} arrow='right' onClick='' />
+              } else {
+                return <AtListItem key={item.key} title={item.name} />
+              }
+            })
+          }
         </AtList>
       </View>
     )

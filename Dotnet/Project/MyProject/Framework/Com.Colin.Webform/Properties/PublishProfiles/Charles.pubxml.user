@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+您 Web 项目的发布/打包进程将使用此文件。您可以通过编辑此 MSBuild 文件
+来自定义该进程的行为。若要了解与此相关的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=208121。
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>D:\发布</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/Jayrock.dll">
+      <publishTime>02/01/2016 08:20:52</publishTime>
+    </File>
+    <File Include="bin/Jayrock.Json.dll">
+      <publishTime>02/01/2016 08:20:52</publishTime>
+    </File>
+    <File Include="bin/TestNet.dll">
+      <publishTime>05/09/2016 09:22:36</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>05/09/2016 09:22:36</publishTime>
+    </File>
+    <File Include="WebBrowser调用.aspx">
+      <publishTime>05/09/2016 08:56:08</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

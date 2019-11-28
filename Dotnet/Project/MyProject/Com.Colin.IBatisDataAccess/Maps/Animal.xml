@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Animal" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <statements>
+    <select id="GetAnimals" resultClass="Com.Colin.Model.AnimalModel">
+      select * from T_Animal
+    </select>
+  </statements>
+</sqlMap>

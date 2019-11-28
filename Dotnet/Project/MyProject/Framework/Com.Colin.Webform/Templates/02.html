@@ -1,0 +1,40 @@
+﻿#include("head.html")<!-- 被引用文件中的$不解析 -->
+
+$ps.tom
+
+1：
+<ul>
+    #foreach($mr in $mingrens)    
+    <li>$mr</li>
+    #end
+</ul>
+
+2：
+<ul>
+    #foreach($p in $persons)
+        <li>$p.Name的年龄是$p.Age</li>
+    #end
+</ul>
+
+3：
+<ul>
+    #foreach($p in $persons)
+        #if($p.Age>20)
+          <li style="color:Red">$p.Name的年龄是$p.Age</li>
+        #else
+          <li style="color:Green">$p.Name的年龄是$p.Age</li>
+        #end
+    #end
+</ul>
+
+<p>
+#if($age>10)
+   大于10
+#else
+   小于等于10
+#end
+</p>
+<a href="Step03.ashx">下一步</a>
+#parse("GG.html")
+
+#parse("foot.html")<!-- 被引用文件中的$会解析 -->

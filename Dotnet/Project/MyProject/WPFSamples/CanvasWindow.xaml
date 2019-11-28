@@ -1,0 +1,14 @@
+﻿<Window x:Class="SC.WPFSamples.CanvasWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SC.WPFSamples"
+        mc:Ignorable="d"
+        Title="CanvasWindow" Height="300" Width="300">
+    <Canvas Background="LightBlue">
+        <Label Canvas.Top="30" Canvas.Left="20">Enter here:</Label>
+        <TextBox Canvas.Top="30" Canvas.Left="120" Width="100" />
+        <Button Canvas.Top="70" Canvas.Left="130" Content="Click Me!" Padding="5" />
+    </Canvas>
+</Window>

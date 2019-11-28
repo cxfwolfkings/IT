@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="RoomReservationModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="RoomReservationModelStoreContainer">
+          <EntitySet Name="MeetingRooms" EntityType="RoomReservationModel.Store.MeetingRooms" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="Reservation" EntityType="RoomReservationModel.Store.Reservation" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <AssociationSet Name="FK_Reservation_To_MeetingRoom" Association="RoomReservationModel.Store.FK_Reservation_To_MeetingRoom">
+            <End Role="MeetingRooms" EntitySet="MeetingRooms" />
+            <End Role="Reservation" EntitySet="Reservation" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="MeetingRooms">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="RoomName" Type="nvarchar" Nullable="false" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Reservation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ReservedFrom" Type="datetime" Nullable="false" />
+          <Property Name="ReservedTo" Type="datetime" Nullable="false" />
+          <Property Name="Contact" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="RoomId" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Reservation_To_MeetingRoom">
+          <End Role="MeetingRooms" Type="RoomReservationModel.Store.MeetingRooms" Multiplicity="1" />
+          <End Role="Reservation" Type="RoomReservationModel.Store.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MeetingRooms">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="RoomId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RoomReservationModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+        <EntityContainer Name="RoomReservationEntities" annotation:LazyLoadingEnabled="true" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+          <EntitySet Name="MeetingRooms" EntityType="RoomReservationModel.MeetingRoom" />
+          <EntitySet Name="Reservations" EntityType="RoomReservationModel.Reservation" />
+          <AssociationSet Name="FK_Reservation_To_MeetingRoom" Association="RoomReservationModel.FK_Reservation_To_MeetingRoom">
+            <End Role="MeetingRooms" EntitySet="MeetingRooms" />
+            <End Role="Reservation" EntitySet="Reservations" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="MeetingRoom">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
+          <Property Name="RoomName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Reservations" Relationship="RoomReservationModel.FK_Reservation_To_MeetingRoom" FromRole="MeetingRooms" ToRole="Reservation" />
+        </EntityType>
+        <EntityType Name="Reservation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
+          <Property Name="ReservedFrom" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ReservedTo" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Contact" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="RoomId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="MeetingRoom" Relationship="RoomReservationModel.FK_Reservation_To_MeetingRoom" FromRole="Reservation" ToRole="MeetingRooms" />
+        </EntityType>
+        <Association Name="FK_Reservation_To_MeetingRoom">
+          <End Role="MeetingRooms" Type="RoomReservationModel.MeetingRoom" Multiplicity="1" />
+          <End Role="Reservation" Type="RoomReservationModel.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MeetingRooms">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="RoomId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RoomReservationModelStoreContainer" CdmEntityContainer="RoomReservationEntities">
+          <EntitySetMapping Name="MeetingRooms">
+            <EntityTypeMapping TypeName="RoomReservationModel.MeetingRoom">
+              <MappingFragment StoreEntitySet="MeetingRooms">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="RoomName" ColumnName="RoomName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Reservations">
+            <EntityTypeMapping TypeName="RoomReservationModel.Reservation">
+              <MappingFragment StoreEntitySet="Reservation">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ReservedFrom" ColumnName="ReservedFrom" />
+                <ScalarProperty Name="ReservedTo" ColumnName="ReservedTo" />
+                <ScalarProperty Name="Contact" ColumnName="Contact" />
+                <ScalarProperty Name="RoomId" ColumnName="RoomId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer>
+    <edmx:Connection>
+      <edmx:DesignerInfoPropertySet>
+        <edmx:DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </edmx:DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <edmx:DesignerInfoPropertySet>
+        <edmx:DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <edmx:DesignerProperty Name="EnablePluralization" Value="True" />
+        <edmx:DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </edmx:DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams />
+  </edmx:Designer>
+</edmx:Edmx>

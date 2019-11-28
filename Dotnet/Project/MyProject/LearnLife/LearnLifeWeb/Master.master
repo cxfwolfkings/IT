@@ -1,0 +1,123 @@
+﻿<%@ Master Language="C#" %>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head runat="server">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- 移动设备优先，禁用缩放功能 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>真实国度</title>
+    <link href="favicon.ico" rel="icon">
+    <!-- Bootstrap core CSS -->
+    <link href="Public/Js/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- 页脚css样式 -->
+    <link href="Public/Js/bootstrap-3.3.5/css/sticky-footer.css" rel="stylesheet"/>
+    <!-- Custom styles for this template -->
+    <!--
+    <link href="bootstrap-3.3.5/css/offcanvas.css" rel="stylesheet">
+    -->
+    <style type="text/css">
+        .navbar {
+            margin-bottom: 0px;
+        }
+        .navbar-brand {
+            padding: 0px;
+        }
+        .navbar-nav {
+            float: none;
+        }
+    </style>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <img alt="Brand" src="Public/Image/logo.jpg" style="width:inherit;height:inherit;"/>
+                </a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">智能时代<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">javascript</a></li>
+                            <li><a href="#">html5</a></li>
+                            <li><a href="#">css</a></li>
+                            <li><a href="#">xml</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">php</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">C</a></li>
+                            <li><a href="#">C++</a></li>
+                            <li><a href="#">C#</a></li>
+                            <li><a href="#">Object-C</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">java</a></li>
+                            <li><a href="#">android</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">金融世界<span class="sr-only">(current)</span></a></li>
+                    <li><a href="#">生活百科</a></li>
+                    <li><a href="#">数学奥秘</a></li>
+                    <li><a href="#">科学探索</a></li>
+                    <li><a href="#">宇宙自然</a></li>
+                    <li><a href="#">人文地理</a></li>
+                    <li><a href="#">历史政治</a></li>
+                    <li><a href="#">艺术殿堂</a></li>
+                    <li><a href="#">棋行天下</a></li>
+                    <li style="float:right"><a href="editNote.aspx">学习笔记</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <div>
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted">欢迎来到真实国度</p>
+        </div>
+    </footer>
+    </form>
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="Public/Js/bootstrap-3.3.5/js/jquery.min.js" type="text/javascript"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="Public/Js/bootstrap-3.3.5/js/bootstrap.min.js" type="text/javascript"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="Public/Js/bootstrap-3.3.5/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="Public/Js/bootstrap-3.3.5/js/offcanvas.js"></script>
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="Public/Js/bootstrap-3.3.5/js/ie-emulation-modes-warning.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('.navbar-nav li').click(function() {
+                $(".navbar-nav").find("li").not(this).removeClass("active");
+                $(this).addClass("active"); 
+            });
+        });
+    </script>
+</body>
+</html>

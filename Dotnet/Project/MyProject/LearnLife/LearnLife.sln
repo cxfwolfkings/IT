@@ -1,0 +1,94 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.152
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LearnLifeApp", "LearnLifeApp\LearnLifeApp.csproj", "{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "LearnLifeWeb", "LearnLifeWeb\", "{92996202-A80E-4E7B-B58E-6250BA3F6941}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_8020"
+		Debug.AspNetCompiler.PhysicalPath = "LearnLifeWeb\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_8020\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_8020"
+		Release.AspNetCompiler.PhysicalPath = "LearnLifeWeb\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_8020\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "8020"
+		SlnRelativePath = "LearnLifeWeb\"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnLifeLib", "LearnLifeLib\LearnLifeLib.csproj", "{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnLifeNUnitTest", "LearnLifeNUnitTest\LearnLifeNUnitTest.csproj", "{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnLifeConsole", "LearnLifeConsole\LearnLifeConsole.csproj", "{06404809-932C-4987-8945-5D1EB29B925C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Debug|x86.Build.0 = Debug|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Release|x86.ActiveCfg = Release|Any CPU
+		{B530E63A-7B4B-4AEC-BA9D-7B5D439C04E3}.Release|x86.Build.0 = Release|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Debug|x86.Build.0 = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Release|x86.ActiveCfg = Debug|Any CPU
+		{92996202-A80E-4E7B-B58E-6250BA3F6941}.Release|x86.Build.0 = Debug|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Debug|x86.Build.0 = Debug|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Release|x86.ActiveCfg = Release|Any CPU
+		{1417F643-5932-4FC4-B9FC-21DAE8B5BA83}.Release|x86.Build.0 = Release|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Debug|x86.Build.0 = Debug|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Release|x86.ActiveCfg = Release|Any CPU
+		{A5CEAC67-8DF4-4C27-9799-C9514C9FE7E6}.Release|x86.Build.0 = Release|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Debug|x86.Build.0 = Debug|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Release|x86.ActiveCfg = Release|Any CPU
+		{06404809-932C-4987-8945-5D1EB29B925C}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {876D76D6-FE8D-4A38-ABFB-1D26F503AFC8}
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+EndGlobal

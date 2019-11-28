@@ -1,0 +1,59 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Company.master.cs" Inherits="Com.Colin.Web.Company" %>
+
+<!DOCTYPE html>
+
+<html>
+<head id="Head1" runat="server">
+    <link rel="stylesheet" type="text/css" href="Company.css" />
+    <title></title>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="top">
+            <h1>Professional C# 2012 Demo Web Application</h1>
+        </div>
+        <div class="top2">
+            <asp:ContentPlaceHolder ID="topContent" runat="server">
+                <asp:SiteMapPath ID="SiteMapPath1" runat="server"></asp:SiteMapPath>
+            </asp:ContentPlaceHolder>
+        </div>
+        <div class="left">
+            <asp:ContentPlaceHolder ID="leftContent" runat="server">
+                <asp:Menu ID="Menu1" runat="server" DataSourceID="SiteMapDataSource1" CssClass="mainnav" Orientation="Horizontal" BackColor="#F7F6F3" DynamicHorizontalOffset="2" Font-Names="Verdana" Font-Size="0.8em" ForeColor="#7C6F57" StaticSubMenuIndent="10px">
+                    <DynamicHoverStyle BackColor="#7C6F57" ForeColor="White" />
+                    <DynamicMenuItemStyle HorizontalPadding="5px" VerticalPadding="2px" />
+                    <DynamicMenuStyle BackColor="#F7F6F3" />
+                    <DynamicSelectedStyle BackColor="#5D7B9D" />
+                    <StaticHoverStyle BackColor="#7C6F57" ForeColor="White" />
+                    <StaticMenuItemStyle HorizontalPadding="5px" VerticalPadding="2px" />
+                    <StaticSelectedStyle BackColor="#5D7B9D" />
+                </asp:Menu>
+                <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" />
+
+                <%--      <nav>
+        <ul>
+          <li>Home
+          <ul>
+            <li>Reserve Room</li>
+            <li>Show Rooms</li>
+          </ul>
+          </li>
+          <li>About</li>
+        </ul>
+      </nav>--%>
+            </asp:ContentPlaceHolder>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="mainContent" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+        <div class="bottom">
+            <asp:Label ID="LabelBottom" runat="server" />
+            <div>CN innovation</div>
+            <div>http://www.cninnovation.com</div>
+        </div>
+    </form>
+</body>
+</html>

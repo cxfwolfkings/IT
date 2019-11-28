@@ -27,13 +27,16 @@ class App extends Component {
       'pages/index/index',
       'components/business/index',
       'components/business/record',
-      'components/business/apply'
+      'components/business/apply',
+      'components/business/companies',
+      'components/notice/index'
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarTextStyle: 'black',
+      navigationStyle: 'default'
     }
   }
 
