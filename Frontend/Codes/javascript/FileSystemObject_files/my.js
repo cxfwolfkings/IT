@@ -1,1 +1,0 @@
-document.write("ÎÞÓÇ½Å±¾ 51JS.COM");
