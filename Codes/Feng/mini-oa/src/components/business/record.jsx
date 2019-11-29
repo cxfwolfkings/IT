@@ -6,8 +6,13 @@ export default class Record extends Component {
 
   constructor() {
     super(...arguments)
+    let list = this.data
+    if (this.$router.params.key) {
+      // ...
+    }
     this.state = {
-      current: 2
+      current: 2,
+      list: list
     }
   }
 
@@ -25,22 +30,63 @@ export default class Record extends Component {
     navigationBarTitleText: '出差记录'
   }
 
-  list = [
+  data = [
     {
       key: 1,
       name: '电气研发部(12)',
       children: [
         {
           key: 1.1,
-          name: '电气一组(3)'
+          name: '电气一组(3)',
+          children: [
+            {
+              key: '1.1.1',
+              isLeaf: true,
+              name: '鸣人',
+              from: '木叶村',
+              to: '妙木山',
+              date: '2019-12-31 上午',
+              parentKey: 1.1
+            },
+            {
+              key: '1.1.2',
+              isLeaf: true,
+              name: '鸣人',
+              from: '木叶村',
+              to: '妙木山',
+              date: '2019-12-31 上午',
+              parentKey: 1.1
+            },
+            {
+              key: '1.1.3',
+              isLeaf: true,
+              name: '鸣人',
+              from: '木叶村',
+              to: '妙木山',
+              date: '2019-12-31 上午',
+              parentKey: 1.1
+            }
+          ]
         },
         {
           key: 1.2,
-          name: '电气二组(3)'
+          name: '电气二组'
         },
         {
           key: 1.3,
-          name: '电气三组(3)'
+          name: '电气三组'
+        },
+        {
+          key: 1.4,
+          name: '电气四组'
+        },
+        {
+          key: 1.5,
+          name: '电气五组'
+        },
+        {
+          key: 1.6,
+          name: '电气六组'
         }
       ]
     },
@@ -86,11 +132,22 @@ export default class Record extends Component {
     })
   }
 
-  handleClickRow(row) {
-    console.log(row)
+  handleClickRow(itemKey) {
+    let data = this.state.list
+    data = data.find(_ => _.key == itemKey).children
+    this.setState({
+      list: data
+    })
+  }
+
+  handleViewDetail(itemKey, parentKey) {
+    Taro.redirectTo({
+      url: '/components/business/apply?key=' + itemKey + '&parentKey=' + parentKey
+    })
   }
 
   render() {
+    const _this = this
     return (
       <View>
         <View className='at-row'>
@@ -122,12 +179,31 @@ export default class Record extends Component {
         </View>
         <AtList>
           {
-            this.list.map(function (item) {
-              if (item.children) {
-                return <AtListItem key={item.key} title={item.name} arrow='right' onClick='' />
-              } else {
-                return <AtListItem key={item.key} title={item.name} />
+            this.state.list.map(function (item) {
+              if (item.isLeaf) {
+                return (
+                  <View key={item.key} className='at-row'
+                    style='font-size:32rpx;border:0 solid #d6e4ef;border-bottom-width:1px;padding:30rpx'
+                    onClick={_this.handleViewDetail.bind(_this, item.key, item.parentKey)}
+                  >
+                    <View className='at-col'>
+                      <View className='at-row'>
+                        <View className='at-col' style='font-size:36rpx'>{item.name}</View>
+                        <View className='at-col'>{item.date}</View>
+                      </View>
+                      <View className='at-row'>
+                        <View className='at-col'>出发地：{item.from}</View>
+                      </View>
+                      <View className='at-row'>
+                        <View className='at-col'>目的地：{item.to}</View>
+                      </View>
+                    </View>
+                  </View>
+                )
+              } else if (item.children) {
+                return <AtListItem key={item.key} title={item.name} arrow='right' onClick={_this.handleClickRow.bind(_this, item.key)} />
               }
+              return <AtListItem key={item.key} title={item.name} />
             })
           }
         </AtList>

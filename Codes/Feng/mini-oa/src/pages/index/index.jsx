@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Image } from '@tarojs/components'
-import { AtTabBar, AtGrid, AtList, AtListItem, AtInput } from 'taro-ui'
+import { AtTabBar, AtGrid, AtList, AtListItem, AtSearchBar } from 'taro-ui'
 
 import './index.scss'
 import funcImg from '../../assets/homeFunctions.png'
@@ -16,7 +16,7 @@ export default class Index extends Component {
     super(...arguments)
     this.state = {
       current: 0,
-      address: ''
+      searchAddress: ''
     }
   }
 
@@ -40,15 +40,38 @@ export default class Index extends Component {
     })
   }
 
-  handleChange(address) {
+  onChangeAddress(searchAddress) {
     this.setState({
-      address
+      searchAddress
     })
     // 在小程序中，如果想改变 value 的值，需要 `return value` 从而改变输入框的当前值
-    return address
+    return searchAddress
   }
 
   handleGridCellClick(item, index) {
+    switch (index) {
+      case 0:
+        Taro.redirectTo({
+          url: '/components/business/index'
+        })
+        break
+      case 1:
+        Taro.redirectTo({
+          url: '/components/notice/index'
+        })
+        break
+      case 2:
+        break
+    }
+  }
+
+  handleViewAddress() {
+    Taro.redirectTo({
+      url: '/components/address/detail'
+    })
+  }
+
+  handleViewAccount(index) {
     switch (index) {
       case 0:
         Taro.redirectTo({
@@ -69,7 +92,7 @@ export default class Index extends Component {
     return (
       <View>
         <View hidden={this.state.current != 0}>
-          <Image src={homeHeaderImg}  style='height:400rpx;width:100%'></Image>
+          <Image src={homeHeaderImg} style='height:400rpx;width:100%'></Image>
           <AtGrid data={
             [
               {
@@ -113,18 +136,22 @@ export default class Index extends Component {
           />
         </View>
         <View hidden={this.state.current != 1}>
-          <AtInput
-            name='value'
-            title=''
-            type='text'
-            placeholder='搜索'
-            value={this.state.address}
-            onChange={this.handleChange.bind(this)}
+          <AtSearchBar
+            value={this.state.searchAddress}
+            onChange={this.onChangeAddress.bind(this)}
           />
           <AtList>
-            <AtListItem title='电气研发部(12)' arrow='right' />
-            <AtListItem title='机械研发部' arrow='right' />
-            <AtListItem title='项目管理部' arrow='right' />
+            <AtListItem title='电气研发部(12)' arrow='right' onClick={this.handleViewAddress} />
+            <AtListItem title='机械研发部' arrow='right' onClick={this.handleViewAddress} />
+            <AtListItem title='项目管理部' arrow='right' onClick={this.handleViewAddress} />
+          </AtList>
+        </View>
+        <View hidden={this.state.current != 2}>
+          <Image src={homeHeaderImg} style='height:400rpx;width:100%'></Image>
+          <AtList>
+            <AtListItem title='我的出差' arrow='right' onClick={this.handleViewAccount} />
+            <AtListItem title='个人信息' arrow='right' onClick={this.handleViewAccount} />
+            <AtListItem title='设置' arrow='right' onClick={this.handleViewAccount} />
           </AtList>
         </View>
         <AtTabBar

@@ -29,7 +29,8 @@ class App extends Component {
       'components/business/record',
       'components/business/apply',
       'components/business/companies',
-      'components/notice/index'
+      'components/notice/index',
+      'components/address/detail'
     ],
     window: {
       backgroundTextStyle: 'light',

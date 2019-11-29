@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text, Label, Radio, RadioGroup } from '@tarojs/components'
-import { AtForm, AtInput, AtButton, AtNavBar } from 'taro-ui'
+import { AtForm, AtInput, AtButton, AtIcon } from 'taro-ui'
 
 export default class Apply extends Component {
 
@@ -21,6 +21,15 @@ export default class Apply extends Component {
         }
       ]
     }
+    if (this.$router.params.key) {
+      Taro.setNavigationBarTitle({
+        title: '记录详情'
+      })
+    } else {
+      Taro.setNavigationBarTitle({
+        title: '出差申请'
+      })
+    }
   }
 
   componentWillMount() { }
@@ -32,10 +41,6 @@ export default class Apply extends Component {
   componentDidShow() { }
 
   componentDidHide() { }
-
-  config = {
-    navigationBarTitleText: '出差申请'
-  }
 
   handleChange(value) {
     this.setState({
@@ -53,10 +58,28 @@ export default class Apply extends Component {
     })
   }
 
+  handleReturn() {
+    Taro.redirectTo({
+      url: '/components/business/record?key=' + this.$router.params.parentKey
+    })
+  }
+
   handleClickRgIconSt() {
     Taro.redirectTo({
       url: '/components/business/companies'
     })
+  }
+
+  addButtons() {
+    if (this.$router.params.key) {
+      return <AtButton type='secondary' className='bottomBar' onClick={this.handleReturn.bind(this)}>返回</AtButton>
+    }
+    return (
+      <View className='bottomBar'>
+        <AtButton type='primary' formType='submit'>提交</AtButton>
+        <AtButton type='secondary' onClick={this.handleCancel.bind(this)}>取消</AtButton>
+      </View>
+    )
   }
 
   render() {
@@ -116,11 +139,18 @@ export default class Apply extends Component {
           value={this.state.value}
           onChange={this.handleChange.bind(this, 'value')}
         />
-        <View className='at-row' style='padding:24rpx 0;font-size: 32rpx;line-height:1.5'>
+        <View
+          hidden={this.$router.params.key}
+          className='at-row'
+          style='padding:24rpx 0;font-size: 32rpx;line-height:1.5'
+          onClick={this.handleClickRgIconSt}
+        >
           <Text style='margin-left:32rpx;margin-right:16rpx;width:172rpx'>同行人</Text>
+          <AtIcon value='chevron-right' size='28' color='#CCC' className='rightArrow'></AtIcon>
         </View>
-        <AtButton type='primary' formType='submit'>提交</AtButton>
-        <AtButton type='secondary' onClick={this.handleCancel.bind(this)}>取消</AtButton>
+        {
+          this.addButtons()
+        }
       </AtForm >
     )
   }

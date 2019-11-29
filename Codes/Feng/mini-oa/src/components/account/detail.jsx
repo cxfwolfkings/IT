@@ -2,9 +2,9 @@ import Taro, { Component } from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import { AtList, AtListItem, AtButton, AtSearchBar } from 'taro-ui'
 
-export default class Companies extends Component {
+export default class Detail extends Component {
   config = {
-    navigationBarTitleText: '同行人选择'
+    navigationBarTitleText: '个人信息'
   }
 
   handleCancel() {

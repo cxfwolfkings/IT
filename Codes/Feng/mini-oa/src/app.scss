@@ -27,3 +27,14 @@
 .radio-list__label {
     margin-right: 30rpx
 }
+
+.rightArrow {
+    position: absolute;
+    right   : 30rpx
+}
+
+.bottomBar {
+    position: fixed;
+    bottom  : 0px;
+    width   : 100%;
+}
