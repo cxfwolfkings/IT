@@ -1,0 +1,376 @@
+<html>
+<head>
+<title>JAVASCRIPT对象及属性</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+</head>
+
+<style>p {font:menu;line-height: 150%}</style>
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0" cellspacing="4" cellpadding="1">
+<tr>
+<td width="155" valign="top" bgcolor="#eeeeee">
+	<div id="floater" style="position:absolute; width:153px; height:31px; z-index:1; left: 20px; top: 20px">
+		<p><font size="3" face="Geneva, Arial, Helvetica, san-serif"><b><font color="#990000">对象列表：</font></b></font></p>
+		<p><a href="#1">windows对象</a> </p>
+		<p><a href="#2">frame对象</a></p>
+		<p><a href="#3">location对象</a></p>
+		<p><a href="#4">document对象</a></p>
+		<p><a href="#5">form对象</a></p>
+		<p><a href="#6">text和textarea对象</a></p>
+		<p><a href="#7">复选框(checkbox)对象</a></p>
+		<p><a href="#8">单选按钮(radio)对象</a></p>
+		<p><a href="#9">select对象</a></p>
+		<p><a href="#10">Button对象</a> </p>
+		<p><a href="#11">submit和reset对象</a></p>
+		<p><a href="#12">password对象 </a></p>
+		<p><a href="#13">navigator对象</a></p>
+		<p><a href="#14">string对象</a></p>
+		<p><a href="#15">Date对象</a></p>
+		<p><a href="#16">Math对象</a></p>
+	</div>
+<script type="text/javascript">
+    self.onError=null;
+    currentX = currentY = 0; 
+    whichIt = null; 
+    lastScrollX = 0; 
+    lastScrollY = 0;
+    NS = (document.layers) ? 1 : 0;
+    IE = (document.all) ? 1: 0;
+    //STALKER CODE
+    function heartBeat() {
+        if(IE) { 
+        	diffY = document.body.scrollTop; 
+        	diffX = document.body.scrollLeft; 
+        }
+    	if(NS) { 
+    		diffY = self.pageYOffset; 
+    		diffX = self.pageXOffset; 
+    	}
+        if(diffY != lastScrollY) {
+    		percent = .1 * (diffY - lastScrollY);
+    		if(percent > 0) 
+    			percent = Math.ceil(percent);
+    		else 
+    			percent = Math.floor(percent);
+           	if(IE) 
+           		document.all.floater.style.pixelTop += percent;
+            if(NS) 
+            	document.floater.top += percent; 
+    		lastScrollY = lastScrollY + percent;
+    	}
+        if(diffX != lastScrollX) {
+            percent = .1 * (diffX - lastScrollX);
+            if(percent > 0) 
+            	percent = Math.ceil(percent);
+            else 
+            	percent = Math.floor(percent);
+            if(IE) 
+            	document.all.floater.style.pixelLeft += percent;
+            if(NS) 
+            	document.floater.left += percent;
+            lastScrollX = lastScrollX + percent;
+        }    
+    }
+    // STALKER CODE
+    // DRAG DROP CODE
+    function checkFocus(x,y) { 
+    	stalkerx = document.floater.pageX;
+    	stalkery = document.floater.pageY;
+    	stalkerwidth = document.floater.clip.width;
+    	stalkerheight = document.floater.clip.height;
+    	if( (x > stalkerx && x < (stalkerx+stalkerwidth)) && (y > stalkery && y < (stalkery+stalkerheight))) 
+    		return true;
+    	else 
+    		return false;
+    }
+    function grabIt(e) {
+        if(IE) {
+            whichIt = event.srcElement;
+            while (whichIt.id.indexOf("floater") == -1) {
+                whichIt = whichIt.parentElement;
+                if (whichIt == null) { 
+                	return true; 
+                }
+        	}
+            whichIt.style.pixelLeft = whichIt.offsetLeft;
+        	whichIt.style.pixelTop = whichIt.offsetTop;
+            currentX = (event.clientX + document.body.scrollLeft);
+            currentY = (event.clientY + document.body.scrollTop);     
+        } else { 
+    		window.captureEvents(Event.MOUSEMOVE);
+    		if(checkFocus (e.pageX,e.pageY)) { 
+    			whichIt = document.floater;
+   				StalkerTouchedX = e.pageX-document.floater.pageX;
+    			StalkerTouchedY = e.pageY-document.floater.pageY;
+    		} 
+        }
+    	return true;
+    }
+    function moveIt(e) {
+        if (whichIt == null) { 
+        	return false; 
+        }
+        if(IE) {
+        	newX = (event.clientX + document.body.scrollLeft);
+        	newY = (event.clientY + document.body.scrollTop);
+        	distanceX = (newX - currentX); 
+        	distanceY = (newY - currentY);
+        	currentX = newX; 
+        	currentY = newY;
+        	whichIt.style.pixelLeft += distanceX;
+        	whichIt.style.pixelTop += distanceY;
+            if(whichIt.style.pixelTop < document.body.scrollTop) 
+            	whichIt.style.pixelTop = document.body.scrollTop;
+            if(whichIt.style.pixelLeft < document.body.scrollLeft) 
+            	whichIt.style.pixelLeft = document.body.scrollLeft;
+            if(whichIt.style.pixelLeft > document.body.offsetWidth - document.body.scrollLeft - whichIt.style.pixelWidth - 20) 
+            	whichIt.style.pixelLeft = document.body.offsetWidth - whichIt.style.pixelWidth - 20;
+            if(whichIt.style.pixelTop > document.body.offsetHeight + document.body.scrollTop - whichIt.style.pixelHeight - 5) 
+            	whichIt.style.pixelTop = document.body.offsetHeight + document.body.scrollTop - whichIt.style.pixelHeight - 5;
+            event.returnValue = false;
+        } else { 
+            whichIt.moveTo(e.pageX-StalkerTouchedX,e.pageY-StalkerTouchedY);
+   			if(whichIt.left < 0+self.pageXOffset) 
+   				whichIt.left = 0+self.pageXOffset;
+    		if(whichIt.top < 0+self.pageYOffset) 
+    			whichIt.top = 0+self.pageYOffset;
+    		if( (whichIt.left + whichIt.clip.width) >= (window.innerWidth+self.pageXOffset-17)) 
+    			whichIt.left = ((window.innerWidth+self.pageXOffset)-whichIt.clip.width)-17;
+    		if( (whichIt.top + whichIt.clip.height) >= (window.innerHeight+self.pageYOffset-17)) 
+    			whichIt.top = ((window.innerHeight+self.pageYOffset)-whichIt.clip.height)-17;
+    		return false;
+        }
+    	return false;
+    }
+    function dropIt() {
+        whichIt = null;
+    	if(NS) 
+    		window.releaseEvents (Event.MOUSEMOVE);
+    	return true;
+    }
+    // DRAG DROP CODE 
+    if(NS) {
+        window.captureEvents(Event.MOUSEUP|Event.MOUSEDOWN);
+        window.onmousedown = grabIt;
+        window.onmousemove = moveIt;
+        window.onmouseup = dropIt;
+    }
+    if(IE) {
+        document.onmousedown = grabIt;
+        document.onmousemove = moveIt;
+        document.onmouseup = dropIt;
+    }
+    if(NS || IE) action = window.setInterval("heartBeat()",1);
+</script>
+</td>
+<td>
+	<font size="3" face="Geneva, Arial, Helvetica, san-serif"><b><font color="#990000" size="7">JAVASCRIPT对象及属性教程</font></b></font>
+	<p><font face="Geneva, Arial, Helvetica, san-serif"><b><font color="#0066CC">[CP设计动力 </font></b><font color="#0066CC"><a href="mailto:chenxiao8516@163.com">chenxiao8516@163.com</a></font><b><font color="#0066CC"><a href="mailto:csplanet@21cn.com"> </a>]</font></b></font></p>
+	<p><font color="#009933">SCRIPT 标记 </font></p>
+	<p><font color="#009933">用于包含JavaScript代码. </font></p>
+	<p><font color="#009933">语法 </font></p>
+	<p><font color="#009933">属性 </font></p>
+	<p><font color="#009933">LANGUAGE 定义脚本语言 </font></p>
+	<p><font color="#009933">SRC 定义一个URL用以指定以.JS结尾的文件</font><font color="#00CC99"> </font></p>
+	<p><a id="1"></a><font color="#FF6600"><b>windows对象</b></font></p>
+	<p>每个HTML文档的顶层对象. </p>
+	<p>属性 </p>
+	<p>frames[] 子桢数组.每个子桢数组按源文档中定义的顺序存放. </p>
+	<p>feames.length 子桢个数. </p>
+	<p>self 当前窗口. </p>
+	<p>parent 父窗口(当前窗口是中一个子窗口). </p>
+	<p>top 顶层窗口(是所有可见窗口的父窗口). </p>
+	<p>status 浏览器状态窗口上的消息. </p>
+	<p>defaultStatus 当status无效时,出现在浏览器状态窗口上的缺省消息. </p>
+	<p>name 内部名,为由window.open()方法打开的窗口定义的名字. </p>
+	<p><br>方法 </p>
+	<p>alert("message") 显示含有给定消息的"JavaScript Alert"对话框. </p>
+	<p>confirm("message") 显示含有给定消息的"Confirm"对话框(有一个OK按钮和一个Cancel按钮).如果用户单击OK返回true,否则返回false. </p>
+	<p>prompt("message") 显示一个"prompt"对话框,要求用户根据显示消息给予相应输入. </p>
+	<p>open("URL","name") 打开一个新窗口,给予一个指定的名字. </p>
+	<p>close() 关闭当前窗口. </p>
+	<p><font color="#FF3300"><b><font color="#FF6600"><a name="2"></a>frame对象</font></b></font> </p>
+	<p><br>它是整个浏览器窗口的子窗口,除了status,defaultStatus,name属性外,它拥有window对象的全部属性. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="3"></a></font></b></font><font color="#FF6600">location对象</font></b> </p>
+	<p><br>含有当前URL的信息. </p>
+	<p>属性 </p>
+	<p>href 整个URL字符串. </p>
+	<p>protocol 含有URL第一部分的字符串,如http: </p>
+	<p>host 包含有URL中主机名:端口号部分的字符串.如//www.cenpok.net/server/ </p>
+	<p>hostname 包含URL中主机名的字符串.如http://www.cenpok.net </p>
+	<p>port 包含URL中可能存在的端口号字符串. </p>
+	<p>pathname URL中"/"以后的部分.如~list/index.htm </p>
+	<p>hash "#"号(CGI参数)之后的字符串. </p>
+	<p>search "?"号(CGI参数)之后的字符串. </p>
+	<p><br><font color="#FF6600"><b><font color="#FF3300"><b><font color="#FF6600"><a name="4"></a></font></b></font>document对象</b></font> </p>
+	<p><br>含有当前文档信息的对象. </p>
+	<p>属性 </p>
+	<p>title 当前文档标题,如果未定义,则包含"Untitled". </p>
+	<p>location 文档的全URL. </p>
+	<p>lastModified 含有文档最后修改日期. </p>
+	<p>referrer 调用者URL,即用户是从哪个URL链接到当前页面的. </p>
+	<p>bgColor 背景色(#xxxxxx) </p>
+	<p>fgColor 前景文本颜色. </p>
+	<p>linkColor 超链接颜色. </p>
+	<p>vlinkColor 访问过的超链颜色. </p>
+	<p>alinkColor 激活链颜色(鼠标按住未放时). </p>
+	<p>forms[] 文档中form对象的数组,按定义次序存储. </p>
+	<p>forms.length 文档中的form对象数目. </p>
+	<p>links[] 与文档中所有HREF链对应的数组对象,按次序定义存储. </p>
+	<p>links.length 文档中HREF链的数目. </p>
+	<p>anchors[] 锚(...)数组,按次序定义存储. </p>
+	<p>anchors.length 文档中锚的数目. </p>
+	<p><br>方法 </p>
+	<p>write("string") 将字符串突出给当前窗口.(字符串可以含有HTML标记) </p>
+	<p>writeln("string") 与write()类似,在结尾追加回车符,只在预定格式文本中( </p>
+	<p>... <br>或 <br>... <br>)生效. </p>
+	<p>clear() 清当前窗口. </p>
+	<p>close() 关闭当前窗口. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="5"></a></font></b></font><font color="#FF6600">form对象</font></b> </p>
+	<p><br>属性 </p>
+	<p>name </p>
+	<p>中的NAME属性的字符串值. </p>
+	<p>method 中METHOD属性的类值,"0"="GET" ,"1"="POST" . </p>
+	<p>action 中ACTION属性的字符串值. </p>
+	<p>target 表格数据提交的目标,与标记中相应属性一致. </p>
+	<p>elements[index] elements属性包含form中的各个元素. </p>
+	<p>length 表格中的元素个数. </p>
+	<p><br>方法 </p>
+	<p>submit() 提交表格. </p>
+	<p>事件处理器onSubmit() 用户单击一个定义好的按钮提交form时运行的代码. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="6"></a></font></b></font><font color="#FF6600">text和textarea对象</font></b> </p>
+	<p>属性 </p>
+	<p>name NAME属性的字符串值. </p>
+	<p>value 域内容的字符串值. </p>
+	<p>defaultValue 域内容的初始字符串值. </p>
+	<p><br>方法 </p>
+	<p>focus() 设置对象输入焦点. </p>
+	<p>blur() 从对象上移走输入焦点. </p>
+	<p>select() 选定对象的输入区域. </p>
+	<p><br>事件处理器 </p>
+	<p>onFocus 当输入焦点进入时执行. </p>
+	<p>onBlur 当域失去焦点时执行. </p>
+	<p>onSelect 当域中有部分文本被选定时执行. </p>
+	<p>onChange 当域失去焦点且域值相对于onFocus执行有所改变时执行. <br></p>
+	<p><font color="#FF6600"><b><font color="#FF3300"><b><font color="#FF6600"><a name="7"></a></font></b></font>复选框(checkbox)对象</b></font> </p>
+	<p><br>属性 </p>
+	<p>name NAME属性的字符串值. </p>
+	<p>value 复选框内容的字符串值.如果设置了,则为"on",否则为"off". </p>
+	<p>checked 复选框内容的布尔值.如果设置了,则为true,否则为false . </p>
+	<p>defaultChecked 反映(CHECKED)属性的布尔值(缺省状态). </p>
+	<p><br>方法 </p>
+	<p>click() 选定复选框,并使之状态为"on". </p>
+	<p><br>事件处理器 </p>
+	<p>onClick 当用户单击Checkbox时执行. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="8"></a></font></b></font><font color="#FF6600">单选按钮(radio)对象</font></b> </p>
+	<p><br>属性 </p>
+	<p>name NAME属性的字符串值. </p>
+	<p>length radio对象中单选按钮的个数. </p>
+	<p>value VALUE属性的字符串值. </p>
+	<p>checked 布尔值,按下为true,否则为false . </p>
+	<p>defaultChecked 反映CHECKED属性值的布尔值. </p>
+	<p><br>方法 </p>
+	<p>click() 选定单选按钮. </p>
+	<p><br>事件处理器 </p>
+	<p>onClick 当单选按钮被选定时执行. <br></p>
+	<p><font color="#FF6600"><b><font color="#FF3300"><b><font color="#FF6600"><a name="9"></a></font></b></font>select对象</b></font> </p>
+	<p>属性 </p>
+	<p>length select对象中对象的个数. </p>
+	<p>name 由NAME=属性定义的select对象的内部名. </p>
+	<p>selectedIndex select对象中当前被选option的下标. </p>
+	<p>options 该属性对应于在HTML中定义select对象时标记中的内容,它有如下属性: </p>
+	<p>text 标记后的文本串. </p>
+	<p>value VALUE属性的值,当Submit按钮被按下时,该值被提交. </p>
+	<p>defaultSelected 反映标记的SELECTED属性的布尔值. </p>
+	<p>selected 反映option的当前选择状态的布尔值. </p>
+	<p><br>事件处理器 </p>
+	<p>onFocus 当输入焦点进入域时执行. </p>
+	<p>onBlur 当域失去输入焦点时执行. </p>
+	<p>onChange 当域失去焦点且如果域的值相对于onFocus执行时有所改变,则执行onChange. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="10"></a></font></b></font><font color="#FF6600">Button对象</font></b> </p>
+	<p><br>表格中有三种类型按钮,由标记中的TYPE属性定义: </p>
+	<p>.submit (type="SUBMIT") </p>
+	<p>.reset (type="RESET") </p>
+	<p>.custom (type="BUTTON") </p>
+	<p>所有按钮对象都有如下成分: </p>
+	<p>属性 </p>
+	<p>value VALUE属性的字符串值. </p>
+	<p>name NAME属性的字符串值. </p>
+	<p><br>方法 </p>
+	<p>click() 选定按钮 </p>
+	<p><br>事件处理器 </p>
+	<p>onClick 当按钮被单击时执行. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="11"></a></font></b></font><font color="#FF6600">submit和reset对象</font></b> </p>
+	<p><br>属性 </p>
+	<p>value VALUE=属性的内容. </p>
+	<p>name NAME=属性的内容. </p>
+	<p><br>方法 </p>
+	<p>click() 选定按钮 </p>
+	<p><br>事件处理器 </p>
+	<p>onClick 当按钮被单击时执行. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="12"></a></font></b></font><font color="#FF6600">password对象</font></b> </p>
+	<p><br>属性 </p>
+	<p>defaultValue VALUE=属性的内容. </p>
+	<p>name NAME=属性的内容. </p>
+	<p>value 目前输入password域的数据. </p>
+	<p><br>方法 </p>
+	<p>focus() 将焦点带入password域. </p>
+	<p>blur 将焦点从password域移出. </p>
+	<p>select() 选定password域中的当前数据,以备修改. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="13"></a></font></b></font><font color="#FF6600">navigator对象</font></b> </p>
+	<p><br>该对象用于确定用户访问时使用的Navigator版本. </p>
+	<p>属性 </p>
+	<p>appCodeName 相对于用户浏览器的"codename" </p>
+	<p>appName 相对于用户浏览器的实际名字. </p>
+	<p>appVersion 相对于用户浏览器的版本号. </p>
+	<p>userAgent 该属性反映用户浏览器的全部信息. <br></p>
+	<p><font color="#FF6600"><b><font color="#FF3300"><b><font color="#FF6600"><a name="14"></a></font></b></font>string对象</b></font> </p>
+	<p><br>string对象为操作字符串的内容提供了很多方法. </p>
+	<p><br>属性 </p>
+	<p>length 字符串的长度,即字符串中字符的个数. </p>
+	<p><br>方法 </p>
+	<p>big(),blink(),bold(),fixed(),italics(),small(),sub(),strike(),sup(),fontColor(color),fontSize(size) </p>
+	<p>以上方法为字符串增加相应的HTML标记. </p>
+	<p>charAt(index) 返回字符串中index处的字符. </p>
+	<p>indexOf(searchValue,[fromIndex]) 该方法在字符串中寻找第一次出现的searchValue.如果给定了fromIndex,则从 </p>
+	<p>字符串内该位置开始搜索,当searchValue找到后,返回该串第一个字符的位置. </p>
+	<p>lastIndexOf(searchValue,[fromIndex]) 从字符串的尾部向前搜索searchValue,并报告找到的第一个实例. </p>
+	<p>substring(indexA,indexB) 获取自indexA到indexB的子串. </p>
+	<p>toLowerCase(),toUpperCase() 将字符串中所有字符全部转换成大写,小写. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="15"></a></font></b></font><font color="#FF6600">Date对象</font></b> </p>
+	<p><br>要使用Date对象,必须先生成一个Date实例: </p>
+	<p>变量名=new Date(); </p>
+	<p>方法 </p>
+	<p>getDay(),getDate(),getHours(),getMinutes(),getMonth(),getSeconds(),getTime(), </p>
+	<p>getTimeZoneOffset(),getYear() </p>
+	<p>还有setDay... ... </p>
+	<p>toGMTString() 用GMT格式返回当前时间. (Sun,12 Feb 1999 14:19:22 GMT) </p>
+	<p>toLocaleString 用locale格式返回当前时间. (03/11/99 14:19:22) </p>
+	<p>parse(date) 将普通date字符串转换成豪秒形式,从而给setTime()做参数. </p>
+	<p><br><b><font color="#FF3300"><b><font color="#FF6600"><a name="16"></a></font></b></font><font color="#FF6600">Math对象</font></b> </p>
+	<p><br>属性 </p>
+	<p>LN10 (10的自然对数) </p>
+	<p>PI (3.1415926...) </p>
+	<p>SQRT1_2 (1/2的平方根) </p>
+	<p>方法 </p>
+	<p>abs(x) 返回x的绝对值 </p>
+	<p>acos(x) 返回x的arc cosine值 </p>
+	<p>asin(x) 返回x的arc sin值 </p>
+	<p>atan(x) 返回x的arc tangent值 </p>
+	<p>ceil(x) 返回大于等于x的最小整数 </p>
+	<p>cos(x) 返回x的cosine值 </p>
+	<p>exp(x) 返回e的x次方 </p>
+	<p>floor(x) 返回小于等于x的最大整数 </p>
+	<p>log(x) 返回x的 </p>
+	<p>max(x,y) 返回x,y中的大值 </p>
+	<p>min(x,y) 返回x,y中的小值 </p>
+	<p>pow(x,y) 返回x的y次方 </p>
+	<p>round(x) 舍入到最近整数,(小于或等于0.5小数舍去) </p>
+	<p>sin(x) 返回x的sin值 </p>
+	<p>sqrt(x) 返回x的平方根 </p>
+	<p>tan(x) 返回x的tangent值</p>
+</td>
+</tr>
+</table>
+</body>
+</html>
