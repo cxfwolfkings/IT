@@ -1,6 +1,0 @@
-server:
-  port: 8100
-
-student:
-  name: prod-winter
-  age: 40

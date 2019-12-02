@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "dependencies": {
+    "@babel/standalone": "^7.0.0-beta.32",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "todomvc-app-css": "^2.0.0",
+    "todomvc-common": "^1.0.0"
+  }
+}
