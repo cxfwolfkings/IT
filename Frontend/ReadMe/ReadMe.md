@@ -11,7 +11,7 @@
 
 ## 第一部分 javascript + jQuery
 
-### 第1-6天：[javascript核心](./1.1_javascript核心.md)
+### 1.1 [javascript核心](./1.1_javascript核心.md)
 
 - 概述
 - 词法结构
@@ -20,7 +20,7 @@
 - 对象、数组和函数
 - 类、模块、子集和扩展
 
-### 第7-8天：[客户端javascript](./1.2_客户端javascript.md)
+### 1.2 [客户端javascript](./1.2_客户端javascript.md)
 
 1. web中的js简介
 2. dom操作
@@ -30,9 +30,9 @@
 6. 客户端存储
 7. 多媒体和图形
 
-### 第9天：[html5](./1.3_html5.md)
+### 1.3 [html5](./1.3_html5.md)
 
-### 第10天：[jQuery类库](./1.4_jQuery类库.md)
+### 1.4 [jQuery类库](./1.4_jQuery类库.md)
 
 1. jQuery简介
 2. 选择器
@@ -140,20 +140,18 @@ Php 开源 php-open.com  模仿->()创新
 
 ## 第六部分 UI设计
 
-### [6.1 css介绍](./6.1_css介绍.md)
-
-### [6.2 css常用样式](./6.2_css常用样式.md)
+### 6.1 [CSS](./6.1_css.md)
 
 1. 布局
 2. 内容
    - 文字效果（超出一行、两行隐藏）
    - 图形效果（圆形、三角形、五角星、六芒星...）
 
-### [6.3 jQMobile](./6.3_jQMobile.md)
+### 6.2 [jQMobile](./6.2_jQMobile.md)
 
-### [6.4 PhoneGap](./6.4_PhoneGap.md)
+### 6.3 [PhoneGap](./6.3_PhoneGap.md)
 
-### [6.5 fabric.js](https://github.com/fabricjs/fabric.js/)
+### 6.4 [fabric.js](https://github.com/fabricjs/fabric.js/)
 
 ### 6.6 WebGL
 
