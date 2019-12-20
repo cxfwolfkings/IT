@@ -15,6 +15,7 @@
      - 消息队列
        - [ActiveMQ](#ActiveMQ)
        - [RabbitMQ](#RabbitMQ)
+       - [RocketMQ](#RocketMQ)
 2. 设计工具
    - UML
    - 原型
@@ -176,3 +177,16 @@ RabbitMQ 支持多个版本的 Windows 和 Unix 系统，此外，ActiveMQ 由 E
 7. 访问：`http://localhost:15672`，得到 RabbitMQ Web 管理页面
 
    此时，RabbitMQ 已经安装成功。
+
+## RocketMQ
+
+**RocketMQ 部署环境：**
+
+操作系统：
+
+- 推荐使用 64 位操作系统，包括 Linux、Unix 和 Mac OX。
+
+安装环境：
+
+- JDK：RocketMQ 基于 Java 语言开发，需 JDK 支持，版本 64bit JDK 1.8 及以上；
+- Maven：编译构建需要 Maven 支持，版本 3.2.x 及以上。
