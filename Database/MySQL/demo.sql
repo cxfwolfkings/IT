@@ -493,69 +493,47 @@ WHERE
 
 END IF;
 
-END -- 循环
+END 
+
+-- 循环
+
 /**
  * 获取时间段内的假期天数
  */
 CREATE FUNCTION GetHolidaysCount(
-    holidays VARCHAR(2000),
-    beginDate datetime,
-    endDate datetime
+  holidays VARCHAR(2000),
+  beginDate datetime,
+  endDate datetime
 ) RETURNS int BEGIN DECLARE beginDateValue DOUBLE;
 
 DECLARE endDateValue DOUBLE;
-
 DECLARE holiday DOUBLE;
-
 DECLARE counts INT;
-
 DECLARE itemIndex int;
 
-SET
-    counts = 0;
-
-SET
-    beginDateValue = DATE_FORMAT(beginDate, '%m.%d') - 0.00;
-
-SET
-    endDateValue = DATE_FORMAT(endDate, '%m.%d') - 0.00;
-
-SET
-    itemIndex = INSTR(holidays, ',');
+SET counts = 0;
+SET beginDateValue = DATE_FORMAT(beginDate, '%m.%d') - 0.00;
+SET endDateValue = DATE_FORMAT(endDate, '%m.%d') - 0.00;
+SET itemIndex = INSTR(holidays, ',');
 
 WHILE itemIndex > 0 DO
-SET
-    holiday = LEFT(holidays, itemIndex - 1) - 0.00;
-
-SET
-    holidays = SUBSTRING(
-        holidays
-        FROM
-            itemIndex + 1
-    );
-
-SET
-    itemIndex = INSTR(holidays, ',');
-
-IF holiday >= beginDateValue
-AND holiday <= endDateValue THEN
-SET
-    counts = counts + 1;
-
-END IF;
-
+  SET holiday = LEFT(holidays, itemIndex - 1) - 0.00;
+  SET holidays = SUBSTRING(holidays FROM itemIndex + 1);
+  SET itemIndex = INSTR(holidays, ',');
+  IF holiday >= beginDateValue AND holiday <= endDateValue THEN
+    SET counts = counts + 1;
+  END IF;
 END WHILE;
 
-IF holidays >= beginDateValue
-AND holidays <= endDateValue THEN
-SET
-    counts = counts + 1;
-
+IF holidays >= beginDateValue AND holidays <= endDateValue THEN
+  SET counts = counts + 1;
 END IF;
 
 RETURN counts;
+END 
 
-END -- 游标
+-- 游标
+
 /**
  * 查询单店报表数据
  */
