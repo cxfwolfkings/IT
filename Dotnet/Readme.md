@@ -79,15 +79,10 @@
 - Cookie和Session简介
 - 扩展：ASP.NET页面之间传递值的方式
 
-### 第3天：[Token身份认证](./3.3_Token身份认证.md)
+### 第3天：[认证与授权](./3.3_认证与授权.md)
 
 - OAuth2 和 JWT - 如何设计安全的API？
-
-### 第4天：[JWT](./3.4_JWT.md)
-
 - 为什么要使用JWT / Json Web Token基础 / 认证流程 / .NET Core中使用JWT
-
-### 第4天：[授权](./3.4_授权.md)
 
 ### 第5天：[WebForm](./3.5_WebForm.md)
 
