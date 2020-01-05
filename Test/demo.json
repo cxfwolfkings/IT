@@ -1,0 +1,18 @@
+{
+     // 尝试每 10 秒通过 curl 连接到 Web 服务
+     // 如果连接失败，该服务将被标记为不正常
+    "service": {
+        "name": "web",
+        "tags": [
+            "rails"
+        ],
+        "port": 80,
+        "check": {
+            "args": [
+                "curl",
+                "localhost"
+            ],
+            "interval": "10s"
+        }
+    }
+}
