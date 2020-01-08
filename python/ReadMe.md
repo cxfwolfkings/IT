@@ -266,7 +266,7 @@
 
 ### 第1天：机器学习基础
 
-### 第2天：[Pandas入门](./4.2_Pandas入门.md)
+### 第2天：[Pandas](./4.2_Pandas.md)
 
 ### 第3天：[NumPy和SciPy的应用](./4.3_NumPy和SciPy的应用.md)
 
