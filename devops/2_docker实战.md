@@ -3,9 +3,7 @@
 ## 目录
 
 - [CentOS7安装SFTP](#CentOS7安装SFTP)
-- [图形化管理界面Portainer](#图形化管理界面Portainer)
 - [宝塔Linux面板](#宝塔Linux面板)
-- [docker-compose](#docker-compose)
 - [k8s安装部署](#k8s安装部署)
 - [docker安装centos7镜像](#docker安装centos7镜像)
 - [使用Docker Registry搭建私有镜像仓库](使用Docker&nbsp;Registry搭建私有镜像仓库)
@@ -64,12 +62,6 @@ systemctl restart sshd.service
 sftp sftp@127.0.0.1
 ```
 
-## 图形化管理界面Portainer
-
-```sh
-docker pull portainer/portainer
-```
-
 ## 宝塔Linux面板
 
 官网：[https://www.bt.cn/download/linux.html](https://www.bt.cn/download/linux.html)
@@ -106,24 +98,6 @@ docker pull portainer/portainer
 
 1. 查看面板入口：/etc/init.d/bt default
 2. 关闭入口验证：rm -f /www/server/panel/data/admin_path.pl
-
-## docker-compose
-
-Docker Compose 是一个用来定义和运行复杂应用的 Docker 工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器。（通过 docker-compose.yml 配置）
-
-安装：
-
-```sh
-curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-# 授予执行权限
-chmod +x /usr/local/bin/docker-compose
-```
-
-卸载：
-
-```sh
-rm /usr/local/bin/docker-compose
-```
 
 ## k8s安装部署
 
