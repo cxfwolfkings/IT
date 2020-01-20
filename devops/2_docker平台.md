@@ -2,8 +2,8 @@
 
 ## 目录
 
-1. Kubernetes
-   - 安装
+1. [Kubernetes](#Kubernetes)
+   - [安装部署](#安装部署)
 2. [AKS](#AKS)
 3. [Service Fabric](#Service&nbsp;Fabric)
 4. [Azure Service Fabric 网格](#Azure&nbsp;Service&nbsp;Fabric&nbsp;网格)
@@ -16,6 +16,114 @@
 Kubernetes 提供以容器为中心的基础结构，将应用程序容器分组为逻辑单元，以便管理和发现。
 
 Kubernetes 在 Linux 中的运用已发展成熟，但在 Windows 中相对较弱。
+
+### 安装部署
+
+**1、安装kubelet、kubeadm 和 kubectl：**
+
+kubelet 运行在 Cluster 所有节点上，负责启动 Pod 和容器。
+
+kubeadm 用于初始化 Cluster.
+
+添加阿里源，国外的你懂的：
+
+```sh
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+
+setenforce 0
+yum install -y kubelet kubeadm kubectl
+systemctl enable kubelet && systemctl start kubelet
+```
+
+**安装minikube：**
+
+```sh
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+```
+
+**安装虚拟机：**
+
+安装包：[https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
+
+```sh
+yum install VirtualBox-6.1-6.1.2_135662_el7-1.x86_64.rpm
+```
+
+**使用virtualbox驱动程序启动群集：**
+
+```sh
+minikube start --vm-driver=virtualbox
+```
+
+root权限不允许，所以添加一个用户：
+
+```sh
+# 创建用户：
+adduser admin
+# 设置密码：
+passwd admin
+
+# 找到sudoers文件位置
+whereis sudoers
+
+# 修改文件权限，一般文件默认为只读
+chmod -v u+w /etc/sudoers
+
+# 修改文件，在如下位置增加一行
+vim /etc/sudoers
+# 文件内容改变如下：
+root ALL=(ALL) ALL # 已有行
+admin ALL=(ALL) ALL # 新增行
+
+# 将文件权限还原回只读
+chmod -v u-w /etc/sudoers
+
+# 查看文件权限
+ls -l /etc/sudoers
+```
+
+**2、使用kubeadm创建cluster：**
+
+初始化master：
+
+```sh
+kubeadm init --apiserver-advertise-address 192.168.2.120 --pod-network-cidr=10.244.0.0/16
+```
+
+参数说明：
+
+- --apiserver-advertise-address
+
+  API服务器将公布它正在监听的IP地址。指定 "0.0.0.0" 以使用默认网络接口的地址。
+
+- -pod-network-cidr string
+
+  指定pod网络的IP地址范围。如果设置，控制平面将自动为每个节点分配CIDR。
+
+**卸载清理K8S：**
+
+```sh
+kubeadm reset -f
+modprobe -r ipip
+lsmod
+rm -rf ~/.kube/
+rm -rf /etc/kubernetes/
+rm -rf /etc/systemd/system/kubelet.service.d
+rm -rf /etc/systemd/system/kubelet.service
+rm -rf /usr/bin/kube*
+rm -rf /etc/cni
+rm -rf /opt/cni
+rm -rf /var/lib/etcd
+rm -rf /var/etcd
+```
 
 ## AKS
 

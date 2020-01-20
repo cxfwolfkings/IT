@@ -2,157 +2,12 @@
 
 ## 目录
 
-- [CentOS7安装SFTP](#CentOS7安装SFTP)
-- [宝塔Linux面板](#宝塔Linux面板)
-- [k8s安装部署](#k8s安装部署)
 - [docker安装centos7镜像](#docker安装centos7镜像)
 - [使用Docker Registry搭建私有镜像仓库](使用Docker&nbsp;Registry搭建私有镜像仓库)
 - [docker搭建consul集群](#docker搭建consul集群)
 - [.NET Core微服务应用部署](#.NET&nbsp;Core微服务应用部署)
 - [可视化工具Grafana](#可视化工具Grafana)
 - [问题](#问题)
-
-## CentOS7安装SFTP
-
-```sh
-# 查看openssh版本，openssh版本必须大于4.8p1
-ssh -V
-# 创建sftp组
-groupadd sftp
-# 创建sftp用户
-useradd -g sftp -s /sbin/nologin -M sftp
-passwd sftp
-输入密码
-# 建立目录
-mkdir -p /data/sftp/mysftp
-usermod -d /data/sftp/mysftp sftp
-
-# 修改sshd_config
-vim /etc/ssh/sshd_config
-# 注释掉
-# Subsystem sftp /usr/libexec/openssh/sftp-server
-# 添加
-Subsystem sftp internal-sftp
-Match Group sftp
-ChrootDirectory /data/sftp/mysftp
-ForceCommand internal-sftp
-AllowTcpForwarding no
-X11Forwarding no
-
-# 设置Chroot目录权限
-chown root:sftp /data/sftp/mysftp
-chmod 755 /data/sftp/mysftp
-
-# 设置可以写入的目录
-mkdir /data/sftp/mysftp/upload
-chown sftp:sftp /data/sftp/mysftp/upload
-chmod 755 /data/sftp/mysftp/upload
-
-# 关闭selinux：
-vim /etc/selinux/config
-# 将文件中的 SELINUX=enforcing 修改为 SELINUX=disabled，然后保存。
-
-# 执行：
-setenforce 0
-service sshd restart
-# 或
-systemctl restart sshd.service
-
-# 测试
-sftp sftp@127.0.0.1
-```
-
-## 宝塔Linux面板
-
-官网：[https://www.bt.cn/download/linux.html](https://www.bt.cn/download/linux.html)
-
-安装方法：
-
-- Centos安装脚本：
-  
-  ```sh
-  yum install -y wget && wget -O install.sh http://download.bt.cn/install/install_6.0.sh && sh install.sh
-  ```
-
-- Ubuntu/Deepin安装脚本：
-  
-  ```sh
-  wget -O install.sh http://download.bt.cn/install/install-ubuntu_6.0.sh && sudo bash install.sh
-  ```
-
-- Debian安装脚本：
-  
-  ```sh
-  wget -O install.sh http://download.bt.cn/install/install-ubuntu_6.0.sh && bash install.sh
-  ```
-
-- Fedora安装脚本：
-  
-  ```sh
-  wget -O install.sh http://download.bt.cn/install/install_6.0.sh && bash install.sh
-  ```
-
-默认端口：8888
-
-为了提高安全性，当前宝塔新安装的已经开启了安全目录登录，新装机器都会随机一个8位字符的目录名，亦可以在面板设置处修改，如您没记录或不记得了，可以使用以下方式解决：登陆SSH终端输入以下一种命令来解决
-
-1. 查看面板入口：/etc/init.d/bt default
-2. 关闭入口验证：rm -f /www/server/panel/data/admin_path.pl
-
-## k8s安装部署
-
-**1、安装kubelet、kubeadm 和 kubectl：**
-
-kubelet 运行在 Cluster 所有节点上，负责启动 Pod 和容器。
-
-kubeadm 用于初始化 Cluster.
-
-添加阿里源，国外的你懂的：
-
-```sh
-# vim /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
-enabled=1
-gpgcheck=0
-```
-
-安装kubelet kubeadm kubectl：
-
-```sh
-yum install -y kubelet kubeadm kubectl
-```
-
-启用kubelet：
-
-```sh
-systemctl enable kubelet.service
-```
-
-关闭swap：
-
-```sh
-swapoff -a
-```
-
-**2、使用kubeadm创建cluster：**
-
-初始化master：
-
-```sh
-kubeadm init --apiserver-advertise-address 192.168.2.120 --pod-network-cidr=10.244.0.0/16
-```
-
-参数说明：
-
-- --apiserver-advertise-address
-
-  API服务器将公布它正在监听的IP地址。指定 "0.0.0.0" 以使用默认网络接口的地址。
-
-- -pod-network-cidr string
-
-  指定pod网络的IP地址范围。如果设置，控制平面将自动为每个节点分配CIDR。
 
 ## docker安装centos7镜像
 
@@ -443,18 +298,21 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
 # 工作目录
 WORKDIR /app
 
-COPY . .
+# COPY . .
 
 # 开放端口
-EXPOSE 80
-EXPOSE 443
+# EXPOSE 80
+# EXPOSE 443
 
 ENTRYPOINT ["dotnet", "LeadChina.Gateway.dll"]
 ```
 
 ```sh
+# 生成镜像
+docker build -t gateway .
 # 启动
-docker run -d -p 6080:6080 --name gateway1 gateway
+# docker run -d -p 6080:6080 --name gateway1 gateway
+docker run -d -p 6080:6080 -v /data/sftp/mysftp/upload/gateway/:/app --name gateway gateway
 ```
 
 认证服务器Dockfile：
@@ -498,18 +356,17 @@ docker run -d -p 6100:6100 --name pmweb pmweb
 ```sh
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
 WORKDIR /app
-
-COPY . .
-
-EXPOSE 80
-EXPOSE 443
-
+#COPY . .
+#EXPOSE 6082
 ENTRYPOINT ["dotnet", "LeadChina.PM.SysSetting.API.dll"]
 ```
 
 ```sh
+# 生成镜像
+docker build -t pmsetting .
 # 启动
-docker run -d -p 6082:6082 --name sysSetting --restart=always pm_setting
+# docker run -d -p 6082:6082 --name pmsetting pmsetting
+docker run -d -p 6082:6082 -v /data/sftp/mysftp/upload/setting/SysSetting/:/app --name pmsetting pmsetting
 ```
 
 ## 可视化工具Grafana
