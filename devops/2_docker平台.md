@@ -19,6 +19,8 @@ Kubernetes 在 Linux 中的运用已发展成熟，但在 Windows 中相对较�
 
 ### 安装部署
 
+>以下方法没有安装成功！往下看有另一种方法！
+
 **1、安装kubelet、kubeadm 和 kubectl：**
 
 kubelet 运行在 Cluster 所有节点上，负责启动 Pod 和容器。
@@ -107,6 +109,167 @@ kubeadm init --apiserver-advertise-address 192.168.2.120 --pod-network-cidr=10.2
 - -pod-network-cidr string
 
   指定pod网络的IP地址范围。如果设置，控制平面将自动为每个节点分配CIDR。
+
+>上面的安装方法卡住，弃用
+
+```sh
+#docker
+curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+
+curl -o /etc/yum.repos.d/docker-ce.repo  https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+yum clean all
+yum makecache
+yum install docker-ce  -y
+
+mkdir -pv /etc/docker/
+tee /etc/docker/daemon.json <<-'EOF'
+{
+  // 阿里镜像加速："https://kddj4xy6.mirror.aliyuncs.com"
+  "registry-mirrors": [*****************],
+  // 设定使用的driver ，节点要一致
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+
+# 上面配置以后，启动docker失败，改用下面配置
+vim /etc/docker/daemon.json
+# 内容
+{
+  "registry-mirrors":["https://kddj4xy6.mirror.aliyuncs.com"]
+}
+
+systemctl restart docker && echo "restart"
+systemctl enable docker  && echo "enable"
+
+#k8s
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+EOF
+
+yum clean all
+yum makecache && echo "yum makecache ok"
+
+yum install kubelet-1.14.1 kubeadm-1.14.1 kubectl-1.14.1 -y
+
+systemctl enable kubelet && echo "enable kubelet"
+systemctl status kubelet
+# 关闭防火墙
+systemctl stop firewalld.service
+
+echo "1" >/proc/sys/net/bridge/bridge-nf-call-iptables
+echo "1" >/proc/sys/net/bridge/bridge-nf-call-ip6tables
+swapoff -a && sysctl -w vm.swappiness=0
+sed -ri '/^[^#]*swap/s@^@#@' /etc/fstab
+```
+
+**master，首先下载使用的镜像：**
+
+```sh
+docker pull mirrorgooglecontainers/kube-apiserver:v1.14.1
+docker pull mirrorgooglecontainers/kube-controller-manager:v1.14.1
+docker pull mirrorgooglecontainers/kube-scheduler:v1.14.1
+docker pull mirrorgooglecontainers/kube-proxy:v1.14.1
+docker pull mirrorgooglecontainers/pause:3.1
+docker pull mirrorgooglecontainers/etcd:3.3.10
+docker pull coredns/coredns:1.3.1  # 这个在mirrorgooglecontainers中没有
+
+#修改镜像tag
+
+docker tag mirrorgooglecontainers/kube-apiserver:v1.14.1 k8s.gcr.io/kube-apiserver:v1.14.1
+docker tag mirrorgooglecontainers/kube-controller-manager:v1.14.1 k8s.gcr.io/kube-controller-manager:v1.14.1
+docker tag mirrorgooglecontainers/kube-scheduler:v1.14.1 k8s.gcr.io/kube-scheduler:v1.14.1
+docker tag mirrorgooglecontainers/kube-proxy:v1.14.1 k8s.gcr.io/kube-proxy:v1.14.1
+docker tag mirrorgooglecontainers/pause:3.1 k8s.gcr.io/pause:3.1
+docker tag mirrorgooglecontainers/etcd:3.3.10 k8s.gcr.io/etcd:3.3.10
+docker tag coredns/coredns:1.3.1 k8s.gcr.io/coredns:1.3.1
+# 把所需的镜像下载好，init的时候就不会再拉镜像，由于无法连接google镜像库导致出错
+# 删除原来的镜像
+docker rmi mirrorgooglecontainers/kube-apiserver:v1.14.1
+docker rmi mirrorgooglecontainers/kube-controller-manager:v1.14.1
+docker rmi mirrorgooglecontainers/kube-scheduler:v1.14.1
+docker rmi mirrorgooglecontainers/kube-proxy:v1.14.1
+docker rmi mirrorgooglecontainers/pause:3.1
+docker rmi mirrorgooglecontainers/etcd:3.3.10
+docker rmi coredns/coredns:1.3.1
+```
+
+**node，注意：**
+
+```sh
+docker pull mirrorgooglecontainers/kube-proxy:v1.14.1
+docker pull mirrorgooglecontainers/pause:3.1
+docker pull coredns/coredns:1.3.1  
+#注意，这个下载的特别特别慢，建议先下载一个，其他的复制过去效率更高 save 和 load  
+docker pull quay.io/coreos/flannel:v0.11.0-amd64
+
+# 修改镜像tag
+docker tag mirrorgooglecontainers/kube-proxy:v1.14.1 k8s.gcr.io/kube-proxy:v1.14.1
+docker tag mirrorgooglecontainers/pause:3.1 k8s.gcr.io/pause:3.1
+docker tag coredns/coredns:1.3.1 k8s.gcr.io/coredns:1.3.1
+
+# 删除原来的镜像
+docker rmi mirrorgooglecontainers/kube-proxy:v1.14.1
+docker rmi mirrorgooglecontainers/pause:3.1
+docker rmi coredns/coredns:1.3.1
+```
+
+**master，初始化master init：**
+
+kubeadm 初始化会先检查使用的版本，默认为初始化最新版（也就是1.15.0），本次部署的是1.14.1
+
+如果在下载kuberadm时，不指明使用的版本，会下载1.15.0。部署 k8s 集群的时候如果下载和部署的不是同一版本，在初始化没问题，但是node节点会有问题，不如在下载时使用要部署的版本
+
+```sh
+kubeadm init --apiserver-advertise-address 10.30.100.104  --pod-network-cidr 10.244.0.0/16
+```
+
+根据初始化后的提示，进行下面的操作
+
+```sh
+mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+```
+
+为了方便添加提示
+
+```sh
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+```
+
+**node：**
+
+之前的都可用直接复制，这个要使用本地的运行结果。node 节点加入master节点 根据初始化成功后的最后提示，复制到node节点运行
+
+```sh
+kubeadm join 10.30.100.103:6443 --token sjzlrv.ux5n624eat2wuu9y \
+--discovery-token-ca-cert-hash sha256:4bf111ef0d8a2f061a430622cd031828c9bac55087e8eda36c0d38577df18016 --ignore-preflight-errors=Swap
+```
+
+等待一会儿，在master节点查看成功
+
+```sh
+# kubectl get nodes
+NAME      STATUS   ROLES    AGE   VERSION
+kang10    Ready    <none>   22h   v1.14.1
+kang100   Ready    <none>   22h   v1.14.1
+kang120   Ready    master   22h   v1.14.1
+```
 
 **卸载清理K8S：**
 
