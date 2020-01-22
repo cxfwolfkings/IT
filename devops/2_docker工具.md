@@ -14,7 +14,6 @@
 docker pull portainer/portainer
 ```
 
-
 ## docker-compose
 
 Docker Compose 是一个用来定义和运行复杂应用的 Docker 工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器。（通过 docker-compose.yml 配置）
