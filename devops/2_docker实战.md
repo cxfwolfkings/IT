@@ -339,16 +339,19 @@ docker run -d -p 6181:6181 --name jwtserver jwtserver
 ```sh
 # 拉取nginx镜像
 FROM nginx:alpine
+WORKDIR /app
 # 从客户机复制到容器中
-COPY . .
+#COPY . .
 COPY nginx.conf /etc/nginx/nginx.conf
 ```
 
 ```sh
+# 进入目录
+cd /data/sftp/mysftp//upload/pmweb/
 # 生成镜像
 docker build -t pmweb .
 # 启动
-docker run -d -p 6100:6100 --name pmweb pmweb
+docker run -d -p 6100:6100 -v /data/sftp/mysftp/upload/pmweb/:/app --name pmweb pmweb
 ```
 
 **系统设置微服务应用Dockfile：**
@@ -362,6 +365,8 @@ ENTRYPOINT ["dotnet", "LeadChina.PM.SysSetting.API.dll"]
 ```
 
 ```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/setting/SysSetting/
 # 生成镜像
 docker build -t pmsetting .
 # 启动

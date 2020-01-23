@@ -6,6 +6,9 @@
    - [宝塔Linux面板](#宝塔Linux面板)
    - [CentOS7安装SFTP](#CentOS7安装SFTP)
    - [jenkins](#jenkins)
+2. 常用命令
+   - [yum](#yum)
+3. [问题](#问题)
 
 ## 宝塔Linux面板
 
@@ -145,3 +148,34 @@ jenkins官网地址为[http://jenkins-ci.org/](http://jenkins-ci.org/)，jenkins
 5. 访问jenkins服务：[http://localhost:8080](http://localhost:8080)
 
    >注意：第一次启动的时候访问失败，执行 `service jenkins restart` 重启服务就可以了
+
+## yum
+
+## 问题
+
+### find:'/run/user/1000/gvfs':Permission denied解决办法
+
+linux使用命令：`find / -name ***`  查找文件的时候会遇到以下报错
+
+`find: '/run/user/1000/gvfs': Permission denied`
+
+明明用的是root用户，为什么权限不足呢？
+
+官方说这是一个bug——bug#615848。原因是FUSE文件系统和权限不配的问题，全局搜索时碰到它就会退出报错。
+
+其实这个目录是空的，查不查都没关系。所以，以下解决方式比较简直暴
+
+```sh
+umount /run/user/1000/gvfs
+rm -rf /run/user/1000/gvfs
+```
+
+现在，你再使用命令：`find / -name ***` 查找东西是不是就爽多了。
+
+再给一条命令简直暴一下
+
+一次删除所有目录的目标文件或文件夹：
+
+`find / -name ***|xargs rm -rf//***` 为你要删除的文件或文件夹
+
+相信这个命令在你要彻底卸载某个程序的时候会有帮助。
