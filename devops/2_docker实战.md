@@ -3,7 +3,7 @@
 ## 目录
 
 - [docker安装centos7镜像](#docker安装centos7镜像)
-- [使用Docker Registry搭建私有镜像仓库](使用Docker&nbsp;Registry搭建私有镜像仓库)
+- [使用Docker Registry搭建私有镜像仓库](#使用Docker&nbsp;Registry搭建私有镜像仓库)
 - [docker搭建consul集群](#docker搭建consul集群)
 - [.NET Core微服务应用部署](#.NET&nbsp;Core微服务应用部署)
 - [可视化工具Grafana](#可视化工具Grafana)
