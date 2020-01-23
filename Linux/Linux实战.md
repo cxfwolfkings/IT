@@ -5,6 +5,7 @@
 1. 安装
    - [宝塔Linux面板](#宝塔Linux面板)
    - [CentOS7安装SFTP](#CentOS7安装SFTP)
+   - [jenkins](#jenkins)
 2. 常用命令
    - [yum](#yum)
 3. [问题](#问题)
@@ -95,6 +96,58 @@ systemctl restart sshd.service
 # 测试
 sftp sftp@127.0.0.1
 ```
+
+## jenkins
+
+**什么是Jenkins?**
+
+jenkins是一个广泛用于持续构建的可视化web工具，持续构建说得更直白点，就是各种项目的”自动化”编译、打包、分发部署。jenkins可以很好的支持各种语言（比如：java, c#, php等）的项目构建，也完全兼容ant、maven、gradle等多种第三方构建工具，同时跟svn、git能无缝集成，也支持直接与知名源代码托管网站，比如github、bitbucket直接集成。
+
+jenkins官网地址为[http://jenkins-ci.org/](http://jenkins-ci.org/)，jenkins本身是用java语言开发的，所以安装jenkins的机器至少要有jdk，另外建议git、ant、maven、gradle、groovy等工具也一并安装好，方便与这些构建工具集成。
+
+### Jenkins使用流程
+
+1. 安装
+
+   - 安装java: `sudo yum install -y java`
+   - 安装wget: `sudo yum install -y wget`
+   - 参考：[http://pkg.jenkins-ci.org/redhat/](http://pkg.jenkins-ci.org/redhat/)，下载jenkins.repo定义源：
+
+     ```sh
+     sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat/jenkins.repo
+     ```
+
+   - 导入jenkins key：
+
+     ```sh
+     sudo rpm –import http://pkg.jenkins.io/redhat/jenkins.io.key
+     ```
+
+   - 安装jenkins: `yum install jenkins`
+
+2. 启动jenkins
+
+   ```sh
+   sudo service jenkins start
+   ```
+
+3. 查看jenkins进程状态
+
+   ```sh
+   sudo service jenkins status
+   ```
+
+4. 修改配置（选填）
+
+   ```sh
+   vi /etc/sysconfig/jenkins
+   # 日志目录
+   tail -f  /var/log/jenkins/jenkins.log
+   ```
+
+5. 访问jenkins服务：[http://localhost:8080](http://localhost:8080)
+
+   >注意：第一次启动的时候访问失败，执行 `service jenkins restart` 重启服务就可以了
 
 ## yum
 

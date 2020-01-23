@@ -294,7 +294,6 @@ None |  |  |  | 不用于写日志消息。 指定记录类别不应写任何消
 -|-
 `yum repolist all`|列出所有仓库
 `yum list all`|列出仓库中所有软件包
-`yum list installed | grep Kubernetes` | 查看安装包
 `yum info 软件包名称`|查看软件包信息
 `yum install 软件包名称`|安装软件包
 `yum reinstall 软件包名称`|重新安装软件包

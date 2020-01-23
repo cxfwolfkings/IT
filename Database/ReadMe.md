@@ -36,7 +36,7 @@
 
 ## 第一部分 SQL
 
-### 第1天：[SQL](./1.1_SQL.md)
+### 1.1 [SQL](./1.1_SQL.md)
 
 ## 第二部分 关系型数据库
 
@@ -46,16 +46,16 @@
 - PostgreSQL: [https://www.postgresql.org/](https://www.postgresql.org/)
 - Oracle: [https://www.oracle.com/index.html](https://www.oracle.com/index.html)
 
-### 第1天：[RDBMS概念](./2.1_RDBMS概念.md)
+### 2.1 [RDBMS概念](./2.1_RDBMS概念.md)
 
 - SQL92标准
 - SQL99标准
 - 数据库范式
 
-### 第2天：[MySQL](./2.2_MySQL.md)
+### 2.2 [MySQL](./2.2_MySQL.md)
 
-### 第3天：[SQLServer](./2.3_SQLServer.md)
+### 2.3 [SQLServer](./2.3_SQLServer.md)
 
 ## 第三部分 NoSQL数据库
 
-### 第1天：[Redis](./3.1_Redis.md)
+### 3.1 [Redis](./3.1_Redis.md)
