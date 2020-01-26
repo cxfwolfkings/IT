@@ -2,18 +2,77 @@
 
 ## 目录
 
-- [docker安装centos7镜像](#docker安装centos7镜像)
-- [使用Docker Registry搭建私有镜像仓库](#使用Docker&nbsp;Registry搭建私有镜像仓库)
-- [docker搭建consul集群](#docker搭建consul集群)
-- [.NET Core微服务应用部署](#.NET&nbsp;Core微服务应用部署)
-- [可视化工具Grafana](#可视化工具Grafana)
-- [问题](#问题)
+1. 安装与配置
+   - [阿里云镜像配置](#阿里云镜像配置)
+   - [Portainer](#Portainer)
+   - [centos7](#centos7)
+   - [gitlab](#gitlab)
+   - [使用Docker Registry搭建私有镜像仓库](#使用Docker&nbsp;Registry搭建私有镜像仓库)
+   - [docker搭建consul集群](#docker搭建consul集群)
+   - [.NET Core微服务应用部署](#.NET&nbsp;Core微服务应用部署)
+   - [可视化工具Grafana](#可视化工具Grafana)
+2. [问题](#问题)
 
-## docker安装centos7镜像
+## 阿里云镜像配置
+
+提升获取官方镜像的速度：
+
+```sh
+mkdir -p /etc/docker
+tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://6o1rxqal.mirror.aliyuncs.com"]
+}
+EOF
+systemctl daemon-reload
+systemctl restart docker
+```
+
+镜像仓库申请地址：[https://cr.console.aliyun.com/cn-shanghai/instances/repositories](#https://cr.console.aliyun.com/cn-shanghai/instances/repositories)
+
+注册登录，创建命名空间，创建镜像仓库
+
+```sh
+# 登录阿里云 Docker Registry
+docker login --username=一尾蜂 registry.cn-shanghai.aliyuncs.com
+# 用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。
+
+# 从Registry中拉取镜像
+docker pull registry.cn-shanghai.aliyuncs.com/daniel-hub/nginx-docker:[镜像版本号]
+
+# 将镜像推送到Registry
+docker tag [ImageId] registry.cn-shanghai.aliyuncs.com/daniel-hub/nginx-docker:[镜像版本号]
+docker push registry.cn-shanghai.aliyuncs.com/daniel-hub/nginx-docker:[镜像版本号]
+@ 请根据实际镜像信息替换示例中的[ImageId]和[镜像版本号]参数。
+```
+
+选择合适的镜像仓库地址：从ECS推送镜像时，可以选择使用镜像仓库内网地址，推送速度将得到提升并且将不会损耗您的公网流量。
+
+如果您使用的机器位于经典网络，请使用 registry-internal.cn-shanghai.aliyuncs.com 作为Registry的域名登录，并作为镜像命名空间前缀。
+
+如果您使用的机器位于VPC网络，请使用 registry-vpc.cn-shanghai.aliyuncs.com 作为Registry的域名登录，并作为镜像命名空间前缀。
+
+## Portainer
+
+好用的图形化管理界面
+
+```sh
+docker pull portainer/portainer
+docker run -d -p 9000:9000 portainer/portainer
+```
+
+## centos7
 
 ```sh
 docker pull centos:7
-docker run -it <IMAGE ID> /bin/bash
+docker run -it centos:7 /bin/bash
+```
+
+## gitlab
+
+```sh
+# gitlab-ce为稳定版本
+docker pull gitlab/gitlab-ce
 ```
 
 ## 使用Docker&nbsp;Registry搭建私有镜像仓库
@@ -382,8 +441,12 @@ docker run -d -p 6082:6082 -v /data/sftp/mysftp/upload/setting/SysSetting/:/app 
 
 ## 问题
 
-### iptables: No chain/target/match by that name
+### 1. iptables: No chain/target/match by that name
 
 ```sh
 systemctl restart docker
 ```
+
+### 2. Job for docker.service failed
+
+解决：执行 `vim /etc/sysconfig/selinux`，把 selinux 属性值改为disabled。然后重启系统，docker就可以启动

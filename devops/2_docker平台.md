@@ -20,6 +20,36 @@ Kubernetes 在 Linux 中的运用已发展成熟，但在 Windows 中相对较�
 ### 安装部署
 
 ```sh
+#docker
+curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+
+curl -o /etc/yum.repos.d/docker-ce.repo  https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+yum clean all
+yum makecache
+yum install docker-ce -y
+
+mkdir -pv /etc/docker/
+# tee /etc/docker/daemon.json <<-'EOF'
+# {
+#   #阿里镜像加速
+#   "registry-mirrors": [*****************],
+#   #设定使用的driver ，节点要一致
+#   "exec-opts": ["native.cgroupdriver=systemd"],
+#   "log-driver": "json-file",
+#   "log-opts": {
+#     "max-size": "100m"
+#   },
+#   "storage-driver": "overlay2",
+#   "storage-opts": [
+#     "overlay2.override_kernel_check=true"
+#   ]
+# }
+# EOF
+
+systemctl restart docker && echo "restart"
+systemctl enable docker  && echo "enable"
+
 # 提前拉取使用的镜像
 docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.17.1
 docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v1.17.1

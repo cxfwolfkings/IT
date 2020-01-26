@@ -2,18 +2,10 @@
 
 ## 目录
 
-- 图形化管理界面Portainer
 - [docker-compose](#docker-compose)
 - [docker&nbsp;Machine](#docker-machine)
 - [docker&nbsp;swarm](#docker-swarm)
 - [docker swarm](#docker&nbsp;swarm)
-
-## 图形化管理界面Portainer
-
-```sh
-docker pull portainer/portainer
-docker run -d -p 9000:9000 portainer/portainer
-```
 
 ## docker-compose
 

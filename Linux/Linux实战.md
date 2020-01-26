@@ -2,8 +2,9 @@
 
 ## 目录
 
-1. 安装
+1. 安装与配置
    - [宝塔Linux面板](#宝塔Linux面板)
+   - [vim](#vim)
    - [CentOS7安装SFTP](#CentOS7安装SFTP)
    - [jenkins](#jenkins)
 2. 常用命令
@@ -46,6 +47,12 @@
 
 1. 查看面板入口：/etc/init.d/bt default
 2. 关闭入口验证：rm -f /www/server/panel/data/admin_path.pl
+
+## vim
+
+```sh
+yum install -y vim
+```
 
 ## CentOS7安装SFTP
 
