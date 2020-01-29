@@ -2,100 +2,10 @@
 
 ## 目录
 
-1. [Kubernetes](#Kubernetes)
-   - [安装部署](#安装部署)
-2. [AKS](#AKS)
-3. [Service Fabric](#Service&nbsp;Fabric)
-4. [Azure Service Fabric 网格](#Azure&nbsp;Service&nbsp;Fabric&nbsp;网格)
-5. [基于容器和微服务的架构](#基于容器和微服务的架构)
-
-## Kubernetes
-
-[Kubernetes](https://kubernetes.io/) 是一款开源产品，提供各种功能，从群集基础结构和容器计划到安排功能均涵盖在内。 它能实现跨主机群集自动部署、缩放以及执行各种应用程序容器操作。
-
-Kubernetes 提供以容器为中心的基础结构，将应用程序容器分组为逻辑单元，以便管理和发现。
-
-Kubernetes 在 Linux 中的运用已发展成熟，但在 Windows 中相对较弱。
-
-### 安装部署
-
-```sh
-#docker
-curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-
-curl -o /etc/yum.repos.d/docker-ce.repo  https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-
-yum clean all
-yum makecache
-yum install docker-ce -y
-
-mkdir -pv /etc/docker/
-# tee /etc/docker/daemon.json <<-'EOF'
-# {
-#   #阿里镜像加速
-#   "registry-mirrors": [*****************],
-#   #设定使用的driver ，节点要一致
-#   "exec-opts": ["native.cgroupdriver=systemd"],
-#   "log-driver": "json-file",
-#   "log-opts": {
-#     "max-size": "100m"
-#   },
-#   "storage-driver": "overlay2",
-#   "storage-opts": [
-#     "overlay2.override_kernel_check=true"
-#   ]
-# }
-# EOF
-
-systemctl restart docker && echo "restart"
-systemctl enable docker  && echo "enable"
-
-# 提前拉取使用的镜像
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.17.1
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v1.17.1
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v1.17.1
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.17.1
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.4.3-0
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.6.5
-# 打标签
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.17.1 k8s.gcr.io/kube-apiserver:v1.17.1
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v1.17.1 k8s.gcr.io/kube-controller-manager:v1.17.1
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v1.17.1 k8s.gcr.io/kube-scheduler:v1.17.1
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.17.1 k8s.gcr.io/kube-proxy:v1.17.1
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1 k8s.gcr.io/pause:3.1
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.4.3-0 k8s.gcr.io/etcd:3.4.3-0
-docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.6.5 k8s.gcr.io/coredns:1.6.5
-```
-
-```sh
-kubeadm init --kubernetes-version=v1.17.1 --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=10.30.100.103 --ignore-preflight-errors=Swap
-```
-
-```sh
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.1/bin/linux/amd64/kubectl
-# 赋予执行权限
-chmod +x ./kubectl
-# 将其移动到bin目录下
-sudo mv ./kubectl /usr/local/bin/kubectl
-```
-
-**卸载清理K8S：**
-
-```sh
-kubeadm reset -f
-modprobe -r ipip
-lsmod
-rm -rf ~/.kube/
-rm -rf /etc/kubernetes/
-rm -rf /etc/systemd/system/kubelet.service.d
-rm -rf /etc/systemd/system/kubelet.service
-rm -rf /usr/bin/kube*
-rm -rf /etc/cni
-rm -rf /opt/cni
-rm -rf /var/lib/etcd
-rm -rf /var/etcd
-```
+1. [AKS](#AKS)
+2. [Service Fabric](#Service&nbsp;Fabric)
+3. [Azure Service Fabric 网格](#Azure&nbsp;Service&nbsp;Fabric&nbsp;网格)
+4. [基于容器和微服务的架构](#基于容器和微服务的架构)
 
 ## AKS
 
