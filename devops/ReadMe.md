@@ -19,8 +19,6 @@
 
 ## 第二部分 Docker + K8s
 
-### 2.1 [Docker](./2.1_Docker.md)
-
 1. 简介
    - 什么是Docker / Windows容器 / 为什么使用Docker / 虚拟化与docker
    - VM和Docker容器之间的比较 / Docker官网注册 / Docker术语
@@ -29,8 +27,6 @@
    - Docker子命令分类
    - 镜像命令
    - Dockerfile命令
-
-### 2.2 [平台](./2.2_平台.md)
 
 - 附录
 

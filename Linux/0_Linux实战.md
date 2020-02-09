@@ -8,7 +8,7 @@
    - [CentOS7安装SFTP](#CentOS7安装SFTP)
    - [jenkins](#jenkins)
 2. 常用命令
-   - [yum](#yum)
+   - [关闭防火墙](#关闭防火墙)
 3. [问题](#问题)
 
 ## 宝塔Linux面板
@@ -156,7 +156,18 @@ jenkins官网地址为[http://jenkins-ci.org/](http://jenkins-ci.org/)，jenkins
 
    >注意：第一次启动的时候访问失败，执行 `service jenkins restart` 重启服务就可以了
 
-## yum
+## 常用命令
+
+### 关闭防火墙
+
+```sh
+# 查看防火墙状态
+systemctl status firewalld.service
+# 关闭运行的防火墙（重启失效）
+systemctl stop firewalld.service
+# 禁止防火墙服务器（永久生效）
+systemctl disable firewalld.service
+```
 
 ## 问题
 
