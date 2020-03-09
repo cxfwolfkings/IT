@@ -11,9 +11,12 @@
    - [docker搭建consul集群](#docker搭建consul集群)
    - [.NET Core微服务应用部署](#.NET&nbsp;Core微服务应用部署)
    - [可视化工具Grafana](#可视化工具Grafana)
+   - [基于Docker安装RabbitMQ](#基于Docker安装RabbitMQ)
 2. [问题](#问题)
 
-## 阿里云镜像配置
+## 安装与配置
+
+### 阿里云镜像配置
 
 提升获取官方镜像的速度：
 
@@ -52,7 +55,7 @@ docker push registry.cn-shanghai.aliyuncs.com/daniel-hub/nginx-docker:[镜像版
 
 如果您使用的机器位于VPC网络，请使用 registry-vpc.cn-shanghai.aliyuncs.com 作为Registry的域名登录，并作为镜像命名空间前缀。
 
-## Portainer
+### Portainer
 
 好用的图形化管理界面
 
@@ -61,21 +64,21 @@ docker pull portainer/portainer
 docker run -d -p 9000:9000 portainer/portainer
 ```
 
-## centos7
+### centos7
 
 ```sh
 docker pull centos:7
 docker run -it centos:7 /bin/bash
 ```
 
-## gitlab
+### gitlab
 
 ```sh
 # gitlab-ce为稳定版本
 docker pull gitlab/gitlab-ce
 ```
 
-## 使用Docker&nbsp;Registry搭建私有镜像仓库
+### 使用Docker&nbsp;Registry搭建私有镜像仓库
 
 1、下载镜像registry
 
@@ -150,7 +153,7 @@ curl http://127.0.0.1:5000/v2/_catalog
 curl http://127.0.0.1:5000/v2/consul/tags/list
 ```
 
-## docker搭建consul集群
+### docker搭建consul集群
 
 1、拉取consul镜像
 
@@ -347,7 +350,7 @@ docker logs 容器id/容器名称
 docker history leadgateway --format "table {{.ID}}\t{{.CreatedBy}}" --no-trunc
 ```
 
-## .NET&nbsp;Core微服务应用部署
+### .NET&nbsp;Core微服务应用部署
 
 网关Dockfile：
 
@@ -433,11 +436,38 @@ docker build -t pmsetting .
 docker run -d -p 6082:6082 -v /data/sftp/mysftp/upload/setting/SysSetting/:/app --name pmsetting pmsetting
 ```
 
-## 可视化工具Grafana
+### 可视化工具Grafana
 
 下载地址：[https://grafana.com/grafana/download?platform=windows](https://grafana.com/grafana/download?platform=windows)
 
 1、把下载的.zip文件解压到您的想运行Grafana的任何地方，然后进入conf目录复制一份sample.ini并重命名为custom.ini。以后所有的配置应该编辑custom.ini，永远不要去修改defaults.ini。
+
+### 基于Docker安装RabbitMQ
+
+```sh
+# 查找RabbitMQ镜像
+docker search rabbitmq
+# 拉取RabbitMQ镜像
+docker pull rabbitmq #（镜像未配有控制台）
+docker pull rabbitmq:management #（镜像配有控制台）
+```
+
+>注意：rabbitmq是官方镜像，该镜像不带控制台。如果要安装带控制台的镜像，需要在拉取镜像时附带tag标签，例如：management。tag标签可以通过[https://hub.docker.com/_/rabbitmq?tab=tags](https://hub.docker.com/_/rabbitmq?tab=tags)来查询。
+
+```sh
+# 安装并运行容器
+docker run --name rabbitmq -d -p 15672:15672 -p 5672:5672 rabbitmq:management
+# 停止容器
+docker stop rabbitmq
+# 启动容器
+docker start rabbitmq
+# 重启
+docker restart rabbitmq
+# 查看进程信息
+docker restart rabbitmq
+```
+
+启动容器后，可以浏览器中访问[http://localhost:15672](http://localhost:15672)来查看控制台信息。RabbitMQ默认的用户名：guest，密码：guest
 
 ## 问题
 
