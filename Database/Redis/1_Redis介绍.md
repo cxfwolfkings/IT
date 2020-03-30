@@ -42,6 +42,7 @@ A、想要从自己的帐户中转1000块钱到B的帐户里。那个从A开始�
 ## 目录
 
 1. [安装](#安装)
+   - [开启远程访问](#开启远程访问)
 2. [数据类型](#数据类型)
 3. [数据持久化](#数据持久化)
 4. [内存管理](#内存管理)
@@ -75,6 +76,12 @@ redis-cli.exe -h 127.0.0.1 -p 6379
 安装调试完成！
 
 >windows下也有专门的安装软件进行向导式安装！
+
+**服务安装：**
+
+```cmd
+redis-server.exe --service-install redis.windows.conf --loglevel verbose
+```
 
 ### CentOS 7
 
@@ -171,6 +178,12 @@ mac 下安装也可以使用 homebrew，homebrew 是 mac 的包管理器。
    ![x](./Resource/5.jpg)
 
 接下来和在Ubuntu中安装并无二致！
+
+### 开启远程访问
+
+修改redis.conf，注释掉 `bind 127.0.0.1` 可以使所有的ip访问redis；若是想指定多个ip访问，但并不是全部的ip访问，可以bind。
+
+在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了 `bind 127.0.0.1`，再访问redis的时候还是报错，修改办法：`protected-mode no`
 
 ## 数据类型
 

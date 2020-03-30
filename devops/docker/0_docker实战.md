@@ -352,6 +352,16 @@ docker history leadgateway --format "table {{.ID}}\t{{.CreatedBy}}" --no-trunc
 
 ### .NET&nbsp;Core微服务应用部署
 
+查看docker启动命令：
+
+```sh
+# 外部
+docker inspect
+docker inspect container
+# 内部
+ps -fe
+```
+
 网关Dockfile：
 
 ```sh
@@ -359,21 +369,19 @@ docker history leadgateway --format "table {{.ID}}\t{{.CreatedBy}}" --no-trunc
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
 # 工作目录
 WORKDIR /app
-
 # COPY . .
-
 # 开放端口
 # EXPOSE 80
 # EXPOSE 443
-
 ENTRYPOINT ["dotnet", "LeadChina.Gateway.dll"]
 ```
 
 ```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/gateway/
 # 生成镜像
 docker build -t gateway .
 # 启动
-# docker run -d -p 6080:6080 --name gateway1 gateway
 docker run -d -p 6080:6080 -v /data/sftp/mysftp/upload/gateway/:/app --name gateway gateway
 ```
 
@@ -382,18 +390,16 @@ docker run -d -p 6080:6080 -v /data/sftp/mysftp/upload/gateway/:/app --name gate
 ```sh
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
 WORKDIR /app
-
-COPY . .
-
-EXPOSE 80
-EXPOSE 443
-
 ENTRYPOINT ["dotnet", "LeadChina.JwtServer.dll"]
 ```
 
 ```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/JwtServer/
+# 生成镜像
+docker build -t jwtserver .
 # 启动
-docker run -d -p 6181:6181 --name jwtserver jwtserver
+docker run -d -p 6181:6181 -v /data/sftp/mysftp/upload/JwtServer/:/app --name jwtserver jwtserver
 ```
 
 **前端web的Dockerfile：**
@@ -409,7 +415,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 ```sh
 # 进入目录
-cd /data/sftp/mysftp//upload/pmweb/
+cd /data/sftp/mysftp/upload/pmweb/
 # 生成镜像
 docker build -t pmweb .
 # 启动
@@ -432,8 +438,92 @@ cd /data/sftp/mysftp/upload/setting/SysSetting/
 # 生成镜像
 docker build -t pmsetting .
 # 启动
-# docker run -d -p 6082:6082 --name pmsetting pmsetting
 docker run -d -p 6082:6082 -v /data/sftp/mysftp/upload/setting/SysSetting/:/app --name pmsetting pmsetting
+```
+
+**基础微服务应用Dockfile：**
+
+```sh
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+WORKDIR /app
+ENTRYPOINT ["dotnet", "LeadChina.Base.API.dll"]
+```
+
+```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/base
+# 生成镜像
+docker build -t basic .
+# 启动
+docker run -d -p 6190:6190 -v /data/sftp/mysftp/upload/base/:/app --name basic basic
+```
+
+**项目微服务应用Dockfile：**
+
+```sh
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+WORKDIR /app
+ENTRYPOINT ["dotnet", "LeadChina.PM.Project.API.dll"]
+```
+
+```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/project
+# 生成镜像
+docker build -t project .
+# 启动
+docker run -d -p 6083:6083 -v /data/sftp/mysftp/upload/project/:/app --name project project
+```
+
+**任务微服务应用Dockfile：**
+
+```sh
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+WORKDIR /app
+ENTRYPOINT ["dotnet", "LeadChina.PM.Task.API.dll"]
+```
+
+```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/task
+# 生成镜像
+docker build -t task .
+# 启动
+docker run -d -p 6084:6084 -v /data/sftp/mysftp/upload/task/:/app --name task task
+```
+
+**消息微服务应用Dockfile：**
+
+```sh
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+WORKDIR /app
+ENTRYPOINT ["dotnet", "LeadChina.PM.Message.API.dll"]
+```
+
+```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/message
+# 生成镜像
+docker build -t message .
+# 启动
+docker run -d -p 6085:6085 -v /data/sftp/mysftp/upload/message/:/app --name message message
+```
+
+**文档微服务应用Dockfile：**
+
+```sh
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+WORKDIR /app
+ENTRYPOINT ["dotnet", "LeadChina.PM.Document.API.dll"]
+```
+
+```sh
+# 进入目录
+cd /data/sftp/mysftp/upload/document
+# 生成镜像
+docker build -t document .
+# 启动
+docker run -d -p 6086:6086 -v /data/sftp/mysftp/upload/document/:/app --name document document
 ```
 
 ### 可视化工具Grafana
