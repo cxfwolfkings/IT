@@ -5,7 +5,6 @@
 1. 安装与配置
    - [宝塔Linux面板](#宝塔Linux面板)
    - [vim](#vim)
-   - [CentOS7安装SFTP](#CentOS7安装SFTP)
    - [jenkins](#jenkins)
 2. 常用命令
    - [关闭防火墙](#关闭防火墙)
@@ -52,56 +51,6 @@
 
 ```sh
 yum install -y vim
-```
-
-## CentOS7安装SFTP
-
-```sh
-# 查看openssh版本，openssh版本必须大于4.8p1
-ssh -V
-# 创建sftp组
-groupadd sftp
-# 创建sftp用户
-useradd -g sftp -s /sbin/nologin -M sftp
-passwd sftp
-输入密码
-# 建立目录
-mkdir -p /data/sftp/mysftp
-usermod -d /data/sftp/mysftp sftp
-
-# 修改sshd_config
-vim /etc/ssh/sshd_config
-# 注释掉
-# Subsystem sftp /usr/libexec/openssh/sftp-server
-# 添加
-Subsystem sftp internal-sftp
-Match Group sftp
-ChrootDirectory /data/sftp/mysftp
-ForceCommand internal-sftp
-AllowTcpForwarding no
-X11Forwarding no
-
-# 设置Chroot目录权限
-chown root:sftp /data/sftp/mysftp
-chmod 755 /data/sftp/mysftp
-
-# 设置可以写入的目录
-mkdir /data/sftp/mysftp/upload
-chown sftp:sftp /data/sftp/mysftp/upload
-chmod 755 /data/sftp/mysftp/upload
-
-# 关闭selinux：
-vim /etc/selinux/config
-# 将文件中的 SELINUX=enforcing 修改为 SELINUX=disabled，然后保存。
-
-# 执行：
-setenforce 0
-service sshd restart
-# 或
-systemctl restart sshd.service
-
-# 测试
-sftp sftp@127.0.0.1
 ```
 
 ## jenkins
