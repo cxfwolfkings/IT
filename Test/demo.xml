@@ -1,0 +1,7 @@
+<dataHost name="localhost1" maxCon="1000" minCon="10" balance="0" writeType="0" dbType="mysql" dbDriver="native" switchType="3" >
+  <heartbeat> show status like 'wsrep%'</heartbeat>
+  <writeHost host="hostM1" url="localhost:3306" user="root" password="123456">
+  </writeHost>
+  <writeHost host="hostS1" url="localhost:3316" user="root" password="123456">
+  </writeHost>
+</dataHost> 

@@ -16,6 +16,15 @@
    - [目录切换](#目录切换)
      - [pwd](#pwd)
      - [ls](#ls)
+     - [cd](#cd)
+   - [文档编辑](#文档编辑)
+     - [cat](#cat)
+     - [more](#more)
+     - [head](#head)
+     - [tail](#tail)
+     - [od](#od)
+     - [tr](#tr)
+   - [系统状态检测](#系统状态检测)
 
 计算机硬件是由运算器、控制器、存储器、输入/输出设备等设备组成的，而能够让机箱内各种设备各司其职东西就叫做——系统内核。内核负责驱动硬件、管理活动和分配/管理硬件资源，如此说来系统内核对计算机来讲可真的是太重要了，所以它不能直接让用户操作。
 
@@ -392,127 +401,205 @@ cd .. #转移到上一级目录
 
 **参数：**
 
-- -数字：预先显示的行数（默认为一页）
-- -d：显示提示语句与报错信息
+- -数字    预先显示的行数（默认为一页）
+- -d       显示提示语句与报错信息
 
 #### head
 
-作用：
+**作用：**
+
 用于查看纯文本文档的前N行，格式为："head [选项] [文件]"。
-参数：
-  -n 10	   显示10行
-  -n -10  正常输出（如cat命令），但不显示最后的10行
-示例：
-查看文本文件前20行：#head -n 20 文件名
-tail
-作用：
+
+**参数：**
+
+- `-n 10`    显示10行
+- `-n -10`   正常输出（如cat命令），但不显示最后的10行
+
+**示例：**
+
+```sh
+# 查看文本文件前20行
+head -n 20 文件名
+```
+
+#### tail
+
+**作用：**
+
 用于查看纯文本文档的后N行
-格式：
+
+**格式：**
+
 "tail [选项] [文件]"。
-参数：
-  -n 10	  显示后面的10行
-  -f	  持续刷新显示的内容
-示例：
-查看文本文件后20行：#tail -n 20 文件名
-od
-作用：
+
+**参数：**
+
+- -n 10  显示后面的10行
+- -f     持续刷新显示的内容
+
+**示例：**
+
+```sh
+# 查看文本文件后20行
+tail -n 20 文件名
+```
+
+#### od
+
+**作用：**
+
 用于对查看特殊格式的文件
-格式：
-"od [选项] [文件]"。
-参数：
-  -t a	默认字符
-  -t c	ASCII字符
-  -t o	八进制
-  -t d	十进制
-  -t x	十六进制
-  -t f	浮点数
-tr
-作用：
+
+**格式：**
+
+`od [选项] [文件]`
+
+**参数：**
+
+- -t a  默认字符
+- -t c  ASCII字符
+- -t o  八进制
+- -t d  十进制
+- -t x  十六进制
+- -t f  浮点数
+
+#### tr
+
+**作用：**
+
 用于转换文本文件中的字符
-格式：
-"tr [原始字符] [目标字符]"。
-示例：
-  读者如果想转换实例中的文件，可下载文件tr.txt。将tr.txt文件的内容转换成大写（注意到命令中间的 | 了吗？这个叫管道命令符，后面会学到）
-  #cat tr.txt | tr [a-z] [A-Z]
-  WELCOME TO LINUXPROBE.COM RED HAT CERTIFIED FREE LINUX LESSONS PROFESSIONAL GUIDANCE LINUX COURSE
-wc
-作用：
-  用于统计指定文本的行数、字数、字节数
-格式：
-  wc [参数] 文本
-参数：
-  -l	只显示行数
-  -w	只显示单词数
-  -c	只显示字节数
-示例：
-  统计当前系统中的用户个数：wc -l /etc/passwd
-cut
-作用：
-  用于通过列来提取文本字符
-格式：
-  cut [参数] 文本
-参数：
-  -d 分隔符	 指定分隔符，默认为Tab。
-  -f	     指定显示的列数。
-  -c	     单位改为字符
-示例：
-  获取当前系统中所有用户的名称（参数作用：-d以":"来做分隔符，-f参数代表只看第一列的内容。）：
-  cut -d: -f 1 /etc/passwd
-  获取root用户的默认SHELL解释器：
-  grep ^root /etc/passwd | cut -d: -f 7
-  /bin/bash
-sed
-作用：
+
+**格式：**
+
+`tr [原始字符] [目标字符]`
+
+**示例：**
+
+读者如果想转换实例中的文件，可下载文件tr.txt。将tr.txt文件的内容转换成大写（注意到命令中间的 | 了吗？这个叫管道命令符，后面会学到）
+
+```sh
+cat tr.txt | tr [a-z] [A-Z]
+
+WELCOME TO LINUXPROBE.COM RED HAT CERTIFIED FREE LINUX LESSONS PROFESSIONAL GUIDANCE LINUX COURSE
+```
+
+#### wc
+
+**作用：**
+
+用于统计指定文本的行数、字数、字节数
+
+**格式：**
+
+`wc [参数] 文本`
+
+**参数：**
+
+- -l  只显示行数
+- -w  只显示单词数
+- -c  只显示字节数
+
+**示例：**
+
+```sh
+# 统计当前系统中的用户个数
+wc -l /etc/passwd
+```
+
+#### cut
+
+**作用：**
+
+用于通过列来提取文本字符
+
+**格式：**
+
+`cut [参数] 文本`
+
+**参数：**
+
+- -d 分隔符 指定分隔符，默认为Tab。
+- -f 指定显示的列数。
+- -c 单位改为字符
+
+**示例：**
+
+```sh
+# 获取当前系统中所有用户的名称（参数作用：-d以":"来做分隔符，-f参数代表只看第一列的内容。）：
+cut -d: -f 1 /etc/passwd
+# 获取root用户的默认SHELL解释器：
+grep ^root /etc/passwd | cut -d: -f 7
+/bin/bash
+```
+
+#### sed
+
+**作用：**
+
 Linux sed 命令是利用脚本来处理文本文件。sed 可依照脚本的指令来处理、编辑文本文件。Sed 主要用来自动编辑一个或多个文件、简化对文件的反复操作、编写转换程序等。
-格式：
-sed [-hnV][-e<script>][-f<script文件>][文本文件]
-参数：
--e<script>或--expression=<script> 以选项中指定的script来处理输入的文本文件。
--f<script文件>或--file=<script文件> 以选项中指定的script文件来处理输入的文本文件。
--h或--help 显示帮助。
--n或--quiet或--silent 仅显示script处理后的结果。
--V或--version 显示版本信息。
-动作：
-a ：新增，a 的后面可以接字串，而这些字串会在新的一行出现（目前的下一行）～
-c ：取代，c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
-d ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
-i ：插入，i 的后面可以接字串，而这些字串会在新的一行出现（目前的上一行）；
-p ：打印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～
-s ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g 就是啦！
-示例：
-在testfile文件的第四行后添加一行，并将结果输出到标准输出，在命令行提示符下输入如下命令：
-sed -e 4a\newLine testfile 
-首先查看testfile中的内容如下：
+
+**格式：**
+
+`sed [-hnV][-e<script>][-f<script文件>][文本文件]`
+
+**参数：**
+
+- `-e<script>` 或 `--expression=<script>` 以选项中指定的script来处理输入的文本文件。
+- `-f<script文件>` 或 `--file=<script文件>` 以选项中指定的script文件来处理输入的文本文件。
+- -h或--help 显示帮助。
+- -n或--quiet或--silent 仅显示script处理后的结果。
+- -V或--version 显示版本信息。
+
+**动作：**
+
+- a ：新增，a 的后面可以接字串，而这些字串会在新的一行出现（目前的下一行）～
+- c ：取代，c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
+- d ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
+- i ：插入，i 的后面可以接字串，而这些字串会在新的一行出现（目前的上一行）；
+- p ：打印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～
+- s ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g 就是啦！
+
+**示例：**
+
+```sh
+# 在testfile文件的第四行后添加一行，并将结果输出到标准输出，在命令行提示符下输入如下命令：
+sed -e 4a\newLine testfile
+# 首先查看testfile中的内容如下：
 cat testfile #查看testfile 中的内容  
 HELLO LINUX!  
 Linux is a free unix-type opterating system.  
 This is a linux testfile!  
-Linux test 
-使用sed命令后，输出结果如下：
+Linux test
+
+# 使用sed命令后，输出结果如下：
 HELLO LINUX! #testfile文件原有的内容  
 Linux is a free unix-type opterating system.  
 This is a linux testfile!  
-Linux test 
-newline 
-以行为单位的新增/删除
-将 /etc/passwd 的内容列出并且列印行号，同时，请将第 2~5 行删除！
+Linux test
+newline
+
+# 以行为单位的新增/删除
+# 将 /etc/passwd 的内容列出并且列印行号，同时，请将第 2~5 行删除！
 nl /etc/passwd | sed '2,5d'
 1 root:x:0:0:root:/root:/bin/bash
 6 sync:x:5:0:sync:/sbin:/bin/sync
 7 shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
 .....(后面省略).....
-sed 的动作为 '2,5d' ，那个 d 就是删除！因为 2-5 行给他删除了，所以显示的数据就没有 2-5 行罗～ 另外，注意一下，原本应该是要下达 sed -e 才对，没有 -e 也行啦！同时也要注意的是， sed 后面接的动作，请务必以 '' 两个单引号括住喔！
-只要删除第 2 行：nl /etc/passwd | sed '2d' 
-要删除第 3 到最后一行：nl /etc/passwd | sed '3,$d'
-在第二行后（亦即是加在第三行）加上『drink tea?』字样！
+
+# sed 的动作为 '2,5d' ，那个 d 就是删除！因为 2-5 行给他删除了，所以显示的数据就没有 2-5 行罗～ 另外，注意一下，原本应该是要下达 sed -e 才对，没有 -e 也行啦！同时也要注意的是， sed 后面接的动作，请务必以 '' 两个单引号括住喔！
+# 只要删除第 2 行
+nl /etc/passwd | sed '2d'
+# 要删除第 3 到最后一行
+nl /etc/passwd | sed '3,$d'
+# 在第二行后（亦即是加在第三行）加上『drink tea?』字样！
 nl /etc/passwd | sed '2a drink tea'
 1 root:x:0:0:root:/root:/bin/bash
 2 bin:x:1:1:bin:/bin:/sbin/nologin
 drink tea
 3 daemon:x:2:2:daemon:/sbin:/sbin/nologin
 .....(后面省略).....
-那如果是要在第二行前：nl /etc/passwd | sed '2i drink tea' 
-如果是要增加两行以上，在第二行后面加入两行字，例如 Drink tea or ..... 与 drink beer?
+# 那如果是要在第二行前：nl /etc/passwd | sed '2i drink tea'
+# 如果是要增加两行以上，在第二行后面加入两行字，例如 Drink tea or ..... 与 drink beer?
 nl /etc/passwd | sed '2a Drink tea or ......\
 > drink beer ?'
 1 root:x:0:0:root:/root:/bin/bash
@@ -521,23 +608,23 @@ Drink tea or ......
 drink beer ?
 3 daemon:x:2:2:daemon:/sbin:/sbin/nologin
 .....（后面省略）.....
-每一行之间都必须要以反斜杠『 \ 』来进行新行的添加喔！所以，上面的例子中，我们可以发现在第一行的最后面就有 \ 存在。
-以行为单位的替换与显示
-将第2-5行的内容取代成为『No 2-5 number』呢？
+# 每一行之间都必须要以反斜杠『 \ 』来进行新行的添加喔！所以，上面的例子中，我们可以发现在第一行的最后面就有 \ 存在。
+# 以行为单位的替换与显示
+# 将第2-5行的内容取代成为『No 2-5 number』呢？
 nl /etc/passwd | sed '2,5c No 2-5 number'
 1 root:x:0:0:root:/root:/bin/bash
 No 2-5 number
 6 sync:x:5:0:sync:/sbin:/bin/sync
 .....(后面省略).....
-透过这个方法我们就能够将数据整行取代了！
-仅列出 /etc/passwd 文件内的第 5-7 行
+# 透过这个方法我们就能够将数据整行取代了！
+# 仅列出 /etc/passwd 文件内的第 5-7 行
 nl /etc/passwd | sed -n '5,7p'
 5 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 6 sync:x:5:0:sync:/sbin:/bin/sync
 7 shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
-可以透过这个 sed 的以行为单位的显示功能， 就能够将某一个文件内的某些行号选择出来显示。
-数据的搜寻并显示
-搜索 /etc/passwd有root关键字的行
+# 可以透过这个 sed 的以行为单位的显示功能， 就能够将某一个文件内的某些行号选择出来显示。
+# 数据的搜寻并显示
+# 搜索 /etc/passwd有root关键字的行
 nl /etc/passwd | sed '/root/p'
 1  root:x:0:0:root:/root:/bin/bash
 1  root:x:0:0:root:/root:/bin/bash
@@ -545,60 +632,61 @@ nl /etc/passwd | sed '/root/p'
 3  bin:x:2:2:bin:/bin:/bin/sh
 4  sys:x:3:3:sys:/dev:/bin/sh
 5  sync:x:4:65534:sync:/bin:/bin/sync
-....下面忽略 
-如果root找到，除了输出所有行，还会输出匹配行。
-使用-n的时候将只打印包含模板的行。
+....下面忽略
+# 如果root找到，除了输出所有行，还会输出匹配行。
+# 使用-n的时候将只打印包含模板的行。
 nl /etc/passwd | sed -n '/root/p'
 1  root:x:0:0:root:/root:/bin/bash
-数据的搜寻并删除
-删除/etc/passwd所有包含root的行，其他行输出
+# 数据的搜寻并删除
+# 删除/etc/passwd所有包含root的行，其他行输出
 nl /etc/passwd | sed  '/root/d'
 2  daemon:x:1:1:daemon:/usr/sbin:/bin/sh
 3  bin:x:2:2:bin:/bin:/bin/sh
 ....下面忽略
-#第一行的匹配root已经删除了
-数据的搜寻并执行命令
-搜索/etc/passwd，找到root对应的行，执行后面花括号中的一组命令，每个命令之间用分号分隔，这里把bash替换为blueshell，再输出这行：
-nl /etc/passwd | sed -n '/root/{s/bash/blueshell/;p;q}'    
+# 第一行的匹配root已经删除了
+# 数据的搜寻并执行命令
+# 搜索/etc/passwd，找到root对应的行，执行后面花括号中的一组命令，每个命令之间用分号分隔，这里把bash替换为blueshell，再输出这行：
+nl /etc/passwd | sed -n '/root/{s/bash/blueshell/;p;q}'
 1  root:x:0:0:root:/root:/bin/blueshell
-最后的q是退出。
-数据的搜寻并替换
-除了整行的处理模式之外， sed 还可以用行为单位进行部分数据的搜寻并取代。基本上 sed 的搜寻与替代的与 vi 相当的类似！他有点像这样：
+# 最后的q是退出。
+# 数据的搜寻并替换
+# 除了整行的处理模式之外， sed 还可以用行为单位进行部分数据的搜寻并取代。基本上 sed 的搜寻与替代的与 vi 相当的类似！他有点像这样：
 sed 's/要被取代的字串/新的字串/g'
-先观察原始信息，利用 /sbin/ifconfig 查询 IP
+# 先观察原始信息，利用 /sbin/ifconfig 查询 IP
 /sbin/ifconfig eth0
 eth0 Link encap:Ethernet HWaddr 00:90:CC:A6:34:84
 inet addr:192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
 inet6 addr: fe80::290:ccff:fea6:3484/64 Scope:Link
 UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1
 .....（以下省略）.....
-本机的ip是192.168.1.100。
-将 IP 前面的部分予以删除
+# 本机的ip是192.168.1.100。
+# 将 IP 前面的部分予以删除
 /sbin/ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g'
 192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
-接下来则是删除后续的部分，亦即：192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
-将 IP 后面的部分予以删除
+# 接下来则是删除后续的部分，亦即：192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
+# 将 IP 后面的部分予以删除
 /sbin/ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g' | sed 's/Bcast.*$//g'
 192.168.1.100
-多点编辑
-一条sed命令，删除/etc/passwd第三行到末尾的数据，并把bash替换为blueshell
+# 多点编辑
+# 一条sed命令，删除/etc/passwd第三行到末尾的数据，并把bash替换为blueshell
 nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 1  root:x:0:0:root:/root:/bin/blueshell
 2  daemon:x:1:1:daemon:/usr/sbin:/bin/sh
--e表示多点编辑，第一个编辑命令删除/etc/passwd第三行到末尾的数据，第二条命令搜索bash替换为blueshell。
-直接修改文件内容（危险动作）
-sed 可以直接修改文件的内容，不必使用管道命令或数据流重导向！不过，由於这个动作会直接修改到原始的文件，所以请你千万不要随便拿系统配置来测试！我们还是使用文件regular_express.txt文件来测试看看吧！
-regular_express.txt文件内容如下：
-cat regular_express.txt 
+# -e 表示多点编辑，第一个编辑命令删除/etc/passwd第三行到末尾的数据，第二条命令搜索bash替换为blueshell。
+
+# 直接修改文件内容（危险动作）
+# sed 可以直接修改文件的内容，不必使用管道命令或数据流重导向！不过，由於这个动作会直接修改到原始的文件，所以请你千万不要随便拿系统配置来测试！我们还是使用文件regular_express.txt文件来测试看看吧！
+# regular_express.txt文件内容如下：
+cat regular_express.txt
 runoob.
 google.
 taobao.
 facebook.
 zhihu-
 weibo-
-利用 sed 将 regular_express.txt 内每一行结尾若为 . 则换成 !
+# 利用 sed 将 regular_express.txt 内每一行结尾若为 . 则换成 !
 sed -i 's/\.$/\!/g' regular_express.txt
-cat regular_express.txt 
+cat regular_express.txt
 runoob!
 google!
 taobao!
@@ -606,9 +694,9 @@ facebook!
 zhihu-
 weibo-
 :q:q
-利用 sed 直接在 regular_express.txt 最后一行加入 # This is a test:
+# 利用 sed 直接在 regular_express.txt 最后一行加入 # This is a test:
 sed -i '$a # This is a test' regular_express.txt
-cat regular_express.txt 
+cat regular_express.txt
 runoob!
 google!
 taobao!
@@ -616,96 +704,136 @@ facebook!
 zhihu-
 weibo-
 # This is a test
-由於 $ 代表的是最后一行，而 a 的动作是新增，因此该文件最后新增 # This is a test！
-sed 的 -i 选项可以直接修改文件内容，这功能非常有帮助！举例来说，如果你有一个 100 万行的文件，你要在第 100 行加某些文字，此时使用 vim 可能会疯掉！因为文件太大了！那怎办？就利用 sed 啊！透过 sed 直接修改/取代的功能，你甚至不需要使用 vim 去修订！
+# 由於 $ 代表的是最后一行，而 a 的动作是新增，因此该文件最后新增 # This is a test！
+# sed 的 -i 选项可以直接修改文件内容，这功能非常有帮助！举例来说，如果你有一个 100 万行的文件，你要在第 100 行加某些文字，此时使用 vim 可能会疯掉！因为文件太大了！那怎办？就利用 sed 啊！透过 sed 直接修改/取代的功能，你甚至不需要使用 vim 去修订！
+```
 
+#### sort
 
+**作用：**
 
-sort
-作用：
-  将文本文件内容加以排序，sort可针对文本文件的内容，以行为单位来排序。
-参数：
-  -b   忽略每行前面开始出的空格字符。
-  -c   检查文件是否已经按照顺序排序。
-  -d   排序时，处理英文字母、数字及空格字符外，忽略其他的字符。
-  -f   排序时，将小写字母视为大写字母。
-  -i   排序时，除了040至176之间的ASCII字符外，忽略其他的字符。
-  -m   将几个排序好的文件进行合并。
-  -M   将前面3个字母依照月份的缩写进行排序。
-  -n   依照数值的大小排序。
-  -o<输出文件>   将排序后的结果存入指定的文件。
-  -r   以相反的顺序来排序。
-  -t<分隔字符>   指定排序时所用的栏位分隔字符。
-  +<起始栏位>-<结束栏位>   以指定的栏位来排序，范围由起始栏位到结束栏位的前一栏位。
-  --help   显示帮助。
-  --version   显示版本信息
-示例：
+将文本文件内容加以排序，sort可针对文本文件的内容，以行为单位来排序。
 
+**参数：**
 
+- -b   忽略每行前面开始出的空格字符。
+- -c   检查文件是否已经按照顺序排序。
+- -d   排序时，处理英文字母、数字及空格字符外，忽略其他的字符。
+- -f   排序时，将小写字母视为大写字母。
+- -i   排序时，除了040至176之间的ASCII字符外，忽略其他的字符。
+- -m   将几个排序好的文件进行合并。
+- -M   将前面3个字母依照月份的缩写进行排序。
+- -n   依照数值的大小排序。
+- -o<输出文件>   将排序后的结果存入指定的文件。
+- -r   以相反的顺序来排序。
+- -t<分隔字符>   指定排序时所用的栏位分隔字符。
+- +<起始栏位>-<结束栏位>   以指定的栏位来排序，范围由起始栏位到结束栏位的前一栏位。
+- --help   显示帮助。
+- --version   显示版本信息
 
+**示例：**
 
-diff
-作用：
-  用于比较多个文本文件的差异
-格式：
-  diff [参数] 文件"。
-参数：
-  -b	        忽略空格引起的差异。
-  -B	        忽略空行引起的差异。
-  --brief或-q	仅报告是否存在差异。
-  -c	        使用上下文输出格式。
-chown
-示例：
-  chown workman.workgroup /data/pub/upload #改变文件所有者。
-  chmod -R 755 /usr/local/LumaQQ #改变文件访问权限
-文件检索
-grep
-作用：
-  用于对文本进行搜索
-格式：
-  grep [选项] [文件]
-参数：
-  -b	将可执行文件(binary)当作文本文件(text)来搜索
-  -c	仅显示找到的次数
-  -i	忽略大小写
-  -n	显示行号
-  -v	反向选择——仅列出没有“关键词”的行。
-示例：
-  1、搜索某个关键词："grep 关键词 文本文件"
-  2、搜索在/etc/passwd中"/sbin/nologin"出现的行，找出系统中不允许登陆的用户。
-     grep /sbin/nologin /etc/passwd
-  3、找出文件"/usr/share/gedit/plugins/snippets/docbook.xml"中所有包含entry的行并输出到/root/lines：
-     grep entry /usr/share/gedit/plugins/snippets/docbook.xml >> /root/lines
-find
-作用：
-  按文件名查找文件。find命令非常灵活导致参数非常复杂，用时来查即可。
+#### diff
+
+**作用：**
+
+用于比较多个文本文件的差异
+
+**格式：**
+
+diff [参数] 文件"
+
+**参数：**
+
+- -b           忽略空格引起的差异。
+- -B           忽略空行引起的差异。
+- --brief或-q  仅报告是否存在差异。
+- -c           使用上下文输出格式。
+
+#### chown
+
+**示例：**
+
+```sh
+# 改变文件所有者
+chown workman.workgroup /data/pub/upload
+# 改变文件访问权限
+chmod -R 755 /usr/local/LumaQQ
+```
+
+### 文件检索
+
+#### grep
+
+**作用：**
+
+用于对文本进行搜索
+
+**格式：**
+
+`grep [选项] [文件]`
+
+**参数：**
+
+- -b  将可执行文件(binary)当作文本文件(text)来搜索
+- -c  仅显示找到的次数
+- -i  忽略大小写
+- -n  显示行号
+- -v  反向选择——仅列出没有“关键词”的行。
+
+**示例：**
+
+```sh
+# 1、搜索某个关键词：
+grep 关键词 文本文件
+# 2、搜索在/etc/passwd中"/sbin/nologin"出现的行，找出系统中不允许登陆的用户。
+grep /sbin/nologin /etc/passwd
+# 3、找出文件"/usr/share/gedit/plugins/snippets/docbook.xml"中所有包含entry的行并输出到/root/lines：
+grep entry /usr/share/gedit/plugins/snippets/docbook.xml >> /root/lines
+```
+
+#### find
+
+**作用：**
+
+按文件名查找文件。find命令非常灵活导致参数非常复杂，用时来查即可。
+
 对于常用搜索路径有几个小窍门："~"代表用户的Home目录，"."代表当前目录，"/"代表根目录。
-格式：
-  "find [查找路径] 寻找条件 操作"。
-参数：
-  -name                匹配名称
-  -perm                匹配权限（mode为完全匹配，-mode为包含即可）
-  -user                匹配所有者
-  -group               匹配所有组
-  -mtime -n +n	        匹配修改内容的时间（-n指n天以内，+n指n天以前）
-  -atime -n +n	        匹配访问文件的时间-n指n天以内，+n指n天以前
-  -ctime -n +n	        匹配修改权限的时间-n指n天以内，+n指n天以前
-  -nouser	            匹配无所有者的文件
-  -nogroup	            匹配无所有组的文件
-  -newer f1 !f2        匹配比文件f1新却比f2旧的文件
-  --type b/d/c/p/l/f	匹配文件类型（块设备、目录、字符设备、管道、链接文件、文件文件）
-  --size	            匹配文件的大小（+50k：超过50k，-50k：小于50k）
-  -prune	            忽略某个目录
-  --exec {} \;	        后面可接对搜索到结果进一步处理的命令（下面会有演示）
-示例：
-  1、搜索在/etc/中所有以host开头的文件：其中的"host*"表示所有以host开头的文件：
-     #find /etc -name "host*" -print
-  2、搜索整个系统中包含SUID的文件（因SUID的数字表示法是4，而减号表示只要包含即可）。
-     #find / -perm -4000 -print
-  3、找出用户linuxprobe的文件并复制到/root/findresults目录。
-     重点是 "-exec {} \;" 其中的{}代表find命令搜索出的文件，记住结尾必须是\;
-     #find / -user linuxprobe -exec cp -arf {} /root/findresults/ \;
-系统状态检测
+
+**格式：**
+
+`find [查找路径] 寻找条件 操作`
+
+**参数：**
+
+- -name                匹配名称
+- -perm                匹配权限（mode为完全匹配，-mode为包含即可）
+- -user                匹配所有者
+- -group               匹配所有组
+- -mtime -n +n         匹配修改内容的时间（-n指n天以内，+n指n天以前）
+- -atime -n +n         匹配访问文件的时间-n指n天以内，+n指n天以前
+- -ctime -n +n         匹配修改权限的时间-n指n天以内，+n指n天以前
+- -nouser              匹配无所有者的文件
+- -nogroup             匹配无所有组的文件
+- -newer f1 !f2        匹配比文件f1新却比f2旧的文件
+- --type b/d/c/p/l/f   匹配文件类型（块设备、目录、字符设备、管道、链接文件、文件文件）
+- --size               匹配文件的大小（+50k：超过50k，-50k：小于50k）
+- -prune               忽略某个目录
+- --exec {} \;         后面可接对搜索到结果进一步处理的命令（下面会有演示）
+
+**示例：**
+
+```sh
+# 1、搜索在/etc/中所有以host开头的文件：其中的"host*"表示所有以host开头的文件：
+find /etc -name "host*" -print
+# 2、搜索整个系统中包含SUID的文件（因SUID的数字表示法是4，而减号表示只要包含即可）。
+find / -perm -4000 -print
+# 3、找出用户linuxprobe的文件并复制到/root/findresults目录。重点是 "-exec {} \;" 其中的{}代表find命令搜索出的文件，记住结尾必须是\;
+find / -user linuxprobe -exec cp -arf {} /root/findresults/ \;
+```
+
+### 系统状态检测
+
 uname
 作用：
 用于查看系统内核版本等信息
