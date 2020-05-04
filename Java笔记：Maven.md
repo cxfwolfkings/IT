@@ -776,13 +776,191 @@ Maven是分阶段运行，因此，执行"package"阶段的时候，所有阶段
 </project>
 ```
 
+### 使用Maven清理项目
 
+在基于Maven的项目中，很多缓存输出在“target”文件夹中。如果想建立项目部署，必须确保清理所有缓存的输出，从面能够随时获得最新的部署。
 
+要清理项目缓存的输出，发出以下命令：
 
+```sh
+mvn clean
+```
 
+当 `mvn clean` 执行，在 "target" 文件夹中的一切都将被删除。
 
+要部署您的项目进行生产，它总是建议使用 `mvn clean package`, 以确保始终获得最新的部署。
 
+### 使用Maven运行单元测试
 
+```sh
+mvn test
+```
 
+这会在你的项目中运行整个单元测试
 
+运行单个测试：
+
+```sh
+mvn -Dtest=TestApp1 test
+mvn -Dtest=TestApp2 test
+```
+
+### 将项目安装到Maven本地资源库
+
+```sh
+# 打包项目，并自动部署到本地资源库，让其他开发人员使用它
+mvn install
+```
+
+当 "install" 在执行阶段，上述所有阶段 "validate", "compile", "test", "package", "integration-test", "verify" 阶段, 包括目前的 "install" 阶段将被有序执行。
+
+它总是建议 "clean" 和 "install" 在一起运行，让您能始终部署最新的项目到本地存储库
+
+```sh
+mvn clean install
+```
+
+### 生成基于Maven的项目文档站点
+
+```sh
+# 为您的项目信息生成文档站点，生成的网站在项目的"target/site"文件夹中
+mvn site
+```
+
+### 使用 `mvn site-deploy` 部署站点
+
+**1、[启用 WebDAV](https://www.yiibai.com/article/enable-webdav-in-apache-server-2-2-x-windows.html)**
+
+**2、配置在何处部署**
+
+```xml
+<distributionManagement>
+    <site>
+      <id>yiibaiserver</id>
+      <url>dav:http://127.0.0.1/sites/</url>
+    </site>
+</distributionManagement>
+```
+
+**注**： "dav" 前缀是 HTTP 协议之前添加的，这意味着通过 WebDAV 机制部署您的网站。或者，可以用 "scp" 取代它，如果您的服务器支持 "scp" 访问。
+
+告诉 Maven 来使用 "wagon-webdav-jackrabbit" 扩展部署。
+
+```xml
+<build>
+	<extensions>
+		<extension>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-webdav-jackrabbit</artifactId>
+			<version>1.0-beta-7</version>
+		</extension>
+	</extensions>
+</build>
+```
+
+**3、配置WebDAV身份验证**
+
+%MAVEN_HOME%/conf/settings.xml
+
+```xml
+<servers>
+	<server>
+		<id>yiibaiserver</id>
+		<username>admin</username>
+		<password>123456</password>
+	</server>
+</servers>
+```
+
+"settings.xml" 中的文件服务器ID将在的 "pom.xml" 文件中被网站引用
+
+**4、`mvn site:deploy` 命令执行**
+
+所有站点文件夹和文件，在项目文件夹- "target/site" 会被自动部署到服务器。
+
+### 部署基于Maven的war文件到Tomcat
+
+```sh
+mvn tomcat7:deploy
+mvn tomcat6:deploy
+```
+
+**1、Tomcat 认证**
+
+添加具有角色管理器GUI和管理脚本权限的用户
+
+%TOMCAT7_PATH%/conf/tomcat-users.xml
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+	<role rolename="manager-gui"/>
+	<role rolename="manager-script"/>
+	<user username="admin" password="password" roles="manager-gui,manager-script" />
+</tomcat-users>
+```
+
+**2、Maven 认证**
+
+添加上面 Maven 文件 设置的 Tomcat 用户，之后 Maven 使用此用户来登录 Tomcat 服务器！
+
+%MAVEN_PATH%/conf/settings.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<settings ...>
+	<servers>
+		<server>
+			<id>TomcatServer</id>
+			<username>admin</username>
+			<password>password</password>
+		</server>
+	</servers>
+</settings>
+```
+
+**3、Tomcat Maven 插件**
+
+Tomcat7：
+
+```xml
+<plugin>
+    <groupId>org.apache.tomcat.maven</groupId>
+	<artifactId>tomcat7-maven-plugin</artifactId>
+	<version>2.2</version>
+	<configuration>
+		<url>http://localhost:8080/manager/text</url>
+		<server>TomcatServer</server>
+		<path>/yiibaiWebApp</path>
+	</configuration>
+</plugin>
+```
+
+Tomcat6：
+
+```xml
+<plugin>
+	<groupId>org.apache.tomcat.maven</groupId>
+	<artifactId>tomcat6-maven-plugin</artifactId>
+	<version>2.2</version>
+	<configuration>
+		<url>http://localhost:8080/manager</url>
+		<server>TomcatServer</server>
+		<path>/yiibaiWebApp</path>
+	</configuration>
+</plugin>	
+```
+
+**4、发布到 Tomcat**
+
+```sh
+# tomcat7
+mvn tomcat7:deploy 
+mvn tomcat7:undeploy 
+mvn tomcat7:redeploy
+# tomcat6
+mvn tomcat6:deploy 
+mvn tomcat6:undeploy 
+mvn tomcat6:redeploy
+```
 
