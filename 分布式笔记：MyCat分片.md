@@ -9,8 +9,13 @@
    - [取模分片](#取模分片)
    - [范围求模算法](#范围求模算法)
    - [固定分片hash算法](#固定分片hash算法)
+   - [取模范围算法](#取模范围算法)
+   - [字符串hash求模范围算法](#字符串hash求模范围算法)
    - [按日期分片](#按日期分片)
+   - [枚举分片](#枚举分片)
    - [应用指定的算法](#应用指定的算法)
+   - [字符串hash解析算法](#字符串hash解析算法)
+   - [一致性hash算法](#一致性hash算法)
 3. [分库分表案例](#分库分表案例)
 
 ## 分片
@@ -381,6 +386,49 @@ sPartionDay：分区天数，即默认从开始日期算起，每隔 10 天一�
 </function>
 ```
 
+#### 日期范围hash算法
+
+其思想与范围求模一致，由于日期取模方法会出现数据热点问题，所以先根据日期分组，再根据时间 hash 使得短期内数据分布的更均匀。
+
+优点是可以避免扩容时的数据迁移，又可以一定程度上避免范围分片的热点问题，要求日期格式尽量精确些，不然达不到局部均匀的目的。配置如下：
+
+```xml
+<tableRule name="rangeDateHash">
+  <rule>
+    <columns>col_date</columns>
+    <algorithm>range-date-hash</algorithm>
+  </rule>
+</tableRule>
+<function name="range-date-hash" class="io.mycat.route.function.PartitionByRangeDateHash">
+  <!-- 指定开始日期 -->
+  <property name="sBeginDate">2014-01-01 00:00:00</property>
+  <!-- 代表多少天一组 -->
+  <property name="sPartionDay">3</property>
+  <!-- 指定日期格式 -->
+  <property name="dateFormat">yyyy-MM-dd HH:mm:ss</property>
+  <!-- 每组的分片数量 -->
+  <property name="groupPartionSize">6</property>
+</function>
+```
+
+#### 冷热数据分片
+
+根据日期查询日志数据 冷热数据分布，最近 n 个月的到实时交易库查询，超过 n 个月的按照 m 天分片。
+
+```xml
+<tableRule name="sharding-by-date">
+  <rule>
+    <columns>create_time</columns>
+    <algorithm>sharding-by-hotdate</algorithm>
+  </rule>
+</tableRule>
+<function name="sharding-by-hotdate" class="io.mycat.route.function.PartitionByHotDate">
+  <property name="dateFormat">yyyy-MM-dd</property>
+  <property name="sLastDay">10</property>
+  <property name="sPartionDay">30</property>
+</function>
+```
+
 ### 枚举分片
 
 ```xml
@@ -495,50 +543,7 @@ hashSlice：0 means str.length(), -1 means str.length()-1
 </function>
 ```
 
-#### 日期范围hash算法
-
-其思想与范围求模一致，由于日期取模方法会出现数据热点问题，所以先根据日期分组，再根据时间 hash 使得短期内数据分布的更均匀。
-
-优点是可以避免扩容时的数据迁移，又可以一定程度上避免范围分片的热点问题，要求日期格式尽量精确些，不然达不到局部均匀的目的。配置如下：
-
-```xml
-<tableRule name="rangeDateHash">
-  <rule>
-    <columns>col_date</columns>
-    <algorithm>range-date-hash</algorithm>
-  </rule>
-</tableRule>
-<function name="range-date-hash" class="io.mycat.route.function.PartitionByRangeDateHash">
-  <!-- 指定开始日期 -->
-  <property name="sBeginDate">2014-01-01 00:00:00</property>
-  <!-- 代表多少天一组 -->
-  <property name="sPartionDay">3</property>
-  <!-- 指定日期格式 -->
-  <property name="dateFormat">yyyy-MM-dd HH:mm:ss</property>
-  <!-- 每组的分片数量 -->
-  <property name="groupPartionSize">6</property>
-</function>
-```
-
-#### 冷热数据分片
-
-根据日期查询日志数据 冷热数据分布，最近 n 个月的到实时交易库查询，超过 n 个月的按照 m 天分片。
-
-```xml
-<tableRule name="sharding-by-date">
-  <rule>
-    <columns>create_time</columns>
-    <algorithm>sharding-by-hotdate</algorithm>
-  </rule>
-</tableRule>
-<function name="sharding-by-hotdate" class="io.mycat.route.function.PartitionByHotDate">
-  <property name="dateFormat">yyyy-MM-dd</property>
-  <property name="sLastDay">10</property>
-  <property name="sPartionDay">30</property>
-</function>
-```
-
-#### 有状态分片算法
+### 有状态分片算法
 
 有状态分片算法与之前的分片算法不同,它是为数据自动迁移而设计的。直至2018年7月24日为止，现支持有状态算法的分片策略只有 crc32slot 欢迎大家提供更多有状态分片算法。
 
@@ -649,7 +654,7 @@ CREATE TABLE `travelrecord` (
 
 ## 分库分表案例
 
-1、字符串hash求模范围算法示例
+**1、字符串hash求模范围算法示例**
 
 schema.xml：
 
@@ -726,4 +731,35 @@ sharding-by-question-behavior.txt：
 86-170=1
 171-255=2
 ```
+
+**2、固定分片hash算法示例**
+
+schemal.xml
+
+```xml
+<table name="BIZ_DOCUMENT_USER" primaryKey="ID" autoIncrement="true" rule="partition-by-long" dataNode="dn1,dn2,dn3" />
+```
+
+rule.xml
+
+```xml
+<tableRule name="partition-by-long">
+  <rule>
+    <!-- 将要分片的表字段 -->
+    <columns>ID</columns>
+    <!-- 分片函数 -->
+    <algorithm>partition-by-long</algorithm>
+  </rule>
+</tableRule>
+<function name="partition-by-long" class="io.mycat.route.function.PartitionByLong">
+  <!-- partitionCount 分片个数列表 -->
+  <property name="partitionCount">2,1</property>
+  <!-- partitionLength 分片范围列表 -->
+  <property name="partitionLength">341,342</property>
+</function>
+```
+
+
+
+
 

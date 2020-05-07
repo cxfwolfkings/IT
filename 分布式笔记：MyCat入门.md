@@ -251,7 +251,7 @@ server.xml：
 插入一条Sequence
 
 ```sql
-INSERT INTO MYCAT_SEQUENCE(name,current_value,increment) VALUES ('GLOBAL',0,1);
+INSERT INTO MYCAT_SEQUENCE(`name`,current_value,increment) VALUES ('bas_account',0,1);
 ```
 
 **指定sequence相关配置在哪个节点上**：
@@ -259,7 +259,7 @@ INSERT INTO MYCAT_SEQUENCE(name,current_value,increment) VALUES ('GLOBAL',0,1);
 sequence_db_conf.properties
 
 ```properties
-GLOBAL=dn1
+bas_account=dn1
 ```
 
 注意：MYCAT_SEQUENCE 表和以上的 3 个 function，需要放在同一个节点上。
