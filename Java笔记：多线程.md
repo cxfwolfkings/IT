@@ -3,6 +3,9 @@
 1. 为什么需要并行？
 2. 同步、异步、并发、并行概念 
 3. 有关并行的2个重要定律
+4. 从头开始——并行基础
+5. 内存模型和线程安全
+6. 无锁
 
 ## 为什么需要并行?
 
@@ -91,6 +94,190 @@ while (!atomicVar.compareAndSet(localVar, localVar+1)) {
 ### Gustafson定律（古斯塔夫森）
 
 ![x](http://hyw6485860001.my3w.com/public/images/Gustafson.jpg)
+
+## 从头开始——并行基础
+
+### 什么是线程
+
+线程是进程内的执行单元
+
+### 线程内的基本操作
+
+
+
+**新建线程**
+
+```java
+Thread t1 = new Thread();
+// 线程不会马上开启
+t1.start();
+// Thread.run()的实现target是Runnable接口
+t1.run();
+
+Thread t2 = new Thread() {
+    @Override
+    public void run() {
+        System.out.println("Hello, I am t1");
+    }
+};
+```
+
+**终止线程**
+
+```java
+Thread.stop(); // 不推荐使用，会释放所有monitor
+```
+
+**中断线程**
+
+```java
+public void Thread.interrupt();  // 中断线程
+public boolean Thread.isInterrupted(); // 判断是否被中断
+public static boolean Thread.interrupted(); // 判断当前是否被中断，并清除当前中断状态
+```
+
+**挂起和恢复**
+
+- `suspend()` 不会释放锁
+
+- 如果加锁发生在 `resume()` 之前，则死锁发生
+
+**等待线程结束和谦让**
+
+```java
+public final void join() throws InterrupedException;
+public final synchronized void join(long millis) throws InterrupedException;
+```
+
+join的本质
+
+```java
+while (isAlive()) {
+    wait(0);
+}
+// 线程执行完毕后，系统会调用notifyAll()
+```
+
+不要在 Thread 实例上使用 `wait()` 和 `notify()` 方法
+
+
+
+### 守护线程
+
+- 在后台默默完成一些系统性服务，比如垃圾回收、JIT
+- 当一个java应用内只有守护线程时，java虚拟机会自然退出
+
+```java
+Thread t = new DaemonT();
+t.setDaemon(true);
+t.start();
+```
+
+
+
+### 线程优先级
+
+```java
+public final static int MIN_PRIORITY = 1;
+public final static int NORM_PRIORITY = 5;
+public final static int MAX_PRIORITY = 10;
+
+Thread high = new HighPriority();
+LowPriority low = new LowPriority();
+high.setPriority(Thread.MAX_PRIORITY);
+low.setPriority(Thread.MIN_PRIORITY);
+low.start();
+high.start();
+```
+
+高优先级的线程更容易在竞争中获胜
+
+### 基本的线程同步操作
+
+- synchronized
+- `Object.wait()` 和 `Object.notify()`
+
+
+
+## 内存模型和线程安全
+
+### 原子性
+
+原子性是指一个操作是不可中断的。即使是在多个线程一起执行的时候，一个操作一旦开始，就不会被其它线程干扰。
+
+i++是原子操作吗？
+
+### 有序性
+
+在并发时，程序的执行可能就会出现乱序！
+
+一条指令的执行是可以分为很多步骤的：
+
+- 取指 IF
+- 译码和取寄存器操作数 ID
+- 执行或者有效地址计算 EX
+- 存储器访问 MEM
+- 写回 WB
+
+指令重排可以使流水线更加顺畅
+
+
+
+### 可见性
+
+可见性是指当一个线程修改了某一个共享变量的值，其他线程是否能够立即知道这个修改
+
+- 编译器优化
+- 硬件优化（如写吸收，批操作）
+
+Java虚拟机层面的可见性：http://hushi55.github.io/2015/01/05/volatile-assembly
+
+
+
+### Happen-Before
+
+- 程序顺序原则：一个线程内保证语义的串行性
+- volatile规则：volatile变量的写，先发生于读，这保证了volatile变量的可见性
+- 锁规则：解锁（unlock）必然发生在随后的加锁（lock）前
+- 传递性：A先于B，B先于C，那么A必然先于C
+- 线程的start()方法先于它的每一个动作
+- 线程的所有操作先于线程的终结（Thread.join()）
+- 线程的中断（interrupt()）先于被中断线程的代码
+- 对象的构造函数执行结束先于finalize()方法
+
+
+
+### 线程安全的概念
+
+指某个函数、函数库在多线程环境中被调用时，能够正确地处理各个线程的局部变量，使程序功能正确完成。
+
+## 无锁
+
+
+
+### 无锁类的原理
+
+
+
+### 无锁类的使用
+
+
+
+### 无锁算法
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

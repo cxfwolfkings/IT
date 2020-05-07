@@ -421,3 +421,255 @@ public class CalculateExpression {
 JAVA中，栈 `Stack` 是 **Vector** 的一个子类，内部使用数组保存数据，可以自动按需增长（不够时翻倍，最大`Integer.MAX_VALUE`），线程安全。
 
 OK~，到此我们对栈的分析就结束了，本来还想聊聊函数调用的问题，但感觉这个问题放在递归算法更恰当。
+
+## Set
+
+![x](http://viyitech.cn/public/images/java_set.png)
+
+Set和List一样，也继承于Collection，是集合的一种。和List不同的是，Set内部实现是基于Map的，所以Set取值时不保证数据和存入的时候顺序一致，并且不允许空值，不允许重复值。
+
+Set的特点，主要由其内部的Map决定的，Set就是Map的一个马甲
+
+HashSet主要由HashMap实现，TreeSet和HashMap的处理方式相似，区别的地方是，TreeSet内部的是一颗红黑树。
+
+```txt
+---| Itreable          接口，实现该接口可以使用增强for循环
+---| Collection        描述所有集合共性的接口
+    ---| List接口       可以有重复元素的集合
+        ---| ArrayList   
+        ---| LinkedList
+    ---| Set接口        不可以有重复元素的集合
+        ---| HashSet    线程不安全，存取速度快。底层是以哈希表实现的。
+        ---| TreeSet    红-黑树的数据结构，默认对元素进行自然排序(String)。如果在比较的时候两个对象返回值为0，那么元素重复。
+```
+
+### 对象的相等性
+
+引用到堆上同一个对象的两个引用是相等的。如果对两个引用调用hashCode方法，会得到相同的结果，如果对象所属的类没有覆盖Object的hashCode方法的话，hashCode会返回每个对象特有的序号（java是依据对象的内存地址计算出的此序号），所以两个不同的对象的hashCode值是不可能相等的。
+
+如果想要让两个不同的Person对象视为相等的，就必须覆盖Object继承下来的hashCode方法和equals方法，因为Object hashCode方法返回的是该对象的内存地址，所以必须重写hashCode方法，才能保证两个不同的对象具有相同的hashCode，同时也需要两个不同对象比较equals方法会返回true。该集合中没有特有的方法，直接继承自Collection。
+
+### HashSet
+
+哈希表边存放的是哈希值。HashSet 存储元素的顺序并不是按照存入时的顺序（和 List 显然不同），是按照哈希值来存的。所以取数据也是按照哈希值取的。
+
+HashSet 不存入重复元素的规则：使用 hashcode 和 equals
+
+由于 Set 集合是不能存入重复元素的集合。那么 HashSet 也是具备这一特性的。HashSet 如何检查重复？
+
+HashSet 会通过元素的 hashcode() 和 equals 方法进行判断元素是否重复。
+
+当你试图把对象加入 HashSet 时，HashSet 会使用对象的 hashCode 来判断对象加入的位置。同时也会与其他已经加入的对象的 hashCode 进行比较，如果没有相等的hashCode，HashSet 就会假设对象没有重复出现。
+
+简单一句话，如果对象的 hashCode 值是不同的，那么 HashSet 会认为对象是不可能相等的。因此我们自定义类的时候需要重写 hashCode，来确保相等对象具有相同的 hashCode 值。
+
+如果元素（对象）的 hashCode 值相同，是不是就无法存入 HashSet 中了？当然不是，会继续使用 equals 进行比较。如果 equals 为 true 那么 HashSet 认为新加入的对象重复了，所以加入失败。如果 equals 为 false，那么HashSet 认为新加入的对象没有重复，新元素可以存入。
+
+总结：
+
+元素的哈希值是通过元素的 hashcode 方法来获取的，HashSet 首先判断两个元素的哈希值，如果哈希值一样，接着会比较 equals 方法。如果 equals 结果为 true，HashSet 就视为同一个元素。如果 equals 为 false 就不是同一个元素。
+
+哈希值相同，equals 为 false 的元素是怎么存储呢，就是在同样的哈希值下顺延（可以认为哈希值相同的元素放在一个哈希桶中）。也就是哈希一样的存一列。
+
+![x](http://viyitech.cn/public/images/java_hash.png)
+
+图1：hashCode值不相同的情况；图2：hashCode值相同，但equals不相同的情况。
+
+HashSet：通过 hashCode 值来确定元素在内存中的位置。一个 hashCode 位置上可以存放多个元素。
+
+HashSet 到底是如何判断两个元素重复？
+
+通过 hashCode 方法和 equals 方法来保证元素的唯一性，add() 返回的是 boolean 类型。
+
+HashSet 和 ArrayList 集合都有判断元素是否相同的方法，`boolean contains(Object o)`
+
+HashSet 使用 `hashCode` 和 `equals` 方法，ArrayList 使用了 `equals` 方法
+
+案例：
+
+- 使用 HashSet 存储字符串，并尝试添加重复字符串；回顾 String 类的 equals()、hashCode() 两个方法。
+
+问题：
+
+- 现在有一批数据，要求不能重复存储元素，而且要排序。ArrayList、LinkedList不能去除重复数据。HashSet可以去除重复，但是是无序。所以这时候就要使用 TreeSet 了
+
+### TreeSet
+
+案例：使用TreeSet集合存储字符串元素，并遍历
+
+红黑树是一种特定类型的二叉树
+
+![x](http://viyitech.cn/public/images/java_treeset.jpg)
+
+红黑树算法的规则: **左小右大**。
+
+既然 TreeSet 可以自然排序，那么 TreeSet 必定是有排序规则的。
+
+1、让存入的元素自定义比较规则。
+2、给 TreeSet 指定排序规则。
+
+方式一：元素自身具备比较性
+
+元素自身具备比较性，需要元素实现 `Comparable` 接口，重写 `compareTo` 方法，也就是让元素自身具备比较性，这种方式叫做元素的自然排序也叫做默认排序。
+
+示例：
+
+方式二：容器具备比较性
+
+当元素自身不具备比较性，或者自身具备的比较性不是所需要的。那么此时可以让容器自身具备。需要定义一个类实现接口 `Comparator`，重写 `compare` 方法，并将该接口的子类实例对象作为参数传递给 TreeMap 集合的构造方法。
+
+示例：
+
+注意：当 `Comparable` 比较方式和 `Comparator` 比较方式同时存在时，以 `Comparator` 的比较方式为主；在重写 `compareTo` 或者 `compare` 方法时，必须要明确：比较的主要条件相等时还要比较次要条件。（假设姓名和年龄一致的人为相同的人，如果想要对人按照年龄的大小来排序，如果年龄相同的人，需要如何处理？不能直接 `return 0` ，因为可能姓名不同（年龄相同姓名不同的人是不同的人）。此时就需要进行次要条件判断（需要判断姓名），只有姓名和年龄同时相等的才可以返回0），通过 `return 0` 来判断唯一性。
+
+问题：为什么使用 TreeSet 存入字符串，字符串默认输出是按升序排列的？因为字符串实现了一个接口，叫做`Comparable`接口。字符串重写了该接口的 `compareTo` 方法，所以 String 对象具备了比较性，那么同样道理，我的自定义元素（例如Person类，Book类）想要存入 TreeSet 集合，就需要实现该接口，也就是要让自定义对象具备比较性。
+
+存入 TreeSet 集合中的元素要具备比较性，比较性要实现 `Comparable` 接口，重写该接口的 `compareTo` 方法
+
+TreeSet 属于 Set 集合，该集合的元素是不能重复的，TreeSet 如何保证元素的唯一性？通过 `compareTo` 或者 `compare` 方法来保证元素的唯一性。
+
+添加的元素必须要实现 `Comparable` 接口。当 `compareTo()` 函数返回值为0时，说明两个对象相等，此时该对象不会添加进来。
+
+比较器接口：
+
+```txt
+----| Comparable
+       compareTo(Object o)              元素自身具备比较性
+----| Comparator
+       compare(Object o1, Object o2)    给容器传入比较器
+```
+
+### LinkedHashSet
+
+会保存插入的顺序。
+
+### 总结
+
+- 看到 array，就要想到角标。
+- 看到 link，就要想到first, last。
+- 看到 hash，就要想到hashCode, equals。
+- 看到 tree，就要想到两个接口：Comparable, Comparator。
+
+## [Map](https://baike.xsoftlab.net/view/250.html)
+
+![x](http://viyitech.cn/public/images/java_map.png)
+
+Java 自带了各种 Map 类，这些 Map 类可归为三种类型：
+
+- 通用Map：用于在应用程序中管理映射，通常在 java.util 程序包中实现：
+
+  HashMap、Hashtable、Properties、LinkedHashMap、IdentityHashMap、TreeMap、WeakHashMap、ConcurrentHashMap
+
+- 专用Map：通常我们不必亲自创建此类Map，而是通过某些其他类对其进行访问
+
+  java.util.jar.Attributes、javax.print.attribute.standard.PrinterStateReasons、java.security.Provider、java.awt.RenderingHints、javax.swing.UIDefaults
+
+- 自行实现Map：一个用于帮助我们实现自己的Map类的抽象类AbstractMap
+
+**类型区别：**
+
+- HashMap：最常用的Map，它根据键的 HashCode 值存储数据，根据键可以直接获取它的值，具有很快的访问速度。HashMap 最多只允许一条记录的键为Null（多条会覆盖）；允许多条记录的值为 Null。非同步的。
+
+- TreeMap：能够把它保存的记录根据键(key)排序，默认是按升序排序，也可以指定排序的比较器，当用Iterator 遍历 TreeMap 时，得到的记录是排过序的。TreeMap 不允许 key 的值为 null。非同步的。
+
+  分析 TreeMap 之前，首先先来了解下 NavigableMap 和 SortedMap 这个两个接口 
+
+  SortedMap 从名字就可以看出，在 Map 的基础上增加了排序的功能。它要求 key 与 key 之间是可以相互比较的，从而达到排序的目的。怎么样才能比较呢？在之前的 Set 中提到了 comparator 实现了内部排序，这儿，就通过 comparator 来实现排序。
+
+  而 NavigableMap 是继承于 SortedMap，目前只有 TreeMap 和 ConcurrentNavigableMap 两种实现方式。它本质上添加了搜索选项到接口，主要为红黑树服务。
+
+  TreeMap 其实就是一颗红黑树。
+
+- Hashtable：与 HashMap 类似，不同的是：key 和 value 的值均不允许为 null；它支持线程的同步，即任一时刻只有一个线程能写 Hashtable，因此也导致了 Hashtale 在写入时会比较慢。
+- LinkedHashMap：从名字就可以看出 LinkedHashMap 继承于 HashMap，它相比于 HashMap 内部多维护了一个双向列表，目的就是保证输入顺序和输出顺序一致，带来的劣势也很明显，性能的消耗大大提升。在遍历的时候会比 HashMap 慢。key 和 value 均允许为空，非同步的。
+
+参考：https://blog.csdn.net/wz249863091/article/details/77483948
+
+**四种常用Map插入与读取性能比较**
+
+测试代码，请看示例。
+
+### 遍历
+
+#### 增强for循环遍历
+
+**使用keySet()遍历**
+
+```java
+for (String key : map.keySet()) {
+    System.out.println(key + " ：" + map.get(key));
+}
+```
+
+**使用entrySet()遍历**
+
+```java
+for (Map.Entry<String, String> entry : map.entrySet()) {
+    System.out.println(entry.getKey() + " ：" + entry.getValue());
+}
+```
+
+#### 迭代器遍历
+
+**使用keySet()遍历**
+
+```java
+Iterator<String> iterator = map.keySet().iterator();
+while (iterator.hasNext()) {
+    String key = iterator.next();
+    System.out.println(key + "　：" + map.get(key));
+}
+```
+
+**使用entrySet()遍历**
+
+```java
+Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
+while (iterator.hasNext()) {
+    Map.Entry<String, String> entry = iterator.next();
+    		System.out.println(entry.getKey() + "　：" + entry.getValue());
+}
+```
+
+#### 性能比较
+
+测试代码，请看示例。
+
+- 增强 for 循环使用方便，但性能较差，不适合处理超大量级的数据。
+- 迭代器的遍历速度要比增强 for 循环快很多，是增强 for 循环的2倍左右。
+  使用 entrySet 遍历的速度要比 keySet 快很多，是 keySet 的1.5倍左右。
+
+### 排序
+
+**HashMap、Hashtable、LinkedHashMap 排序**：
+
+通过 ArrayList 构造函数把 map.entrySet() 转换成 list，自定义比较器实现比较排序。测试代码
+
+**TreeMap 排序**：
+
+TreeMap 默认按 key 进行升序排序，如果想改变默认的顺序，可以使用比较器按 value 排序（通用），请看示例代码！
+
+### 常用API
+
+| **方法**                       | **描述**                                                     |
+| ------------------------------ | ------------------------------------------------------------ |
+| clear()                        | 从 Map 中删除所有映射                                        |
+| remove(Object  key)            | 从 Map 中删除键和关联的值                                    |
+| put(Object  key, Object value) | 将指定值与指定键相关联                                       |
+| putAll(Map  t)                 | 将指定 Map 中的所有映射复制到此  map                         |
+| entrySet()                     | 返回 Map 中所包含映射的  Set 视图。Set  中的每个元素都是一个  Map.Entry 对象，可以使用  getKey() 和  getValue() 方法（还有一个  setValue() 方法）访问后者的键元素和值元素 |
+| keySet()                       | 返回 Map 中所包含键的  Set 视图。删除  Set 中的元素还将删除  Map 中相应的映射（键和值） |
+| values()                       | 返回 map 中所包含值的  Collection 视图。删除  Collection 中的元素还将删除  Map 中相应的映射（键和值） |
+| get(Object  key)               | 返回与指定键关联的值                                         |
+| containsKey(Object  key)       | 如果 Map 包含指定键的映射，则返回  true                      |
+| containsValue(Object  value)   | 如果此 Map 将一个或多个键映射到指定值，则返回  true          |
+| isEmpty()                      | 如果 Map 不包含键-值映射，则返回  true                       |
+| size()                         | 返回 Map 中的键-值映射的数目                                 |
+
+解决哈希冲突的常见4种方法：
+
+1. 开放地址，简单说就是如果当前当前坑被占了，就继续找下个坑 
+2. 拉链法，也就是 JDK 中选择实现 HashMap 的方法，数组的每个项又是一个链表，如果哈希后发现当前地址有数据了，就挂在这个链表的最后 
+3. 再哈希 选择多种哈希方法，一个不行再换下一个，直到有坑为止 
+4. 建立公共溢出，就把所有溢出的数据都放在溢出表里 
+
