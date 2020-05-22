@@ -56,6 +56,9 @@ git config --global user.email "colin.chen@softtek.com"
 ## 分支相关命令
 
 ```shell
+# 拉取服务器新的分支
+git pull origin <branch>:<branch>
+
 # 新建分支
 git branch feature1
 
