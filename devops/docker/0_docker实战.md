@@ -61,7 +61,11 @@ docker push registry.cn-shanghai.aliyuncs.com/daniel-hub/nginx-docker:[镜像版
 
 ```sh
 docker pull portainer/portainer
-docker run -d -p 9000:9000 portainer/portainer
+docker run -d -p 9000:9000 \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --name prtainer-dev1 \
+  portainer/portainer
 ```
 
 ### centos7

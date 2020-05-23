@@ -102,7 +102,7 @@ docker版本：最新版本
 
 ```sh
 # 查看当前内核版本
-uname –r
+uname -r
 # 更改网卡配置
 vi /etc/sysconfig/network-scripts/ifcfg-enp0s3  
 ---
