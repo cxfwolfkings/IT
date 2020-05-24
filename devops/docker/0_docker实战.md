@@ -413,7 +413,6 @@ docker run -d -p 6181:6181 -v /data/sftp/mysftp/upload/JwtServer/:/app --name jw
 FROM nginx:alpine
 WORKDIR /app
 # 从客户机复制到容器中
-#COPY . .
 COPY nginx.conf /etc/nginx/nginx.conf
 ```
 
