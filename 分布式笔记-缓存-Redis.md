@@ -1,48 +1,32 @@
 # 目录
 
-1. 分布式缓存简介
-2. Redis简介
-3. [Redis使用](#Redis使用)
+1. [简介](#简介)
    - [数据类型](#数据类型)
    - [数据持久化](#数据持久化)
+2. [实战](#实战)
+   - [安装](#安装)
    - [开源客户端](#开源客户端)
    - [内存管理](#内存管理)
    - [淘汰策略](#淘汰策略)
+   - [主从复制](#主从复制)
    - [集群部署](#集群部署)
-4. 系统解析
-5. 生态链
+     - [Redis Cluster](#Redis&nbsp;Cluster)
+     - [ShardedJedis](#ShardedJedis)
+     - [Codis](#Codis)
+3. 系统解析
+4. [生态链](#生态链)
 
-## 分布式缓存简介
+## 简介
 
-缓存是一种用于提高系统响应速度、改善系统运行性能的技术。对于一个服务，其性能瓶颈往往都在 DB，传统关系型存储尤甚。从磁盘中读取数据，IO 瓶颈是非常明显的，而缓存通常是基于内存的，比 DB 从磁盘读数据快两个数量级。
-
-分布式缓存主要包含以上几大特性：
-
-1. **高性能**：当传统数据库面临大规模数据访问时，磁盘 I/O 往往成为性能瓶颈，从而导致过高的响应延迟。分布式缓存将高速内存作为数据对象的存储介质，数据以 key/value 形式存储，理想情况下可以获得 DRAM 级的读写性能；
-
-2. **动态扩展性**：支持弹性扩展，通过动态增加或减少节点应对变化的数据访问负载，提供可预测的性能与扩展性，同时，最大限度地提高资源利用率；
-
-3. **高可用性**：包含数据可用性与服务可用性两方面。基于冗余机制实现高可用性，无单点失效问题，支持故障的自动发现，透明地实施故障切换，不会因服务器故障而导致缓存服务中断或数据丢失，动态扩展时自动均衡数据分区，同时保障缓存服务持续可用；
-
-4. **易用性**：提供单一的数据与管理视图；API 接口简单且与拓扑结构无关；动态扩展或失效恢复时无需人工配置；自动选取备份节点；多数缓存系统提供了图形化的管理控制台，便于统一维护。
-
-典型应用场景主要有：
-
-1. 页面缓存：用来缓存 Web 页面的内容片段，包括 HTML、CSS 和图片等，多应用于社交网站等；
-
-2. 应用对象缓存：缓存系统作为 ORM 框架的二级缓存对外提供服务，目的是减轻数据库的负载压力，加速应用访问；
-
-3. 状态缓存：缓存包括 Session 会话状态及应用横向扩展时的状态数据等，这类数据一般是难以恢复的，对可用性要求较高，多应用于高可用集群；
-
-4. 并行处理：通常涉及大量中间计算结果需要共享；
-
-5. 事件处理：分布式缓存提供了针对事件流的连续查询处理技术,满足实时性需求。
-
-分布式缓存一般被定义为一个数据集合，它将数据分布（或分区）于任意数目的集群节点上。集群中的一个具体节点负责缓存中的一部分数据，整体对外提供统一的访问接口。分布式缓存一般基于 **冗余备份机制** 实现数据高可用，又被称为内存数据网格(IMDG, In-Memory Data Grid)。在云平台飞速发展的今天，作为提升应用性能的重要手段，分布式缓存技术在工业界得到了越来越广泛的关注和研发投入 。
-
-## Redis简介
+官方网站：[https://redis.io/](https://redis.io/)
 
 Redis: Remote Dictionary Server，属于 NoSQL 数据库
+
+Redis是什么：
+
+Redis is an open source, BSD licensed, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
+
+Redis是开源，BSD许可，高级的key-value存储系统。可以用来存储字符串、哈希结构、链表、集合。因此，常用来提供数据结构服务。
 
 作者：来自意大利西西里岛的 Salvatore Sanfilippo，Github地址：[http://github.com/antirez](http://github.com/antirez)。
 
@@ -74,14 +58,6 @@ Redis 特点
 - Redis 主进程是**单线程** 工作，因此，Redis 的所有操作都是原子性的。意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过 `MULTI` 和 `EXEC` 指令包起来。
 - 性能极高：Redis能读的速度是110000次/s，写的速度是81000次/s，此外，Key 和 Value 的大小限制均为 512M，这阈值相当可观。
 - 丰富的特性：Redis 还支持 publish/subscribe，通知，key 过期等等特性。
-
-## Redis使用
-
-**开启远程访问**
-
-修改redis.conf，注释掉 `bind 127.0.0.1` 可以使所有的 ip 访问 redis；若是想指定多个 ip 访问，但并不是全部的 ip 访问，可以 bind。
-
-在 redis3.2 之后，redis 增加了 protected-mode，在这个模式下，即使注释掉了 `bind 127.0.0.1`，再访问 redis 的时候还是报错，修改办法：`protected-mode no`
 
 ### 数据类型
 
@@ -263,7 +239,7 @@ Redis 默认把数据保存在内存中，可对数据的更新异步保存到�
 恢复速度|快|慢
 数据安全性|有可能丢失数据|根据策略而定
 
-**RDB**
+**RDB：**
 
 将某个时间点的所有数据都以二进制形式存放到硬盘上(MySQL Dump)。
 
@@ -288,7 +264,7 @@ Redis 默认把数据保存在内存中，可对数据的更新异步保存到�
 
 其他机制：全量复制、debug reload、shutdown。
 
-**AOF**
+**AOF：**
 
 将写命令添加到 AOF(Append Only File) 文件的末尾(MySQL Binlog、HBase HLog)。
 
@@ -309,8 +285,8 @@ AOF重写：
 - 对多条原生命令进行优化，重写成简化的命令以减少磁盘占用量、提高故障恢复效率。
 - 当 AOF 文件过大或增长速度过快时自动触发。
 
-![x](./Resource/8.png)
-![x](./Resource/9.png)
+![x](http://121.196.182.26:6100/public/images/redis-aof1.png)
+![x](http://121.196.182.26:6100/public/images/redis-aof2.png)
 
 基本配置：
 
@@ -326,6 +302,90 @@ AOF重写：
 
 - aof_current_size > auto-aof-rewrite-min-size
 - aof_current_size - aof_base_size/aof_base_size > auto-aof-rewrite-percentage
+
+## 实战
+
+### 安装
+
+官方站点：redis.io 下载最新版或者最新stable版
+
+windows:
+
+```sh
+# 启动临时服务：
+redis-server.exe redis.windows.conf
+# 客户端调用：
+redis-cli.exe -h 127.0.0.1 -p 6379
+# 安装服务：
+redis-server.exe --service-install redis.windows.conf --service-name redisserver1 --loglevel verbose
+# 启动服务：
+redis-server.exe  --service-start --service-name redisserver1
+# 停止服务：
+redis-server.exe  --service-stop --service-name redisserver1
+# 卸载服务：
+redis-server.exe  --service-uninstall --service-name redisserver1
+```
+
+Linux:
+
+1. 下载[安装包](https://redis.io/download)
+
+   redis是C语言开发，安装redis需要先将官网下载的源码进行编译，编译依赖gcc环境。如果没有gcc环境，需要安装gcc：`yum install gcc-c++`
+
+2. 编译安装
+
+   ```sh
+   # 解压安装包
+   tar -zxvf redis-6.0.3.tar.gz
+
+   # 进入到/usr/local/redis-6.0.3/ 文件目录下
+   cd /usr/local/java/redis-6.0.3/
+
+   # 不用configure，对解压后的文件进行编译，如果是32位机器 make 32bit
+   make
+   # 注：易碰到的问题，时间错误。原因：源码是官方configure过的，但官方configure时，生成的文件有时间戳信息，Make只能发生在configure之后，如果你的虚拟机的时间不对，比如说是2012年，则会报错！解决：date -s 'yyyy-mm-dd hh:mm:ss' 重写时间，再 clock -w 写入cmos
+   # 可选步骤: make test 测试编译情况（可能出现: need tcl > 8.4 这种情况，yum install tcl）
+
+   # 进入到 redis-6.0.3/src 文件目录下
+   cd ./src
+
+   # 进行redis安装，安装到指定的目录，比如 /usr/local/redis
+   # make PREFIX=/usr/local/redis install
+   # 注：PREFIX要大写
+   make install
+   # make install之后，得到如下几个文件
+   # redis-benchmark   性能测试工具
+   # redis-check-aof   AOF日志文件检测工（比如断电造成日志损坏，可以检测并修复）
+   # redis-check-dump  RBD快照文件检测工具，效果类上
+   # redis-cli         客户端
+   # redis-server      服务端
+
+   # 复制配置文件
+   # cp /path/redis.conf /usr/local/redis
+   # 将mkreleasehdr.sh、redis-benchmark、redis-check-aof、redis-cli、redis-server 移动到 /usr/local/redis-6.0.3/bin/ 目录下
+   mv mkreleasehdr.sh redis-benchmark redis-check-aof redis-cli redis-server /usr/local/redis-6.0.3/bin/
+
+   # 启动与连接
+   /path/to/redis/bin/redis-server ./path/to/conf-file
+   # 例：# ./bin/redis-server ./redis.conf
+
+   # 连接：在另外的命令行界面用redis-cli
+   /path/to/redis/bin/redis-cli [-h localhost -p 6379 ]
+   ```
+
+**以后台进程的形式运行：**
+
+编辑conf配置文件，修改如下内容：`daemonize yes`
+
+**开启远程访问：**
+
+修改redis.conf，注释掉 `bind 127.0.0.1` 可以使所有的 ip 访问 redis；若是想指定多个 ip 访问，但并不是全部的 ip 访问，可以 bind。
+
+在 redis3.2 之后，redis 增加了 protected-mode，在这个模式下，即使注释掉了 `bind 127.0.0.1`，再访问 redis 的时候还是报错，修改办法：`protected-mode no`
+
+**设置密码：**
+
+把 `#requirepass foobared` 的 # 号去掉，并把 foobared 改为自己的密码即可
 
 ### 开源客户端
 
@@ -366,6 +426,182 @@ Redis 的过期清理策略：
 Redis 4.0 引入了 `volatile-lfu` 和 `allkeys-lfu` 淘汰策略，LFU 策略通过统计访问频率，将访问频率最少的键值对淘汰。
 
 ### 集群部署
+
+随着大型网站数据量和对系统可用性要求的提升，单机版的Redis越来越难以满足需要，因此我们需要使用Redis集群来提供服务。
+
+目前主流的Redis集群解决方案有三类，它们都是通过将key分散到不同的redis实例上来提高整体能力，这种方法称为分片(sharding)。
+
+1. 服务端分片：客户端与集群中任意的节点通信，服务端计算key在哪一个节点上，若不再当前节点上则通知客户端应访问的节点。 典型代表为官方推出的Redis Cluster
+2. 客户端分片：客户端计算key应在集群中的哪一个节点上，并与该节点通信。典型代表为ShardedJedis
+3. 代理分片：客户端与集群中的代理(proxy)通信，代理与节点通信进行操作。典型代表为Codis
+
+单机版的Redis中单条指令的执行总是原子性的，在集群中则难以保证这一性质，某些指令可能无法在集群中使用或者受到限制。
+
+若需要使用这些指令或需要它们保持原子性，可以采用单机版Redis和集群搭配使用的方法。将主要业务部署在集群上，将需要较多支持的服务部署在单机版Redis上。
+
+三种集群实现方式各有优缺点，下面对其架构和特性进行对比，帮助读者选择合适的解决方案。
+
+基本概念：
+
+**哈希槽**
+
+哈希槽(hash slot)是来自Redis Cluster的概念, 但在各种集群方案都有使用。
+
+哈希槽是一个key的集合，Redis集群共有16384个哈希槽，每个key通过CRC16散列然后对16384进行取模来决定该key应当被放到哪个槽中，集群中的每个节点负责一部分哈希槽。
+
+以有三个节点的集群为例:
+
+- 节点A包含0到5500号哈希槽
+- 节点B包含5501到11000号哈希槽
+- 节点C包含11001到16384号哈希槽
+
+这样的设计有利于对集群进行横向伸缩，若要添加或移除节点只需要将该节点上的槽转移到其它节点即可。
+
+在某些集群方案中，涉及多个key的操作会被限制在一个slot中，如Redis Cluster中的mget/mset操作。
+
+**HashTag**
+
+HashTag机制可以影响key被分配到的slot，从而可以使用那些被限制在slot中操作。
+
+HashTag即是用 `{}` 包裹key的一个子串，如`{user:}1`, `{user:}2`。
+
+在设置了HashTag的情况下，集群会根据HashTag决定key分配到的slot，两个key拥有相同的HashTag:`{user:}`, 它们会被分配到同一个slot，允许我们使用MGET命令。
+
+通常情况下，HashTag不支持嵌套，即将第一个 `{` 和第一个 `}` 中间的内容作为HashTag。若花括号中不包含任何内容则会对整个key进行散列，如`{}user:`。
+
+HashTag可能会使过多的key分配到同一个slot中，造成数据倾斜影响系统的吞吐量，务必谨慎使用。
+
+**主从模型**
+
+几种流行的Redis集群解决方案都没有将一个key写到多个节点中，若某个节点故障则无法访问访问其上的key这显然是不满足集群的分区容错性的。
+
+Redis集群使用主从模型(master-slave)来提高可靠性。每个master节点上绑定若干个slave节点，当master节点故障时集群会推举它的某个slave节点代替master节点。
+
+#### Redis&nbsp;Cluster
+
+Windows: 主从服务器：复制，改host、port配置
+
+Linux: （[参考](https://blog.csdn.net/huyunqiang111/article/details/95025807)）
+
+```sh
+
+```
+
+常用命令：
+
+```sh
+# 先在客户端连接第一台redis服务器（假设端口7000）
+redis-cli -c -p 7000
+# 进入redis命令行窗口后，查看当前集群
+CLUSTER NODES
+# 握手命令，将7001加入当前集群
+CLUSTER MEET 127.0.0.1 7001
+```
+
+用docker部署一个简单集群：
+
+```sh
+docker run -i -t -p 7000:7000 -p 7001:7001 -p 7002:7002 -p 7003:7003 -p 7004:7004 -p 7005:7005 -p 7006:7006 -p 7007:7007 grokzen/redis-cluster
+```
+
+打开另一个终端窗口，启动redis客户端：
+
+```sh
+redis-cli -c -p 7000
+```
+
+在redis客户端中尝试进行操作:
+
+```sh
+127.0.0.1:7000> set a 1
+-> Redirected to slot [15495] located at 127.0.0.1:7002
+OK
+127.0.0.1:7002> get a
+"1"
+127.0.0.1:7002> mset ab 2 ac 3
+(error) CROSSSLOT Keys in request don't hash to the same slot
+127.0.0.1:7002> mset {a}b 2 {a}c 3
+OK
+```
+
+上述示例中，执行 `set a` 命令时客户端被重定向到了其它节点。
+
+`mset ab 2 ac 3` 命令因为 key 被分配到不同的 slot 中导致 CROSSSLOT 错误，而使用 HashTag 机制 `mset {a}b 2 {a}c 3` 就可以解决这个问题。
+
+更多的内容可以参考[Redis Cluster中文文档](http://www.redis.cn/topics/cluster-tutorial.html)。
+
+#### ShardedJedis
+
+Jedis是一个流行的Java语言Redis客户端，在Redis官方提供Redis Cluster之前便实现了客户端集群功能。
+
+ShardedJedis使用一致性哈希算法进行数据分片，不支持涉及多个key的命令， 其不支持的命令可以参考[MultiKeyCommands](https://github.com/xetorthio/jedis/blob/master/src/main/java/redis/clients/jedis/commands/MultiKeyCommands.java)。
+
+```java
+JedisPoolConfig poolConfig = new JedisPoolConfig();
+poolConfig.setMaxTotal(2);
+poolConfig.setMaxIdle(1);
+poolConfig.setMaxWaitMillis(2000);
+
+final String HOST = "127.0.0.1";
+JedisShardInfo shardInfo1 = new JedisShardInfo(HOST, 6379);
+JedisShardInfo shardInfo2 = new JedisShardInfo(HOST, 6380);
+JedisShardInfo shardInfo3 = new JedisShardInfo(HOST, 6381);
+
+ShardedJedisPool jedisPool = new ShardedJedisPool(poolConfig, Arrays.asList(shardInfo1, shardInfo2, shardInfo3));
+
+try(ShardedJedis jedis = jedisPool.getResource()) {
+    jedis.set("a", "1");
+    jedis.set("b", "2");
+    System.out.println(jedis.get("a"));
+}
+```
+
+在初始化ShardedJedisPool时设置keyTagPattern，匹配keyTagPattern的key会被分配到同一个实例中。
+
+#### Codis
+
+Codis是豌豆荚开源的代理式Redis集群解决方案，因为Twemproxy缺乏对弹性伸缩的支持，很多企业选择了经过生产环境检验的Codis。
+
+Codis的安装和使用方法可以参考[官方文档](https://github.com/CodisLabs/codis/blob/release3.2/doc/tutorial_zh.md)，为了方便起见我们使用ReleaseBinary文件安装Codis-Server和Codis-Proxy。
+
+或者使用第三方开发者制作的Docker镜像：
+
+```sh
+docker run -d --name="codis" -h "codis" -p 18087:18087 -p 11000:11000 -p 19000:19000 ruo91/codis
+docker exec codis /bin/bash codis-start all start
+```
+
+使用redis客户端连接19000端口，尝试进行操作：
+
+```sh
+127.0.0.1:19000> set a  1
+OK
+127.0.0.1:19000> get a
+"1"
+127.0.0.1:19000> mset ab 2 ac 3
+OK
+127.0.0.1:19000> mset {a}b 2 {a}c 3
+OK
+```
+
+Codis也支持HashTag，不过Codis已经解决了大多数命令的slot限制。
+
+#### 集群方案对比
+
+协议支持：
+
+命令|Redis Cluster|ShardedJedis|Codis
+-|-|-|-
+mget/mset|仅限同一个slot|不支持|失去原子性
+keys|仅限同一个slot|不支持|不支持
+scan|仅限同一个slot|不支持|仅限同一个slot（SLOTSSCAN命令）
+rename|仅限同一个slot|不支持|不支持
+pipeline|不支持|不支持|支持
+事务|支持相同slot|不支持|不支持
+发布/订阅|支持|不支持|不支持
+eval|仅限同一slot|不支持|支持
+
+参考：[https://www.cnblogs.com/Finley/p/8595506.html](https://www.cnblogs.com/Finley/p/8595506.html)
 
 ### 主从复制
 
@@ -1013,6 +1249,11 @@ Memcached 主要特点是：
 - Oracle: [https://www.oracle.com/index.html](https://www.oracle.com/index.html)
 
 ## 生态链
+
+redis 和 memcached 相比的独特之处：
+
+- redis 可以用来做存储(storge)，而 memcached 用来做缓存(cache)。这个特点主要因为其有“持久化”的功能。
+- redis 存储的数据有“结构”，memcached 缓存的数据只有1种类型——字符串，而 redis 则可以存储字符串、链表、哈希结构、集合、有序集合。
 
 ### Memcached
 
