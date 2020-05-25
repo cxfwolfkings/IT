@@ -61,7 +61,11 @@ docker push registry.cn-shanghai.aliyuncs.com/daniel-hub/nginx-docker:[镜像版
 
 ```sh
 docker pull portainer/portainer
-docker run -d -p 9000:9000 portainer/portainer
+docker run -d -p 9000:9000 \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --name prtainer-dev1 \
+  portainer/portainer
 ```
 
 ### centos7
@@ -409,7 +413,6 @@ docker run -d -p 6181:6181 -v /data/sftp/mysftp/upload/JwtServer/:/app --name jw
 FROM nginx:alpine
 WORKDIR /app
 # 从客户机复制到容器中
-#COPY . .
 COPY nginx.conf /etc/nginx/nginx.conf
 ```
 
