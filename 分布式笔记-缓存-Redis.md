@@ -429,6 +429,16 @@ Redis 4.0 引入了 `volatile-lfu` 和 `allkeys-lfu` 淘汰策略，LFU 策略�
 
 随着大型网站数据量和对系统可用性要求的提升，单机版的Redis越来越难以满足需要，因此我们需要使用Redis集群来提供服务。
 
+集群简介：
+
+- redis 是一个开源的 key-value 存储系统，受到了广大互联网公司的青睐。redis3.0版本之前只支持单例模式，在3.0版本及以后才支持集群；
+- redis 集群采用 P2P 模式，是完全去中心化的，不存在中心节点或者代理节点；
+- redis 集群是没有统一的入口的，客户端（client）连接集群的时候连接集群中的任意节点（node）即可，集群内部的节点是相互通信的（PING-PONG机制），每个节点都是一个 redis 实例；
+- 为了实现集群的高可用，即判断节点是否健康（能否正常使用），redis-cluster有这么一个投票容错机制：如果集群中超过半数的节点投票认为某个节点挂了，那么这个节点就挂了（fail）。这是判断节点是否挂了的方法；
+- 那么如何判断集群是否挂了呢？如果集群中任意一个节点挂了，而且该节点没有从节点（备份节点），那么这个集群就挂了。这是判断集群是否挂了的方法；
+- 那么为什么任意一个节点挂了（没有从节点）这个集群就挂了呢？因为集群内置了16384个slot（哈希槽），并且把所有的物理节点映射到了这16384[0-16383]个slot上，或者说把这些slot均等的分配给了各个节点。当需要在Redis集群存放一个数据（key-value）时，redis会先对这个key进行crc16算法，然后得到一个结果。再把这个结果对16384进行求余，这个余数会对应[0-16383]其中一个槽，进而决定key-value存储到哪个节点中。所以一旦某个节点挂了，该节点对应的slot就无法使用，那么就会导致集群无法正常工作。
+- 综上所述，每个Redis集群理论上最多可以有16384个节点。
+
 目前主流的Redis集群解决方案有三类，它们都是通过将key分散到不同的redis实例上来提高整体能力，这种方法称为分片(sharding)。
 
 1. 服务端分片：客户端与集群中任意的节点通信，服务端计算key在哪一个节点上，若不再当前节点上则通知客户端应访问的节点。 典型代表为官方推出的Redis Cluster
@@ -477,6 +487,11 @@ HashTag可能会使过多的key分配到同一个slot中，造成数据倾斜影
 
 Redis集群使用主从模型(master-slave)来提高可靠性。每个master节点上绑定若干个slave节点，当master节点故障时集群会推举它的某个slave节点代替master节点。
 
+集群搭建需要的环境：
+
+- Redis集群至少需要3个节点，因为投票容错机制要求超过半数节点认为某个节点挂了该节点才是挂了，所以2个节点无法构成集群
+- 要保证集群的高可用，需要每个节点都有从节点，也就是备份节点，所以Redis集群至少需要6台服务器
+
 #### Redis&nbsp;Cluster
 
 Windows: 主从服务器：复制，改host、port配置
@@ -484,7 +499,65 @@ Windows: 主从服务器：复制，改host、port配置
 Linux: （[参考](https://blog.csdn.net/huyunqiang111/article/details/95025807)）
 
 ```sh
+# 在usr/local目录下新建redis-cluster目录，用于存放集群节点
+mkdir redis-cluster
+# 查看
+ll
+# 把redis目录下的bin目录下的所有文件复制到/usr/local/redis-cluster/redis01目录下，不用担心这里没有redis01目录，会自动创建
+cp -r redis/bin/ redis-cluster/redis01
+# 删除redis01目录下的快照文件dump.rdb，并且修改该目录下的redis.cnf文件，具体修改两处地方：一是端口号修改为7001，二是开启集群创建模式，打开注释即可。
+# port 7001
+# cluster-enabled yes
+rm -rf dump.rdb
+# 将redis-cluster/redis01文件复制5份到redis-cluster目录下（redis02-redis06），创建6个redis实例，模拟Redis集群的6个节点。然后将其余5个文件下的redis.conf里面的端口号分别修改为7002-7006
+# 接着启动所有redis节点，由于一个一个启动太麻烦了，所以在这里创建一个批量启动redis节点的脚本文件
+# 创建好启动脚本文件之后，需要修改该脚本的权限，使之能够执行
+chmod +x start-all.sh
+# 执行start-all.sh脚本，启动6个redis节点
+# 至此6个redis节点启动成功，接下来正式开启搭建集群，以上都是准备条件。
+```
 
+批量启动脚本：
+
+```sh
+cd redis01
+./redis-server redis.conf
+cd ..
+cd redis02
+./redis-server redis.conf
+cd ..
+cd redis03
+./redis-server redis.conf
+cd ..
+cd redis04
+./redis-server redis.conf
+cd ..
+cd redis05
+./redis-server redis.conf
+cd ..
+cd redis06
+./redis-server redis.conf
+cd ..
+```
+
+搭建集群：
+
+要搭建集群的话，需要使用一个工具（脚本文件），这个工具在redis解压文件的源代码里。因为这个工具是一个ruby脚本文件，所以这个工具的运行需要ruby的运行环境，就相当于java语言的运行需要在jvm上。所以需要安装ruby，指令如下：
+
+```sh
+yum install ruby
+# 然后需要把ruby相关的包安装到服务器，需要注意的是：redis的版本和ruby包的版本最好保持一致。安装命令如下：
+gem install redis-3.0.0.gem
+# 上一步中已经把ruby工具所需要的运行环境和ruby包安装好了，接下来需要把这个ruby脚本工具复制到usr/local/redis-cluster目录下。那么这个ruby脚本工具在哪里呢？之前提到过，在redis解压文件的源代码里，即redis/src目录下的redis-trib.rb文件
+cd redis/src
+# 将该ruby工具（redis-trib.rb）复制到redis-cluster目录下
+cp redis-trib.rb /usr/local/redis-cluster
+# 然后使用该脚本文件搭建集群，中途有个地方需要手动输入yes即可
+./redis-trib.rb create --replicas 1 47.106.219.251:7001 47.106.219.251:7002 47.106.219.251:7003 47.106.219.251:7004 47.106.219.251:7005 47.106.219.251:7006
+# 至此，Redis集群搭建成功！大家注意最后一段文字，显示了每个节点所分配的slots（哈希槽），这里总共6个节点，其中3个是从节点，所以3个主节点分别映射了0-5460、5461-10922、10933-16383 solts。
+# 最后连接集群节点，连接任意一个即可：
+redis01/redis-cli -p 7001 -c
+# 注意：一定要加上-c，不然节点之间是无法自动跳转的！现在，存储的数据（key-value）是均匀分配到不同的节点的
 ```
 
 常用命令：
@@ -492,6 +565,8 @@ Linux: （[参考](https://blog.csdn.net/huyunqiang111/article/details/95025807)
 ```sh
 # 先在客户端连接第一台redis服务器（假设端口7000）
 redis-cli -c -p 7000
+# 查看当前集群信息
+cluster info
 # 进入redis命令行窗口后，查看当前集群
 CLUSTER NODES
 # 握手命令，将7001加入当前集群

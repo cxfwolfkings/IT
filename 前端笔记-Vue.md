@@ -20,7 +20,8 @@
    - [内容分发](#内容分发)
    - [动画](#动画)
    - [混入](#混入)
-2. 插件
+2. 实战
+   - [事件总线](#事件总线)
    - [vue-resource](#vue-resource)
    - [axios](#axios)
    - [vue-router](#vue-router)
@@ -1597,7 +1598,36 @@ new Vue({
 
 谨慎使用全局混入对象，因为会影响到每个单独创建的 Vue 实例（包括第三方模板）。
 
-## 常用插件
+### 插槽
+
+参考：[https://blog.csdn.net/qq_38128179/article/details/85273522](https://blog.csdn.net/qq_38128179/article/details/85273522)
+
+## 实战
+
+### 事件总线
+
+```js
+// 官网写法，vue实例.$on就可以在根实例上定义全局方法
+vm.$on('test', () => {
+  //...
+})
+// this.$root就是获取根实例，如果没有根实例，就表示当前实例
+// this.$root.$on 不需要 .eventHub
+// 定义了一个方法  其他组件中都可以使用
+this.$root.eventHub.$emit("test", params)
+// 如果这个方法只能在当前路由下调用，在其他路由中不能被调用，则在当前组件的钩子函数加上销毁方法，当前路由变化的时候（当前组件关闭的时候）销毁这个方法
+this.$root.eventHub.$off("test")
+// 当组件中对象的数据需要通过其他组件获取的时候，可以把对象写成方法传过去，对象值更改后，当前组件中的对象也会发生变化
+this.$root.eventHub.$emit("test", {
+  type: [1,3],
+  ok: item => {
+    $this.form.name = item.name;
+  },
+  clear: () => {
+    $this.form.name = "";
+  }
+})
+```
 
 ### vue-resource
 
