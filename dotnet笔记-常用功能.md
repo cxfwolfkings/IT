@@ -1,12 +1,48 @@
 # 目录
 
 1. 简介
+   - [认证授权](#认证授权)
+     - [Form认证](#Form认证)
+     - [jwt和OAuth2](#jwt和OAuth2)
+     - [IdentityServer4](#IdentityServer4)
 2. 实战
+   - [jwt授权](#jwt授权)
 3. 总结
    - [反编译](#反编译)
 4. 练习
 
-## 授权认证
+## 简介
+
+### 认证授权
+
+**身份验证**是这样一个过程：由用户提供凭据，然后将其与存储在操作系统、数据库、应用或资源中的凭据进行比较。
+
+在授权过程中，如果凭据匹配，则用户身份验证成功，可执行已向其授权的操作。 授权指判断允许用户执行的操作的过程。
+
+也可以将身份验证理解为进入空间（例如服务器、数据库、应用或资源）的一种方式，而授权是用户可以对该空间（服务器、数据库或应用）内的哪些对象执行哪些操作。
+
+**软件中的常见漏洞：**
+
+ASP.NET Core 和 EF 提供维护应用安全、预防安全漏洞的功能。下表中链接的文档详细介绍了在 Web 应用中避免最常见安全漏洞的技术：
+
+- [跨站点脚本攻击](https://docs.microsoft.com/zh-cn/aspnet/core/security/cross-site-scripting?view=aspnetcore-3.0)
+- [SQL注入式攻击](https://docs.microsoft.com/zh-cn/ef/core/querying/raw-sql)
+- [跨站点请求伪造(CSRF)](https://docs.microsoft.com/zh-cn/aspnet/core/security/anti-request-forgery?view=aspnetcore-3.0)
+- [打开重定向攻击](https://docs.microsoft.com/zh-cn/aspnet/core/security/preventing-open-redirects?view=aspnetcore-3.0)
+
+**双因素认证：**
+
+双因素认证是一种采用时间同步技术的系统，采用了基于**时间**、**事件** 和 **密钥**三变量而产生的一次性密码来代替传统的静态密码。
+
+每个动态密码卡都有一个唯一的密钥，该密钥同时存放在服务器端，每次认证时动态密码卡与服务器分别根据同样的密钥，同样的随机参数（时间、事件）和同样的算法计算了认证的动态密码，从而确保密码的一致性，从而实现了用户的认证。
+
+因每次认证时的随机参数不同，所以每次产生的动态密码也不同。由于每次计算时参数的随机性保证了每次密码的不可预测性，从而在最基本的密码认证这一环节保证了系统的安全性。解决因口令欺诈而导致的重大损失，防止恶意入侵者或人为破坏，解决由口令泄密导致的入侵问题。
+
+简单来说，双因素身份认证就是通过你所知道再加上你所能拥有的这二个要素组合到一起才能发挥作用的身份认证系统。例如，在ATM上取款的银行卡就是一个双因素认证机制的例子，需要知道取款密码和银行卡这二个要素结合才能使用。
+
+目前主流的双因素认证系统是基于[时间同步](https://baike.baidu.com/item/%E6%97%B6%E9%97%B4%E5%90%8C%E6%AD%A5)型，市场占有率高的有DKEY双因素认证系统、RSA双因素认证系统等，由于DKEY增加对短信密码认证及短信+令牌混合认证支持，相比RSA双因素认证系统更具竞争力。
+
+#### Form认证
 
 先来了解ASP.NET是如何进行Form认证的：
 
@@ -18,63 +54,62 @@
 
 示例：
 
-1. 创建 AuthenticationController 和 Login 行为方法
+1、创建 AuthenticationController 和 Login 行为方法
 
-    ```C#
-    public class AuthenticationController : Controller
+```C#
+public class AuthenticationController : Controller
+{
+    // GET: Authentication
+    public ActionResult Login()
     {
-        // GET: Authentication
-        public ActionResult Login()
+        return View();
+    }
+}
+```
+
+2、创建Model
+
+```C#
+public class UserDetails
+{
+    public string UserName { get; set; }
+    public string Password { get; set; }
+}
+```
+
+3、创建Login View
+
+```html
+@model WebApplication1.Models.UserDetails
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+</head>
+<body>
+    <div>
+        @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
         {
-            return View();
+            @Html.LabelFor(c=>c.UserName)
+            @Html.TextBoxFor(x=>x.UserName)
+            <br />
+            @Html.LabelFor(c => c.Password)
+            @Html.PasswordFor(x => x.Password)
+            <br />
+            <input type="submit" name="BtnSubmit" value="Login" />
         }
-    }
+    </div>
+</body>
+</html>
+```
 
-    ```
+在上述代码中可以看出，使用 HtmlHelper 类在 View 中替代了纯 HTML 代码。View 中可使用 Html 调用 HtmlHelper 类；HtmlHelper 类函数返回 html 字符串。
 
-2. 创建Model
-   
-    ```C#
-    public class UserDetails
-    {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-    }
-    ```
-
-3. 创建Login View
-
-    ```C#
-    @model WebApplication1.Models.UserDetails
-    @{
-        Layout = null;
-    }
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width" />
-        <title>Login</title>
-    </head>
-    <body>
-        <div>
-            @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
-            {
-                @Html.LabelFor(c=>c.UserName)
-                @Html.TextBoxFor(x=>x.UserName)
-                <br />
-                @Html.LabelFor(c => c.Password)
-                @Html.PasswordFor(x => x.Password)
-                <br />
-                <input type="submit" name="BtnSubmit" value="Login" />
-            }
-        </div>
-    </body>
-    </html>
-    ```
-
-    在上述代码中可以看出，使用HtmlHelper类在View中替代了纯HTML代码。View中可使用"Html"调用HtmlHelper类；HtmlHelper类函数返回html字符串
-
-   示例1:
+示例1:
 
    ```C#
    @Html.TextBoxFor(x=>x.UserName)
@@ -101,7 +136,7 @@
    <form action="/Authentication/DoLogin" method="post"></form>
    ```
 
-4. 实现Form认证
+1. 实现Form认证
 
    web.config
 
@@ -111,7 +146,7 @@
    </authentication>
    ```
 
-5. 让Action方法更安全
+2. 让Action方法更安全
 
    在Index action方法中添加认证属性 [Authorize]
 
@@ -124,7 +159,7 @@
    }
    ```
 
-6. 创建 login action 方法
+3. 创建 login action 方法
 
    通过调用业务层功能检测用户是否合法。  
    如果是合法用户，创建认证Cookie。可用于以后的认证请求过程中。  
@@ -149,7 +184,7 @@
     }
     ```
 
-7. 在 View 中显示信息
+4. 在 View 中显示信息
 
     ```C#
     @Html.ValidationMessage("CredentialError", new {style="color:red;" })
@@ -224,6 +259,1183 @@ public class AuthenticationController : Controller
 We have attached Authorize filter at global level. That means now everything is protected including Login and DoLogin action methods. AllowAnonymous opens action method for non-authenticated requests.
 11.	How come this RegisterGlobalFilters method inside FilterConfig class invoked?
 It was invoked in Application_Start event written inside Global.asax file.
+
+
+通过 ASP.NET Core，开发者可轻松配置和管理其应用的安全性。ASP.NET Core 的功能包括管理身份验证、授权、数据保护、HTTPS 强制、应用机密、请求防伪保护及 CORS 管理。 通过这些安全功能，可以生成安全可靠的 ASP.NET Core 应用。
+
+### Cookie和Session
+
+一、关于Cookie和Session此处简单介绍一下、作为初学者可以先了解以下两点
+
+1、Cookie是存于客户端的（即用户电脑）、Session是存于服务端的。
+2、Cookie数据所有的浏览器端共享、Session数据由服务器开辟内存保存、每一个浏览器都有一个唯一的SessionID
+
+二、首先需要介绍一下 `FormsAuthentication` 密封类。
+
+1、用户登录成功后、需要保存用户信息到Cookie（本地）。
+
+可以调用如下方法、下次调用就会判断是否有Cookie信息，如果Cookie信息没有过期可以直接跳过登录。
+
+该类有一个方法 `SetAuthCookie(string userName, bool createPersistentCookie)`
+
+>注意：该方法如果被调用多次、则保存最后一个设置的Cookie
+
+```C#
+public ActionResult AdminLogin(SysAdmin objAdmin)
+{
+    string adminName = new BLL.SysAdminManager().AdminLogin(objAdmin);
+    if (adminName != null)
+    {
+        FormsAuthentication.SetAuthCookie(adminName, true);
+        TempData["adminName"] = adminName;
+        return RedirectToAction("GetAllStuList", "Student");
+    }
+    else
+    {
+        ViewBag.Info = "用户或密码错误";
+    }
+    return View("AdminLogin");
+}
+```
+
+2、判断用户是否通过身份验证并且获取用户名称、没有通过验证、则转到登录页面；已经通过验证、则不需要登录
+
+```C#
+public ActionResult Index()
+{
+    if (this.User.Identity.IsAuthenticated)
+    {
+        string adminName = this.User.Identity.Name;// 获取写入的adminName
+        ViewBag.adminName = adminName;
+        return View("StudentManage");
+    }
+    else
+    {
+        return RedirectToAction("Index", "SysAdmin");
+    }
+}
+```
+
+3、控制器或控制器方法如果添加了 `Authorize` 特性、则通过路由访问之前需要验证是否已经通过身份验证、作用类似于第二点if判断体。
+
+```C#
+[Authorize]
+public ActionResult Index()
+{
+    string adminName = this.User.Identity.Name; //获取写入的adminName
+    ViewBag.adminName = adminName;
+    return View("StudentManage");
+}
+```
+
+如果浏览器没有登录成功、那么url访问该路由就会失败。如果想要浏览器访问url失败后跳转到指定的页面、可以在Web.config的 `<system.web>` 节点中添加如下标签
+
+```xml
+<authentication mode="Forms">
+  <forms loginUrl="~/SysAdmin/Index" timeout="2880" />
+</authentication>
+```
+
+#### jwt和OAuth2
+
+**OAuth2 和 JWT - 如何设计安全的API？**
+
+假设：
+
+- 你已经或者正在实现API；
+- 你正在考虑选择一个合适的方法保证API的安全性；
+
+**JWT 和 OAuth2 比较？**
+
+要比较 JWT 和 OAuth2 ？首先要明白一点就是，这两个根本没有可比性，是两个完全不同的东西。
+
+1、JWT是一种认证协议
+
+> JWT提供了一种用于发布接入令牌（Access Token)，并对发布的签名接入令牌进行验证的方法。令牌（Token）本身包含了一系列声明，应用程序可以根据这些声明限制用户对资源的访问。
+
+2、OAuth2是一种授权框架
+
+> 另一方面，OAuth2是一种授权框架，提供了一套详细的授权机制（指导）。用户或应用可以通过公开的或私有的设置，授权第三方应用访问特定资源。
+>
+> 既然 JWT 和 OAuth2 没有可比性，为什么还要把这两个放在一起说呢？实际中确实会有很多人拿 JWT 和 OAuth2 作比较。标题里把这两个放在一起，确实有误导的意思。很多情况下，在讨论 OAuth2 的实现时，会把 JSON Web Token 作为一种认证机制使用。这也是为什么他们会经常一起出现。
+
+先来搞清楚 JWT 和 OAuth2 究竟是干什么的～
+
+**JSON Web Token (JWT)**
+
+JWT 在标准中是这么定义的：
+
+> JSON Web Token (JWT) is a compact URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is digitally signed using JSON Web Signature (JWS).
+
+参考：[RFC7519](https://tools.ietf.org/html/rfc7519)
+
+JWT 是一种安全标准。基本思路就是用户提供用户名和密码给认证服务器，服务器验证用户提交信息信息的合法性；如果验证成功，会产生并返回一个Token（令牌），用户可以使用这个token访问服务器上受保护的资源。
+
+一个token的例子：
+
+```token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+```
+
+一个token包含三部分：
+
+```token
+header.claims.signature
+```
+
+为了安全的在url中使用，所有部分都 base64 URL-safe 进行编码处理。
+
+**Header头部分：**
+
+头部分简单声明了类型(JWT)以及产生签名所使用的算法。
+
+```json
+{
+  "alg" : "AES256",
+  "typ" : "JWT"
+}
+```
+
+**Claims声明：**
+
+声明部分是整个token的核心，表示要发送的用户详细信息。有些情况下，我们很可能要在一个服务器上实现认证，然后访问另一台服务器上的资源；或者，通过单独的接口来生成token，token被保存在应用程序客户端（比如浏览器）使用。
+
+一个简单的声明（claim）的例子：
+
+```json
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "admin": true
+}
+```
+
+**Signature签名：**
+
+签名的目的是为了保证上边两部分信息不被篡改。如果尝试使用 Base64 对解码后的 token 进行修改，签名信息就会失效。一般使用一个私钥（private key）通过特定算法对 Header 和 Claims 进行混淆产生签名信息，所以只有原始的 token 才能与签名信息匹配。
+
+这里有一个重要的实现细节。只有获取了私钥的应用程序（比如服务器端应用）才能完全认证 token 包含声明信息的合法性。所以，永远不要把私钥信息放在客户端（比如浏览器）。
+
+**OAuth2是什么？**
+
+相反，OAuth2不是一个标准协议，而是一个安全的授权框架。它详细描述了系统中不同角色、用户、服务前端应用（比如API），以及客户端（比如网站或移动App）之间怎么实现相互认证。
+
+> The OAuth 2.0 authorization framework enables a third-party application to obtain limited access to an HTTP service, either on behalf of a resource owner by orchestrating an approval interaction between the resource owner and the HTTP service, or by allowing the third-party application to obtain access on its own behalf.
+
+参考：[RFC6749](https://tools.ietf.org/html/rfc6749)
+
+这里简单说一下涉及到的基本概念。
+
+**Roles 角色**
+
+应用程序或者用户都可以是下边的任何一种角色：
+
+- 资源拥有者
+- 资源服务器
+- 客户端应用
+- 认证服务器
+
+**Client Types 客户端类型**
+
+这里的客户端主要指API的使用者。它可以是以下类型：
+
+- 私有的
+- 公开的
+
+**Client Profile 客户端描述**
+
+OAuth2框架也指定了集中客户端描述，用来表示应用程序的类型：
+
+- Web应用
+- 用户代理
+- 原声应用
+
+**Authorization Grants 认证授权**
+
+认证授权代表资源拥有者授权给客户端应用程序的一组权限，可以是下边几种形式：
+
+- 授权码
+- 隐式授权
+- 资源拥有者密码证书
+- 客户端证书
+- Endpoints终端
+
+**OAuth2 框架需要下边几种终端：**
+
+- 认证终端
+- Token终端
+- 重定向终端
+
+从上边这些应该可以看出，OAuth2定义了一组相当复杂的规范。
+
+**使用 HTTPS 保护用户密码**
+
+在进一步讨论 OAuth2 和 JWT 的实现之前，有必要说一下，两种方案都需要 SSL 安全保护，也就是对要传输的数据进行加密编码。
+
+安全地传输用户提供的私密信息，在任何一个安全的系统里都是必要的。否则任何人都可以通过侵入私人wifi，在用户登录的时候窃取用户的用户名和密码等信息。
+
+**一些重要的实施考虑**
+
+在做选择之前，参考一下下边提到的几点：
+
+- **时间投入**：OAuth2 是一个安全框架，描述了在各种不同场景下，多个应用之间的授权问题。有海量的资料需要学习，要完全理解需要花费大量时间。甚至对于一些有经验的开发工程师来说，也会需要大概一个月的时间来深入理解 OAuth2。这是个很大的时间投入。
+
+  相反，JWT 是一个相对轻量级的概念。可能花一天时间深入学习一下标准规范，就可以很容易地开始具体实施。
+
+- **出现错误的风险**：OAuth2 不像 JWT 一样是一个严格的标准协议，因此在实施过程中更容易出错。尽管有很多现有的库，但是每个库的成熟度也不尽相同，同样很容易引入各种错误。在常用的库中也很容易发现一些安全漏洞。
+
+  当然，如果有相当成熟、强大的开发团队来持续 OAuth2 实施和维护，可以一定成都上避免这些风险。
+
+- **社交登录的好处**：在很多情况下，使用用户在大型社交网站的已有账户来认证会方便。
+
+  如果期望你的用户可以直接使用 Facebook 或者 Gmail 之类的账户，使用现有的库会方便得多。
+
+**结论：**
+
+做结论前，我们先来列举一下 JWT 和 OAuth2 的主要使用场景：
+
+- **JWT 使用场景**：无状态的分布式API
+
+  JWT 的主要优势在于使用无状态、可扩展的方式处理应用中的用户会话。服务端可以通过内嵌的声明信息，很容易地获取用户的会话信息，而不需要去访问用户或会话的数据库。在一个分布式的面向服务的框架中，这一点非常有用。
+
+  但是，如果系统中需要使用黑名单实现长期有效的 token 刷新机制，这种无状态的优势就不明显了。
+
+  优势：
+
+  - 快速开发
+  - 不需要cookie
+  - JSON在移动端的广泛应用
+  - 不依赖于社交登录
+  - 相对简单的概念理解
+
+  限制：
+
+  - Token有长度限制
+  - Token不能撤销
+  - 需要token有失效时间限制(exp)
+
+- **OAuth2 使用场景**：在作者看来两种比较有必要使用 OAuth2 的场景
+
+  ***外包认证服务器***
+
+  上边已经讨论过，如果不介意 API 的使用依赖于外部的第三方认证提供者，你可以简单地把认证工作留给认证服务商去做。
+
+  也就是常见的，去认证服务商（比如facebook）那里注册你的应用，然后设置需要访问的用户信息，比如电子邮箱、姓名等。当用户访问站点的注册页面时，会看到连接到第三方提供商的入口。用户点击以后被重定向到对应的认证服务商网站，获得用户的授权后就可以访问到需要的信息，然后重定向回来。
+
+  优势：
+
+  - 快速开发
+  - 实施代码量小
+  - 维护工作减少
+
+  ***大型企业解决方案***
+
+  如果设计的 API 要被不同的 App 使用，并且每个 App 使用的方式也不一样，使用 OAuth2 是个不错的选择。
+
+  考虑到工作量，可能需要单独的团队，针对各种应用开发完善、灵活的安全策略。当然需要的工作量也比较大！这一点，OAuth2 的作者也指出过：
+
+  > To be clear, OAuth 2.0 at the hand of a developer with deep understanding of web security will likely result is a secure implementation. However, at the hands of most developers – as has been the experience from the past two years – 2.0 is likely to produce insecure implementations.
+  > hueniverse - [OAuth 2.0 and the Road to Hell](https://link.jianshu.com/?t=https%3A%2F%2Fhueniverse.com%2F2012%2F07%2F26%2Foauth-2-0-and-the-road-to-hell%2F)
+
+  优势：
+
+  - 灵活的实现方式
+  - 可以和JWT同时使用
+  - 可针对不同应用扩展
+
+### IdentityServer4
+
+## 特性一览
+
+IdentityServer4 是 `ASP.NET Core 2` 的 OpenID Connect 和 OAuth 2.0 框架。它可以在您的应用程序中提供以下功能：
+
+**认证即服务：**
+
+适用于所有应用程序（web, native, mobile, services）的集中登录逻辑和工作流程。IdentityServer是OpenID Connect的官方认证实现。
+
+**单点登录/注销：**
+
+多个类型的应用程序在一个点进行登录和注销操作。
+
+**API 访问控制：**
+
+为各种类型的客户端颁发 API 的访问令牌，例如 服务器到服务器、Web应用程序，SPA、本地应用和移动应用程序。
+
+**联合网关：**
+
+支持 Azure Active Directory，Google，Facebook 等外部身份提供商。这可以保护您的应用程序免受如何连接到这些外部提供商的详细信息的影响。
+
+**专注于定制：**
+
+最重要的部分 - IdentityServer的许多方面都可以根据您的需求进行定制。由于IdentityServer是一个框架而不是现成的产品或SaaS，因此您可以编写代码以使系统适应您的方案。
+
+**成熟的开源：**
+
+IdentityServer 使用的 Apache 2 开源协议，允许在其上构建商业产品。它也是 .NET Foundation 的一部分，它提供治理和法律支持。
+
+**免费和商业支持：**
+
+如果您需要帮助构建或运行您的身份平台，请告知IdentityServer官方。 他们可以通过多种方式为您提供帮助。
+
+## 整体介绍
+
+现代应用程序看起来更像这个：
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/668104-20170816223247271-1583902578.png)
+
+最常见的相互作用：
+
+- 浏览器与 Web 应用程序的通信 Browser -> Web App
+- Web 应用程序与 Web API 通信
+- 基于浏览器的应用程序与 Web API
+- 本机应用程序与 Web API 进行沟通
+- 基于服务器的应用程序与 Web API
+- Web API 与 Web API通信
+
+通常，每个层（前端、中间层和后端）必须保护资源并实现身份验证或授权——通常针对同一个用户存储区。
+
+将这些基本安全功能外包给安全令牌服务可以防止在这些应用程序和端点上复制该功能。
+
+应用支持安全令牌服务将引起下面的体系结构和协议：
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/668104-20170816224035428-1945725990.png)
+
+这样的设计将安全问题分为两部分：
+
+**认证（Authentication）：**
+
+认证可以让一个应用程序知道当前用户的身份。通常，这些应用程序代表该用户管理数据，并且需要确保该用户只能访问允许他访问的数据。最常见的示例是 Web 应用程序，但基于本地和基于 js 的应用程序也需要进行身份验证。
+
+最常用的认证协议saml2p、WS-Federation 和 OpenID，saml2p协议是最流行和实际应用最多的。
+
+OpenID Connect 对于现在应用来说是被认为是未来最有潜力的，这是专为移动应用场景设计的，一开始就被设计成对移动应用场景友好。
+
+**API访问：**
+
+应用程序有两种基本方式与 API 进行通信，一种是使用应用程序标识，另一种是委托用户的身份。有时这两种方法都需要结合。
+
+OAuth2 协议，它允许应用程序从一个安全令牌服务要求访问令牌，使用这个访问令牌来访问API。这个机制降低了客户机应用程序和 API 的复杂性，因为身份验证和授权可以是集中式的。
+
+**OpenID Connect 和 OAuth 2.0 结合：**
+
+OpenID Connect 和 OAuth 2.0 非常相似，事实上 OpenID Connect 是在 OAuth 2.0 之上的一个扩展。两个基本的安全问题，认证和 API 访问，被组合成单个协议，通常只需一次往返安全令牌服务。
+
+我们认为 OpenID Connect 和 OAuth 2.0 的组合是可预见在未来是保护现代应用程序的最佳方法。IdentityServer4 是这两种协议的实现，并且被高度优化以解决当今移动应用、本地应用和 web 应用的典型安全问题
+
+**IdentityServer4可以帮助你做什么？**
+
+IdentityServer 是将规范兼容的 OpenID Connect 和 OAuth 2.0 端点添加到任意 ASP.NET Core 应用程序的中间件。通常，您构建（或重新使用）包含登录和注销页面的应用程序，IdentityServer 中间件会向其添加必要的协议头，以便客户端应用程序可以与其对话 使用这些标准协议。
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/668104-20170817223131521-2051565471.png)
+
+我们通常建议通过仅包含认证相关的UI来使攻击面尽可能小。
+
+### 术语解释
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/668104-20170906234914913-815927319.png)
+
+**身份认证服务器（IdentityServer）：**
+
+IdentityServer 是一个 OpenID Connect 提供程序，它实现了 OpenID Connect 和 OAuth 2.0 协议。
+
+同样的角色，不同的文档使用不同的术语。在有些文档中，它（IdentityServer）可能会被叫做安全令牌服务器（security token service）、身份提供者（identity provider）、授权服务器（authorization server）、 标识提供方（(IP-STS，[什么是IP-STS](https://msdn.microsoft.com/zh-cn/library/ee748489.aspx)）等等。
+
+但是它们都是一样的，都是向客户端发送安全令牌（security token），
+
+IdentityServer有许多功能：
+
+- 保护你的资源
+- 使用本地帐户或通过外部身份提供程序对用户进行身份验证
+- 提供会话管理和单点登录
+- 管理和验证客户机
+- 向客户发出标识和访问令牌
+- 验证令牌
+
+**用户（User）：**
+
+用户是使用注册的客户端访问资源的人。
+
+**客户端（Client）：**
+
+客户端是从 IdentityServer 请求令牌的软件，用于验证用户（请求身份令牌）或访问资源（请求访问令牌）。必须首先向 IdentityServer 注册客户端才能请求令牌。
+
+客户端可以是 Web 应用程序，本地移动或桌面应用程序，SPA，服务器进程等。
+
+**资源（Resources）：**
+
+资源是您想要使用 IdentityServer 保护的资源，您的用户的身份数据或 API。
+
+每个资源都有一个唯一的名称，客户端使用这个名称来指定他们想要访问的资源。
+
+用户身份数据标识信息，比如姓名或邮件地址等。
+
+API 资源，表示客户端想要调用的功能，通常被建模为 Web API，但不一定。
+
+**身份令牌（Identity Token）：**
+
+身份令牌表示身份验证过程的结果。它最低限度地标识了某个用户，还包含了用户的认证时间和认证方式。它可以包含额外身份数据。
+
+**访问令牌（Access Token）：**
+
+访问令牌允许访问API资源。客户端请求访问令牌并将其转发到API。访问令牌包含有关客户端和用户的信息（如果存在）。API使用该信息来授权访问其数据。
+
+### 支持的规范
+
+**OpenID Connect：**
+
+- OpenID Connect Core 1.0 ([spec](http://openid.net/specs/openid-connect-core-1_0.html))
+- OpenID Connect Discovery 1.0 ([spec](http://openid.net/specs/openid-connect-discovery-1_0.html))
+- OpenID Connect Session Management 1.0 - draft 22 ([spec](http://openid.net/specs/openid-connect-session-1_0.html))
+- OpenID Connect HTTP-based Logout 1.0 - draft 03 ([spec](http://openid.net/specs/openid-connect-logout-1_0.html))
+
+**OAuth 2.0：**
+
+- OAuth 2.0 ([RC-6749](http://tools.ietf.org/html/rfc6749))
+- OAuth 2.0 Bearer Token Usage ([RFC 6750](http://tools.ietf.org/html/rfc6750))
+- OAuth 2.0 Multiple Response Types ([spec](http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html))
+- OAuth 2.0 Form Post Response Mode ([spec](http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html))
+- OAuth 2.0 Token Revocation ([RFC 7009](https://tools.ietf.org/html/rfc7009))
+- OAuth 2.0 Token Introspection ([RFC 7662](https://tools.ietf.org/html/rfc7662))
+- Proof Key for Code Exchange ([RFC 7636](https://tools.ietf.org/html/rfc7636))
+- JSON Web Tokens for Client Authentication ([RFC 7523](https://tools.ietf.org/html/rfc7523))
+
+### 包和构建
+
+IdentityServer 有许多 Nuget 包组件：
+
+**IdentityServer4：**
+
+[nuget](https://www.nuget.org/packages/IdentityServer4/) | [github](#https://github.com/identityserver/IdentityServer4)
+
+包含 IdentityServer 核心对象模型、服务和中间件。默认只包含了基于内存(In-Memory)的配置和用户信息的存储，主要用于快速学习、测试 IdentityServer4，你可通过实现 IdentityServer4 提供的接口，来接入自定义持久化存储。
+
+**Quickstart UI：**
+
+[github](https://github.com/IdentityServer/IdentityServer4.Quickstart.UI)
+
+包含一个简单的入门UI，包括登录，注销和授权询问页面。
+
+**Access token validation middleware：**
+
+[nuget](https://www.nuget.org/packages/IdentityServer4.AccessTokenValidation) | [github](https://github.com/IdentityServer/IdentityServer4.AccessTokenValidation)
+
+用于验证 API 中令牌的 ASP.NET Core 身份验证处理程序。处理程序允许在同一 API 中支持 JWT 和reference Token。
+
+**ASP.NET Core Identity：**
+
+[nuget](https://www.nuget.org/packages/IdentityServer4.AspNetIdentity) | [github](https://github.com/IdentityServer/IdentityServer4.AspNetIdentity)
+
+IdentityServer 的 ASP.NET Core Identity 集成包。此包提供了一个简单的配置API，可以让IdentityServer 用户使用 ASP.NET Identity。
+
+**EntityFramework Core：**
+
+[nuget](https://www.nuget.org/packages/IdentityServer4.EntityFramework) | [github](https://github.com/IdentityServer/IdentityServer4.EntityFramework)
+
+IdentityServer 的 EntityFramework Core 存储实现。这个包提供了 IdentityServer 的配置和操作存储的 EntityFramework Core 实现。
+
+**Dev builds：**
+
+此外，开发/临时构建将发布到MyGet。如果要尝试尝试，请将以下包源添加到Visual Studio：[https://www.myget.org/F/identity/](https://www.myget.org/F/identity/)
+
+**.NET Core 2.0的示例：**
+
+[https://github.com/stulzq/IdentityServer4.Samples](https://github.com/stulzq/IdentityServer4.Samples)
+
+### 客户端授权模式
+
+使用 IdentityServer 保护 API 的最基本场景。在这种情况下，我们将定义一个 API 和要访问它的客户端。客户端将在 IdentityServer 上请求访问令牌，并使用它来访问 API。
+
+此种方式用户和客户端无法交互！
+
+### 资源所有者密码授权模式
+
+OAuth 2.0 资源所有者密码模式允许客户端向令牌服务发送用户名和密码，并获取**代表该用户**的访问令牌。
+
+除了通过无法浏览器进行交互的应用程序之外，通常建议不要使用资源所有者密码模式。 一般来说，当您要对用户进行身份验证并请求访问令牌时，使用其中一个交互式 OpenID Connect 流程通常要好得多。
+
+在这里使用这种模式是为了学习如何快速在 IdentityServer 中使用它
+
+下面这张图，是理解的客户端请求流程：
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/668104-20180419125329982-1803935441.png)
+
+api 资源收到第一个请求之后，会去 id4 服务器公钥，然后用公钥验证 token 是否合法，如果合法进行后面后面的有效性验证。有且只有第一个请求才会去 id4 服务器请求公钥，后面的请求都会用第一次请求的公钥来验证，这也是 jwt 去中心化验证的思想。
+
+### OpenId&nbsp;Connect协议
+
+**OpenId：**
+
+OpenID 是一个**以用户为中心的数字身份识别框架**，它具有开放、分散性。OpenID 的创建基于这样一个概念：我们可以通过 URI （又叫 URL 或网站地址）来认证一个网站的唯一身份，同理，我们也可以通过这种方式来作为用户的身份认证。
+
+简而言之：**OpenId用于身份认证（Authentication）**。
+
+**OAuth 2.0：**
+
+OAuth（**开放授权**）是一个开放标准，目前的版本是2.0。允许用户授权第三方移动应用访问他们存储在其他服务商上存储的私密的资源（如照片，视频，联系人列表），而无需将用户名和密码提供给第三方应用。
+
+OAuth允许用户提供一个**令牌**而不是用户名和密码来访问他们存放在特定服务商上的数据。每一个令牌授权一个特定的网站内访问特定的资源（例如仅仅是某一相册中的视频）。这样，OAuth可以允许用户授权第三方网站访问他们存储在另外服务提供者的某些特定信息，而非所有内容。
+
+OAuth 是 OpenID 的一个补充，但是完全不同的服务。
+
+简而言之：**OAuth2.0 用于授权（Authorization）**。
+
+OpenID Connect 1.0 是基于OAuth 2.0协议之上的简单身份层，它允许客户端根据授权服务器的认证结果最终确认终端用户的身份，以及获取基本的用户信息；它支持包括Web、移动、JavaScript在内的所有客户端类型去请求和接收终端用户信息和身份认证会话信息；它是可扩展的协议，允许你使用某些可选功能，如身份数据加密、OpenID提供商发现、会话管理等。
+
+简而言之：**OpenId Connect = OIDC = Authentication + Authorization + OAuth2.0**。
+
+比如，Facebook、Google、QQ、微博都是比较知名的 OpenId Connect 提供商。
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/19.jpg)
+
+了解完 OpenId Connect 和 OAuth2.0 的基本概念，我们再来梳理下涉及到的相关术语：
+
+1. User：用户
+2. Client：客户端
+3. Resources：Identity Data（身份数据）、Apis
+4. Identity Server：认证授权服务器
+5. Token：Access Token（访问令牌）和 Identity Token（身份令牌）
+
+与 OAuth 2.0 类似，OpenID Connect 也使用 Scope 概念。同样，Scope 代表您想要保护的内容以及客户端想要访问的内容。与 OAuth 相比，**OIDC 中的 Scope 不仅代表 API 资源，还代表用户 ID，姓名或电子邮件地址等身份资源**。
+
+所有标准 Scope 及其相应的 Claim 都可以在 [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) 规范中找到
+
+- 通过访问到受保护的 Controller 操作来触发身份认证。您应该会看到重定向到 IdentityServer 的登录页面
+- 成功登录后，将向用户显示同意授权页面。在这里，用户可以决定是否要将他的身份信息发布到客户端应用程序。
+- 之后，IdentityServer 将重定向回 MVC 客户端，其中 OpenID Connect 身份认证处理程序处理响应并通过设置 cookie 在本地登录用户。最后，MVC 视图将显示 cookie 的内容。
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/668104-20190222105419639-1540528509.png)
+
+如您所见，cookie 包含两部分，即用户的 Claim 和一些元数据。此元数据还包含 IdentityServer 发出的原始令牌。可以将此令牌复制到[jwt.io](https://jwt.io/)以检查其内容。
+
+### Hybrid&nbsp;Flow模式
+
+OpenID Connect 和 OAuth 2.0 组合的优点在于，您可以使用单一协议和单一交换使用令牌服务来使用这两种协议。
+
+在之前的快速入门中，我们使用了 OpenID Connect 简化流程。在简化流程中，所有令牌（身份令牌、访问令牌）都通过浏览器传输，这对于身份令牌（IdentityToken）来说是没有问题的，但是如果是访问令牌直接通过浏览器传输，就增加了一定的安全问题。
+
+访问令牌（AccessToken）比身份令牌（IdentityToken）更敏感，在非必须的情况下，我们不希望将它们暴露给外界。OpenID Connect 包含一个名为 "Hybrid（混合）" 的流程，它为我们提供了两全其美的优势，身份令牌通过浏览器传输，因此客户端可以在进行任何更多工作之前对其进行验证。如果验证成功，客户端会通过令牌服务的以获取访问令牌。
+
+### 授权码模式
+
+本快速入门将展示如何构建基于浏览器的 JavaScript 客户端应用程序（SPA）。
+
+用户将登录 IdentityServer，使用 IdentityServer 发出的 AccessToken 调用Web API，并注销IdentityServer。这些操作都通过 JavaScript 客户端来执行。
+
+## 进一步
+
+- [http://jwt.io](https://link.jianshu.com/?t=http%3A%2F%2Fjwt.io%2F) - JWT官方网站，也可以查看到使用不同语言实现的库的状态。
+- [http://oauth.net/2/](https://link.jianshu.com/?t=http%3A%2F%2Foauth.net%2F2%2F) OAuth2官方网站, 也也可以查看到使用不同语言实现的库的状态。
+- [OAuth 2 tutorials](https://link.jianshu.com/?t=http%3A%2F%2Ftutorials.jenkov.com%2Foauth2%2Foverview.html) - Useful overview of how OAuth 2 works
+- [Oauth2 Spec issues](https://link.jianshu.com/?t=http%3A%2F%2Fhueniverse.com%2F2012%2F07%2F26%2Foauth-2-0-and-the-road-to-hell%2F) Eran Hammer’s (推进OAuth标准的作者) views on what went wrong with the OAuth 2 spec process. Whatever your own opinion, good to get some framing by someone who understand’s key aspects of what make a security standard successful.
+- [Thoery and implemnetation](https://link.jianshu.com/?t=http%3A%2F%2Fwww.toptal.com%2Fweb%2Fcookie-free-authentication-with-json-web-tokens-an-example-in-laravel-and-angularjs): with Laravel and Angular Really informative guide to JWT in theory and in practice for Laravel and Angular.
+- 博客原文地址：[OAuth2和JWT-如何设计安全的API？](https://link.jianshu.com/?t=http%3A%2F%2Fwww.leshalv.net%2Fposts%2F9005%2F)
+
+## 实战
+
+### jwt授权
+
+在 .NET Core 之前对 Web 应用程序跟踪用户登录状态最普遍的方式是使用 Cookie，当用户点击登录后将对其信息进行加密并响应写入到用户浏览器的 Cookie 里，当用户进行请求时，服务端将对 Cookie 进行解密，然后创建用户身份，整个过程都是那么顺其自然，但是这是客户端是基于浏览器的情况，如果客户端是移动app或者桌面应用程序呢？
+
+关于 JWT 原理可以参考系列文章https://www.cnblogs.com/RainingNight/p/jwtbearer-authentication-in-asp-net-core.html，当然这只是其中一种限制还有其他。
+
+如果我们使用 Json Web Token（简称为JWT）而不是使用 Cookie，此时 Token 将代表用户，同时我们不再依赖浏览器的内置机制来处理 Cookie，我们仅仅只需要请求一个 Token 就好。
+
+这个时候就涉及到 Token 认证，那么什么是 Token 认证呢？一言以蔽之：将令牌（我们有时称为 AccessToken 或者是 Bearer Token）附加到 HTTP 请求中并对其进行身份认证的过程。Token 认证被广泛应用于移动端或 SPA。
+
+## JWT简介
+
+根据维基百科定义，JWT（读作 [/dʒɒt/]），即JSON Web Tokens，是一种基于JSON的、用于在网络上声明某种主张的令牌（token）。
+
+JWT通常由三部分组成: 头信息（header），消息体（payload）和签名（signature）。它是一种用于双方之间传递安全信息的表述性声明规范。
+
+JWT作为一个开放的标准（RFC 7519），定义了一种简洁的、自包含的方法，从而使通信双方实现以JSON对象的形式安全的传递信息。
+
+以上是JWT的官方解释，可以看出JWT并不是一种只能权限验证的工具，而是一种标准化的数据传输规范。所以，只要是在系统之间需要传输简短但却需要一定安全等级的数据时，都可以使用JWT规范来传输。规范是不因平台而受限制的，这也是JWT做为授权验证可以跨平台的原因。
+
+如果理解还是有困难的话，我们可以拿JWT和JSON类比：
+
+JSON是一种轻量级的数据交换格式，是一种数据层次结构规范。它并不是只用来给接口传递数据的工具，只要有层级结构的数据都可以使用JSON来存储和表示。当然，JSON也是跨平台的，不管是Win还是Linux，.NET还是Java，都可以使用它作为数据传输形式。
+
+1）客户端向授权服务系统发起请求，申请获取“令牌”。
+
+2）授权服务根据用户身份，生成一张专属“令牌”，并将该“令牌”以JWT规范返回给客户端
+
+3）客户端将获取到的“令牌”放到http请求的headers中后，向主服务系统发起请求。主服务系统收到请求后会从headers中获取“令牌”，并从“令牌”中解析出该用户的身份权限，然后做出相应的处理（同意或拒绝返回资源）
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/77.png)
+
+## 生成 Token 令牌
+
+关于JWT授权，其实过程是很简单的，大家其实这个时候静下心想一想就能明白，这个就是四步走：
+
+1. 首先我们需要一个具有一定规则的 Token 令牌，也就是 JWT 令牌（比如我们的公司门禁卡），--<b style="color:green">登录</b>
+2. 然后呢，我们再定义哪些地方需要什么样的角色（比如领导办公室我们是没办法进去的），--<b style="color:green">授权机制</b>
+3. 接下来，整个公司需要定一个规则，就是如何对这个 Token 进行验证，不能随便写个字条，这样容易被造假（比如我们公司门上的每一道刷卡机），--<b style="color:green">认证方案</b>
+4. 最后，就是安全部门，开启认证中间件服务（那这个服务可以关闭的，比如我们电影里看到的黑客会把这个服务给关掉，这样整个公司安保就形同虚设了）。--<b style="color:green">开启中间件</b>
+
+那现在我们就是需要一个具有一定规则的 Token 令牌，大家可以参考代码：
+
+```C#
+public class JwtHelper
+{
+    /// <summary>
+    /// 颁发JWT字符串
+    /// </summary>
+    /// <param name="tokenModel"></param>
+    /// <returns></returns>
+    public static string IssueJwt(TokenModelJwt tokenModel)
+    {
+        string iss = Appsettings.app(new string[] { "JWT", "Issuer" });
+        string aud = Appsettings.app(new string[] { "JWT", "Audience" });
+        string secret = Appsettings.app(new string[] { "JWT", "Key" });
+        // var claims = new Claim[] //old
+        var claims = new List<Claim>
+        {
+            /*
+             * 特别重要：
+             *   1、这里将用户的部分信息，比如 uid 存到了Claim 中，如果你想知道如何在其他地方将这个 uid从 Token 中取出来，请看下边的SerializeJwt() 方法，或者在整个解决方案，搜索这个方法，看哪里使用了！
+             *   2、你也可以研究下 HttpContext.User.Claims，具体的你可以看看 Policys/PermissionHandler.cs 类中是如何使用的。
+             */
+            new Claim(JwtRegisteredClaimNames.Jti, tokenModel.Uid.ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}"),
+            new Claim(JwtRegisteredClaimNames.Nbf, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}") ,
+            // 这个就是过期时间，目前是过期10秒，可自定义，注意JWT有自己的缓冲过期时间
+            new Claim (JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddSeconds(10)).ToUnixTimeSeconds()}"),
+            new Claim(JwtRegisteredClaimNames.Iss, iss),
+            new Claim(JwtRegisteredClaimNames.Aud, aud),
+            // 这个 Role 是官方 UseAuthentication 要要验证的 Role，我们就不用手动设置 Role 这个属性了
+            new Claim(ClaimTypes.Role, tokenModel.Role), // 为了解决一个用户多个角色（比如：Admin,System），用下边的方法
+        };
+
+        // 可以将一个用户的多个角色全部赋予；
+        // 作者：DX 提供技术支持；
+        // claims.AddRange(tokenModel.Role.Split(',').Select(s => new Claim(ClaimTypes.Role, s)));
+
+        // 秘钥（SymmetricSecurityKey 对安全性的要求，密钥的长度太短会报出异常）
+         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var jwt = new JwtSecurityToken(
+            issuer: iss,
+            claims: claims,
+            signingCredentials: creds
+        );
+
+        var jwtHandler = new JwtSecurityTokenHandler();
+        var encodedJwt = jwtHandler.WriteToken(jwt);
+
+        return encodedJwt;
+    }
+
+    /// <summary>
+    /// 解析
+    /// </summary>
+    /// <param name="jwtStr"></param>
+    /// <returns></returns>
+    public static TokenModelJwt SerializeJwt(string jwtStr)
+    {
+        var jwtHandler = new JwtSecurityTokenHandler();
+        JwtSecurityToken jwtToken = jwtHandler.ReadJwtToken(jwtStr);
+        object role;
+        try
+        {
+            jwtToken.Payload.TryGetValue(ClaimTypes.Role, out role);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        var tm = new TokenModelJwt
+        {
+            Uid = (jwtToken.Id).ObjToInt(),
+            Role = role != null ? role.ObjToString() : "",
+        };
+        return tm;
+    }
+}
+
+/// <summary>
+/// 令牌
+/// </summary>
+public class TokenModelJwt
+{
+    /// <summary>
+    /// Id
+    /// </summary>
+    public long Uid { get; set; }
+
+    /// <summary>
+    /// 角色
+    /// </summary>
+    public string Role { get; set; }
+}
+```
+
+Appsettings —— appsetting.json 操作类
+
+```C#
+public class Appsettings
+{
+    static IConfiguration Configuration { get; set; }
+
+    //static Appsettings()
+    //{
+    //    //ReloadOnChange = true 当appsettings.json被修改时重新加载
+    //    Configuration = new ConfigurationBuilder()
+    //    .Add(new JsonConfigurationSource { Path = "appsettings.json", ReloadOnChange = true })//请注意要把当前appsetting.json 文件->右键->属性->复制到输出目录->始终复制
+    //    .Build();
+    //}
+
+    static Appsettings()
+    {
+        string Path = "appsettings.json";
+        {
+            //如果你把配置文件 是 根据环境变量来分开了，可以这样写
+            //Path = $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json";
+        }
+
+        //Configuration = new ConfigurationBuilder()
+        //.Add(new JsonConfigurationSource { Path = Path, ReloadOnChange = true })//请注意要把当前appsetting.json 文件->右键->属性->复制到输出目录->始终复制
+        //.Build();
+
+        Configuration = new ConfigurationBuilder()
+           .SetBasePath(Directory.GetCurrentDirectory())
+           .Add(new JsonConfigurationSource { Path = Path, Optional = false, ReloadOnChange = true })//这样的话，可以直接读目录里的json文件，而不是 bin 文件夹下的，所以不用修改复制属性
+           .Build();
+    }
+
+    /// <summary>
+    /// 封装要操作的字符
+    /// </summary>
+    /// <param name="sections"></param>
+    /// <returns></returns>
+    public static string app(params string[] sections)
+    {
+        try
+        {
+            var val = string.Empty;
+            for (int i = 0; i < sections.Length; i++)
+            {
+                val += sections[i] + ":";
+            }
+
+            return Configuration[val.TrimEnd(':')];
+        }
+        catch (Exception)
+        {
+            return "";
+        }
+    }
+}
+```
+
+这个接口如何调用呢，很简单，就是我们的登录api：
+
+```C#
+public async Task<object> GetJwtStr(string name, string pass)
+{
+    string jwtStr = string.Empty;
+    bool suc = false;
+
+    // 获取用户的角色名，请暂时忽略其内部是如何获取的，可以直接用 var userRole="Admin"; 来代替更好理解。
+    var userRole = await _sysUserInfoServices.GetUserRoleNameStr(name, pass);
+    if (userRole != null)
+    {
+        // 将用户id和角色名，作为单独的自定义变量封装进 token 字符串中。
+        TokenModelJwt tokenModel = new TokenModelJwt { Uid = 1, Role = userRole };
+        jwtStr = JwtHelper.IssueJwt(tokenModel);//登录，获取到一定规则的 Token 令牌
+        suc = true;
+    }
+    else
+    {
+        jwtStr = "login fail!!!";
+    }
+
+    return Ok(new
+    {
+        success = suc,
+        token = jwtStr
+    });
+}
+
+/// <summary>
+/// 令牌
+/// </summary>
+public class TokenModelJwt
+{
+    /// <summary>
+    /// Id
+    /// </summary>
+    public long Uid { get; set; }
+    /// <summary>
+    /// 角色
+    /// </summary>
+    public string Role { get; set; }
+    /// <summary>
+    /// 职能
+    /// </summary>
+    public string Work { get; set; }
+
+}
+```
+
+现在我们获取到Token了，那如何进行授权认证呢，别着急，重头戏马上到来！
+
+## Json Web Token基础
+
+JWT由三部分构成，Base64编码的Header，Base64编码的Payload，签名，三部分通过点隔开。
+
+第一部分以Base64编码的Header主要包括Token的类型和所使用的算法，例如：
+
+```json
+{
+    "alg": "HS265",
+    "typ": "JWT"
+}
+```
+
+标识加密方式为HS256，Token类型为JWT, 这段JSON通过Base64Url编码形成下例的第一个字符串
+
+第二部分以Base64编码的Payload主要包含的是声明(Claims)，例如，如下：
+
+```json
+{
+    "sub": "765032130654732",
+    "name": "jeffcky"
+}
+```
+
+Payload是JWT用于信息存储部分，其中包含了许多种的声明（claims）。可以自定义多个声明添加到Payload中，系统也提供了一些默认的类型
+
+- iss (issuer)：签发人
+- exp (expiration time)：过期时间
+- sub (subject)：主题
+- aud (audience)：受众
+- nbf (Not Before)：生效时间
+- iat (Issued At)：签发时间
+- jti (JWT ID)：编号
+
+这部分通过Base64Url编码生成第二个字符串。
+
+第三部分则是将Key通过对应的加密算法生成签名。
+
+它的值类似这样的表达式：
+
+```C#
+Signature = HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret)
+```
+
+也就是说，它是通过将前两个字符串加密后生成的一个新字符串。
+
+所以只有拥有同样加密密钥的人，才能通过前两个字符串获得同样的字符串，通过这种方式保证了Token的真实性。
+
+最终三部分以点隔开，比如如下形式：
+
+```sh
+1 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+2 eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiSmVmZmNreSIsImVtYWlsIjoiMjc1MjE1NDg0NEBxcS5jb20iLCJleHAiOjE1NjU2MTUzOTgsIm5iZiI6MTU2MzE5NjE5OCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAxIn0.
+3 OJjlGJOnCCbpok05gOIgu5bwY8QYKfE2pOArtaZJbyI
+```
+
+到这里此时我们应该知道：JWT包含的信息并没有加密，比如为了获取Payload，我们大可通过比如谷歌控制台中的APi(atob)对其进行解码，如下：
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/53.png)
+
+那如我所说既然JWT包含的信息并没有加密，只是进行了Base64编码，岂不是非常不安全呢？
+
+当然不是这样，还没说完，第三部分就是签名，虽然我们对Payload（姑且翻译为有效负载），未进行加密，但是若有蓄意更换Payload，此时签名将能充分保证Token无效，除非将签名的Key不小心暴露在光天化日之下，否则必须是安全的。
+
+好了，到了这里，我们稍稍讲解了下JWT构成，接下来我们进入如何在 .NET Core 中使用JWT。
+
+## 认证流程
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/63.png)
+
+1. 认证服务器：用于用户的登录验证和Token的发放。
+2. 应用服务器：业务数据接口。被保护的API。
+3. 客户端：一般为APP、小程序等。
+
+认证流程：
+
+1. 用户首先通过登录，到认证服务器获取一个Token。
+2. 在访问应用服务器的API的时候，将获取到的Token放置在请求的Header中。
+3. 应用服务器验证该Token，通过后返回对应的结果。
+
+>说明：这只是示例方案，实际项目中可能有所不同。
+
+- 对于小型项目，可能认证服务和应用服务在一起。本例通过分开的方式来实现，使我们能更好的了解二者之间的认证流程。
+- 对于复杂一些的项目，可能存在多个应用服务，用户获取到的Token可以在多个分布式服务中被认证，这也是JWT的优势之一。
+
+## JWT授权认证流程——自定义中间件
+
+在 .NET Core 中如何使用JWT，那么我们必须得知晓如何创建JWT，接下来我们首先创建一个端口号为5000的APi，创建JWT，然后我们需要安装 System.IdentityModel.Tokens.Jwt 包。
+
+我们直接给出代码来创建Token，然后一一对其进行详细解释，代码如下：
+
+```C#
+var claims = new Claim[] {
+    new Claim (ClaimTypes.Name, "Jeffcky"),
+    new Claim (JwtRegisteredClaimNames.Email, "2752154844@qq.com"),
+    new Claim (JwtRegisteredClaimNames.Sub, "D21D099B-B49B-4604-A247-71B0518A0B1C"),
+};
+
+var key = new SymmetricSecurityKey (Encoding.UTF8.GetBytes ("1234567890123456"));
+
+var token = new JwtSecurityToken (
+    issuer: "http://localhost:5000",
+    audience: "http://localhost:5001",
+    claims : claims,
+    notBefore : DateTime.Now,
+    expires : DateTime.Now.AddHours (1),
+    signingCredentials : new SigningCredentials (key, SecurityAlgorithms.HmacSha256)
+);
+
+var jwtToken = new JwtSecurityTokenHandler ().WriteToken (token);
+```
+
+如上我们在声明集合中初始化声明时，我们使用了两种方式，一个是使用 ClaimTypes ，一个是 JwtRegisteredClaimNames ，那么这二者有什么区别？以及我们到底应该使用哪种方式更好？或者说两种方式都使用是否有问题呢？
+
+ClaimTypes来自命名空间 System.Security.Claims ，而JwtRegisteredClaimNames来自命名空间 System.IdentityModel.Tokens.Jwt ，二者在获取声明方式上是不同的，ClaimTypes是沿袭微软提供获取声明的方式，比如我们要在控制器Action方法上获取上述ClaimTypes.Name的值，此时我们需要F12查看Name的常量定义值是多少，如下：
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/54.png)
+
+接下来则是获取声明Name的值，如下：
+
+```C#
+var sub = User.FindFirst(d => d.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
+```
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/55-1.png)
+
+那么如果我们想要获取声明JwtRegisterClaimNames.Sub的值，我们是不是应该如上同样去获取呢？我们来试试。
+
+```C#
+var sub = User.FindFirst(d => d.Type == JwtRegisteredClaimNames.Sub)?.Value;
+```
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/56.png)
+
+此时我们发现为空没有获取到，这是为何呢？这是因为获取声明的方式默认是走微软定义的一套映射方式，如果我们想要走JWT映射声明，那么我们需要将默认映射方式给移除掉，在对应客户端Startup构造函数中，添加如下代码：
+
+```C#
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+```
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/57.png)
+
+如果用过并熟悉IdentityServer4的童鞋关于这点早已明了，因为在IdentityServer4中映射声明比如用户Id即（sub）是使用的JWT，也就是说使用的JwtRegisteredClaimNames，此时我们再来获取Sub看看。
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/58.png)
+
+所以以上对于初始化声明两种方式的探讨并没有用哪个更好，因为对于使用ClaimTypes是沿袭以往声明映射的方式，如果要出于兼容性考虑，可以结合两种声明映射方式来使用。接下来我们来看生成签名代码，生成签名是如下代码：
+
+```C#
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567890123456"));
+```
+
+如上我们给出签名的Key是1234567890123456，是不是给定Key的任意长度皆可呢，显然不是，关于Key的长度至少是16，否则会抛出如下错误
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/59.png
+
+接下来我们再来看实例化Token的参数，即如下代码：
+
+```C#
+var token = new JwtSecurityToken (
+    issuer: "http://localhost:5000",
+    audience: "http://localhost:5001",
+    claims : claims,
+    notBefore : DateTime.Now,
+    expires : DateTime.Now.AddHours (1),
+    signingCredentials : new SigningCredentials (key, SecurityAlgorithms.HmacSha256)
+);
+```
+
+issuer代表颁发Token的Web应用程序，audience是Token的受理者，如果是依赖第三方来创建Token，这两个参数肯定必须要指定，因为第三方本就不受信任，如此设置这两个参数后，我们可验证这两个参数。要是我们完全不关心这两个参数，可直接使用JwtSecurityToken的构造函数来创建Token，如下：
+
+```C#
+var claims = new Claim[] {
+    new Claim (ClaimTypes.Name, "Jeffcky"),
+    new Claim (JwtRegisteredClaimNames.Email, "2752154844@qq.com"),
+    new Claim (JwtRegisteredClaimNames.Sub, "D21D099B-B49B-4604-A247-71B0518A0B1C"),
+    new Claim (JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddMilliseconds(1)).ToUnixTimeSeconds()}"),
+    new Claim (JwtRegisteredClaimNames.Nbf, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}")
+};
+
+var key = new SymmetricSecurityKey (Encoding.UTF8.GetBytes ("1234567890123456"));
+
+var jwtToken = new JwtSecurityToken (new JwtHeader (new SigningCredentials (key, SecurityAlgorithms.HmacSha256)), new JwtPayload (claims));
+```
+
+这里需要注意的是Exp和Nbf是基于Unix时间的字符串，所以上述通过实例化DateTimeOffset来创建基于Unix的时间。到了这里，我们已经清楚的知道如何创建Token，接下来我们来使用Token获取数据。我们新建一个端口号为5001的Web应用程序，同时安装包 `Microsoft.AspNetCore.Authentication.JwtBearer` 接下来在Startup中ConfigureServices添加如下代码：
+
+```C#
+services.AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer (options => {
+        options.TokenValidationParameters = new TokenValidationParameters {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey (Encoding.UTF8.GetBytes ("1234567890123456")),
+
+            ValidateIssuer = true,
+            ValidIssuer = "http://localhost:5000",
+
+            ValidateAudience = true,
+            ValidAudience = "http://localhost:5001",
+
+            ValidateLifetime = true,
+
+            ClockSkew = TimeSpan.FromMinutes (5)
+        };
+    });
+```
+
+如上述若Token依赖于第三方而创建，此时必然会配置issuer和audience，同时在我方也如上必须验证issuer和audience，上述我们也验证了签名，我们通过设置 ValidateLifetime  为true，说明验证过期时间而并非Token中的值，最后设置 ClockSkew  有效期为5分钟。对于设置 ClockSkew  除了如上方式外，还可如下设置默认也是5分钟。
+
+```C#
+ClockSkew = TimeSpan.Zero
+```
+
+如上对于认证方案我们使用的是 JwtBearerDefaults.AuthenticationScheme 即Bearer，除此之外我们也可以自定义认证方案名称，如下：
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/60.png)
+
+最后别忘记添加认证中间件在Configure方法中，认证中间件必须放在使用MVC中间件之前，如下：
+
+```C#
+app.UseAuthentication ();
+
+app.UseMvc (routes => {
+    routes.MapRoute (
+        name: "default",
+        template: "{controller=Home}/{action=Index}/{id?}");
+});
+```
+
+到了这里，我们通过端口为5000的Web Api创建了Token，并配置了端口号为5001的Web应用程序使用JWT认证，接下来最后一步则是调用端口号为5000的APi获取Token，并将Token设置到请求头中Authorization键的值，格式如下（注意Bearer后面有一个空格）：
+
+```C#
+('Authorization', 'Bearer ' + token);
+```
+
+我们在页面上放置一个按钮点击获取端口号为5000的Token后，接下来请求端口号为5001的应用程序，如下：
+
+```js
+$(function () {
+    $('#btn').click(function () {
+        $.get("http://localhost:5000/api/token").done(function (token) {
+            $.ajax({
+                type: 'get',
+                contentType: 'application/json',
+                url: 'http://localhost:5001/api/home',
+                beforeSend: function (xhr) {
+                    if (token !== null) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                    }
+                },
+                success: function (data) {
+                    alert(data);
+                },
+                error: function (xhr) {
+                    alert(xhr.status);
+                }
+            });
+        });
+    });
+});
+```
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/61.png)
+
+![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/62.png)
+
+## 参考
+
+1. 一篇不错的[教程](https://www.cnblogs.com/wyt007/p/11459547.html)和[示例代码](https://github.com/FlyLolo)
+2. [JWT Token刷新方案](https://blog.csdn.net/m0_37809141/article/details/86572697)
+3. [解决使用jwt刷新token带来的问题](https://segmentfault.com/a/1190000013151506)
+4. [ASP.NET Core Web Api之JWT](https://www.cnblogs.com/CreateMyself/p/11123023.html)
+5. [ASP.NET MVC使用Oauth2.0实现身份验证](https://blog.csdn.net/sD7O95O/article/details/78852449)
+- [IdentityServer4官网](https://identityserver4.readthedocs.io/en/latest/index.html)
+
+
+## 扩展
+
+### ASP.NET页面之间传递值的方式
+
+1、使用QueryString（get传值）
+
+将客户端重定向到新的页面，只是简单地终止当前页面，并转入新的页面开始执行，对转入的页面无任何限制。数据直接在url中传递，可见，但可以加密，简单方便，不可传递大量数据，并不可传递对象
+
+传值: `Response.Redirect("B.aspx?id="+x);`
+接受: `textBox1.Text=Request.QueryString["id"].ToString();`
+
+2、使用Session变量（会话）
+
+Session对象为当前用户会话提供信息。全局变量，在整个应用程序都可以使用，会话关闭，Session失效。存储在服务器中，依靠cookie来运行，SessionID存放在cookie中。
+
+由于Web应用程序对每个用户都会生成Session变量，因此它会随着用户数量的增多而加重服务器的负担。如果数据量比较小，Session对象是保存只需要在当前对话中保持的特定数据的极好位置。
+
+```C#
+Session["id"]=x;
+textBox1.Text=Session["id"].ToString();
+Session.Remove("id"); //清除Session变量
+```
+
+3、使用Server.Transfer（post传值）form
+
+Src.aspx:
+
+```C#
+public string id { get { return TextBox1.Text; } } //定义公共属性
+Server.Transfer("Dst.aspx"); //重定向到目标页面
+```
+
+Dst.aspx: //HTML中引入PreviousPageType指令
+
+```aspx
+<%@ PreviousPageType VirtualPath="~/Src.aspx"%>
+```
+
+```C#
+//代码中获取Form数据
+Label1.Text=PreviousPage.id;
+Lable1.Text=Convert.ToString(Request.Form["txtusername"]);
+```
+
+终止当前页的执行，并为当前请求开始执行新的页面。把执行流程从当前页面转到同一服务器中的另一页面，但是新的页面仍然使用当前页面创建的应答流。
+
+4、ViewState
+
+保存原来页面中服务器控件视图状态的数据供新页面使用，存储在客户端，ViewState的工作原理是：作为一个隐藏的窗体字段在客户端和服务器之间传递
+
+```C#
+ViewState["id"]=TextBox1.Text; //数据存储
+Label1.Text= ViewState["id"].ToString(); //数据取出
+ViewState.Remove("id"); //数据移除
+```
+
+5、Cache的使用
+
+需要设置缓存项优先级和缓存时间。
+
+Src.aspx:
+
+```C#
+Cache["id"]=TextBox1.Text;
+//---------------------------------------
+Cache.Insert("id", x);
+Response.Redirect("Dst.aspx");
+```
+
+Dst.aspx:
+
+```C#
+if(Cache["id"]!=null) Labell.Text=Cache["id"].ToString();
+Cache.Remove("id"); //移除缓存项
+```
+
+如果Cache["id"]为空，则传值失败。
+
 
 ## 任务调度
 

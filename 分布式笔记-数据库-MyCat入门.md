@@ -8,6 +8,8 @@
 
 MyCAT是使用JAVA语言进行编写开发，使用前需要先安装JAVA运行环境(JRE)，由于MyCAT中使用了JDK7中的一些特性，所以要求必须在JDK7以上的版本上运行。
 
+参考：[Mycat catlet跨库JOIN与全局JOIN](https://blog.csdn.net/boonya/article/details/73200994)
+
 ## 环境准备
 
 1) JDK下载
