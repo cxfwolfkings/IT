@@ -5,6 +5,7 @@
      - [Form认证](#Form认证)
      - [jwt和OAuth2](#jwt和OAuth2)
      - [IdentityServer4](#IdentityServer4)
+   - [gRPC](#gRPC)
 2. 实战
    - [jwt授权](#jwt授权)
 3. 总结
@@ -17,7 +18,7 @@
 
 **身份验证**是这样一个过程：由用户提供凭据，然后将其与存储在操作系统、数据库、应用或资源中的凭据进行比较。
 
-在授权过程中，如果凭据匹配，则用户身份验证成功，可执行已向其授权的操作。 授权指判断允许用户执行的操作的过程。
+在授权过程中，如果凭据匹配，则用户身份验证成功，可执行已向其授权的操作。授权指判断允许用户执行的操作的过程。
 
 也可以将身份验证理解为进入空间（例如服务器、数据库、应用或资源）的一种方式，而授权是用户可以对该空间（服务器、数据库或应用）内的哪些对象执行哪些操作。
 
@@ -46,95 +47,11 @@ ASP.NET Core 和 EF 提供维护应用安全、预防安全漏洞的功能。下
 
 先来了解ASP.NET是如何进行Form认证的：
 
-1. 终端用户在浏览器的帮助下，发送Form认证请求。
+1. 终端用户在浏览器的帮助下，发送 Form 认证请求。
 2. 浏览器会发送存储在客户端的所有相关的用户数据。
 3. 当服务器端接收到请求时，服务器会检测请求，查看是否存在 "Authentication Cookie" 的Cookie。
 4. 如果查找到认证Cookie，服务器会识别用户，验证用户是否合法。
-5. 如果未找到"Authentication Cookie"，服务器会将用户作为匿名（未认证）用户处理，在这种情况下，如果请求的资源标记着 protected/secured，用户将会重定位到登录页面。
-
-示例：
-
-1、创建 AuthenticationController 和 Login 行为方法
-
-```C#
-public class AuthenticationController : Controller
-{
-    // GET: Authentication
-    public ActionResult Login()
-    {
-        return View();
-    }
-}
-```
-
-2、创建Model
-
-```C#
-public class UserDetails
-{
-    public string UserName { get; set; }
-    public string Password { get; set; }
-}
-```
-
-3、创建Login View
-
-```html
-@model WebApplication1.Models.UserDetails
-@{
-    Layout = null;
-}
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Login</title>
-</head>
-<body>
-    <div>
-        @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
-        {
-            @Html.LabelFor(c=>c.UserName)
-            @Html.TextBoxFor(x=>x.UserName)
-            <br />
-            @Html.LabelFor(c => c.Password)
-            @Html.PasswordFor(x => x.Password)
-            <br />
-            <input type="submit" name="BtnSubmit" value="Login" />
-        }
-    </div>
-</body>
-</html>
-```
-
-在上述代码中可以看出，使用 HtmlHelper 类在 View 中替代了纯 HTML 代码。View 中可使用 Html 调用 HtmlHelper 类；HtmlHelper 类函数返回 html 字符串。
-
-示例1:
-
-   ```C#
-   @Html.TextBoxFor(x=>x.UserName)
-   ```
-
-   转换为HTML代码
-
-   ```html
-   <input id="UserName" name="UserName" type="text" value="" />
-   ```
-
-   示例2：
-
-   ```C#
-   @using (Html.BeginForm("DoLogin", "Authentication", FormMethod.Post))
-   {
-
-   }
-   ```
-
-   转换为HTML代码：
-
-   ```html
-   <form action="/Authentication/DoLogin" method="post"></form>
-   ```
+5. 如果未找到 "Authentication Cookie"，服务器会将用户作为匿名（未认证）用户处理，在这种情况下，如果请求的资源标记着 protected/secured，用户将会重定位到登录页面。
 
 1. 实现Form认证
 
@@ -829,6 +746,12 @@ OpenID Connect 和 OAuth 2.0 组合的优点在于，您可以使用单一协议
 - [Oauth2 Spec issues](https://link.jianshu.com/?t=http%3A%2F%2Fhueniverse.com%2F2012%2F07%2F26%2Foauth-2-0-and-the-road-to-hell%2F) Eran Hammer’s (推进OAuth标准的作者) views on what went wrong with the OAuth 2 spec process. Whatever your own opinion, good to get some framing by someone who understand’s key aspects of what make a security standard successful.
 - [Thoery and implemnetation](https://link.jianshu.com/?t=http%3A%2F%2Fwww.toptal.com%2Fweb%2Fcookie-free-authentication-with-json-web-tokens-an-example-in-laravel-and-angularjs): with Laravel and Angular Really informative guide to JWT in theory and in practice for Laravel and Angular.
 - 博客原文地址：[OAuth2和JWT-如何设计安全的API？](https://link.jianshu.com/?t=http%3A%2F%2Fwww.leshalv.net%2Fposts%2F9005%2F)
+
+### gRPC
+
+gRPC 是一个由Google开源的，跨语言的，高性能的远程过程调用（RPC）框架。gRPC使客户端和服务端应用程序可以透明地进行通信，并简化了连接系统的构建。它使用HTTP/2作为通信协议，使用 Protocol Buffers 作为序列化协议。
+
+参考：[https://www.cnblogs.com/stulzq/p/11581967.html](https://www.cnblogs.com/stulzq/p/11581967.html)
 
 ## 实战
 

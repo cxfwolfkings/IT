@@ -8,11 +8,12 @@
    - [开源客户端](#开源客户端)
    - [内存管理](#内存管理)
    - [淘汰策略](#淘汰策略)
-   - [主从复制](#主从复制)
    - [集群部署](#集群部署)
-     - [Redis Cluster](#Redis&nbsp;Cluster)
-     - [ShardedJedis](#ShardedJedis)
-     - [Codis](#Codis)
+     - [主从复制](#主从复制)
+     - [哨兵模式](#哨兵模式)
+     - [集群](#Redis&nbsp;Cluster)
+     - [分片](#ShardedJedis)
+     - [代理](#Codis)
 3. 系统解析
 4. [生态链](#生态链)
 
@@ -328,50 +329,32 @@ redis-server.exe  --service-uninstall --service-name redisserver1
 
 Linux:
 
-1. 下载[安装包](https://redis.io/download)
+1、下载[安装包](https://redis.io/download)
 
-   redis是C语言开发，安装redis需要先将官网下载的源码进行编译，编译依赖gcc环境。如果没有gcc环境，需要安装gcc：`yum install gcc-c++`
+redis是C语言开发，安装redis需要先将官网下载的源码进行编译，编译依赖gcc环境。如果没有gcc环境，需要安装gcc：`yum install gcc-c++`
 
-2. 编译安装
+2、编译安装
 
-   ```sh
-   # 解压安装包
-   tar -zxvf redis-6.0.3.tar.gz
-
-   # 进入到/usr/local/redis-6.0.3/ 文件目录下
-   cd /usr/local/java/redis-6.0.3/
-
-   # 不用configure，对解压后的文件进行编译，如果是32位机器 make 32bit
-   make
-   # 注：易碰到的问题，时间错误。原因：源码是官方configure过的，但官方configure时，生成的文件有时间戳信息，Make只能发生在configure之后，如果你的虚拟机的时间不对，比如说是2012年，则会报错！解决：date -s 'yyyy-mm-dd hh:mm:ss' 重写时间，再 clock -w 写入cmos
-   # 可选步骤: make test 测试编译情况（可能出现: need tcl > 8.4 这种情况，yum install tcl）
-
-   # 进入到 redis-6.0.3/src 文件目录下
-   cd ./src
-
-   # 进行redis安装，安装到指定的目录，比如 /usr/local/redis
-   # make PREFIX=/usr/local/redis install
-   # 注：PREFIX要大写
-   make install
-   # make install之后，得到如下几个文件
-   # redis-benchmark   性能测试工具
-   # redis-check-aof   AOF日志文件检测工（比如断电造成日志损坏，可以检测并修复）
-   # redis-check-dump  RBD快照文件检测工具，效果类上
-   # redis-cli         客户端
-   # redis-server      服务端
-
-   # 复制配置文件
-   # cp /path/redis.conf /usr/local/redis
-   # 将mkreleasehdr.sh、redis-benchmark、redis-check-aof、redis-cli、redis-server 移动到 /usr/local/redis-6.0.3/bin/ 目录下
-   mv mkreleasehdr.sh redis-benchmark redis-check-aof redis-cli redis-server /usr/local/redis-6.0.3/bin/
-
-   # 启动与连接
-   /path/to/redis/bin/redis-server ./path/to/conf-file
-   # 例：# ./bin/redis-server ./redis.conf
-
-   # 连接：在另外的命令行界面用redis-cli
-   /path/to/redis/bin/redis-cli [-h localhost -p 6379 ]
-   ```
+```sh
+yum -y install gcc tcl
+wget http://download.redis.io/releases/redis-6.0.4.tar.gz
+# wget找不到时：yum install -y wget
+tar xzf redis-6.0.4.tar.gz
+cd redis-6.0.4
+# 编译失败！未解决
+make PREFIX=/usr/local/redis/6.0.4 install
+# 启动
+src/redis-server
+# 使用另外的窗口
+src/redis-cli
+redis> set foo bar
+OK
+redis> get foo
+"bar"
+# 删除
+make clean
+rm -rf redis-6.0.4
+```
 
 **以后台进程的形式运行：**
 
@@ -429,6 +412,13 @@ Redis 4.0 引入了 `volatile-lfu` 和 `allkeys-lfu` 淘汰策略，LFU 策略�
 
 随着大型网站数据量和对系统可用性要求的提升，单机版的Redis越来越难以满足需要，因此我们需要使用Redis集群来提供服务。
 
+Redis集群策略主要有:
+
+- 主从复制
+- 哨兵模式
+- 集群
+- 分片
+
 集群简介：
 
 - redis 是一个开源的 key-value 存储系统，受到了广大互联网公司的青睐。redis3.0版本之前只支持单例模式，在3.0版本及以后才支持集群；
@@ -439,35 +429,83 @@ Redis 4.0 引入了 `volatile-lfu` 和 `allkeys-lfu` 淘汰策略，LFU 策略�
 - 那么为什么任意一个节点挂了（没有从节点）这个集群就挂了呢？因为集群内置了16384个slot（哈希槽），并且把所有的物理节点映射到了这16384[0-16383]个slot上，或者说把这些slot均等的分配给了各个节点。当需要在Redis集群存放一个数据（key-value）时，redis会先对这个key进行crc16算法，然后得到一个结果。再把这个结果对16384进行求余，这个余数会对应[0-16383]其中一个槽，进而决定key-value存储到哪个节点中。所以一旦某个节点挂了，该节点对应的slot就无法使用，那么就会导致集群无法正常工作。
 - 综上所述，每个Redis集群理论上最多可以有16384个节点。
 
-目前主流的Redis集群解决方案有三类，它们都是通过将key分散到不同的redis实例上来提高整体能力，这种方法称为分片(sharding)。
+#### 主从复制
 
-1. 服务端分片：客户端与集群中任意的节点通信，服务端计算key在哪一个节点上，若不再当前节点上则通知客户端应访问的节点。 典型代表为官方推出的Redis Cluster
-2. 客户端分片：客户端计算key应在集群中的哪一个节点上，并与该节点通信。典型代表为ShardedJedis
-3. 代理分片：客户端与集群中的代理(proxy)通信，代理与节点通信进行操作。典型代表为Codis
+数据从线上 Redis 实例（主）复制到新启动 Redis 实例（从），提供备份和读写分离；
 
-单机版的Redis中单条指令的执行总是原子性的，在集群中则难以保证这一性质，某些指令可能无法在集群中使用或者受到限制。
+几种流行的Redis集群解决方案都没有将一个key写到多个节点中，若某个节点故障则无法访问访问其上的key这显然是不满足集群的分区容错性的。
 
-若需要使用这些指令或需要它们保持原子性，可以采用单机版Redis和集群搭配使用的方法。将主要业务部署在集群上，将需要较多支持的服务部署在单机版Redis上。
+Redis集群使用主从模型(master-slave)来提高可靠性。每个master节点上绑定若干个slave节点（哨兵模式下，当master节点故障时集群会推举它的某个slave节点代替master节点）。
 
-三种集群实现方式各有优缺点，下面对其架构和特性进行对比，帮助读者选择合适的解决方案。
+使用 **主从复制**，解决 **单点故障**、**容量瓶颈** 和 **QPS瓶颈** 的问题。
+
+使用 slaveof host port 异步命令 或 配置文件 可以让一个节点成为另一个节点的从节点，并复制数据；
+
+从节点在从主节点上同步数据时会把旧数据都清空，同步后只允许读，不能写入数据；
+
+一个主节点可以有多个从节点，但一个从节点只能有一个主节点，并且不支持主主复制。
+
+Redis主从复制常用的几种方式：
+
+- 一主二仆 A（B、C） 一个Master两个Slave
+- 薪火相传（去中心化） A-B-C，B既是主节点（C的主节点），又是从节点（A的从节点）
+- 反客为主（主节点down掉后，手动操作升级从节点为主节点）
+- 哨兵模式（反客为主的自动版，即主节点down掉后，从节点会自动升级为主节点）
+
+参考：[https://blog.csdn.net/weixin_41846320/article/details/83753667](https://blog.csdn.net/weixin_41846320/article/details/83753667)
+
+**复制过程**
+
+同步(sync) + 命令传播(command propagate)
+
+1. 主服务器创建快照文件，发送给从服务器，并在发送期间使用缓冲区记录执行的写命令。快照文件发送完毕之后，开始向从服务器发送存储在缓冲区中的写命令；
+2. 从服务器丢弃所有旧数据，载入主服务器发来的快照文件，之后从服务器开始接受主服务器发来的写命令；
+3. 主服务器每执行一次写命令，就向从服务器发送相同的写命令。
+
+**全量复制**
+
+主节点所有数据同步到从节点，包括同步过程中产生的数据。
+
+![x](http://121.196.182.26:6100/public/images/redis-copy1.png)
+
+**部分复制**
+
+如果主从间网络状况不好，从节点上可能会发生部分数据丢失，这时候再进行一次全量复制开销会很大。可以采用部分复制策略
+
+![x](http://121.196.182.26:6100/public/images/redis-copy2.png)
+
+**主从链**
+
+随着负载不断上升，主服务器可能无法很快地更新所有从服务器，或者重新连接和重新同步从服务器将导致系统超载。为了解决这个问题，可以创建一个中间层来分担主服务器的复制工作。中间层的服务器是最上层服务器的从服务器，又是最下层服务器的主服务器。
+
+![x](http://121.196.182.26:6100/public/images/redis-copy3.png)
+
+**常见问题**
+
+- 同步故障
+- 读写分离：将主节点读流量分摊到从节点。但可能存在以下问题：
+  - 复制数据延迟（不一致）；
+  - 读取过期数据（Slave不能删除数据）；
+  - 从节点故障；
+  - 主节点故障。
+- 配置不一致
+- maxmemory不一致：丢失数据；
+- 优化参数不一致：内存不一致。
+
+**规避全量复制：**
+
+全量复制开销较大，除了第一次以外，应该尽量规避。
+
+- 可以选择小主节点（分片）、低峰期间操作。
+- 如果节点运行 id 不匹配（如主节点重启、运行 id 发生变化），此时要执行全量复制，应该配合哨兵和集群解决。
+- 主从复制挤压缓冲区不足产生的问题（网络中断，部分复制无法满足），可增大复制缓冲区（rel_backlog_size 参数）。
+
+**复制风暴**
+
+- 单主节点复制风暴：主节点宕机恢复之后，所有的从节点会重新执行复制，开销非常大。解决方法是更换复制拓扑，把 “一主 - 多从” 替换成 “一主 - 一从 - 多从从” 或更好的拓扑，有效减少多节点复制的压力；
+- 单机器复制风暴：一台机器上运行多个主实例，机器宕机后所有实例都要进行复制。解决方法是把主节点分散到多台机器，或改成高可用架构（从节点接替主节点）。
 
 基本概念：
-
-**哈希槽**
-
-哈希槽(hash slot)是来自Redis Cluster的概念, 但在各种集群方案都有使用。
-
-哈希槽是一个key的集合，Redis集群共有16384个哈希槽，每个key通过CRC16散列然后对16384进行取模来决定该key应当被放到哪个槽中，集群中的每个节点负责一部分哈希槽。
-
-以有三个节点的集群为例:
-
-- 节点A包含0到5500号哈希槽
-- 节点B包含5501到11000号哈希槽
-- 节点C包含11001到16384号哈希槽
-
-这样的设计有利于对集群进行横向伸缩，若要添加或移除节点只需要将该节点上的槽转移到其它节点即可。
-
-在某些集群方案中，涉及多个key的操作会被限制在一个slot中，如Redis Cluster中的mget/mset操作。
 
 **HashTag**
 
@@ -481,22 +519,229 @@ HashTag即是用 `{}` 包裹key的一个子串，如`{user:}1`, `{user:}2`。
 
 HashTag可能会使过多的key分配到同一个slot中，造成数据倾斜影响系统的吞吐量，务必谨慎使用。
 
-**主从模型**
+**通信机制**
 
-几种流行的Redis集群解决方案都没有将一个key写到多个节点中，若某个节点故障则无法访问访问其上的key这显然是不满足集群的分区容错性的。
+集群元数据的维护有两种方式：集中式、Gossip 协议。
 
-Redis集群使用主从模型(master-slave)来提高可靠性。每个master节点上绑定若干个slave节点，当master节点故障时集群会推举它的某个slave节点代替master节点。
+redis cluster 节点间采用 Gossip 协议进行通信。
+
+**集中式：**
+
+将集群元数据（节点信息、故障等等）集中存储在某个节点上。集中式的好处在于，元数据的读取和更新，时效性非常好，一旦元数据出现了变更，就立即更新到集中式的存储中，其它节点读取的时候就可以感知到；不好在于，所有的元数据的更新压力全部集中在一个地方，可能会导致元数据的存储有压力。
+
+![x](http://121.196.182.26:6100/public/images/redis-cluster2.png)
+
+集中式元数据集中存储的一个典型代表，就是大数据领域的 storm。它是分布式的大数据实时计算引擎，是集中式的元数据存储的结构，底层基于 zookeeper（分布式协调的中间件）对所有元数据进行存储维护。
+
+**Gossip协议**
+
+redis 维护集群元数据采用 Gossip 协议：所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。
+
+其好处在于元数据的更新比较分散，不是集中在一个地方，更新请求会陆陆续续打到所有节点上执行，降低了压力；缺点在于元数据的更新有延时，可能导致集群中的一些操作会有一些滞后。
+
+10000 端口：每个节点都有一个专门用于节点间通信的端口，就是自己提供服务的端口号+10000。每个节点每隔一段时间都会往其他节点发送 ping 消息，接收到 ping 之后节点会返回 pong。
+
+交换信息：信息包括故障信息，节点的增加和删除，hash slot 信息等等。
+
+**Gossip消息**
+
+Gossip 协议包含多种消息：
+
+- meet：某个节点发送 meet 给新加入的节点，让新节点加入集群中，然后新节点就会开始与其它节点进行通信：redis-trib.rb add-node，其实内部就是发送了一个 gossip meet 消息给新加入的节点，通知那个节点去加入我们的集群。
+- ping：每个节点都会频繁给其它节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过 ping 交换元数据。
+- pong：返回 ping 和 meeet，包含自己的状态和其它信息，也用于信息广播和更新。
+- fail：某个节点判断另一个节点 fail 之后，就发送 fail 给其它节点，通知其它节点说，某个节点宕机啦。
+
+其中 ping 消息会携带一些元数据，如果很频繁，可能会加重网络负担：
+
+- 每个节点每秒会执行 10 次 ping，每次会选择 5 个最久没有通信的其它节点。
+  
+  当然如果发现某个节点通信延时达到了 cluster_node_timeout / 2，那么立即发送 ping，避免数据交换延时过长（比如两个节点之间都 10 分钟没有交换数据了，那么整个集群处于严重的元数据不一致的情况，就会有问题）。
+  
+  cluster_node_timeout 如果调得比较大会降低 ping 的频率。
+
+- 每次 ping 会带上自己节点的信息，还有就是带上 1/10 其它节点的信息，发送出去，进行交换。
+
+  至少包含 3 个其它节点的信息，最多包含 **总节点数减 2** 个其它节点的信息。
+
+**数据分片（寻址）：**
+
+分片是将数据划分为多个部分的方法，可以将数据存储到多台机器里面，这种方法在解决某些问题时可以获得线性级别的性能提升。
+
+分布方式|描述|特点|典型产品
+-|-|-|-
+顺序分布|把 id 按顺序平均地划分到不同区间，对应的数据分配到不同的实例中|数据分散度易倾斜，键值业务相关，可顺序访问，支持批量操作|BigTable<br>HBase
+哈希分布|使用 CRC32 哈希函数将键转换为 hash 值，所得 hash 值取模分配到不同实例中|业务分散度高，键值分布业务无关，无法顺序访问，支持批量操作|MemCache<br>Redis Cluster
+
+根据执行分片的位置，可以分为三种分片方式：
+
+- 客户端分片：客户端使用一致性哈希等算法决定键应当分布到哪个节点；典型代表为ShardedJedis
+- 代理分片：将客户端请求发送到代理上，由代理转发请求到正确的节点上；典型代表为Codis
+- 服务器分片：客户端与集群中任意的节点通信，服务端计算 key 在哪一个节点上，若不在当前节点上则通知客户端应访问的节点。典型代表为官方推出的Redis Cluster。
+
+单机版的Redis中单条指令的执行总是原子性的，在集群中则难以保证这一性质，某些指令可能无法在集群中使用或者受到限制。
+
+若需要使用这些指令或需要它们保持原子性，可以采用单机版Redis和集群搭配使用的方法。将主要业务部署在集群上，将需要较多支持的服务部署在单机版Redis上。
+
+**哈希取模**
+
+对于客户端请求的 key，会首先计算 hash 值，然后对节点数取模，分配到不同的 master 节点上。这种做法最简单，但存在以下问题：
+
+- 节点伸缩：数据节点关系变化会导致数据迁移（迁移数量和添加节点数量有关，建议翻倍扩容）；
+- 缓存失效：加入某一 master 节点宕机，所有请求过来都会基于最新的剩余可用节点数取模、尝试去取数据。这会导致大部分无法命中缓存的请求流量涌入数据库。
+
+**一致性哈希**
+
+一致性 hash 算法将整个 hash 值空间组织成一个虚拟的圆环，整个空间按顺时针方向组织，下一步将各个 master 节点（ip 或主机名）进行 hash。这样就能确定每个节点在其哈希环上的位置。
+
+对于客户端请求的 key，首先计算 hash 值，并确定此数据在环上的位置，从此位置沿环顺时针移动，遇到的第一个 master 节点就是 key 所在位置。
+
+在一致性哈希算法中增删一个节点受影响的数据仅仅是此节点到环空间前一个节点（沿着逆时针方向行走遇到的第一个节点）之间的数据，其它不受影响（保证节点伸缩、数据迁移受影响范围最小）。
+
+但同样会有问题：一致性哈希算法在节点太少时，容易因为节点分布不均匀而造成缓存热点的问题。可以通过引入虚拟节点机制解决：即对每一个节点计算多个 hash，每个计算结果位置都放置一个虚拟节点。这样就实现了数据的均匀分布，负载均衡。
+
+- 客户端分片：hash + 优化取余
+- 节点伸缩：只影响邻近节点，不需要整体上做数据迁移
+- 翻倍伸缩：保证最小迁移数据和负载均衡
+
+**虚拟槽**
+
+哈希槽(hash slot)是来自Redis Cluster的概念, 但在各种集群方案都有使用。
+
+redis cluster 有固定的 16384 个 hash slot，对每个 key 计算 CRC16 值，然后对 16384 取模，可以获取 key 对应的 hash slot。
+
+每个 master 都会持有部分 slot（比如有 3 个 master，可能每个 master 持有 5000 多个 hash slot）。因此节点的增加和移除很简单：只需要在 master 之间移动 hash slot 即可，移动成本是非常低的。
+
+客户端的 api，可以对指定的数据，让他们走同一个 hash slot，通过 hash tag 来实现。如果任何一台机器宕机，另外两个节点不受影响。因为 key 找的是 hash slot 不是机器。
+
+![x](http://121.196.182.26:6100/public/images/redis-cluster3.png)
+
+以有三个节点的集群为例:
+
+- 节点A包含0到5500号哈希槽
+- 节点B包含5501到11000号哈希槽
+- 节点C包含11001到16384号哈希槽
+
+这样的设计有利于对集群进行横向伸缩，若要添加或移除节点只需要将该节点上的槽转移到其它节点即可。
+
+在某些集群方案中，涉及多个key的操作会被限制在一个 slot 中，如 Redis Cluster 中的 mget/mset 操作。
+
+**高可用原理**
+
+redis cluster 的高可用的原理，几乎跟哨兵是类似的，直接集成了 replication 和 sentinel 的功能。
+
+**判断节点宕机**
+
+分为主观宕机和客观宕机：
+
+- 主观宕机（pfail）：即一个节点认为另外一个节点宕机。在 cluster-node-timeout 内，某个节点一直没有返回 pong，那么就被认为 pfail。
+- 客观宕机（fail）：即多个节点都认为另外一个节点宕机。如果一个节点认为某个节点 pfail 了，那么会在 gossip ping 消息中提示给其他节点，如果超过半数的节点都认为 pfail 了，那么就会变成 fail。
+
+**从节点过滤**
+
+- 对宕机的 master node，从其所有的 slave node 中选择一个切换成 master node；
+- 判断标准：检查每个 slave node 与 master node 断开连接的时间，如果超过了 cluster-node-timeout * cluster-slave-validity-factor，就没有资格切换成 master。
+
+**从节点选举**
+
+每个从节点，都根据自己对 master 复制数据的 offset，来设置一个选举时间，offset 越大（复制数据越多）的从节点，选举时间越靠前，优先进行选举。
+
+所有的 master node 开始 slave 选举投票，给要进行选举的 slave 进行投票，如果大部分 master node（N/2 + 1）都投票给了某个从节点，那么选举通过，那个从节点可以切换成 master。
+
+从节点执行主备切换，从节点切换为主节点。
+
+#### Redis&nbsp;Cluster
+
+在分布式架构下：
+
+- 每个节点都负责读写（分配指派槽）；
+- 之间相互通信(meet)，所有节点共享指派槽信息，因此客户端请求不需要数据具体在哪个节点；
+
+![x](http://121.196.182.26:6100/public/images/redis-cluster1.png)
 
 集群搭建需要的环境：
 
 - Redis集群至少需要3个节点，因为投票容错机制要求超过半数节点认为某个节点挂了该节点才是挂了，所以2个节点无法构成集群
 - 要保证集群的高可用，需要每个节点都有从节点，也就是备份节点，所以Redis集群至少需要6台服务器
 
-#### Redis&nbsp;Cluster
+**Windows:**
 
-Windows: 主从服务器：复制，改host、port配置
+[参考](https://blog.csdn.net/A_Runner/article/details/105013679)
 
-Linux: （[参考](https://blog.csdn.net/huyunqiang111/article/details/95025807)）
+***ruby***，TIOBE年度编程语言。Ruby on Rails (RoR)：严格按照MVC结构开发，设计原则：“不要重复自己(Don't repeat Yourself)”和“约定胜于配置(Convention Over Configuration)”。开发工具：SciTE、RadRails
+
+ruby命令执行代码：
+
+- c 检查代码正确性，不执行程序
+- w 警告模式
+- l 行模式
+- e 运行引号中代码
+
+安装：
+
+下载地址：[https://rubyinstaller.org/downloads/](https://rubyinstaller.org/downloads/)
+
+```sh
+# 查看版本
+ruby -v
+# 对Ruby进行配置
+gem install redis
+```
+
+将 redis.windows.conf 改名为 redis.conf，修改如下配置：
+
+```ini
+#设置端口号，可以依次递增
+port 7000
+
+appendonly yes
+
+cluster-enabled yes
+#这个7000可以根据每个端口设定
+cluster-config-file nodes-7000.conf
+cluster-node-timeout 15000
+```
+
+创建批量启动脚本(Windows)：
+
+```sh
+cd Redis7000
+start redis-server.exe redis.conf
+cd ..
+cd Redis7001
+start redis-server.exe redis.conf
+cd ..
+cd Redis7002
+start redis-server.exe redis.conf
+cd ..
+cd Redis7003
+start redis-server.exe redis.conf
+cd ..
+cd Redis7004
+start redis-server.exe redis.conf
+cd ..
+cd Redis7005
+start redis-server.exe redis.conf
+cd ..
+```
+
+在Redis集群目录下写入Ruby脚本：redis-trib.rb，链接：[百度网盘](https://pan.baidu.com/s/1tR0wC3xrGqY7SLQoEj8NvA)，提取码：12zw
+
+启动所有Redis，使用上面的批量启动脚本。所有的Redis启动之后，输入：
+
+```sh
+ruby redis-trib.rb create --replicas 1 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005  
+
+...
+Can I set the above configuration? (type 'yes' to accept): 请确定并输入 yes
+...
+```
+
+OK，到此，Redis集群就搭建成功了。
+
+**Linux:**
+
+（[参考](https://blog.csdn.net/huyunqiang111/article/details/95025807)）
 
 ```sh
 # 在usr/local目录下新建redis-cluster目录，用于存放集群节点
@@ -517,25 +762,25 @@ chmod +x start-all.sh
 # 至此6个redis节点启动成功，接下来正式开启搭建集群，以上都是准备条件。
 ```
 
-批量启动脚本：
+批量启动脚本(Linux)：
 
 ```sh
-cd redis01
+cd Redis7000
 ./redis-server redis.conf
 cd ..
-cd redis02
+cd Redis7001
 ./redis-server redis.conf
 cd ..
-cd redis03
+cd Redis7002
 ./redis-server redis.conf
 cd ..
-cd redis04
+cd Redis7003
 ./redis-server redis.conf
 cd ..
-cd redis05
+cd Redis7004
 ./redis-server redis.conf
 cd ..
-cd redis06
+cd Redis7005
 ./redis-server redis.conf
 cd ..
 ```
@@ -678,69 +923,6 @@ eval|仅限同一slot|不支持|支持
 
 参考：[https://www.cnblogs.com/Finley/p/8595506.html](https://www.cnblogs.com/Finley/p/8595506.html)
 
-### 主从复制
-
-使用 **主从复制**，解决 **单点故障**、**容量瓶颈** 和 **QPS瓶颈** 的问题。
-
-数据从线上 Redis 实例（主）复制到新启动 Redis 实例（从），提供备份和读写分离；
-
-使用 slaveof host port 异步命令 或 配置文件 可以让一个节点成为另一个节点的从节点，并复制数据；
-
-从节点在从主节点上同步数据时会把旧数据都清空，同步后只允许读，不能写入数据；
-
-一个主节点可以有多个从节点，但一个从节点只能有一个主节点，并且不支持主主复制。
-
-**复制过程**
-
-1、主服务器创建快照文件，发送给从服务器，并在发送期间使用缓冲区记录执行的写命令。快照文件发送完毕之后，开始向从服务器发送存储在缓冲区中的写命令；
-
-2、从服务器丢弃所有旧数据，载入主服务器发来的快照文件，之后从服务器开始接受主服务器发来的写命令；
-
-3、主服务器每执行一次写命令，就向从服务器发送相同的写命令。
-
-**全量复制**
-
-主节点所有数据同步到从节点，包括同步过程中产生的数据。
-
-![x](./Resource/10.png)
-
-**部分复制**
-
-如果主从间网络状况不好，从节点上可能会发生部分数据丢失，这时候再进行一次全量复制开销会很大。可以采用部分复制策略
-
-![x](./Resource/11.png)
-
-**主从链**
-
-随着负载不断上升，主服务器可能无法很快地更新所有从服务器，或者重新连接和重新同步从服务器将导致系统超载。为了解决这个问题，可以创建一个中间层来分担主服务器的复制工作。中间层的服务器是最上层服务器的从服务器，又是最下层服务器的主服务器。
-
-![x](./Resource/12.png)
-
-**常见问题**
-
-- 同步故障
-- 读写分离：将主节点读流量分摊到从节点。但可能存在以下问题：
-  - 复制数据延迟（不一致）；
-  - 读取过期数据（Slave 不能删除数据）；
-  - 从节点故障；
-  - 主节点故障。
-- 配置不一致
-- maxmemory 不一致：丢失数据；
-- 优化参数不一致：内存不一致。
-
-**规避全量复制**
-
-全量复制开销较大，除了第一次以外，应该尽量规避。
-
-- 可以选择小主节点（分片）、低峰期间操作。
-- 如果节点运行 id 不匹配（如主节点重启、运行 id 发生变化），此时要执行全量复制，应该配合哨兵和集群解决。
-- 主从复制挤压缓冲区不足产生的问题（网络中断，部分复制无法满足），可增大复制缓冲区（rel_backlog_size 参数）。
-
-**复制风暴**
-
-- 单主节点复制风暴：主节点宕机恢复之后，所有的从节点会重新执行复制，开销非常大。解决方法是更换复制拓扑，把 “一主 - 多从” 替换成 “一主 - 一从 - 多从从” 或更好的拓扑，有效减少多节点复制的压力；
-- 单机器复制风暴：一台机器上运行多个主实例，机器宕机后所有实例都要进行复制。解决方法是把主节点分散到多台机器、或改成高可用架构（从节点接替主节点）。
-
 **哨兵机制**
 
 哨兵(Sentinel)是非存储节点，作为 Redis 配置中心可以监听一或多套集群中的存储节点。
@@ -792,11 +974,11 @@ sentinel is-mastr-down-by-addr
 
 当主节点宕机，Sentinel 可以选出新的 Master 解决问题，但同时也需要向客户端发出通知消息，使之基于三个消息做出调整：
 
-- +switch-master：切换主节点（从 -> 主）；
-- +convert-to-slave：切换从节点（旧主 -> 从）；
-- +sdown：主观下线。
+1. +switch-master：切换主节点（从 -> 主）；
+2. +convert-to-slave：切换从节点（旧主 -> 从）；
+3. +sdown：主观下线。
 
-![x](./Resource/13.png)
+![x](http://121.196.182.26:6100/public/images/redis-copy4.png)
 
 **定时任务**
 
@@ -805,123 +987,6 @@ sentinel is-mastr-down-by-addr
 - 通过 `__sentinel__:hello` 频道交互；
 - 交互对节点的分析和自身信息；
 - 每 1s 每个 Sentinel 对其他 Sentinel 和 Redis 执行 ping，进行心跳检测。
-
-#### 分布式集群
-
-在分布式架构下：
-
-- 每个节点都负责读写（分配指派槽）；
-- 之间相互通信(meet)，所有节点共享指派槽信息，因此客户端请求不需要数据具体在哪个节点；
-
-每个主节点都有对应的从节点。
-
-![x](./Resource/14.png)
-
-#### 通信机制
-
-集群元数据的维护有两种方式：集中式、Gossip 协议。
-
-redis cluster 节点间采用 Gossip 协议进行通信。
-
-集中式
-
-将集群元数据（节点信息、故障等等）集中存储在某个节点上。集中式的好处在于，元数据的读取和更新，时效性非常好，一旦元数据出现了变更，就立即更新到集中式的存储中，其它节点读取的时候就可以感知到；不好在于，所有的元数据的更新压力全部集中在一个地方，可能会导致元数据的存储有压力。
-
-![x](./REsource/15.png)
-
-集中式元数据集中存储的一个典型代表，就是大数据领域的 storm。它是分布式的大数据实时计算引擎，是集中式的元数据存储的结构，底层基于 zookeeper（分布式协调的中间件）对所有元数据进行存储维护。
-
-### Gossip协议
-
-redis 维护集群元数据采用 Gossip 协议：所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。
-
-其好处在于元数据的更新比较分散，不是集中在一个地方，更新请求会陆陆续续打到所有节点上执行，降低了压力；缺点在于元数据的更新有延时，可能导致集群中的一些操作会有一些滞后。
-
-- 10000 端口：每个节点都有一个专门用于节点间通信的端口，就是自己提供服务的端口号+10000。每个节点每隔一段时间都会往其他节点发送 ping 消息，接收到 ping 之后节点会返回 pong。
-- 交换信息：信息包括故障信息，节点的增加和删除，hash slot 信息等等。
-
-### Gossip消息
-
-Gossip 协议包含多种消息：
-
-- meet：某个节点发送 meet 给新加入的节点，让新节点加入集群中，然后新节点就会开始与其它节点进行通信：redis-trib.rb add-node，其实内部就是发送了一个 gossip meet 消息给新加入的节点，通知那个节点去加入我们的集群。
-- ping：每个节点都会频繁给其它节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过 ping 交换元数据。
-- pong：返回 ping 和 meeet，包含自己的状态和其它信息，也用于信息广播和更新。
-- fail：某个节点判断另一个节点 fail 之后，就发送 fail 给其它节点，通知其它节点说，某个节点宕机啦。
-
-其中 ping 消息会携带一些元数据，如果很频繁，可能会加重网络负担：
-
-- 每个节点每秒会执行 10 次 ping，每次会选择 5 个最久没有通信的其它节点。当然如果发现某个节点通信延时达到了 cluster_node_timeout / 2，那么立即发送 ping，避免数据交换延时过长（比如两个节点之间都 10 分钟没有交换数据了，那么整个集群处于严重的元数据不一致的情况，就会有问题）。cluster_node_timeout 如果调得比较大会降低 ping 的频率。
-- 每次 ping 会带上自己节点的信息，还有就是带上 1/10 其它节点的信息，发送出去，进行交换。至少包含 3 个其它节点的信息，最多包含 总节点数减 2 个其它节点的信息。
-
-**数据分片（寻址）：**
-
-分片是将数据划分为多个部分的方法，可以将数据存储到多台机器里面，这种方法在解决某些问题时可以获得线性级别的性能提升。
-
-分布方式|描述|特点|典型产品
--|-|-|-
-顺序分布|把 id 按顺序平均地划分到不同区间，对应的数据分配到不同的实例中|数据分散度易倾斜，键值业务相关，可顺序访问，支持批量操作|BigTable<br>HBase
-哈希分布|使用 CRC32 哈希函数将键转换为 hash 值，所得 hash 值取模分配到不同实例中|业务分散度高，键值分布业务无关，无法顺序访问，支持批量操作|MemCache<br>Redis Cluster
-
-根据执行分片的位置，可以分为三种分片方式：
-
-- 客户端分片：客户端使用一致性哈希等算法决定键应当分布到哪个节点；
-- 代理分片：将客户端请求发送到代理上，由代理转发请求到正确的节点上；
-- 服务器分片：Redis Cluster。
-
-哈希取模
-
-对于客户端请求的 key，会首先计算 hash 值，然后对节点数取模，分配到不同的 master 节点上。这种做法最简单，但存在以下问题：
-
-- 节点伸缩：数据节点关系变化会导致数据迁移（迁移数量和添加节点数量有关，建议翻倍扩容）；
-- 缓存失效：加入某一 master 节点宕机，所有请求过来都会基于最新的剩余可用节点数取模、尝试去取数据。这会导致大部分无法命中缓存的请求流量涌入数据库。
-
-一致性哈希
-
-一致性 hash 算法将整个 hash 值空间组织成一个虚拟的圆环，整个空间按顺时针方向组织，下一步将各个 master 节点（ip 或主机名）进行 hash。这样就能确定每个节点在其哈希环上的位置。
-
-对于客户端请求的 key，首先计算 hash 值，并确定此数据在环上的位置，从此位置沿环顺时针移动，遇到的第一个 master 节点就是 key 所在位置。
-
-在一致性哈希算法中增删一个节点受影响的数据仅仅是此节点到环空间前一个节点（沿着逆时针方向行走遇到的第一个节点）之间的数据，其它不受影响（保证节点伸缩、数据迁移受影响范围最小）。
-
-但同样会有问题：一致性哈希算法在节点太少时，容易因为节点分布不均匀而造成缓存热点的问题。可以通过引入虚拟节点机制解决：即对每一个节点计算多个 hash，每个计算结果位置都放置一个虚拟节点。这样就实现了数据的均匀分布，负载均衡。
-
-- 客户端分片：hash + 优化取余
-- 节点伸缩：只影响邻近节点，不需要整体上做数据迁移
-- 翻倍伸缩：保证最小迁移数据和负载均衡
-
-虚拟槽
-
-redis cluster 有固定的 16384 个 hash slot，对每个 key 计算 CRC16 值，然后对 16384 取模，可以获取 key 对应的 hash slot。
-
-每个 master 都会持有部分 slot（比如有 3 个 master，可能每个 master 持有 5000 多个 hash slot）。因此节点的增加和移除很简单：只需要在 master 之间移动 hash slot 即可，移动成本是非常低的。
-
-客户端的 api，可以对指定的数据，让他们走同一个 hash slot，通过 hash tag 来实现。如果任何一台机器宕机，另外两个节点不受影响。因为 key 找的是 hash slot 不是机器。
-
-![x](./Resource/17.png)
-
-高可用原理
-
-redis cluster 的高可用的原理，几乎跟哨兵是类似的，直接集成了 replication 和 sentinel 的功能。
-
-判断节点宕机
-
-分为主观宕机和客观宕机：
-
-- 主观宕机（pfail）：即一个节点认为另外一个节点宕机。在 cluster-node-timeout 内，某个节点一直没有返回 pong，那么就被认为 pfail。
-- 客观宕机（fail）：即多个节点都认为另外一个节点宕机。如果一个节点认为某个节点 pfail 了，那么会在 gossip ping 消息中提示给其他节点，如果超过半数的节点都认为 pfail 了，那么就会变成 fail。
-
-从节点过滤
-
-- 对宕机的 master node，从其所有的 slave node 中选择一个切换成 master node；
-- 判断标准：检查每个 slave node 与 master node 断开连接的时间，如果超过了 cluster-node-timeout * cluster-slave-validity-factor，就没有资格切换成 master。
-
-从节点选举
-
-每个从节点，都根据自己对 master 复制数据的 offset，来设置一个选举时间，offset 越大（复制数据越多）的从节点，选举时间越靠前，优先进行选举。
-
-所有的 master node 开始 slave 选举投票，给要进行选举的 slave 进行投票，如果大部分 master node（N/2 + 1）都投票给了某个从节点，那么选举通过，那个从节点可以切换成 master。
-从节点执行主备切换，从节点切换为主节点。
 
 ## 事务管理
 
@@ -1293,6 +1358,20 @@ Codis 是一个分布式 Redis 解决方案，对于上层的应用来说，连�
 >原因3：Redis 服务器的 redis.conf 中没有配置 redis 访问密码。  
 >解决办法：取消 requirepass 前面的注释，然后在后面配置密码即可。
 
+## 参考
+
+- Sql Server: [https://docs.microsoft.com/zh-cn/sql/index](https://docs.microsoft.com/zh-cn/sql/index)
+- [SSMS](https://docs.microsoft.com/zh-cn/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017)
+- PostgreSQL: [https://www.postgresql.org/](https://www.postgresql.org/)
+- Oracle: [https://www.oracle.com/index.html](https://www.oracle.com/index.html)
+
+## 生态链
+
+redis 和 memcached 相比的独特之处：
+
+- redis 可以用来做存储(storge)，而 memcached 用来做缓存(cache)。这个特点主要因为其有“持久化”的功能。
+- redis 存储的数据有“结构”，memcached 缓存的数据只有1种类型——字符串，而 redis 则可以存储字符串、链表、哈希结构、集合、有序集合。
+
 ### Memcached
 
 **Memcached** 是免费的，开源的，高性能的，分布式内存对象的缓存系统（键/值字典），旨在通过减轻数据库负载加快动态 Web 应用程序的使用。
@@ -1315,22 +1394,6 @@ Memcached 主要特点是：
 - 特殊应用
 - 大对象缓存
 - 容错或高可用性
-
-## 参考
-
-- Sql Server: [https://docs.microsoft.com/zh-cn/sql/index](https://docs.microsoft.com/zh-cn/sql/index)
-- [SSMS](https://docs.microsoft.com/zh-cn/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017)
-- PostgreSQL: [https://www.postgresql.org/](https://www.postgresql.org/)
-- Oracle: [https://www.oracle.com/index.html](https://www.oracle.com/index.html)
-
-## 生态链
-
-redis 和 memcached 相比的独特之处：
-
-- redis 可以用来做存储(storge)，而 memcached 用来做缓存(cache)。这个特点主要因为其有“持久化”的功能。
-- redis 存储的数据有“结构”，memcached 缓存的数据只有1种类型——字符串，而 redis 则可以存储字符串、链表、哈希结构、集合、有序集合。
-
-### Memcached
 
 Windows安装包：
 
