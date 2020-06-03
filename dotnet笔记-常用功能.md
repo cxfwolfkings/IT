@@ -13,6 +13,30 @@
 
 ## 简介
 
+```C#
+public DateTime GetSpecificZoneNowDate(string zoneName = "Asia/Shanghai")
+        {
+            var utcdate = DateTime.Now.ToUniversalTime();
+            var localZone = TimeZoneInfo.Utc;
+            try
+            {
+                localZone = TimeZoneInfo.FindSystemTimeZoneById(zoneName);
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                try
+                {
+                    localZone = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time");
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                    localZone = TimeZoneInfo.Utc;
+                }
+            }
+            return TimeZoneInfo.ConvertTimeFromUtc(utcdate, localZone);
+        }
+```
+
 ### 认证授权
 
 **身份验证**是这样一个过程：由用户提供凭据，然后将其与存储在操作系统、数据库、应用或资源中的凭据进行比较。
@@ -1190,6 +1214,218 @@ Signature = HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload),
 
 好了，到了这里，我们稍稍讲解了下JWT构成，接下来我们进入如何在 .NET Core 中使用JWT。
 
+**前端3次请求：**
+
+```js
+import Qs from 'qs'
+import axios from 'axios'
+import store from '../store'
+import router from '../router'
+import { Message, MessageBox } from 'element-ui'
+import { getToken, getRefreshToken } from '@/utils/auth'
+
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8' // 配置请求头
+axios.defaults.headers['x-requested-with'] = 'XMLHttpRequest' // 让后台判断是否ajax请求
+axios.defaults.timeout = 60000 // 响应时间
+axios.defaults.baseURL = process.env.BASE_API // 配置接口地址
+
+// 创建axios实例
+const service = axios.create({
+  baseURL: process.env.BASE_API, // api的base_url
+  timeout: 60000 // 请求超时时间
+})
+
+// request拦截器
+service.interceptors.request.use(config => {
+  var token = getToken()
+  if (token) {
+    // config.headers['X-Token'] = 'Bearer ' + getToken() // 让每个请求携带自定义token，请根据实际情况自行修改
+    config.headers['Authorization'] = 'Bearer ' + token
+  }
+  return config
+}, error => {
+  // Do something with request error
+  Promise.reject(error)
+})
+
+// respone拦截器
+service.interceptors.response.use(
+  response => {
+    const res = response.data
+    if (res.code === 401) {
+      Message({
+        message: '登录身份过期，请重新登录。',
+        type: 'warning',
+        duration: 5 * 1000
+      })
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('user')
+      router.push('/login')
+      return Promise.reject(new Error('身份过期'))
+    } else if (res.code !== 200) {
+      Message({
+        message: res.message || 'error',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return Promise.reject('error')
+    } else {
+      // 验证码更新失败
+      if (res.notValid) { // 重新登录
+        return Message({
+          message: '您的登录状态已过期，请重新登录！',
+          type: 'error',
+          duration: 2 * 1000,
+          onClose: () => {
+            store.dispatch('FedLogOut').then(() => {
+              location.reload() // 为了重新实例化vue-router对象，避免bug
+            })
+          }
+        })
+      }
+      return response.data.data
+    }
+  },
+  error => {
+    if (error.response.status === 401) {
+      if (error.request.getResponseHeader('auth') === 'expired') {
+        return Promise.reject({
+          // 是否刷新token的标识
+          isRefresh: true,
+          // 原先请求函数和对应的参数
+          nextRest: (callback, args) => {
+            generateRefreshToken().then(res => {
+              // 更新保存在前端的token值
+              sessionStorage.setItem('token', res.accessToken)
+              sessionStorage.setItem('refreshToken', res.refreshToken)
+              // 前端token更新后，再次发起原先请求
+              if (typeof callback === 'function') {
+                args = args || []
+                callback(...args)
+              }
+            })
+          }
+        })
+      }
+      return Message({
+        message: '您的登录状态已过期，请重新登录！',
+        type: 'error',
+        duration: 2 * 1000,
+        onClose: () => {
+          store.dispatch('FedLogOut').then(() => {
+            location.reload() // 为了重新实例化vue-router对象，避免bug
+          })
+        }
+      })
+    }
+    // 兼容异常当做流程提示的做法
+    if (error.response.data && error.response.data.message) {
+      error.message = error.response.data.message.split('：   at')[0]
+    }
+    Message({
+      message: error.message,
+      type: 'error',
+      duration: 5 * 1000
+    })
+    return Promise.reject(error)
+  }
+)
+
+/**
+ * 更新token
+ */
+const generateRefreshToken = () => {
+  return post('/auth/account/refresh', {
+    accessToken: getToken(),
+    refreshToken: getRefreshToken()
+  })
+}
+
+// 返回一个Promise（发送post请求）
+export function post(url, params) {
+  return service({
+    method: 'post',
+    url,
+    // data:params,
+    data: Qs.stringify(params),
+    headers: {
+      // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    }
+  })
+}
+
+// 返回一个Promise（发送get请求）
+export function get(url, param) {
+  return service({
+    method: 'get',
+    url,
+    params: param
+  })
+}
+
+/**
+ * 下载文件
+ * @param {*} url
+ * @param {*} param
+ */
+export function exportFile(url, param) {
+  return new Promise((resolve, reject) => {
+    const fileName = param.name + '.' + param.type
+    delete param.name
+    delete param.type
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
+    axios({
+      method: 'post',
+      responseType: 'blob',
+      url: url,
+      params: param
+    })
+      .then(response => {
+        resolve(response)
+        if (response && response.data) {
+          const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/octet-stream' }))
+          const link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', fileName)
+          document.body.appendChild(link)
+          link.click()
+          link.parentNode.removeChild(link)
+        }
+      }, err => {
+        reject(err)
+      }).catch((error) => {
+        reject(error)
+      })
+  })
+}
+
+export default { service, get, post, exportFile }
+```
+
+参考功能：
+
+```js
+/**
+ * 生成新的axios实例
+ */
+const createService = token => {
+  const myAxios = axios.create({
+    baseURL: process.env.BASE_API,
+    timeout: 60000,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'x-requested-with': 'XMLHttpRequest',
+      'Authorization': 'Bearer ' + token
+    }
+  })
+  return myAxios
+}
+
+// 类数组转换为数组，并排除第一个元素
+const args = Array.prototype.slice.call(arguments).filter((item, index) => { return index > 0 })
+```
+
 ## 认证流程
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/63.png)
@@ -1390,6 +1626,9 @@ $(function () {
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/62.png)
 
+
+
+
 ## 参考
 
 1. 一篇不错的[教程](https://www.cnblogs.com/wyt007/p/11459547.html)和[示例代码](https://github.com/FlyLolo)
@@ -1398,7 +1637,6 @@ $(function () {
 4. [ASP.NET Core Web Api之JWT](https://www.cnblogs.com/CreateMyself/p/11123023.html)
 5. [ASP.NET MVC使用Oauth2.0实现身份验证](https://blog.csdn.net/sD7O95O/article/details/78852449)
 - [IdentityServer4官网](https://identityserver4.readthedocs.io/en/latest/index.html)
-
 
 ## 扩展
 
