@@ -5,6 +5,8 @@
 3. [服务启动与启动设置](#服务启动与启动设置)
 4. [配置详解](#配置详解)
    - [全局序列号](#全局序列号)
+   - [连接Oracle](#连接Oracle)
+   - [连接MongoDB](#连接MongoDB)
 
 MyCAT是使用JAVA语言进行编写开发，使用前需要先安装JAVA运行环境(JRE)，由于MyCAT中使用了JDK7中的一些特性，所以要求必须在JDK7以上的版本上运行。
 
@@ -12,33 +14,21 @@ MyCAT是使用JAVA语言进行编写开发，使用前需要先安装JAVA运行�
 
 ## 环境准备
 
-1) JDK下载
+1、[JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)下载。注意：必须JDK7或更高版本.
 
-http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+2、[MySQL](http://dev.mysql.com/downloads/mysql/5.5.html#downloads)下载。MyCAT支持多种数据库接入，如：MySQL、SQLServer、Oracle、MongoDB等，推荐使用MySQL做集群。
 
-注：必须JDK7或更高版本.
-
-2) MySQL下载
-
-http://dev.mysql.com/downloads/mysql/5.5.html#downloads
-
-注：MyCAT支持多种数据库接入，如：MySQL、SQLServer、Oracle、MongoDB等，推荐使用MySQL做集群。
-
-3) MyCAT项目主页
-
-https://github.com/MyCATApache/
-
-注：MyCAT相关源码、文档都可以在此地址下进行下载。
+3、MyCAT项目[主页](https://github.com/MyCATApache/)。MyCAT相关源码、文档都可以在此地址下进行下载。
 
 **环境安装与配置**
 
 如果是第一次刚接触MyCAT，建议先下载MyCAT-Server源码到本地，通过Eclipse等工具进行配置和运行，便于深入了解和调试程序运行逻辑。
 
-1) MyCAT-Server源码下载
+1、MyCAT-Server源码下载
 
-由于MyCAT源码目前主要托管在github上，需要先在本地安装和配置好相关环境。MyCAT-Server仓库地址：https://github.com/MyCATApache/Mycat-Server.git
+由于MyCAT源码目前主要托管在github上，需要先在本地安装和配置好相关环境。MyCAT-Server仓库地址：[https://github.com/MyCATApache/Mycat-Server.git](https://github.com/MyCATApache/Mycat-Server.git)
 
-2) 源码调试与配置
+2、源码调试与配置
 
 MyCAT目前主要通过配置文件的方式来定义逻辑库和相关配置：
 
@@ -46,7 +36,7 @@ MyCAT目前主要通过配置文件的方式来定义逻辑库和相关配置：
 - MYCAT_HOME/conf/rule.xml中定义分片规则
 - MYCAT_HOME/conf/server.xml中定义用户以及系统相关变量，如端口等
 
-3) 源码运行
+3、源码运行
 
 MyCAT入口程序是org.opencloudb.MycatStartup.java，右键run as出现下面的界面，需要设置MYCAT_HOME目录：你工程当前所在的目录(src/main)：
 
@@ -58,7 +48,7 @@ MyCAT入口程序是org.opencloudb.MycatStartup.java，右键run as出现下面�
 
 **快速镜像方式体验MyCAT**
 
-此方式通过将已经安装和配置好的MySQL+MyCAT做成镜像，可实现快速运行和体验MyCAT服务。镜像文件及快速运行体验文档下载地址：http://pan.baidu.com/s/1o61EXaa
+此方式通过将已经安装和配置好的MySQL+MyCAT做成镜像，可实现快速运行和体验MyCAT服务。镜像文件及快速运行体验文档下载地址：[http://pan.baidu.com/s/1o61EXaa](http://pan.baidu.com/s/1o61EXaa)
 
 ## 服务安装与配置
 
@@ -131,7 +121,7 @@ mycat remove # 表示执行卸载MyCAT服务
 
 **demo使用**
 
-springMVC+ibatis+FreeMarker 连接 mycat 示例：http://pan.baidu.com/s/1qWr4AF6
+springMVC+ibatis+FreeMarker 连接 mycat 示例：[http://pan.baidu.com/s/1qWr4AF6](http://pan.baidu.com/s/1qWr4AF6)
 
 ## 配置详解
 
@@ -247,16 +237,15 @@ server.xml：
 **sequnceHandlerType**：
 
 - 0: 本地文件方式
-
 - 1: 数据库方式
 
-插入一条Sequence
+插入一条Sequence配置：
 
 ```sql
 INSERT INTO MYCAT_SEQUENCE(`name`,current_value,increment) VALUES ('bas_account',0,1);
 ```
 
-**指定sequence相关配置在哪个节点上**：
+指定sequence相关配置在哪个节点上：
 
 sequence_db_conf.properties
 
@@ -266,21 +255,22 @@ bas_account=dn1
 
 注意：MYCAT_SEQUENCE 表和以上的 3 个 function，需要放在同一个节点上。
 
+### 连接Oracle
 
+参考：[http://www.mamicode.com/info-detail-2183303.html](http://www.mamicode.com/info-detail-2183303.html)
 
+### 连接MongoDB
 
+schema.xml:
 
+```xml
+<table name="people" primaryKey="_ID" dataNode="dn4" />
 
+<dataNode name="dn4" dataHost="jdbchost1" database="test" />
 
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- dbDriver一定为jdbc，dbType代表数据库类型，可以为mysql,oracle,mongodb。通过配置这个可以支持其他数据库 -->
+<dataHost name="jdbchost1" maxCon="1000" minCon="1" balance="0" writeType="0" dbType="mongodb" dbDriver="jdbc">
+  <heartbeat>select user()</heartbeat>
+  <writeHost host="hostM" url="mongodb://localhost:27017/" user="admin" password="123456" ></writeHost>
+</dataHost>  
+```
