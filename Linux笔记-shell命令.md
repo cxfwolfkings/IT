@@ -257,7 +257,7 @@ cd linuxprobe
 
 **示例：**
 
-将文件aaa重命名为bbb：#mv aaa bbb
+将文件aaa重命名为bbb：`mv aaa bbb`
 
 #### rm
 
