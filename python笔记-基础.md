@@ -7,7 +7,9 @@
      - [循环结构](#循环结构)
      - [构造程序逻辑](#构造程序逻辑)
    - [函数和模块的使用](#函数和模块的使用)
-2. [练习](#练习)
+2. [实战](#实战)
+   - [安装](#安装)
+   - [练习](#练习)
 
 ## 简介
 
@@ -713,7 +715,19 @@ lambda函数可以接受任意个参数，包括可选参数，但是表达式�
 
 如果你的函数非常简单，只有一个表达式，不包含命令，可以考虑lambda函数。否则，你还是定义函数才对，毕竟函数没有这么多限制。
 
-## 练习
+## 实战
+
+### 安装
+
+**anaconda：** Data science technology for human sensemaking.
+
+A movement that brings together millions of data science practitioners, data-driven enterprises, and the open source community.
+
+官网: [https://www.anaconda.com/](https://www.anaconda.com/)
+
+镜像：[https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/](https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/)
+
+### 练习
 
 1、华氏温度到摄氏温度的转换公式为：$C = (F - 32) / 1.8$。
 

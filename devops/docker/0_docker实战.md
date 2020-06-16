@@ -6,7 +6,6 @@
    - [阿里云镜像配置](#阿里云镜像配置)
    - [Portainer](#Portainer)
    - [centos7](#centos7)
-   - [gitlab](#gitlab)
    - [使用Docker Registry搭建私有镜像仓库](#使用Docker&nbsp;Registry搭建私有镜像仓库)
    - [docker搭建consul集群](#docker搭建consul集群)
    - [.NET Core微服务应用部署](#.NET&nbsp;Core微服务应用部署)
@@ -73,13 +72,6 @@ docker run -d -p 9000:9000 \
 ```sh
 docker pull centos:7
 docker run -it centos:7 /bin/bash
-```
-
-### gitlab
-
-```sh
-# gitlab-ce为稳定版本
-docker pull gitlab/gitlab-ce
 ```
 
 ### 使用Docker&nbsp;Registry搭建私有镜像仓库
