@@ -1,13 +1,18 @@
 # 目录
 
-- Spring
-- SSH
-- SSM
-- SpringBoot
+1. 简介
+   - [Spring](#Spring)
+   - SSH
+   - SSM
+   - [SpringBoot](#SpringBoot)
+2. 实战
+3. - [电商项目(SpringBoot)](#电商项目(SpringBoot))
+4. 总结
+5. 参考
 
+## 简介
 
-
-## Spring
+### Spring
 
 ![x](http://viyitech.cn/public/images/spring_frm.png)
 
@@ -19,29 +24,25 @@ MyBatis 的结构图：
 
 ![x](http://viyitech.cn/public/images/mybatis.png)
 
+### SpringBoot
 
+Spring Boot 未出现之前，我们利用 Spring、Spring MVC 进行项目开发时，整个项目从引入依赖 Jar 包，书写配置文件，打包部署到开发环境、测试环境、生产环境都需要大量人力，但是最终的效果仍不尽如人意，甚至还会给一个项目组带来项目延期的风险等。
 
+随着敏捷开发思想被越来越多的人接受以及开发者对开发效率的不断追求，最终推出了具有颠覆和划时代意义的框架 Spring Boot。
 
+Spring Boot 首先遵循 **习惯优于配置** 原则，言外之意即是尽量使用自动配置让开发者从繁琐的书写配置文件的工作中解放出来；Spring Boot 另外一个比较明显的特点就是尽量不使用原来 Spring 框架中的 XML 配置，而主要使用 **注解** 代替。
 
-## SpringBoot
+Spring Boot 由 Spring、Spring MVC 演化而来，注解也继承自两者。下面我们看下 Spring MVC 中常用的注解：
 
-Spring Boot未出现之前，我们利用Spring、Spring MVC进行项目开发时，整个项目从引入依赖Jar包，书写配置文件，打包部署到开发环境、测试环境、生产环境都需要大量人力，但是最终的效果仍不尽如人意，甚至还会给一个项目组带来项目延期的风险等。
+1. `@Controller`：该注解用于类上，其表明该类是 Spring MVC 的 Controller
+2. `@RequestMapping`：该注解主要用来映射 Web 请求，其可以用于类或者方法上
+3. `@RequestParam`：该注解主要用于将请求参数数据映射到功能处理方法的参数上
+4. `@ResponseBody`：该注解的作用是将方法的返回值放在 Response 中，而不是返回一个页面，其可以用于方法上或者方法返回值前；
+5. `@RequestBody`：用于读取 HTTP 请求的内容（字符串），通过 Spring MVC 提供的 HttpMessageConverter 接口将读到的内容转换为 JSON、XML 等格式的数据并绑定到 Controller 方法的参数上；
+6. `@PathVariable`：用于接收请求路径参数，将其绑定到方法参数上；
+7. `@RestController`：该注解是一个组合注解，只能用于类上，其作用与 `@Controller`、`@ResponseBody` 一起用于类上等价。
 
-随着敏捷开发思想被越来越多的人接受以及开发者对开发效率的不断追求，最终推出了具有颠覆和划时代意义的框架Spring Boot。
-
-Spring Boot首先遵循 **习惯优于配置** 原则，言外之意即是尽量使用自动配置让开发者从繁琐的书写配置文件的工作中解放出来；Spring Boot另外一个比较明显的特点就是尽量不使用原来 Spring 框架中的 XML 配置，而主要使用 **注解** 代替。
-
-Spring Boot由 Spring、Spring MVC演化而来，注解也继承自两者。下面我们看下Spring MVC中常用的注解：
-
-1.	@Controller：该注解用于类上，其表明该类是Spring MVC的 Controller；
-2.	@RequestMapping：该注解主要用来映射Web请求，其可以用于类或者方法上；
-3.	@RequestParam：该注解主要用于将请求参数数据映射到功能处理方法的参数上；
-4.	@ResponseBody：该注解的作用是将方法的返回值放在Response中，而不是返回一个页面，其可以用于方法上或者方法返回值前；
-5.	@RequestBody：用于读取HTTP请求的内容（字符串），通过Spring MVC提供的HttpMessageConverter接口将读到的内容转换为JSON、XML等格式的数据并绑定到Controller方法的参数上；
-6.	@PathVariable：用于接收请求路径参数，将其绑定到方法参数上；
-7.	@RestController：该注解是一个组合注解，只能用于类上，其作用与@Controller、@ResponseBody一起用于类上等价。
-
-注：在Spring 4.3中引进了@GetMapping、@PostMapping、@PutMapping、@DeleteMapping、@PatchMapping。
+>注：在 Spring 4.3 中引进了 `@GetMapping`、`@PostMapping`、`@PutMapping`、`@DeleteMapping`、`@PatchMapping`。
 
 ```java
 @RestController
@@ -55,36 +56,74 @@ public class TestAnnotationController {
 }
 ```
 
-以上是运用Spring MVC注解的一个简单实例，下面对其发送请求到结果返回的整个流程进行简要分析
+以上是运用 Spring MVC 注解的一个简单实例，下面对其发送请求到结果返回的整个流程进行简要分析
 
 1、调用类 `DispatcherServlet` 中 `doService` 方法对请求进行处理，该方法主要就进一步调用 `doDispatch` 方法对请求进行处理，源码如下：
 
+## 实战
 
+### 电商项目(SpringBoot)
 
-
-
-**开发流程**
+**开发流程：**
 
 从软件项目开发的基本流程讲起，一个项目从开始立项到项目完成一般包含这么几个过程：
 
-- 可行性分析：从市场、政策、经济、技术、人员等各方面因素来分析这个软件项目开发的可实行性。
-- 需求分析：做市场调研，通过请教行业专家或者分析市场同类型的产品，来判断这个项目的开发是否有发展前景。
-- 系统设计：确定软件的体系结构、数据结构、算法、模块功能，以及用户界面的设计等等，如果这些事情没有设计好，接下来的设计可能会变得一团糟。
-- 程序设计：根据以上几点进行软件编码，将软件设计转换成计算机能够识别的程序语言。
-- 测试与调整：一款软件从开发出来到正式的发布，一定需要经过不断的测试，才能尽可能地发现更多的错误，然后做出相应的修改，而且修改之后还需要重新测试。
-- 系统维护：系统维护主要是根据用户在使用过程遇到的错误，或者由于硬件设备不断更新等外部因素引发的问题，或者为了完善用户的体验度等等而做出的相应的完善和维护。
+- **可行性分析**：从市场、政策、经济、技术、人员等各方面因素来分析这个软件项目开发的可实行性。
+- **需求分析**：做市场调研，通过请教行业专家或者分析市场同类型的产品，来判断这个项目的开发是否有发展前景。
+- **系统设计**：确定软件的体系结构、数据结构、算法、模块功能，以及用户界面的设计等等，如果这些事情没有设计好，接下来的设计可能会变得一团糟。
+- **程序设计**：根据以上几点进行软件编码，将软件设计转换成计算机能够识别的程序语言。
+- **测试与调整**：一款软件从开发出来到正式的发布，一定需要经过不断的测试，才能尽可能地发现更多的错误，然后做出相应的修改，而且修改之后还需要重新测试。
+- **系统维护**：系统维护主要是根据用户在使用过程遇到的错误，或者由于硬件设备不断更新等外部因素引发的问题，或者为了完善用户的体验度等等而做出的相应的完善和维护。
 
-下面，主要带大家掌握Spring Boot开发时所需要的以下技能：
+**创建一个Spring Boot项目：**
 
-- 简单的RESTful风格接口开发；
-- 多环境配置文件动态切换，并读取配置文件内容；
-- Listener的使用；
-- Filter的使用；
-- Interceptor的使用。
+1、使用 IDEA，创建项目的时候选择 Spring Initializr，然后点击 Next，填入 Maven 项目的基本信息，再选择需要的依赖(Web)，完成项目的创建。这个方式，其实借助了 [https://start.spring.io/](https://start.spring.io/) 网站（也可以从该网站直接创建，查看“开发简单的RESTful风格接口”一节）。
 
-### 开发简单的RESTful风格接口
+2、使用 Maven 创建：首先创建一个普通的 Maven 项目，以 IDEA 为例，不需要选择项目骨架，填入一个 Maven 项目的基本信息，创建完成之后，在 pom.xml 文件中，添加如下依赖：
 
-首先，我们访问：http://start.spring.io/，选择构建工具Maven，采用编程语言Java，下载项目压缩包。将下载的项目压缩包解压后，导入idea中，然后在此基础项目结构中进行开发即可。为了能够开发RESTful风格的接口，需要在pom.xml文件中添加如下依赖：
+```xml
+<parent>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-parent</artifactId>
+  <version>2.1.4.RELEASE</version>
+</parent>
+<dependencies>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+</dependencies>
+```
+
+添加成功之后，在 java 目录下创建包，包中创建一个名为 App 的启动类：
+
+```java
+@EnableAutoConfiguration
+@RestController
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello";
+    }
+}
+```
+
+`@EnableAutoConfiguration` 注解表示开启自动化配置，然后执行这里的 main 方法就可以启动一个 Spring Boot 工程了
+
+下面，主要带大家掌握 Spring Boot 开发时所需要的以下技能：
+
+- 简单的 RESTful 风格接口开发
+- 多环境配置文件动态切换，并读取配置文件内容
+- Listener 的使用；
+- Filter 的使用；
+- Interceptor 的使用。
+
+**开发简单的RESTful风格接口：**
+
+首先，我们访问 [http://start.spring.io/](http://start.spring.io/)，选择构建工具 Maven，采用编程语言 Java，下载项目压缩包。将下载的项目压缩包解压后，导入 idea 中，然后在此基础项目结构中进行开发即可。为了能够开发 RESTful 风格的接口，需要在 pom.xml 文件中添加如下依赖：
 
 ```xml
 <dependency>
@@ -93,7 +132,7 @@ public class TestAnnotationController {
 </dependency>
 ```
 
-接下来编写Controller：
+接下来编写控制器：
 
 ```C#
 @RestController
@@ -106,7 +145,7 @@ public class TestRestfulInterfaceController{
 }
 ```
 
-将程序启动起来，并利用Postman进行测试(http://localhost:8080/restful/test?name=Colin)，可以查看输出结果。
+将程序启动起来，并利用 Postman 进行测试(`http://localhost:8080/restful/test?name=Colin`)，可以查看输出结果。
 
 ### 多环境配置文件动态切换并读取配置文件内容
 

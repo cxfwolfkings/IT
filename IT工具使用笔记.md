@@ -2,11 +2,15 @@
 
 1. 开发工具
    - [JetBrain](#JetBrain)
+     - [快捷键](#JetBrain快捷键)
+     - [激活](#JetBrain激活)
+     - [修改Maven镜像](#修改Maven镜像)
+
 ## 开发工具
 
 ### JetBrain
 
-**快捷键：**
+#### JetBrain快捷键
 
 ```txt
 查找/代替：
@@ -86,7 +90,7 @@ ctrl+alt+shift+T 弹出重构菜单
 
 怎么找快捷键？在快捷键设置里面，在菜单上有提示，`ctrl+shift+A` 查找快捷键。
 
-**激活**
+#### JetBrain激活
 
 补丁下载地址：[点击这里](https://pan.baidu.com/s/1h0I_hBW86g4M6EA-zWrcHA)
 
@@ -95,7 +99,7 @@ ctrl+alt+shift+T 弹出重构菜单
 - 下载补丁后，找到安装目录，将文件复制到 bin 文件夹。
 - 在安装目录的 \bin 目录下有两个文件 xxx.exe.vmoptions 和 xxx64.exe.vmoptions
 - （打开文件，最后面加入：`-javaagent:文件路径`）
-  2019.02版本必须在idea配置中添加才可以（也就是用户config选项下的idea配置）
+  2019.02 版本必须在 idea 配置中添加才可以（也就是用户 config 选项下的 idea 配置）
 - 保存退出，**重启**，首次打开会提示激活，选择 Activation code，移除以前的license（remove license，没有就跳过）输入code，点击 OK，即可激活成功。
 
 1、第1个code
@@ -117,6 +121,31 @@ KNBB2QUUR1-eyJsaWNlbnNlSWQiOiJLTkJCMlFVVVIxIiwibGljZW5zZWVOYW1lIjoiZ2hib2tlIiwiY
 ```
 
 使用任何一个code都行！
+
+#### 修改Maven镜像
+
+C:\Users\23907\.m2\settings.xml
+
+```xml
+<settings
+    xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <mirrors>
+    <mirror>
+      <id>alimaven</id>
+      <name>aliyun maven</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>  
+      <mirrorOf>central</mirrorOf>
+    </mirror>  
+  </mirrors>
+</settings>
+```
+
+![x](./Resources/jetbrain1.JPG)
+
+注意：右下角的“覆盖”选项！
 
 ## Sunny-Ngrok
 

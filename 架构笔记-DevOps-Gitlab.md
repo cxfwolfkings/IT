@@ -1,19 +1,23 @@
 # Gitlab
 
->不要让懒惰占据你的大脑，不让要妥协拖跨你的人生。青春就是一张票，能不能赶上时代的快车，你的步伐掌握在自己脚下，good luck！
-
 ## 目录
 
-1. 介绍
+1. 简介
    - [生命周期](#生命周期)
+   - [CI/CD（持续集成/持续部署）](#CI/CD（持续集成/持续部署）)
+2. [实战](#实战)
    - [安装](#安装)
      - [在docker中使用](#在docker中使用)
      - [在CentOS7上安装GitLab](#在CentOS7上安装GitLab)
      - [手动下载和安装GitLab包](#手动下载和安装GitLab包)
      - [安装GitLab Runner](#安装GitLab&nbsp;Runner)
    - [配置](#配置)
-   - [CI/CD（持续集成/持续部署）](#CI/CD（持续集成/持续部署）)
-2. [常用命令](#常用命令)
+   - [常用命令](#常用命令)
+   - [创建SpringBoot项目测试CI/CD](#创建SpringBoot项目测试CI/CD)
+3. [总结](#总结)
+4. [参考](#参考)
+
+## 简介
 
 - [官方文档](https://docs.gitlab.com/ee/README.html)
 - [安装文档](https://about.gitlab.com/install/)
@@ -21,9 +25,9 @@
 
 GitLab是一个基于Git的平台，集成了大量用于软件开发和部署以及项目管理的基本工具。
 
-## 生命周期
+### 生命周期
 
-![x](./Resource/1.png)
+![x](./Resources/gitlab1.png)
 
 DevOps阶段|文档
 -|-
@@ -37,9 +41,25 @@ DevOps阶段|文档
 [监控](https://docs.gitlab.com/ee/README.html#monitor)|应用程序监控和指标功能。
 [安全](https://docs.gitlab.com/ee/README.html#secure)|安全功能。
 
-## 安装
+### CI/CD（持续集成/持续部署）
 
-### 在CentOS7上安装GitLab
+![x](./Resources/CI&CD.png)
+
+CI/CD 是一个整套流程的解决方案，光依靠 docker 和 k8s 是完全不行的，中间涉及到很多 CI/CD 的工具，CI 的服务器。本地用 github 做代码的管理，Travis CI 用于构建 docker，docker 的镜像发布到 docker hub，docker hub 又和 docker cloud 做了个集成处理，通过 docker image 在公有云上做一个部署。进行服务的更新。
+
+github 和 docker hub 都是一种公共服务，都是收费的。jenkins 文档太多了不讲了，网上一搜一堆，这次不使用 jenkins。gitlab 和 gitlab CI，程序语言 python，java！通过之后的学习让 CI/CD 更加平民话，而不是高不可攀！
+
+持续集成(Continuous integration)是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽早地发现集成错误。
+
+PS：本人的目标 CI/CD 的整个流程，可以自己搭建一套小公司内部的流程，方便开发人员和测试使用。
+
+## 实战
+
+### 安装
+
+#### [在docker中使用](./备忘录.md#gitlab)
+
+#### 在CentOS7上安装GitLab
 
 1. 在CentOS 7（和RedHat/Oracle/Scientific Linux 7）上，以下命令将在系统防火墙中打开HTTP和SSH访问
 
@@ -157,41 +177,41 @@ sudo EXTERNAL_URL="http://gitlab.example.com" rpm -i gitlab-ee-9.5.2-ee.0.el7.x8
 
 示例：`sudo EXTERNAL_URL="http://gitlab.colin.com" rpm -i gitlab-ce-11.9.1-ce.0.el7.x86_64.rpm`
 
-### 安装GitLab&nbsp;Runner
+#### 安装GitLab&nbsp;Runner
 
-1. 添加GitLab的官方存储库
+1、添加GitLab的官方存储库
 
-   ```sh
-   # For Debian/Ubuntu/Mint
-   curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
+```sh
+# For Debian/Ubuntu/Mint
+curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
 
-   # For RHEL/CentOS/Fedora
-   curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | sudo bash
-   ```
+# For RHEL/CentOS/Fedora
+curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | sudo bash
+```
 
-2. 安装最新版本的GitLab Runner，或跳到下一步安装特定版本：
+2、安装最新版本的GitLab Runner，或跳到下一步安装特定版本：
 
-   ```sh
-   # For Debian/Ubuntu/Mint
-   sudo apt-get install gitlab-runner
+```sh
+# For Debian/Ubuntu/Mint
+sudo apt-get install gitlab-runner
 
-   # For RHEL/CentOS/Fedora
-   sudo yum install gitlab-runner
-   ```
+# For RHEL/CentOS/Fedora
+sudo yum install gitlab-runner
+```
 
-3. 要安装特定版本的GitLab Runner：
+3、要安装特定版本的GitLab Runner：
 
-   ```sh
-   # for DEB based systems
-   apt-cache madison gitlab-runner
-   sudo apt-get install gitlab-runner=10.0.0
+```sh
+# for DEB based systems
+apt-cache madison gitlab-runner
+sudo apt-get install gitlab-runner=10.0.0
 
-   # for RPM based systems
-   yum list gitlab-runner --showduplicates | sort -r
-   sudo yum install gitlab-runner-10.0.0-1
-   ```
+# for RPM based systems
+yum list gitlab-runner --showduplicates | sort -r
+sudo yum install gitlab-runner-10.0.0-1
+```
 
-## 配置
+### 配置
 
 1. 外部URL
 
@@ -219,17 +239,7 @@ sudo EXTERNAL_URL="http://gitlab.example.com" rpm -i gitlab-ee-9.5.2-ee.0.el7.x8
 
    测试：`ssh -T git@192.168.235.128`
 
-## CI/CD（持续集成/持续部署）
-
-![x](./Resource/CI&CD.png)
-
-CICD是一个整套流程的解决方案，光依靠docker和k8s是完全不行的，中间涉及到很多CICD的工具，CI的服务器。本地用github做代码的管理，Travis CI用于构建docker，docker的镜像发布到docker hub，docker hub又和docker cloud做了个集成处理，通过docker image 在公有云上做一个部署。进行服务的更新。github 和 docker hub 都是一种公共服务，都是收费的。jenkins文档太多了不讲了，网上一搜一堆，这次不使用jenkins。gitlab 和 gitlab CI，程序语言python，java！通过之后的学习让CICD更加平民话，而不是高不可攀！
-
-持续集成(Continuous integration)是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽早地发现集成错误。
-
-PS：本人的目标CICD的整个流程，可以自己搭建一套小公司内部的流程，方便开发人员和测试使用。
-
-## 常用命令
+### 常用命令
 
 ```sh
 # 查看版本号 12.3.5
@@ -253,6 +263,77 @@ gitlab-rake gitlab:backup:restore BACKUP=1393513186
 # 启动Gitlab
 sudo gitlab-ctl start
 ```
+
+### 创建SpringBoot项目测试CI/CD
+
+1、在项目根目录创建 `Dockerfile`
+
+```Dockerfile
+FROM openjdk:8-jdk
+COPY target/*.jar swarm-test.jar
+EXPOSE 8000
+ENTRYPOINT ["java","-jar","swarm-test.jar"]
+```
+
+2、项目根目录创建 `.gitlab-ci.yml` 文件
+
+```yml
+# 因为我们Runner执行器设置为docker，所以这里需要指定docker的版本
+image: docker:stable
+# 定义三个阶段
+stages:
+  - compile
+  - build
+  - run
+# 定义个变量，指定maven下载的jar包存放的位置
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=/.m2"
+# 第一阶段
+compile:
+  # 打包用到了maven，所有需要拉取maven镜像，这是我自己构建的阿里云maven私服的maven镜像
+  image: registry.cn-hangzhou.aliyuncs.com/gjing/maven:1.0
+  # 指定阶段
+  stage: compile
+  # 运行脚本，使用变量时要用到 $ 符号
+  script:
+    - mvn $MAVEN_OPTS clean package -Dmaven.test.skip=true
+  # 只作用在master分支
+  only:
+    - master
+  # 创建runner时指定的tag
+  tags:
+    - test
+  # 编译后有产物，所以要指定下过期时间和路径，以供于其他阶段使用
+  artifacts:
+    expire_in: 1 days
+    paths:
+      - target/*.jar
+# 第二阶段，这里不再一一介绍，和第一阶段差不多
+build:
+  stage: build
+  script:
+    - docker build -t registry.cn-hangzhou.aliyuncs.com/gjing/test:1.0 .
+    - docker login --username xxx --password xxx registry.cn-hangzhou.aliyuncs.com
+    - docker push registry.cn-hangzhou.aliyuncs.com/gjing/test:1.0
+  only:
+    - master
+  tags:
+    - test
+run:
+  stage: run
+  script:
+    - docker run -d --name my-test -p 8000:8000 registry.cn-hangzhou.aliyuncs.com/gjing/test:1.0
+  only:
+    - master
+  tags:
+    - test
+```
+
+3、将项目提交到 `Gitlab` 仓库即可
+
+提交到仓库的 master 分支后，会自动执行 CI/CD，第一次会比较慢，因为要拉取一些镜像和下载目前本地库没有的 jar 包。
+
+## 总结
 
 ## 参考
 
