@@ -12,6 +12,9 @@
    - [docker-compose](#docker-compose)
 3. 总结
    - [常见问题](#常见问题)
+   - [Windows容器](#Windows容器)
+   - [基于Docker的DevOps方案](#基于Docker的DevOps方案)
+   - [容器云平台的构建实践](#容器云平台的构建实践)
 
 ## 简介
 
@@ -1055,7 +1058,6 @@ ip addr show | grep ens3
 
 >注意：如果不开启混杂模式，会导致macvlan网络无法访问外界。具体在不使用vlan时，表现为无法ping通路由，无法ping通同一网络内其他主机
 
-
 ### 端口暴露
 
 然后，使用 ifconfig 命令查看宿主主机的 IP 地址，我的宿主主机有2个IP，一个是无线网 IP： 10.192.19.12，一个是有线网 IP：223.3.48.163，如果你有另一台在同一局域网的设备，比如你的手机，你可以访问这两个 IP，发现都可以访问 Apache 服务器主页
@@ -1224,6 +1226,479 @@ curl http://127.0.0.1:5000/v2/_catalog
 # 列出consul镜像有哪些tag
 curl http://127.0.0.1:5000/v2/consul/tags/list
 ```
+
+## 容器网络机制和多主机网络实践
+
+容器网络不是新技术，它是云计算虚拟化技术互联互通的基础核心技术。一般意义的网络都是主机与主机之间的通信，颗粒度局限在物理层面的网卡接口。随着虚拟化技术的发展，以应用为中心的新网络结构逐渐明朗清晰。容器技术就是让依赖环境可以跟着应用绑定打包，并随需启动并互联。容器技术的特点也对网络技术的发展起到了互推的作用，当网络不在持久化存在的时候，软件定义网络（SDN）技术的能力就会体现的更充分。
+
+### 容器主机网络模型
+
+Docker 内建的网络模型是 Bridge Network。这种网络是基于主机内部模型的网络，设计之初也是为了解决单机模式下容器之间的互联互通问题。如图：
+
+![x](./Resource/47.png)
+
+Veth pair 技术源于 Linux 网络模型的虚拟设备，比如 TAP 设备，方便主机上应用程序接收网络数据而创建。TAP 设备只能监听到网卡接口上的数据流量，如果想连接多个网络命名空间，就需要用到 Veth pair 技术来打通连接。容器网络之间的互通就是通过这个做到的，但是细心的读者可以看到，图上主机网卡和 docker0 网桥是没有连接的，不能数据互联。为了让容器与外界网络相连，首先要保证主机能允许转发 IP 数据包，另外需要让 iptables 能指定特定的 IP 链路。通过系统参数 ip_forward 来调节开关，如：
+
+```sh
+sysctl net.ipv4.conf.all.forwarding
+
+  net.ipv4.conf.all.forwarding = 0
+
+sysctl net.ipv4.conf.all.forwarding=1
+
+sysctl net.ipv4.conf.all.forwarding
+
+  net.ipv4.conf.all.forwarding = 1
+```
+
+另外，当 Docker 后台程序起来后，会自动添加转发规则到 Docker 过滤链上，如下图：
+
+```sh
+$ sudo iptables -t filter -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:domain
+ACCEPT     udp  --  anywhere             anywhere             udp dpt:domain
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:bootps
+ACCEPT     udp  --  anywhere             anywhere             udp dpt:bootps
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+DOCKER-ISOLATION  all  --  anywhere             anywhere
+DOCKER     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+DOCKER     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+DOCKER     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+Chain DOCKER (3 references)
+target     prot opt source               destination
+Chain DOCKER-ISOLATION (1 references)
+target     prot opt source               destination
+DROP       all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+RETURN     all  --  anywhere             anywhere
+```
+
+另外衍生出来的问题是，所有 Docker 容器启动时都需要显示指定端口参数，这样做是因为由于需要 iptable 规则来开启端口映射能力。
+
+### 跨越主机的容器网络模型
+
+如果需要让容器网络可以跨越主机访问，最原生的方式是 Macvlan 驱动支持的二层网络模型。VLAN 技术是网络组网的基本技术，在网络环境中很容易获得，所以，由此产生的用户映像是能不能打破主机和容器的网络间隙，把他们放在一个网络控制面上协作。Macvlan 技术就是为了这个需求而设计的，它实现了容器网络和主机网络的原生互联。当然，需要支持 Macvlan 也是需要准备一些基础环境的：
+
+- Docker 版本必须在1.12.0+以上
+- Linux kernel v3.9–3.19 and 4.0+才内置支持Macvlan 驱动
+
+Macvlan 技术是一种真实的网络虚拟化技术，比其他Linux Bridge 更加轻量级。相比 Linux Bridge，性能更高。因为它跳过了主机网卡和容器网络直接的转发过程，容器网卡接口直接对接主机网口，可以视作为主机网络的延伸。这样的网络，让外部访问容器变的非常简便，不在需要端口映射，如下图所示：
+
+![x](./Resource/48.png)
+
+为了让容器网络支持多个分组，可以考虑采用802.1q 的 VALN tagging 技术实现。这种技术的好处对于小规模主机网络下容器网络的搭建非常合适。这块通过如下图可以解释清楚：
+
+![x](./Resource/49.png)
+
+### 容器网络标准 CNI
+
+容器网络接口（CNI）是云原生基金会支持项目，属于云计算领域容器行业标准。它包含了定义容器网络插件规范和示范。因为 CNI 仅仅聚焦在容器之间的互联和容器销毁后的网络配置清理，所以它的标准简洁并容易实现。
+
+标准包含两部分，CNI Plugin 旨在配置网络信息，另外定义了 IPAM Plugin 旨在分配 IP，管理 IP。这个接口有更广泛的适用性，适应多种容器标准。如图：
+
+![x](./Resource/50.png)
+
+网络插件是独立的可执行文件，被上层的容器管理平台调用。网络插件只有两件事情要做：把容器加入到网络以及把容器从网络中删除。
+
+调用插件的数据通过两种方式传递：环境变量和标准输入。
+
+一般插件需要三种类型的数据：容器相关的信息，比如 ns 的文件、容器 id 等；网络配置的信息，包括网段、网关、DNS 以及插件额外的信息等；还有就是 CNI 本身的信息，比如 CNI 插件的位置、添加网络还是删除网络等。
+
+### 把容器加入到网络
+
+调用插件的时候，这些参数会通过环境变量进行传递：
+
+- CNI_COMMAND：要执行的操作，可以是 ADD（把容器加入到某个网络）、DEL（把容器从某个网络中删除）、VERSION
+- CNI_CONTAINERID：容器的 ID，比如 ipam 会把容器 ID 和分配的 IP 地址保存下来。可选的参数，但是推荐传递过去。需要保证在管理平台上是唯一的，如果容器被删除后可以循环使用
+- CNI_NETNS：容器的 network namespace 文件，访问这个文件可以在容器的网络 namespace 中操作
+- CNI_IFNAME：要配置的 interface 名字，比如 eth0
+- CNI_ARGS：额外的参数，是由分号;分割的键值对，比如 “FOO=BAR;ABC=123”
+- CNI_PATH：CNI 二进制文件查找的路径列表，多个路径用分隔符 : 分隔
+
+网络信息主要通过标准输入，作为 JSON 字符串传递给插件，必须的参数包括：
+
+- cniVersion：CNI 标准的版本号。因为 CNI 在演化过程中，不同的版本有不同的要求
+- name：网络的名字，在集群中应该保持唯一
+- type：网络插件的类型，也就是 CNI 可执行文件的名称
+- args：额外的信息，类型为字典
+- ipMasq：是否在主机上为该网络配置 IP masquerade
+- ipam：IP 分配相关的信息，类型为字典
+- dns：DNS 相关的信息，类型为字典
+
+CNI 作为一个网络协议标准，它有很强的扩展性和灵活性。如果用户对某个插件有额外的需求，可以通过输入中的 args 和环境变量 CNI_ARGS 传输，然后在插件中实现自定义的功能，这大大增加了它的扩展性；CNI 插件把 main 和 ipam 分开，用户可以自由组合它们，而且一个 CNI 插件也可以直接调用另外一个 CNI 插件，使用起来非常灵活。如果要实现一个继承性的 CNI 插件也不复杂，可以编写自己的 CNI 插件，根据传入的配置调用 main 中已经有的插件，就能让用户自由选择容器的网络。
+
+### 容器网络实践
+
+容器网络的复杂之处在于应用的环境是千变万化的，一招鲜的容器网络模型并不能适用于应用规模的扩张。因为所谓实践，无外乎是在众多网络方案中选择合适自己的网络方案。
+
+一切应用为王，网络性能指标是指导我们选择方案的最佳指南针。主机网络和容器网络互联互通的问题，是首先需要考虑的。当前比较合适的容器网络以 Macvlan/SR-IOV 为主。考虑原因还是尽量在兼容原有网络硬件的集成之上能更方便的集成网络。这块的方案需要软硬件上的支持，如果条件有限制，可能很难实现。比如你的容器网络本来就构建在 Openstack 的虚拟网络中。
+
+退而求其次，当前最普遍的方案就是 Vxlan/overlay 的方案，这种网络方案是虚拟网络，和外界通信需要使用边界网关通信。这块主要的支持者是 Kubernetes 集群。比如常用的 Flannel 方案，主要被用户质疑的地方就是网络效率的损耗。 当然，Vxlan 方案的优秀选择 openswitch，可能是最强有力的支持者。通过 OVS 方便，可以得到一个业界最好的网络通信方案。当遇到生产级瓶颈时，可以考虑使用硬件控制器来代替 OVS 的控制器组件来加速网络。目前 Origin 的方案中选择的就是 OVS 方案，可以认为是当前比较好的选择。
+
+当然，开源的 overlay 方案中有比较优秀的方案比如 Calico 方案，它借用了 BGP 协议作为主机与主机之间边界的路由通信，可以很好的解决小集群模式下的高效网络传输。Calico 的背后公司也是借用此技术在社区中推出商业硬件解决方案。从国内的中小型企业的网络规模来说，此种网络完全可以满足网络需要。
+
+### 展望网络发展趋势
+
+容器网络互联已经不在是棘手的问题，行的实现就在手边。目前用户进一步的使用中，对网络的限流和安全策略有了更多的需求。这也催生了如 cilium 这样的开源项目，旨在利用 Linux 原生的伯克利包过滤（Berkeley Packet Filter，BPF）技术实现网络流量的安全审计和流量导向。如图：
+
+![x](./Resource/51.png)
+
+所以，容器网络的发展正在接近应用生命周期的循环中，从限流，到安全策略，再到可能的虚拟网络 NFV 的构建都有可能改变我们的容器世界。
+
+参考：[容器网络接口标准](https://github.com/containernetworking/cni/blob/master/SPEC.md)
+
+## Docker日志机制与监控实践
+
+日志和监控是容器云平台系统最常见的必备组件，形象一点形容其原理就是咖啡和伴侣一样必须配套使用，让你的应用运行的更贴合用户满意的服务运营目标（SLO）。当容器技术被大量行业采用之后，我们遇到了一个很自然的问题，容器化后应用日志怎么收集，监控报警怎么做。这些问题一直困扰着容器行业的从业者，直到以 Google Borgmon 为理论基础的 Prometheus 开源项目发布，EFK 日志系统的容器化实践落地，得以促成本篇文章的完成。
+
+### EFK 日志系统的容器化实践
+
+日志系统涉及采集、展现和存储三个方面的设计。从采集方面来说，单台容器主机上的采集进程应该是多功能接口的、可以提供插件机制的日志组件才能满足一般采集的需求。那么到了容器这个领域，日志分为控制台日志和应用业务日志两类。对于容器控制台接口，需要通过容器进程开放的接口来采集，如图：
+
+![x](./Resource/52.png)
+
+容器默认采用的是日志驱动为 json-file 模式，采集效率极低还占用大量 IO 读写效能，基本无法适应生产环境需要。在我们生产实践推荐中，偏向于采用系统提供的日志系统 systemd-journal 来接收日志采集，然后通过 fluentd 采集代理进程，把相应的日志按照业务规则分类汇聚，发送到 Elasticsearch 这样的中央日志管理系统。由于业务日志量的规模扩大，日志采集的流量速率会让中央日志系统处理负载过高，导致业务日志处理不过来。所以通常采用流式消息队列服务 Kafka 作为日志存储的异步缓冲，可以极大的缓解日志流量，并高效的解决日志采集的汇聚难题。
+
+CNCF 云原生计算基金会推荐的采集解决方案是 Fluentd，作为行业标杆的托管项目，这个项目的插件是非常丰富的。所以，当你在考虑选择日志采集方案的时候，Fluentd 是当前一站式解决容器日志采集方案的首选，如下图：
+
+![x](./Resource/53.png)
+
+因为 Fluentd 是一套 ruby 编写的日志采集框架，很难让人信服其海量的日志处理能力。所以在今年早些时候推出了基于 C 语言编写的高性能日志转发工具 fluentbit，可以完美承上输入层，起下输出层，如图：
+
+![x](./Resource/54.png)
+
+日志收集到之后，会通过相应的过滤插件汇聚清洗日志条目并聚合到日志中心系统，系统用户通过可视化界面可以检索自己需要的日志信息。
+
+随着 CNCF 在全球范围内吸收了业界主流云计算厂商，导致日志收集又遇到另一个需要解决的问题，那就是 Kubernetes 集群的日志收集问题。所以，我需要逐步按照收集的纬度给予介绍分析。首先，最基本的是 Pod 的日志信息，注意它并不等同于 Docker 容器的控制台日志。
+
+例如 Pod 任务[counter-pod.yaml](https://raw.githubusercontent.com/kubernetes/website/master/docs/tasks/debug-application-cluster/counter-pod.yaml)：
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: counter
+spec:
+  containers:
+  - name: count
+    image: busybox
+    args: [/bin/sh, -c,
+            'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done']
+```
+
+发布这个 Pod 到集群中：
+
+```sh
+kubectl create -f https://k8s.io/docs/tasks/debug-application-cluster/counter-pod.yaml
+--pod "counter" created
+```
+
+查看日志：
+
+```sh
+$ kubectl logs counter
+0: Mon Jan  1 00:00:00 UTC 2001
+1: Mon Jan  1 00:00:01 UTC 2001
+2: Mon Jan  1 00:00:02 UTC 2001
+...
+```
+
+Kubernetes 默认使用容器的 json-file 驱动来写入日志文件，并使用 logrotate 来收敛日志大小。
+
+![x](./Resource/55.png)
+
+除了 Pod 之外，我们还需要考虑 Kubernetes 系统组件的日志收集工作。例如这样的场景：
+
+- Scheduler 和 kube-proxy 是容器化运行
+- Kubelet 和 Docker 是非容器化运行
+
+对于容器化的系统组件，他们都是采用 [glog](https://godoc.org/github.com/golang/glog) 来写入日志的并存入 /var/log 目录下，可以采用logrotate 来按大小分割日志。对于非容器化的系统组件，直接采用系统内建的 systemd-journal 收集即可。
+
+当然对于分布式系统的日志收集，还可以通过发布日志采集容器组件的方式来采集日志。最好的方式是采用 sidecar 的方式，每个 Pod 中加入一个日志采集器，方便日志的采集流式进入日志系统中。
+
+![x](./Resource/56.png)
+
+当应用日志需要落盘的时候，这种 sidecar 模式的日志采集方式尤其灵活，值得推荐采用。
+
+### 容器监控实践
+
+容器监控需要关心的指标范畴主要集中在主机、集群、容器、应用以及报警规则和报警推送。监控的指标也大多放在了 CPU、RAM、NETWORK 三个纬度上面。当然业务应用如果是 Java 系统，还有收集 JMX 的需求存在，从容器角度来讲仅需要暴露 JMX 端口即可。很多开始做容器监控的从业者会考虑使用现有基础监控设施 Zabbix 来做容器监控。但是从业界发展趋势上来说，采用 Prometheus 的解决方案会是主流方案。首先，我们可以通过 Prometheus 的架构来了解监控的流程架构图如下：
+
+![x](./Resource/57.png)
+
+它采用 Pull 模式来主动收集监控信息，并可以采用 Grafana 定制出需要的监控大屏面板。从收集探针角度，Prometheus 有很多[输出指标的插件](https://prometheus.io/docs/instrumenting/exporters/)可以使用。注意插件 exporter 的工作目的是能把监控数据缓存起来，供 Prometheus 服务器来主动抓取数据。从生产级别 HA 的需求来看，目前 Prometheus 并没有提供。所有我们需要给 Prometheus Server 和 AlertManager 两个组件提供 HA 的解决方案。
+
+#### HA Prometheus
+
+当前可以实施的方案是建立两套一模一样配置的Prometheus 服务，各自独立配置并本地存储监控数据并独立报警。因为上面介绍了 PULL 的拉取采集方式，对于两个独立的 Prometheus 服务来说是完全可行的，不需要在客户端配置两份监控服务地址。记住两套 Prometheus Server 必须独立，保证一台当机不会影响另外一台 Server 的使用。
+
+#### HA AlertManager
+
+AlertManager 的 HA 配置是复杂的，毕竟有两个Prometheus Server 会同时触发报警给 AlertManager，用户被报警两遍并不是一个好主意。当前 HA 还在开发过程中，采用了[Mesh技术](https://github.com/prometheus/alertmanager#high-availability)帮助 AlertManager 能协调出哪一个接受者可以报告这次警告。
+
+另外，通过 PromSQL 的 DSL 语法，可以定制出任何关心的监控指标：如图：
+
+![x](./Resource/58.png)
+
+定义报警规则的例子如下：
+
+```sh
+task:requests:rate10s =
+  rate(requests{job="web"}[10s])
+```
+
+同时我们还关注到当前 Prometheus 2.0 即将发布 GA，从 RC 版本透露新特性是时间序列数据存储的自定义实现，参考了 Facebook 的 Gorilla（[Facebook's "Gorilla" paper](http://www.vldb.org/pvldb/vol8/p1816-teller.pdf)），有兴趣的可以关注一下。
+
+另外，Prometheus 还有一个痛点就是系统部署比较麻烦，现在推荐的方式是采用 Operator 的模式发布到K8S 集群中提供服务（[Prometheus Operator](https://coreos.com/operators/prometheus/docs/latest)），效率高并且云原生架构实现。
+
+**总结：**
+
+Docker 日志机制已经没有什么技巧可以优化。这个也证明了容器技术的成熟度已经瓜熟蒂落，并且在日常应用运维中可以很好的实施完成。主要的实践重点在于日志体系的灵活性和日志数据处理能力方面的不断磨合和升级，这是容器技术本身无法支撑的，还需要用户结合自身情况选择发展路线。
+
+对于监控系统，时间序列数据库的性能尤为重要。老版本的 Prometheus 基本都是在采集性能上得不到有效的发挥，这次2.0版本完全重写了一遍 tsdb，经过评测发现比老版本性能提升3-4倍，让人刮目相看。期待正式版本的推出，可以让这套云原生的监控系统得到更好的发展。
+
+**参考：**
+
+- [Kubernetes Logging Architecture](https://kubernetes.io/docs/concepts/cluster-administration/logging/)
+- [HA AlertManager setup (slide)](http://calcotestudios.com/talks/slides-understanding-and-extending-prometheus-alertmanager.html#/1/9)
+- [https://fabxc.org/tsdb/](https://fabxc.org/tsdb/)
+
+## 自动化部署分布式容器云平台实践
+
+当前云计算场景中部署一套 Kubernetes 集群系统是最常见的容器需求。在初期阶段，大量的部署经验都依赖于前人设计实现的自动化部署工具之上，比如 Ansible。但是为什么这样的自动化工具并不能彻底解决所有 Kubernetes 集群的安装问题呢，主要的矛盾在于版本的升级更新动作在分布式系统的部署过程中，由于步骤复杂，无法提供统一的自动化框架来支持。
+
+Ansible 需要撰写大量的有状态的情况来覆盖各种可能发生的部署阶段并做出判断。这种二次判断的操作对于 Ansible 这种自动化工具是无法适应的。Ansible 这样的工具期望行为一致性，如果发生可能发生的情况，将无法有效的保证后续的步奏能有效的安装。通过本文分享的 Kubernetes 社区中提供的安装套件可以帮助大家结合实践现在适合自己的部署分布式容器云平台的方法和工具链。
+
+### Kubernetes Operations（kops）
+
+#### 生产级别 k8s 安装、升级和管理
+
+Ansible 部署 k8s 需要投入很多精力来维护集群知识的 roles 和 inventory，在日常分布式系统中会带来很多不确定的异常，很难维护。所以社区提供了 kops，期望能像 kubectl 一样来管理集群部署的问题。目前实现了 AWS 的支持，GCE 支持属于 Beta 阶段，vSphere 处于 alpha 阶段，其他平台属于计划中。对于中国区的 AWS，可以选用 cn-north-1 可用区来支持。
+
+![x](./Resource/59.png)
+
+1、配置 AWS 信息
+
+```sh
+AWS Access Key ID [None]:
+AWS Secret Access Key [None]:
+Default region name [None]:
+Default output format [None]:
+```
+
+注意需要声明可用区信息
+
+```sh
+export AWS_REGION=$(aws configure get region)
+```
+
+2、DNS 配置
+
+因为工作区没有 AWS 的 Route53 支持，我们通过使用 gossip 技术可以绕过去这个限制。
+
+3、集群状态存储
+
+创建独立的 S3 区来存储集群安装状态。
+
+```sh
+aws s3api create-bucket --bucket prefix-example-com-state-store --create-bucket-configuration LocationConstraint=$AWS_REGION
+```
+
+4、创建第一个 k8s 集群
+
+在中国区执行安装的时候，会遇到网络不稳定的情况，使用如下的环境声明可以缓解此类问题：
+
+```sh
+## Setup vars
+
+KUBERNETES_VERSION=$(curl -fsSL --retry 5 "https://dl.k8s.io/release/stable.txt")
+KOPS_VERSION=$(curl -fsSL --retry 5 "https://api.github.com/repos/kubernetes/kops/releases/latest" | grep 'tag_name' | cut -d\" -f4)
+ASSET_BUCKET="some-asset-bucket"
+ASSET_PREFIX=""
+
+# Please note that this filename of cni asset may change with kubernetes version
+CNI_FILENAME=cni-0799f5732f2a11b329d9e3d51b9c8f2e3759f2ff.tar.gz
+
+
+export KOPS_BASE_URL=https://s3.cn-north-1.amazonaws.com.cn/$ASSET_BUCKET/kops/$KOPS_VERSION/
+export CNI_VERSION_URL=https://s3.cn-north-1.amazonaws.com.cn/$ASSET_BUCKET/kubernetes/network-plugins/$CNI_FILENAME
+
+## Download assets
+
+KUBERNETES_ASSETS=(
+  network-plugins/$CNI_FILENAME
+  release/$KUBERNETES_VERSION/bin/linux/amd64/kube-apiserver.tar
+  release/$KUBERNETES_VERSION/bin/linux/amd64/kube-controller-manager.tar
+  release/$KUBERNETES_VERSION/bin/linux/amd64/kube-proxy.tar
+  release/$KUBERNETES_VERSION/bin/linux/amd64/kube-scheduler.tar
+  release/$KUBERNETES_VERSION/bin/linux/amd64/kubectl
+  release/$KUBERNETES_VERSION/bin/linux/amd64/kubelet
+)
+for asset in "${KUBERNETES_ASSETS[@]}"; do
+  dir="kubernetes/$(dirname "$asset")"
+  mkdir -p "$dir"
+  url="https://storage.googleapis.com/kubernetes-release/$asset"
+  wget -P "$dir" "$url"
+  [ "${asset##*.}" != "gz" ] && wget -P "$dir" "$url.sha1"
+  [ "${asset##*.}" == "tar" ] && wget -P "$dir" "${url%.tar}.docker_tag"
+done
+
+KOPS_ASSETS=(
+  "images/protokube.tar.gz"
+  "linux/amd64/nodeup"
+  "linux/amd64/utils.tar.gz"
+)
+for asset in "${KOPS_ASSETS[@]}"; do
+  kops_path="kops/$KOPS_VERSION/$asset"
+  dir="$(dirname "$kops_path")"
+  mkdir -p "$dir"
+  url="https://kubeupv2.s3.amazonaws.com/kops/$KOPS_VERSION/$asset"
+  wget -P "$dir" "$url"
+  wget -P "$dir" "$url.sha1"
+done
+
+## Upload assets
+
+aws s3api create-bucket --bucket $ASSET_BUCKET --create-bucket-configuration LocationConstraint=$AWS_REGION
+for dir in "kubernetes" "kops"; do
+  aws s3 sync --acl public-read "$dir" "s3://$ASSET_BUCKET/$ASSET_PREFIX$dir"
+done
+```
+
+创建集群的时候加上参数：
+
+```sh
+--kubernetes-version https://s3.cn-north-1.amazonaws.com.cn/$ASSET_BUCKET/kubernetes/release/$KUBERNETES_VERSION
+```
+
+另外，还有一些镜像是托管在 gcr.io 中的，比如pause-amd64， dns等。需要自行下载并提交部署到所有机器上才能做到离线安装。这里有一个技巧是通过自建的 **Dockerfile** 中加上
+
+```sh
+FROM gcr.io/google_containers/pause-amd64
+```
+
+一行，并通过 Docker Cloud 自动构建的功能，把 pause-amd64 这样的镜像同步到 docker hub 中，方便国内的 AWS 主机可以下载使用。
+
+### kubeadm——官方安装 k8s 集群命令行工具
+
+kubeadm 主要的目的就为简化部署集群的难度，提供一键式指令如：kubeadm init 和 kubeadm join 让用户在安装集群的过程中获得平滑的用户体验。
+
+![x](./Resource/60.png)
+
+#### kubeadm init
+
+初始化的过程被严格定义成多个阶段来分步骤跟踪集群的状态。有些参数必须需要调优：
+
+- --apiserver-advertise-address 这个地址是用来让 API Server 来通告其他集群组件的 IP 地址。
+
+- --apiserver-bind-port 这个端口是 API Server 的端口，默认是6443。
+
+- --apiserver-cert-extra-sans 附加的主机名字或地址，并加入到证书中。例如：
+
+  ```sh
+  --apiserver-cert-extra-sans=kubernetes.example.com,kube.example.com,10.100.245.1
+  ```
+
+- --cert-dir 证书地址，默认在 /etc/kubernetes/pki。
+
+- --config kubeadm 的配置文件。
+
+- --dry-run 这个参数告诉 kubeadm 不要执行，只是显示执行步骤。
+
+- --feature-gates 通过键值对来激活 alpha/experimental 的特性。
+
+- --kubernetes-version 集群初始化版本号。
+
+- --node-name 主机名称。
+
+- --pod-network-cidr 选择 pod 的网络网段。
+
+- --service-cidr 服务 IP 地址网段。
+
+- --service-dns-domain 服务域名，默认 cluster.local。
+
+- --skip-preflight-checks 默认 kubeadm 运行一系列事前检查来确认系统的有效性。
+
+- --skip-token-print 去掉默认打印 token 的行为。
+
+- --token 指定 token 的字符串。
+
+- --token-ttl 配置 token 的过期时间，默认24个小时。
+
+#### kubeadm join
+
+两种连接方式：
+
+- 通过共享 token 和 ip 地址和 root CA key 来加入集群。
+
+  ```sh
+  kubeadm join --discovery-token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:1234..cdef 1.2.3.4:6443
+  ```
+
+- 使用配置文件
+
+  ```sh
+  kubeadm join --discovery-file path/to/file.conf
+  ```
+
+#### kubeadm config
+
+kubeadm v1.8.0+ 将自动创建 ConfigMap 提供kubeadm init 需要的所有参数。
+
+#### kubeadm reset
+
+取消 kubeadm init 或者 kubeadm join 对集群做的改动。
+
+#### kubeadm token
+
+管理集群需要的 token。
+
+还有，kubeadm 可以配置使用其他 docker runtime，比如 cri-o 容器引擎。
+
+```sh
+cat > /etc/systemd/system/kubelet.service.d/20-cri.conf <<EOF
+Environment="KUBELET_EXTRA_ARGS=--container-runtime=remote --container-runtime-endpoint=$RUNTIME_ENDPOINT --feature-gates=AllAlpha=true"
+EOF
+systemctl daemon-reload
+```
+
+通过初始化后，就可以调用 cri-o 引擎了。
+
+#### kubeadm 配置自定义镜像
+
+默认，kubeadm 会拉取 gcr.io/google_containers 下的镜像。必须通过配置文件覆盖默认的镜像仓库的地址。
+
+- imageRepository 去掉。gcr.io/google_containers 的值。
+- unifiedControlPlaneImage 提供面板镜像。
+- etcd.image 是 etcd 的镜像。
+
+#### kubeadm 支持云端集成
+
+通过指定--cloud-provider 参数可以实现云端 k8s 集群的部署。比如阿里云就实现了一套 [cloud provider](https://github.com/AliyunContainerService/alicloud-controller-manager) 帮助用户在阿里云一键部署一套集群。从当前社区的热度来看，k8s 社区重点专注在kubeadm的扩展，第三方的 cloud provider 可以自行实现功能，kubeadm 可以通过参数的方式调用阿里云的基础组件。
+
+**总结：**
+
+从 Ansible 自动化工具开始，K8S 集群作为典型的分布式集群系统安装范本，社区在不断的优化用户体验。我们期望集群能够自举的完成系统级配置，并且通过 kubeadm 的方式帮助用户简单的、平滑的升级集群。实现这个 kubeadm，可以帮助任意系统管理员不在为分布式系统的安装犯愁，只需要一行命令就可以完成集群的搭建。所有生产级别的经验都被固化在 kubeadm 的代码中，我们通过参数加以调优，实现集群的生产级别的部署工作。
 
 ### docker-compose
 
@@ -1603,3 +2078,168 @@ systemctl restart docker
 **2、Job for docker.service failed**
 
 解决：执行 `vim /etc/sysconfig/selinux`，把 `selinux` 属性值改为 disabled。然后重启系统，docker 就可以启动了。
+
+### Windows容器
+
+[Windows 容器](https://docs.microsoft.com/zh-cn/virtualization/windowscontainers/about/)：
+
+- Windows Server：通过进程和命名空间隔离技术提供应用程序隔离。Windows Server容器与容器主机和主机上运行的所有容器共享内核。
+- Hyper-V：通过在高度优化的虚拟机中运行各容器来扩展 Windows Server 容器提供的隔离。在此配置中，容器主机的内核不与 Hyper-V 容器共享，以提供更好的隔离。
+
+有关详细信息，请参阅 [Hyper-V 容器](https://docs.microsoft.com/virtualization/windowscontainers/manage-containers/hyperv-container)。
+
+### 基于Docker的DevOps方案
+
+这张时序图概括了目前敏捷开发流程的所有环节：
+
+![x](./Resources/docker4.png)
+
+场景管道图：
+
+![x](./Resources/docker5.png)
+
+**最佳发布环境：**
+
+[Kubernetes](https://github.com/GoogleCloudPlatform/kubernetes) 是 Google 的一个容器集群管理工具，它提出两个概念：
+
+- **Cluster control plane（AKA master）**：集群控制面板，内部包括多个组件来支持容器集群需要的功能扩展。
+- **The Kubernetes Node**：计算节点，通过自维护的策略来保证主机上服务的可用性，当集群控制面板发布指令后，也是异步通过 etcd 来存储和发布指令，没有集群控制链路层面的依赖。
+
+![x](./Resources/docker6.png)
+
+SwarmKit 是一个分布式集群调度平台，作为 docker 一个新的集群调度开源项目，它大量借鉴了 Kubernetes 和 Apache Mesos 的优秀概念和最佳实践：
+
+![x](./Resources/SwarmKit.png)
+
+Apache Mesos 系统是一套资源管理调度集群系统，生产环境使用它可以实现应用集群。Mesos 是一个框架，在设计它的时候只是为了用它执行 Job 来做数据分析。它并不能运行一个比如 Web 服务 Nginx 这样长时间运行的服务，所以我们需要借助 marathon 来支持这个需求。
+
+marathon 有自己的 REST API，我们可以创建如下的配置文件 Docker.json：
+
+```json
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "libmesos/ubuntu"
+    }
+  },
+  "id": "ubuntu",
+  "instances": "1",
+  "cpus": "0.5",
+  "mem": "512",
+  "uris": [],
+  "cmd": "while sleep 10; do date -u +%T; done"
+}
+```
+
+然后调用
+
+```sh
+curl -X POST -H "Content-Type: application/json" http://:8080/v2/apps -d@Docker.json
+```
+
+我们就可以创建出一个 Web 服务在 Mesos 集群上。对于 Marathon 的具体案例，可以参考[官方案例](https://mesosphere.github.io/marathon/)。
+
+![x](./Resources/Marathon.png)
+
+### 容器云平台的构建实践
+
+容器云平台是 Gartner 近些年提出来的云管理平台（Cloud Management Platform，CMP）的企业架构转型衍生品，参考 Gartner 的定义如下：
+
+>云管理平台（CMP）是提供对公有云、私有云和混合云整合管理的产品。
+
+从容器化角度总结起来就是两块，第一是功能需求，管理容器运行引擎、容器编排、容器网络、容器存储、监控报警日志。第二是非功能需求，可用性，兼容性，安全和易用性，负载优化等。容器云平台建设的目标是使企业业务应用被更好的运营管理起来。
+
+从云平台的建设步骤来说，大致需要经过以下步骤来梳理实践，顺序不限：
+
+1.选择运行时容器引擎的基准参考。
+
+实际情况是当前容器运行引擎可以选择的品类并不多，只有 Docker 家的组件是最容易搭建的，所以业界选型的时候，都是默认首选以 Docker 组件作为基准来选型环境配置。当然随着云原生基金会（Cloud Native Computing Foundation，CNCF）接纳下当前几乎所有业界领先的云计算厂商成为其成员单位，从而从侧面奠基了以通用容器运行时接口（CRI）为基础的 cri-o 系列容器引擎的流行，参考 CNCF 的架构鸟瞰图可以看到容器运行引擎的最新的发展走向。
+
+从 CNCF 指导下应用上云的趋势来看，已经在模糊私有云计算资源和公有云计算资源的界限，容器运行引擎也不在是 Docker 一家独有，业界已经偏向选择去除厂商绑定的开源通用容器运行时接口（CRI）对接的容器引擎。这种趋势也明显从 DockerCon17 大会上看到 Docker 宣布支持 Kubernetes 一样，容器引擎已经有了新的架构体系可以参考和扩展。如图：
+
+![x](./Resource/40.png)
+
+由于社区的快速变革，很多读者可能已经无法详细梳理和理解 CRI-containerd 和 CRI-O 的一些细微差别。所以我还要把 CRI-O 的架构图放在这里方便大家做对比。
+
+![x](./Resource/39.png)
+
+2.容器云平台涉及到多租户环境下多个计算节点的资源有效利用和颗粒度更细的资源控制。
+
+Kubernetes 无疑是最佳的开源项目来支撑云平台的实践。Kubernetes 的架构设计是声明式的 API 和一系列独立、可组合的控制器来保证应用总是在期望的状态。这种设计本身考虑的就是云环境下网络的不可靠性。这种声明式 API 的设计在实践中是优于上一代命令式 API 的设计理念。考虑到云原生系统的普及，未来 Kubernetes 生态圈会是类似 Openstack 一样的热点，所以大家的技术栈选择上，也要多往 Kubernetes 方向上靠拢。如图：
+
+![x](./Resource/41.png)
+
+3.容器网络其实从容器云平台建设初期就是重要梳理的对象。
+
+容器引擎是基于单机的容器管理能力，网络默认是基于veth pair 的网桥模式，如图所示：
+
+![x](./Resource/42.png)
+
+这种网络模型在云计算下无法跨主机通信，一般的做法需要考虑如何继承原有网络方案。所以 CNCF 框架下定义有容器网络接口（CNI）标准，这个标准就是定义容器网络接入的规范，帮助其他既有的网络方案能平滑接入容器网络空间内。自从有了 CNI 之后，很多协议扩展有了实现，OpenSwitch、Calico、Fannel、Weave 等项目有了更具体的落地实践。从企业选型的角度来看当前网络环境下，我们仍然需要根据不同场景认真分析才可以获得更好的收益。常见的场景中
+
+- 物理网络大都还是二层网络控制面，使用原生的 MacVlan/IPVlan 技术是比较原生的技术。
+- 从虚拟网络角度入手，容器网络的选择很多，三层 Overlay 网络最为广泛推荐。
+- 还有从云服务商那里可以选择的网络环境都是受限的网络，最优是对接云服务的网络方案，或者就是完全放弃云平台的建设由服务商提供底层方案。
+
+网络性能损耗和安全隔离是最头疼的网络特性。使用容器虚拟网桥一定会有损耗，只有最终嫁接到硬件控制器层面来支撑才能彻底解决此类性能损耗问题。所有从场景出发，网络驱动的选择评估可以用过网络工具的实际压测来得到一些数据的支撑。参考例子：
+
+```sh
+docker run  -it --rm networkstatic/iperf3 -c 172.17.0.163
+
+Connecting to host 172.17.0.163, port 5201
+[  4] local 172.17.0.191 port 51148 connected to 172.17.0.163 port 5201
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec  4.16 GBytes  35.7 Gbits/sec    0    468 KBytes
+[  4]   1.00-2.00   sec  4.10 GBytes  35.2 Gbits/sec    0    632 KBytes
+[  4]   2.00-3.00   sec  4.28 GBytes  36.8 Gbits/sec    0   1.02 MBytes
+[  4]   3.00-4.00   sec  4.25 GBytes  36.5 Gbits/sec    0   1.28 MBytes
+[  4]   4.00-5.00   sec  4.20 GBytes  36.0 Gbits/sec    0   1.37 MBytes
+[  4]   5.00-6.00   sec  4.23 GBytes  36.3 Gbits/sec    0   1.40 MBytes
+[  4]   6.00-7.00   sec  4.17 GBytes  35.8 Gbits/sec    0   1.40 MBytes
+[  4]   7.00-8.00   sec  4.14 GBytes  35.6 Gbits/sec    0   1.40 MBytes
+[  4]   8.00-9.00   sec  4.29 GBytes  36.8 Gbits/sec    0   1.64 MBytes
+[  4]   9.00-10.00  sec  4.15 GBytes  35.7 Gbits/sec    0   1.68 MBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-10.00  sec  42.0 GBytes  36.1 Gbits/sec    0             sender
+[  4]   0.00-10.00  sec  42.0 GBytes  36.0 Gbits/sec                  receiver
+
+iperf Done.
+```
+
+对于网络安全的需求，一种是策略性的网络速度的限制，还有一种是策略上的租户网络隔离，类似 VPC。这块比较有想法的参考开源项目是 [cilium](https://github.com/cilium/cilium)，如图：
+
+![x](./Resource/43.png)
+
+4.容器存储是容器应用持久化必须解决的问题。
+
+从容器提出来之后，业界就一直在探索如何在分布式场景下对接一套分布式存储来支撑有状态应用。可惜的是，在 CNCF 的容器存储接口（CSI）定义之下，目前还没有最终完成参考实现，所有大家只能参考一下[规范](https://github.com/container-storage-interface/spec)。在没有统一接口之前，我们只能一对一的实现当前的存储接口来调用分布式存储。好在存储并没有太多的选择，除了商用存储之外，开源领域可以选择的无非是 GlusterFS 和 Ceph。一种是作为块存储存在，一种是作为文件存储存在。
+
+从容器使用角度来讲，文件存储是应用场景最多的案例，所以使用 Gluster 类来支持就可以在短时间内实现有状态应用的扩展。这里特别需要提醒一句，容器分布式存储的想法有很多种，并不一定要局限在现有存储方案中，只需要实现 FUSE 协议就可以打造自己的存储，可以参考京东云的容器存储实现 [Containerfs](https://github.com/ipdcode/containerfs) 获得灵感：
+
+![x](./Resource/44.png)
+
+5.容器云平台定制化需求最多的地方就是管理平台的功能布局和功能范围。
+
+云平台常常只覆盖底层组件80%左右的功能映射，并不是完全100%匹配。所有通用型云平台的设计实现需要从各家的场景需求出发，大致分为 DevOps 领域的集成开发平台，也可以是支撑微服务的管控平台。两个方向差距非常大，难以放在一起展现，大家的做法就是在行业专家理解的基础之上进行裁剪。目前行业可以参考的案例有 Rancher 的面板，还有 Openshift 的面板，并且谷歌原生的容器面板也是可以参考，如图：
+
+![x](./Resource/45.png)
+
+6.镜像仓库的建设和管理，大家往往趋向于对管理颗粒度的把控。这块，可以参考的开源项目有 [Harbor](https://github.com/vmware/harbor)。
+
+围绕镜像仓库的扩展需求还是非常多的，比如和 CI/CD 的集成，帮助用户从源码层面就自动构建并推入到仓库中。从镜像的分发能不能提供更多的接口，不仅仅是 Docker pull 的方式，可能需要通过 Agent 提前加载镜像也是一种业务需求。相信不久就会有对应的方案来解决这块的扩展问题。
+
+7.还有非功能的需求也是需要考虑的。
+
+比如云平台的高可用怎么实现，是需要考虑清楚的。一般分布式系统都有三个副本的主控节点，所有从方便性来讲，会把云管理平台放在3台主控节点上复用部署，通过Haproxy 和 Keeplived 等技术实现面板访问入口的高可用。还有当云平台还有 DB 需求时，需要单独的数据库主备模式作为 DB 高可用的选项，当然选择分布式 DB 作为支持也是可选项，当时这块就需要把 DB 服务化了。
+
+当你真实引入这些组件部署之后，会发现需要冗余的组件是很多的，无状态的组件和有状态的组件并不能随便的混部，需要根据业务场景归类好。通常从可用性上来讲是应该抽离出来单独放把云管理平台部署两台机器上做高可用。其他部分中容器调度集群系统本身就是分布式设计，天然就有高可用的布局，可以直接利用。从应用上 Kubernets 开始很多分布式的优势会立即受益，我们主要的关心重点在于对集群控制器的业务需求扩展实现和算法调度管理。
+
+8.微服务尤其是 Google Istio 的推出对服务网格化的需求，给容器云平台注入了新的实际的微服务场景，可以预见是未来容器云平台应用的一个重要场景。如下图所示。
+
+弱化网关的单入口性，把网关做成了业务控制面板，可以任意的调度用户的请求流量。这是对上一代以 API 网关为中心的微服务的进化，必将引起软件架构的变革。
+
+![x](./Resource/46.png)
+
+综上所述，云平台的构建实践不是一蹴而就的。需要结合业务场景在方方面面给予规划并分而治之。技术栈的不断迭代，让云计算开始有了很多新内容可以学习和实践。但是，很多历史遗留的应用的容器化工作还是非常棘手的。附加上流程变革的时间进度，我们还是需要在很多方面折中并给出一些冗余的方案来适配传统业务体系的需求。所有，通过以上功能性和非功能性的需求参考，相信可以加快企业构建云平台的步伐并给予一些必要的指导参考。
