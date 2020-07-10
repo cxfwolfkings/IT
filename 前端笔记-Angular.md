@@ -1,24 +1,52 @@
 # 目录
 
 1. [简介](#简介)
-
-
+   - [禅道理念](#禅道理念)
+   - [运行条件](#运行条件)
+   - [Schematics代码生成器](#Schematics代码生成器)
+   - [Workspace与多项目支持](#Workspace与多项目支持)
+   - [Angular架构](#Angular架构)
+   - [浏览器兼容性](#浏览器兼容性)
+2. 实战
+   - [创建项目示例](#创建项目示例)
+   - [一些常见的坑](#一些常见的坑)
+   - [组件](#组件)
+   - [模板](#模板)
+   - [Mustache语法](#Mustache语法)
+   - [值绑定](#值绑定)
+   - [事件绑定](#事件绑定)
+   - [双向绑定](#双向绑定)
+   - [在模板里面使用结构型指令](#在模板里面使用结构型指令)
+   - [在模板里面使用属性型指令](#在模板里面使用属性型指令)
+   - [管道](#管道)
+   - [组件通讯](#组件通讯)
+   - [生命周期钩子](#生命周期钩子)
+   - [OnPush策略](#OnPush策略)
+   - [动效](#动效)
+   - [动态组件](#动态组件)
+   - [ShadowDOM](#ShadowDOM)
+   - [内容投影](#内容投影)
+   - [封装并发布你自己的组件库](#封装并发布你自己的组件库)
+   - [元数据(Metadata)](#元数据(Metadata))
+   - [构建](#构建)
+3. 总结
+4. 参考
 
 ## 简介
 
 Angular 是 Google 开源出来的一套 js 工具，简称为 ng。
 
-**禅道理念**
+### 禅道理念
 
 Angular信奉的是，当组建视图(UI)同时又要写软件逻辑时，声明式的代码会比命令式的代码好得多，尽管命令式的代码非常适合用来表述业务逻辑。
 
-- 将DOM操作和应用逻辑解耦是一种非常好的思路，它能大大改善代码的可调性；
-- 将测试和开发同等看待是一种非常非常好的思路，测试的难度在很大程度上取决于代码的结构；
+- 将 DOM 操作和应用逻辑解耦是一种非常好的思路，它能大大改善代码的可调性；
+- 将 **测试** 和 **开发** 同等看待是一种非常非常好的思路，测试的难度在很大程度上取决于代码的结构；
 - 将客户端和服务器端解耦是一种特别好的做法，它能使两边并行开发，并且使两边代码都能实现重用；
 - 如果框架能够在整个开发流程里都引导着开发者：从设计UI，到编写业务逻辑，再到测试，那对开发者将是极大的帮助；
 - “化繁为简，化简为零”总是好的。
 
-**运行条件**
+### 运行条件
 
 由于目前各种环境（浏览器或 Node）暂不支持 ES6 的代码，所以需要一些 shim 和 polyfill（IE需要）让 ES6 写的代码能够转化为 ES5 形式并可以正常运行在浏览器中。
 
@@ -37,19 +65,19 @@ npm i -g cnpm --registry=https://registry.npm.taobao.org
 cnpm i -g @angular/cli
 ```
 
-cnpm 是淘宝发布的一款工具，会自动把 npm 上面的所有包定时同步到国内的服务器上来（目前大约 10 分钟全量同步一次），cnpm 本身也是一款 Node.js 模块。由于 cnpm 的服务器在国内，因而中文开发者用它装东西比较快。除了定时同步 npm 模块之外，cnpm 还做了一些其他的事情，比如把某些包预先编译好了缓存在服务器上，这样就不用拉源码到你本地进行编译了。有人抱怨使用 cnpm 安装的目录结构和 npm 不同，包括还有其他一些小坑，如果你非常在意这些，可以使用 `nrm` 来管理多个 registry。nrm 本身也是一个 Node.js 模块，你可以这样安装：
+`cnpm` 是淘宝发布的一款工具，会自动把 `npm` 上面的所有包定时同步到国内的服务器上来（目前大约 10 分钟全量同步一次），`cnpm` 本身也是一款 Node.js 模块。由于 `cnpm` 的服务器在国内，因而中文开发者用它装东西比较快。除了定时同步 `npm` 模块之外，`cnpm` 还做了一些其他的事情，比如把某些包预先编译好了缓存在服务器上，这样就不用拉源码到你本地进行编译了。有人抱怨使用 `cnpm` 安装的目录结构和 `npm` 不同，包括还有其他一些小坑，如果你非常在意这些，可以使用 `nrm` 来管理多个 `registry`。`nrm` 本身也是一个 Node.js 模块，你可以这样安装：
 
 ```sh
 npm i -g nrm
 ```
 
-然后你就可以用 nrm 来随时切换 registry 了，比如：
+然后你就可以用 `nrm` 来随时切换 `registry` 了，比如：
 
 ```sh
 nrm use cnpm
 ```
 
-@angular/cli 安装成功之后你的终端里面将会多出一个名叫 ng 的命令
+`@angular/cli` 安装成功之后你的终端里面将会多出一个名叫 ng 的命令
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/ng命令.png)
 
@@ -59,15 +87,15 @@ nrm use cnpm
 ng add @angular/material
 ```
 
-**Schematics代码生成器**
+### Schematics代码生成器
 
-@angular/cli 内部用来自动生成代码的工具叫做 Schematics ：当我们使用 `ng g c \<组件名>` 的时候，它实际上调用了底层的 Schematics 来生成组件对应的 4 个文件。
+`@angular/cli` 内部用来自动生成代码的工具叫做 Schematics ：当我们使用 `ng g c \<组件名>` 的时候，它实际上调用了底层的 Schematics 来生成组件对应的 4 个文件。
 
 Schematics 是框架无关的，它可以脱离 Angular 环境使用，因此你也可以把它单独拿出来，用来自动生成其他框架的代码。为了演示自定义 Schematic 的方法，请看运行效果：
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/Schematics运行效果.gif)
 
-**请特别注意：由于 @angular/schematics 是 cli 工具的组成部分，它的版本号与 cli 之间有对应关系。因此，如果你不确定对应关系是什么，请不要修改示例项目中的 package.json！**
+**请特别注意：由于 `@angular/schematics` 是 cli 工具的组成部分，它的版本号与 cli 之间有对应关系。因此，如果你不确定对应关系是什么，请不要修改示例项目中的 package.json！**
 
 你可以利用 Schematics 来创建自己的代码生成器，可以参考以下步骤：
 
@@ -80,31 +108,33 @@ Schematics 是框架无关的，它可以脱离 Angular 环境使用，因此你
 - 链接到全局，方便本地调试：npm link
 - 准备测试 schema ，用 @angular/cli 创建一个全新的项目 test-learn-schematics 并装好依赖。cd 到新项目 test-learn-schematics，链接 npm link learn-schematics，然后尝试用我们自定义的规则来生成一个组件 ng g my-component My --service --name="damo" --collection learn-schematics --force
 
-**Workspace与多项目支持**
+### Workspace与多项目支持
 
-从 6.0 开始，@angular/cli 支持 workspace 特性，之所以能支持 workspace，也是因为背后有 Schematics 这个底层的工具。
+从 6.0 开始，`@angular/cli` 支持 workspace 特性，之所以能支持 workspace，也是因为背后有 Schematics 这个底层的工具。
 
 有了 workspace 这个机制之后，可以在一个项目里面配置多个子项目，cli 会根据里面的配置进行依赖管理、校验、编译等等操作。
 
-## Angular架构
+### Angular架构
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/overview2.png)
 
-### 核心概念模型
+**核心概念模型：**
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/Angular的核心概念模型.png)
 
-- Component（组件）是整个框架的核心，也是终极目标。“组件化”的意义有 2 个：第一是分治，因为有了组件之后，我们可以把各种逻辑封装在组件内部，避免混在一起；第二是复用，封装成组件之后不仅可以在项目内部复用，而且可以沉淀下来跨项目复用。
-- NgModule（模块）是组织业务代码的利器，按照你自己的业务场景，把组件、服务、路由打包到模块里面，形成一个个的积木块，然后再用这些积木块来搭建出高楼大厦。
-- Router（路由）的角色也非常重要，它有 3 个重要的作用：第一是封装浏览器的 History 操作；第二是负责异步模块的加载；第三是管理组件的生命周期。
+- **Component**（组件）是整个框架的核心，也是终极目标。“组件化”的意义有 2 个：第一是分治，因为有了组件之后，我们可以把各种逻辑封装在组件内部，避免混在一起；第二是复用，封装成组件之后不仅可以在项目内部复用，而且可以沉淀下来跨项目复用。
+- **NgModule**（模块）是组织业务代码的利器，按照你自己的业务场景，把组件、服务、路由打包到模块里面，形成一个个的积木块，然后再用这些积木块来搭建出高楼大厦。
+- **Router**（路由）的角色也非常重要，它有 3 个重要的作用：第一是封装浏览器的 History 操作；第二是负责异步模块的加载；第三是管理组件的生命周期。
 
-## 浏览器兼容性
+### 浏览器兼容性
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/Angular的浏览器兼容性.png)
 
-[数据来源](http://gs.statcounter.com/browser-market-share)
+数据来源：[http://gs.statcounter.com/browser-market-share](http://gs.statcounter.com/browser-market-share)
 
-## 创建项目示例
+## 实战
+
+### 创建项目示例
 
 创建项目 beauty（真美），请在你的终端里面运行：
 
@@ -112,7 +142,7 @@ Schematics 是框架无关的，它可以脱离 Angular 环境使用，因此你
 ng new beauty
 ```
 
->**注意**：@angular/cli 在自动生成好项目骨架之后，会立即自动使用 npm 来安装所依赖的 Node 模块，因此这里我们要 Ctrl+C 终止掉，然后自己进入项目的根目录，使用 cnpm 来进行安装。
+>**注意**：@angular/cli 在自动生成好项目骨架之后，会立即自动使用 `npm` 来安装所依赖的 Node 模块，因此这里我们要 Ctrl+C 终止掉，然后自己进入项目的根目录，使用 `cnpm` 来进行安装。
 
 安装完成之后，使用 `ng serve` 命令启动项目
 
@@ -123,7 +153,7 @@ ng new beauty
 - 如果你想让编译的包更小一些，可以使用 `ng serve --prod`，@angular/cli 会启用 TreeShaking 特性，加了参数之后编译的过程也会慢很多。因此，在正常的开发过程里面请不要加 --prod 参数。
 - `ng serve` 是在内存里面生成项目，如果你想看到项目编译之后的产物，请运行 `ng build`。构建最终产品版本可以加参数，`ng build --prod`。
 
-ng 提供了很多非常好用的工具，除了可以利用 ng new 来自动创建项目骨架之外，它还可以帮助我们创建 Angular 里面所涉及到的很多模块，最常用的几个如下。
+`ng` 提供了很多非常好用的工具，除了可以利用 `ng new` 来自动创建项目骨架之外，它还可以帮助我们创建 Angular 里面所涉及到的很多模块，最常用的几个如下。
 
 - 自动创建组件：`ng generate component MyComponent`，可以简写成 `ng g c MyComponent`。创建组件的时候也可以带路径，如 `ng generate component mydir/MyComponent`
 - 自动创建指令：`ng g d MyDirective`
@@ -138,21 +168,21 @@ ng 提供了很多非常好用的工具，除了可以利用 ng new 来自动创
 
 对于国内的开发者来说，上面这些其实不是最重要的，国内开发者碰到的坑主要是由两点引起的：
 
-- 第一点是网络问题，比如 node-sass 这个模块你很有可能就安装不上，原因你懂的；
-- 第二点是开发环境导致的问题，国内使用 Windows 平台的开发者比例依然巨大，而 @angular/cli 在 Windows 平台上有一些非常恶心的依赖，比如它需要依赖 Python 环境、Visual Studio 环境，这是因为某些 Node.js 的模块需要下载到你的本地进行源码编译。
+- 第一点是网络问题，比如 `node-sass` 这个模块你很有可能就安装不上，原因你懂的；
+- 第二点是开发环境导致的问题，国内使用 Windows 平台的开发者比例依然巨大，而 `@angular/cli` 在 Windows 平台上有一些非常恶心的依赖，比如它需要依赖 Python 环境、Visual Studio 环境，这是因为某些 Node.js 的模块需要下载到你的本地进行源码编译。
 
 因此，如果你的开发平台是 Windows，请特别注意：
 
-- 如果你知道如何给 npm 配置代理，也知道如何翻墙，请首选 npm 来安装@angular/cli 。
-- 否则，请使用 cnpm 来安装 @angular/cli，原因有三：（1）cnpm 的缓存服务器在国内，你装东西的速度会快很多；（2）用 cnpm 可以帮你避开某些模块装不上的问题，因为它在服务器上面做了缓存；（3）cnpm 还把一些包都预编译好了缓存在服务端，比如 node-sass。使用 cnpm 不需要在你本地进行源码编译，因此你的机器上可以没有那一大堆麻烦的环境。
-- 推荐装一个 nrm 来自动切换 registry：npm i -g nrm。
-- 如果 cli 安装失败，请手动把 node_modules 目录删掉重试一遍，全局的 @angular/cli 也需要删掉重装，cnpm uninstall -g @angular/cli。
+- 如果你知道如何给 `npm` 配置代理，也知道如何翻墙，请首选 `npm` 来安装`@angular/cli`。
+- 否则，请使用 `cnpm` 来安装 `@angular/cli`，原因有三：（1）`cnpm` 的缓存服务器在国内，你装东西的速度会快很多；（2）用 `cnpm` 可以帮你避开某些模块装不上的问题，因为它在服务器上面做了缓存；（3）`cnpm` 还把一些包都预编译好了缓存在服务端，比如 `node-sass`。使用 `cnpm` 不需要在你本地进行源码编译，因此你的机器上可以没有那一大堆麻烦的环境。
+- 推荐装一个 `nrm` 来自动切换 registry：`npm i -g nrm`。
+- 如果 cli 安装失败，请手动把 node_modules 目录删掉重试一遍，全局的 `@angular/cli` 也需要删掉重装，`cnpm uninstall -g @angular/cli`。
 - 如果 node_modules 删不掉，爆出路径过长之类的错误，请尝试用一些文件粉碎机之类的工具强行删除。这是 npm 的锅，与 Angular 无关。
-- 最新版本的 @angular/cli 经常会有 bug，尤其是在 Windows 平台上面，因此请不要追新版本追太紧。如果你发现了莫名其妙的问题，请尝试降低一个主版本试试。这一点非常重要，很多初学者会非常困惑，代码什么都没改，就升级了一下环境，然后就各种编译报错。如果你愿意，去官方提 issue 是个很不错的办法。
+- 最新版本的 `@angular/cli` 经常会有 bug，尤其是在 Windows 平台上面，因此请不要追新版本追太紧。如果你发现了莫名其妙的问题，请尝试降低一个主版本试试。这一点非常重要，很多初学者会非常困惑，代码什么都没改，就升级了一下环境，然后就各种编译报错。如果你愿意，去官方提 issue 是个很不错的办法。
 - 对于 MAC 用户或者 *nix 用户，请特别注意权限问题，命令前面最好加上 sudo，保证有 root 权限。
 - 无论你用什么开发环境，安装的过程中请仔细看 log。很多朋友没有看 log 的习惯，报错的时候直接懵掉，根本不知道发生了什么。
 
-## 组件
+### 组件
 
 ```js
 import { Component } from '@angular/core';
@@ -180,15 +210,16 @@ export class AppComponent { // 这是 ES6 里面引入的模块和 class 定义�
 
 创建 Angular 组件的方法有三步：
 
-1. 从 @angular/core 中引入 Component 修饰器
-2. 建立一个普通的类，并用 @Component 修饰它
-3. 在 @Component 中，设置 selector 自定义标签，以及 template 模板
+1. 从 `@angular/core` 中引入 `Component` 修饰器
+2. 建立一个普通的类，并用 `@Component` 修饰它
+3. 在 `@Component` 中，设置 `selector` 自定义标签，以及 `template` 模板
 
 **把CSS预编译器改成SASS**
 
-SASS 是一款非常好用的 CSS 预编译器，Bootstrap 官方从 4.0 开始已经切换到了 SASS。
+`SASS` 是一款非常好用的 `CSS` 预编译器，Bootstrap 官方从 4.0 开始已经切换到了 `SASS`。
 
 1、创建项目的时候指定
+
 2、手动修改
 
 - angular-cli.json 里面的 styleExt 改成 scss
@@ -196,9 +227,9 @@ SASS 是一款非常好用的 CSS 预编译器，Bootstrap 官方从 4.0 开始�
 - src 下面 style.css 改成 style.scss
 - app.component.scss，app.component.ts 里面对应修改
 
-SASS 只是一个预编译器，它支持所有 CSS 原生语法。利用 SASS 可以提升你的 CSS 编码效率，增强 CSS 代码的可维护性，但是千万不要幻想从此就可以不用学习 CSS 基础知识了。
+`SASS` 只是一个预编译器，它支持所有 `CSS` 原生语法。利用 `SASS` 可以提升你的 `CSS` 编码效率，增强 `CSS` 代码的可维护性，但是千万不要幻想从此就可以不用学习 `CSS` 基础知识了。
 
-## 模板
+### 模板
 
 模板是编写 Angular 组件最重要的一环，你必须深入理解以下知识点才能玩转 Angular 模板：
 
@@ -206,18 +237,18 @@ SASS 只是一个预编译器，它支持所有 CSS 原生语法。利用 SASS �
 - Mustache（八字胡）语法
 - 模板内的局部变量
 - 属性绑定、事件绑定、双向绑定
-- 在模板里面使用结构型指令 *ngIf、*ngFor、ngSwitch
-- 在模板里面使用属性型指令 NgClass、NgStyle、NgModel
+- 在模板里面使用结构型指令 `*ngIf`、`*ngFor`、`ngSwitch`
+- 在模板里面使用属性型指令 `NgClass`、`NgStyle`、`NgModel`
 - 在模板里面使用管道格式化数据
 - 一些小 feature：安全导航、非空断言
 
-**“深入理解”的含义是：你需要很自如地运用这些 API，写代码的时候不翻阅 API 文档。因为很多新手之所以编码效率不高，其中一个主要的原因就是在编码过程中不停翻文档、查资料。**
+>“深入理解”的含义是：你需要很自如地运用这些 API，写代码的时候不翻阅 API 文档。因为很多新手之所以编码效率不高，其中一个主要的原因就是在编码过程中不停翻文档、查资料。
 
-### 对比各种 JS 模板引擎的设计思路
+**对比各种 JS 模板引擎的设计思路**
 
 几乎每一款前端框架都会提供自己的模板语法：
 
-- 在 jQuery 如日中天的时代，有 Handlebars 那种功能超强的模板
+- 在 jQuery 如日中天的时代，有 `Handlebars` 那种功能超强的模板
 - React 推崇 JSX 模板语法
 - 当然还有 Angular 提供的那种与“指令”紧密结合的模板语法
 
@@ -234,7 +265,7 @@ SASS 只是一个预编译器，它支持所有 CSS 原生语法。利用 SASS �
 
 **为什么要“轻逻辑”？**
 
-**最重要的原因是怕影响运行性能，因为模板可能会被执行很多次。**
+>最重要的原因是怕影响运行性能，因为模板可能会被执行很多次。
 
 比如你编写了以下 Angular 模板：
 
@@ -246,14 +277,14 @@ SASS 只是一个预编译器，它支持所有 CSS 原生语法。利用 SASS �
 </ul>
 ```
 
-很明显，浏览器不认识 *ngFor 和 {{...}} 这种语法，因此必须在浏览器里面进行“编译”，获得对应的模板函数，然后再把数据传递给模板函数，最终结合起来获得一堆 HTML 标签，然后才能把这一堆标签插入到 DOM 树里面去。
+很明显，浏览器不认识 `*ngFor` 和 `{{...}}` 这种语法，因此必须在浏览器里面进行“编译”，获得对应的模板函数，然后再把数据传递给模板函数，最终结合起来获得一堆 HTML 标签，然后才能把这一堆标签插入到 DOM 树里面去。
 
-如果启用了 AOT，处理的步骤有一些变化，@angular/cli 会对模板进行“静态编译”，避免在浏览器里面动态编译的过程。
+如果启用了 AOT，处理的步骤有一些变化，`@angular/cli` 会对模板进行“静态编译”，避免在浏览器里面动态编译的过程。
 
 而 Handlebars 这种模板引擎完全是运行时编译模板字符串的，你可以编写以下代码：
 
 ```js
-//定义模板字符串
+// 定义模板字符串
 var source=`
 <ul>
   {{#each races}}
@@ -262,10 +293,10 @@ var source=`
 </ul>
 `;
 
-//在运行时把模板字符串编译成 JS 函数
+// 在运行时把模板字符串编译成 JS 函数
 var templateFn=Handlebars.compile(source);
 
-//把数据传给模板函数，获得最终的 HTML
+// 把数据传给模板函数，获得最终的 HTML
 var html=templateFn([
   {name:'人族'},
   {name:'神族'},
@@ -273,7 +304,7 @@ var html=templateFn([
 ]);
 ```
 
-注意到 Handlebars.compile 这个调用了吧？这个地方的本质是在运行时把模板字符串“编译”成了一个 JS 函数。
+注意到 `Handlebars.compile` 这个调用了吧？这个地方的本质是在运行时把模板字符串“编译”成了一个 JS 函数。
 
 鉴于 JS 解释执行的特性，你可能会担忧这里会有性能问题。这种担忧是合理的，但是 Handlebars 是一款非常优秀的模板引擎，它在内部做了各种优化和缓存处理。模板字符串一般只会在第一次被调用的时候编译一次，Handlebars 会把编译好的函数缓存起来，后面再次调用的时候会从缓存里面获取，而不会多次进行“编译”。
 
@@ -293,9 +324,9 @@ var html=templateFn([
 
 目前来说，并没有完美的方案能同时兼顾运行效率和语法表现能力，这里只能取一个平衡。
 
-### Mustache 语法
+### Mustache语法
 
-Mustache 语法也就是你们说的双花括号语法 {{...}}，老外觉得它像八字胡子，很奇怪啊，难道老外喜欢侧着头看东西？
+Mustache 语法也就是你们说的双花括号语法 `{{...}}`，老外觉得它像八字胡子，很奇怪啊，难道老外喜欢侧着头看东西？
 
 好消息是，很多模板引擎都接受了 Mustache 语法，这样一来学习量又降低了不少，开心吧？
 
@@ -305,7 +336,7 @@ Mustache 语法也就是你们说的双花括号语法 {{...}}，老外觉得它
 - 它可以自动计算简单的数学表达式，如加减乘除、取模
 - 它可以获得方法的返回值
 
-### 模板内的局部变量
+**模板内的局部变量**
 
 ```html
 <input #heroInput>
@@ -314,7 +345,7 @@ Mustache 语法也就是你们说的双花括号语法 {{...}}，老外觉得它
 
 有一些朋友会追问，如果我在模板里面定义的局部变量和组件内部的属性重名会怎么样呢？如果真的出现了重名，Angular 会按照以下优先级来进行处理：
 
-**模板局部变量 > 指令中的同名变量 > 组件中的同名属性。**
+>模板局部变量 > 指令中的同名变量 > 组件中的同名属性。
 
 ### 值绑定
 
@@ -364,31 +395,31 @@ AngularJS 是第一个把“双向数据绑定”这个特性带到前端来的�
 
 当然，也有一些人不喜欢“双向数据绑定”，还有人专门写了文章来进行批判，也算是前端一景。
 
-**在模板里面使用结构型指令**
+### 在模板里面使用结构型指令
 
-Angular 有 3 个内置的结构型指令：*ngIf、*ngFor、ngSwitch。ngSwitch 的语法比较啰嗦，使用频率小一些。
+Angular 有 3 个内置的结构型指令：`*ngIf`、`*ngFor`、`ngSwitch`。`ngSwitch` 的语法比较啰嗦，使用频率小一些。
 
-**特别注意：一个 HTML 标签上只能同时使用一个结构型的指令。**
+>特别注意：一个 HTML 标签上只能同时使用一个结构型的指令。
 
 因为“结构型”指令会修改 DOM 结构，如果在一个标签上使用多个结构型指令，大家都一起去修改 DOM 结构，到时候到底谁说了算？
 
 那么需要在同一个 HTML 上使用多个结构型指令应该怎么办呢？有两个办法：
 
-- 加一层空的 div 标签
+- 加一层空的 `div` 标签
 - 加一层 `<ng-container>`
 
-**在模板里面使用属性型指令**
+### 在模板里面使用属性型指令
 
-使用频率比较高的 3 个内置指令是：NgClass、NgStyle、NgModel。
+使用频率比较高的 3 个内置指令是：`NgClass`、`NgStyle`、`NgModel`。
 
-NgClass 使用案例代码：
+`NgClass` 使用案例代码：
 
 ```html
 <div [ngClass]="currentClasses">同时批量设置多个样式</div>
 <button class="btn btn-success" (click)="setCurrentClasses()">设置</button>
 ```
 
-```js
+```ts
 public currentClasses: {};
 
 public canSave: boolean = true;
@@ -416,7 +447,7 @@ setCurrentClasses() {
 }
 ```
 
-NgStyle 使用案例代码：
+`NgStyle` 使用案例代码：
 
 ```html
 <div [ngStyle]="currentStyles">
@@ -440,9 +471,9 @@ setCurrentStyles() {
 }
 ```
 
-ngStyle 这种方式相当于在代码里面写 CSS 样式，比较丑陋，违反了注意点分离的原则，而且将来不太好修改，非常不建议这样写。
+`ngStyle` 这种方式相当于在代码里面写 `CSS` 样式，比较丑陋，违反了注意点分离的原则，而且将来不太好修改，非常不建议这样写。
 
-NgModel 使用案例代码：
+`NgModel` 使用案例代码：
 
 ```html
 <p class="text-danger">ngModel只能用在表单类的元素上面</p>
@@ -454,9 +485,9 @@ NgModel 使用案例代码：
 public currentRace:any={name:"随机种族"};
 ```
 
-**请注意，如果你需要使用 NgModel 来进行双向数据绑定，必须要在对应的模块里面 import FormsModule。**
+>请注意，如果你需要使用 `NgModel` 来进行双向数据绑定，必须要在对应的模块里面 `import FormsModule`。
 
-#### 管道
+### 管道
 
 管道的一个典型作用是用来格式化数据，来一个最简单的例子：
 
@@ -464,19 +495,19 @@ public currentRace:any={name:"随机种族"};
 {{currentTime | date:'yyyy-MM-dd HH:mm:ss'}}
 ```
 
-```js
+```ts
 public currentTime: Date = new Date();
 ```
 
 Angular 里面一共内置了 17 个指令（有一些已经过时了）：
 
-![x](./Resource/Angular管道指令.png)
+![x](./Resources/Angular管道指令.png)
 
 在复杂的业务场景里面，17 个指令肯定不够用，如果需要自定义指令，请查看这里的例子：[https://angular.io/guide/pipes](https://angular.io/guide/pipes)。
 
 管道还有另一个典型的作用，就是用来做国际化，后面有一个独立的小节专门演示 Angular 的国际化写法。
 
-## 组件通讯
+### 组件通讯
 
 组件就像零散的积木，我们需要把这些积木按照一定的规则拼装起来，而且要让它们互相之间能进行通讯，这样才能构成一个有机的完整系统。
 
@@ -488,86 +519,86 @@ Angular 里面一共内置了 17 个指令（有一些已经过时了）：
 
 相应地，组件之间有以下几种典型的通讯方案：
 
-- 直接的父子关系：父组件直接访问子组件的 public 属性和方法
-- 直接的父子关系：借助于 @Input 和 @Output 进行通讯
-- 没有直接关系：借助于 Service 单例进行通讯
-- 利用 cookie 和 localstorage 进行通讯
-- 利用 session 进行通讯
+- 直接的父子关系：父组件直接访问子组件的 `public` 属性和方法
+- 直接的父子关系：借助于 `@Input` 和 `@Output` 进行通讯
+- 没有直接关系：借助于 `Service` 单例进行通讯
+- 利用 `cookie` 和 `localstorage` 进行通讯
+- 利用 `session` 进行通讯
 
 无论你使用什么前端框架，组件之间的通讯都离开不以上几种方案，这些方案与具体框架无关。
 
-### 直接调用
+**直接调用**
 
-对于有直接父子关系的组件，父组件可以直接访问子组件里面 public 型的属性和方法，示例代码片段如下：
+对于有直接父子关系的组件，父组件可以直接访问子组件里面 `public` 型的属性和方法，示例代码片段如下：
 
 ```html
 <child #child></child>
 <button (click)="child.childFn()" class="btn btn-success">调用子组件方法</button>
 ```
 
-显然，子组件里面必须暴露一个 public 型的 childFn 方法，就像这样：
+显然，子组件里面必须暴露一个 `public` 型的 `childFn` 方法，就像这样：
 
 ```ts
 public childFn():void{
-    console.log("子组件的名字是>"+this.panelTitle);
+  console.log("子组件的名字是>" + this.panelTitle);
 }
 ```
 
-以上是通过在模板里面定义局部变量的方式来直接调用子组件里面的 public 型方法。在父组件的内部也可以访问到子组件的实例，需要利用到 `@ViewChild` 装饰器，示例如下：
+以上是通过在模板里面定义局部变量的方式来直接调用子组件里面的 `public` 型方法。在父组件的内部也可以访问到子组件的实例，需要利用到 `@ViewChild` 装饰器，示例如下：
 
 ```ts
 @ViewChild(ChildComponent)
 private childComponent: ChildComponent;
 ```
 
-关于 @ViewChild 在后面的内容里面会有更详细的解释。
+关于 `@ViewChild` 在后面的内容里面会有更详细的解释。
 
 很明显，如果父组件直接访问子组件，那么两个组件之间的关系就被固定死了。父子两个组件紧密依赖，谁也离不开谁，也就都不能单独使用了。所以，除非你知道自己在做什么，最好不要直接在父组件里面直接访问子组件上的属性和方法，以免未来一改一大片。
 
-#### @Input 和 @Output
+**@Input 和 @Output**
 
-我们可以利用 @Input 装饰器，让父组件直接给子组件传递参数，子组件上这样写：
+我们可以利用 `@Input` 装饰器，让父组件直接给子组件传递参数，子组件上这样写：
 
 ```ts
 @Input()
 public panelTitle:string;
 ```
 
-父组件上可以这样设置 panelTitle 这个参数：
+父组件上可以这样设置 `panelTitle` 这个参数：
 
 ```html
 <child panelTitle="一个新的标题"></child>
 ```
 
-@Output 的本质是事件机制，我们可以利用它来监听子组件上派发的事件，子组件上这样写：
+`@Output` 的本质是事件机制，我们可以利用它来监听子组件上派发的事件，子组件上这样写：
 
 ```ts
 @Output()
-public follow=new EventEmitter<string>();
+public follow = new EventEmitter<string>();
 ```
 
-触发 follow 事件的方式如下：
+触发 `follow` 事件的方式如下：
 
 ```ts
 this.follow.emit("follow");
 ```
 
-父组件上可以这样监听 follow 事件：
+父组件上可以这样监听 `follow` 事件：
 
 ```html
 <child (follow)="doSomething()"></child>
 ```
 
-我们可以利用 @Output 来自定义事件，监听自定义事件的方式也是通过小圆括号，与监听 HTML 原生事件的方式一模一样。
+我们可以利用 `@Output` 来自定义事件，监听自定义事件的方式也是通过小圆括号，与监听 HTML 原生事件的方式一模一样。
 
-### 利用 Service 单例进行通讯
+**利用 `Service` 单例进行通讯**
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/利用Service单例进行通讯.png)
 
-如果你在根模块（一般是 app.module.ts）的 providers 里面注册一个 Service，那么这个 Service 就是全局单例的，这样一来我们就可以利用这个单例的 Service 在不同的组件之间进行通讯了。
+如果你在根模块（一般是 `app.module.ts`）的 `providers` 里面注册一个 `Service`，那么这个 `Service` 就是全局单例的，这样一来我们就可以利用这个单例的 `Service` 在不同的组件之间进行通讯了。
 
-- 比较粗暴的方式：我们可以在 Service 里面定义 public 型的共享变量，然后让不同的组件都来访问这块变量，从而达到共享数据的目的。
-- 优雅一点的方式：利用 RxJS，在 Service 里面定义一个 public 型的 Subject（主题），然后让所有组件都来 subscribe（订阅）这个主题，类似于一种“事件总线”的效果。
+- 比较粗暴的方式：我们可以在 `Service` 里面定义 `public` 型的共享变量，然后让不同的组件都来访问这块变量，从而达到共享数据的目的。
+- 优雅一点的方式：利用 `RxJS`，在 `Service` 里面定义一个 `public` 型的 `Subject`（主题），然后让所有组件都来 `subscribe`（订阅）这个主题，类似于一种“事件总线”的效果。
 
 实例代码片段：
 
@@ -582,11 +613,11 @@ import { Subject } from 'rxjs/Subject';
 @Injectable()
 export class EventBusService {
   public eventBus:Subject<string> = new Subject<string>();
-
   constructor() { }
-
 }
 ```
+
+触发组件：
 
 ```ts
 import { Component, OnInit } from '@angular/core';
@@ -598,7 +629,6 @@ import { EventBusService } from '../service/event-bus.service';
   styleUrls: ['./child-1.component.css']
 })
 export class Child1Component implements OnInit {
-
   constructor(public eventBusService:EventBusService) { }
 
   ngOnInit() {
@@ -609,6 +639,8 @@ export class Child1Component implements OnInit {
   }
 }
 ```
+
+订阅组件：
 
 ```ts
 import { Component, OnInit } from '@angular/core';
@@ -622,9 +654,7 @@ import { EventBusService } from '../service/event-bus.service';
 export class Child2Component implements OnInit {
   public events:Array<any>=[];
 
-  constructor(public eventBusService:EventBusService) {
-
-  }
+  constructor(public eventBusService:EventBusService) { }
 
   ngOnInit() {
     this.eventBusService.eventBus.subscribe((value)=>{
@@ -634,33 +664,33 @@ export class Child2Component implements OnInit {
 }
 ```
 
-### 利用 cookie 或者 localstorage 进行通讯
+**利用 cookie 或者 localstorage 进行通讯**
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/利用cookie或者localstorage进行通讯.png)
 
 ```ts
-public writeData():void{
-    window.localStorage.setItem("json",JSON.stringify({name:'大漠穷秋',age:18}));
+public writeData():void {
+  window.localStorage.setItem("json", JSON.stringify({ name:'大漠穷秋', age:18 }));
 }
 ```
 
 ```ts
-var json=window.localStorage.getItem("json");
+var json = window.localStorage.getItem("json");
 // window.localStorage.removeItem("json");
-var obj=JSON.parse(json);
+var obj = JSON.parse(json);
 console.log(obj.name);
 console.log(obj.age);
 ```
 
-### 利用 session 进行通讯
+**利用 session 进行通讯**
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/利用session进行通讯.png)
 
-### 小结
+**小结**
 
 组件间的通讯方案是通用的，无论你使用什么样的前端框架，都会面临这个问题，而解决的方案无外乎本文所列出的几种。
 
-## 生命周期钩子
+### 生命周期钩子
 
 参考：[https://angular.io/guide/lifecycle-hooks](https://angular.io/guide/lifecycle-hooks)
 
@@ -668,23 +698,23 @@ console.log(obj.age);
 
 1. 什么是 UI 组件的生命周期？
 2. Angular 组件的生命周期有什么特别的地方？
-3. OnPush 策略的使用方式。
+3. `OnPush` 策略的使用方式。
 4. 简要介绍脏检查的实现原理。
 
-### UI组件的生命周期
+**UI组件的生命周期**
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/UI组件的生命周期.png)
 
 无论使用什么样的前端框架，只要编写 UI 组件，生命周期都是必须要考虑的重要内容。请展开你的想象，如果让你来设计 UI 系统，组件有几个重要的阶段一定是绕不开的，比如：
 
-- 初始化（init）阶段：在这个阶段你需要把组件 new 出来，把一些属性设置上去，等等这些操作。
-- 渲染（render）阶段：在这个阶段需你要把组件的模板和数据结合起来，生成 HTML 标签结构，并且要整合到现有的 DOM 树里面去。
-- 存活阶段：既然带有 UI，那么在组件的存活期内就一定会和用户进行交互。一般来说，带有 UI 的系统都是通过事件机制进行用户交互的。也就是说，这个阶段将会处理大量的用户事件：鼠标点击、键盘按键、手指触摸。
-- 销毁（destory）阶段：最后，组件使用完了，需要把一些资源释放掉。最典型的操作：需要把组件上的所有事件全部清理干净，避免造成内存泄漏。
+- **初始化**（init）阶段：在这个阶段你需要把组件 `new` 出来，把一些属性设置上去，等等这些操作。
+- **渲染**（render）阶段：在这个阶段需你要把组件的模板和数据结合起来，生成 `HTML` 标签结构，并且要整合到现有的 `DOM` 树里面去。
+- **存活**阶段：既然带有 UI，那么在组件的存活期内就一定会和用户进行交互。一般来说，带有 UI 的系统都是通过事件机制进行用户交互的。也就是说，这个阶段将会处理大量的用户事件：鼠标点击、键盘按键、手指触摸。
+- **销毁**（destory）阶段：最后，组件使用完了，需要把一些资源释放掉。最典型的操作：需要把组件上的所有事件全部清理干净，避免造成内存泄漏。
 
 在组件生命的不同阶段，框架一般会暴露出一些“接口”，开发者可以利用这些接口来实现一些自己的业务逻辑。这种接口在有些框架里面叫做“事件”，在 Angular 里面叫做“钩子”，但其底层的本质都是一样的。
 
-### Angular组件的生命周期钩子
+**Angular组件的生命周期钩子**
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/Angular组件的生命周期钩子.png)
 
@@ -693,10 +723,10 @@ console.log(obj.age);
 - 绿色的 1357 会被执行很多次，2468 只会执行一次。
 - Content 和 View 相关的 4 个钩子只对组件有效，指令上不能使用。因为在新版本的 Angular 里面，指令不能带有 HTML 模板。指令没有自己的 UI，当然就没有 View 和 Content 相关的“钩子”了。
 - 请不要在生命周期钩子里面实现复杂的业务逻辑，尤其是那 4 个会被反复执行的钩子，否则一定会造成界面卡顿。
-- 对于 @Input 型的属性，在构造函数里面是取不到值的，在 ngOnInit 里面才有值。
-- 在 ngAfterViewChecked 这个钩子里面不可以再修改组件内部被绑定的值，否则会抛出异常。
+- 对于 `@Input` 型的属性，在构造函数里面是取不到值的，在 `ngOnInit` 里面才有值。
+- 在 `ngAfterViewChecked` 这个钩子里面不可以再修改组件内部被绑定的值，否则会抛出异常。
 
-**特别注意：对于业务开发者来说，一般只用到 ngOnInit 这个钩子，其它几个钩子在日常业务开发中是用不到的。**
+>特别注意：对于业务开发者来说，一般只用到 `ngOnInit` 这个钩子，其它几个钩子在日常业务开发中是用不到的。
 
 ### OnPush策略
 
@@ -708,22 +738,22 @@ console.log(obj.age);
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/数据模型发生变化.png)
 
-**这时候，Angular 将会从根组件开始，遍历整颗组件树，把所有组件上的 ngDoCheck() 方法都调用一遍：**
-
-**请注意，默认情况下，无论哪个叶子组件上发生了变化，都会把整个组件树遍历一遍**。如果组件树非常庞大，嵌套非常深，很明显会有效率问题。在绝大部分时间里面，并不会出现每个组件都需要刷新的情况，根本没有必要每次都去全部遍历。所以 Angular 提供了一种叫做 OnPush 的策略，只要把某个组件上的检测策略设置为 OnPush，就可以忽略整个子树了，就像这样：
+>这时候，Angular 将会从根组件开始，遍历整颗组件树，把所有组件上的 `ngDoCheck()` 方法都调用一遍。
+>
+>请注意，默认情况下，无论哪个叶子组件上发生了变化，都会把整个组件树遍历一遍。如果组件树非常庞大，嵌套非常深，很明显会有效率问题。在绝大部分时间里面，并不会出现每个组件都需要刷新的情况，根本没有必要每次都去全部遍历。所以 Angular 提供了一种叫做 `OnPush` 的策略，只要把某个组件上的检测策略设置为 `OnPush`，就可以忽略整个子树了，就像这样：
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/OnPush.png)
 
-很明显，使用了 OnPush 策略之后，检查效率将会获得大幅度的提升，尤其在组件的数量非常多的情况下：
+很明显，使用了 `OnPush` 策略之后，检查效率将会获得大幅度的提升，尤其在组件的数量非常多的情况下：
 
 Angular 内置的两种变更检测策略：
 
-- Default：无论哪个组件发生了变化，从根组件开始全局遍历，调用每个组件上的 ngDoCheck() 钩子。
-- OnPush：**只有当组件的 @Input 属性发生变化的时候才调用本组件的 ngDoCheck() 钩子**。
+- `Default`：无论哪个组件发生了变化，从根组件开始全局遍历，调用每个组件上的 `ngDoCheck()` 钩子。
+- `OnPush`：只有当组件的 `@Input` 属性发生变化的时候才调用本组件的 `ngDoCheck()` 钩子。
 
-有一些开发者建议 Angular 项目组把 OnPush 作为默认策略，但是目前还没有得到官方支持，或许在未来的某个版本里面会进行修改。
+有一些开发者建议 Angular 项目组把 `OnPush` 作为默认策略，但是目前还没有得到官方支持，或许在未来的某个版本里面会进行修改。
 
-### 了解一点点原理
+**了解一点点原理**
 
 大家都知道，AngularJS 是第一个把“双向数据绑定”这种设计带到前端领域来的框架，“双向数据绑定”最典型的场景就是对表单的处理。
 
@@ -731,25 +761,25 @@ Angular 内置的两种变更检测策略：
 
 很明显，这里需要一种同步机制，在 Angular 里面这种同步机制叫做“变更检测”。
 
-在老版本 AgnularJS 里面，变更检测机制实现得不太完善，经常会出现检测不到变更的情况，所以才有了让大家很厌烦的 $apply() 调用。
+在老版本 AgnularJS 里面，变更检测机制实现得不太完善，经常会出现检测不到变更的情况，所以才有了让大家很厌烦的 `$apply()` 调用。
 
-在新版本的 Angular 里面不再存在这个问题了，因为新版本的 Angular 使用 Zone.js 这个库，它会把所有可能导致数据模型发生变更的情况全部拦截掉，从而在数据发生变化的时候去通知 Angular 进行刷新。
+在新版本的 Angular 里面不再存在这个问题了，因为新版本的 Angular 使用 `Zone.js` 这个库，它会把所有可能导致数据模型发生变更的情况全部拦截掉，从而在数据发生变化的时候去通知 Angular 进行刷新。
 
-有一些朋友可能会觉得奇怪，Zone.js 怎么这么牛叉？它内部到底是怎么玩的呢？
+有一些朋友可能会觉得奇怪，`Zone.js` 怎么这么牛叉？它内部到底是怎么玩的呢？
 
 实际上要做到这一点并不复杂，因为在浏览器环境下，有可能导致数据模型发生变化的情况只有 3 种典型的回调：
 
 1. 事件回调：鼠标、键盘、触摸
-2. 定时器回调：setTimeout 和 setInterval
+2. 定时器回调：`setTimeout` 和 `setInterval`
 3. Ajax 回调
 
 Zone.js 覆盖了所有原生实现，当开发者在调用这些函数的时候，并不是调用的原生方法，而是调用的 Zone.js 自己的实现，因此 Zone.js 就可以做一些自己的处理了。
 
-也就是说 Zone.js 会负责通知 Angular：“数据模型发生变化了”！然后 Angular 的 ChangeDetector 就会在下一次 dirty check 的周期里面来检查哪些组件上的值发生了变化，然后做出相应的处理。
+也就是说 Zone.js 会负责通知 Angular：“数据模型发生变化了”！然后 Angular 的 `ChangeDetector` 就会在下一次 **dirty check** 的周期里面来检查哪些组件上的值发生了变化，然后做出相应的处理。
 
 如果你的好奇心特别旺盛，这里有一篇非常长的[文章](https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html)，大约二十多页，详细解释了这一话题。
 
-## 动效
+### 动效
 
 Angular 默认的动画模块使用的是 Web Animations 规范，这个规范目前处于 Editor's Draft 状态(2017-09-22)，详情请看[这里](https://drafts.csswg.org/web-animations/)
 
@@ -761,7 +791,7 @@ Angular 默认的动画模块使用的是 Web Animations 规范，这个规范�
 
 Web Animations 这套新的规范在 FireFox、Chrome、Opera 里面得到了完整的支持，而其它所有浏览器内核几乎都完全不支持，所以请慎重选择。我的建议是，请优先使用 CSS3 规范里面的 anmimation 方案
 
-### 用法示范
+**用法示范**
 
 第一步，导入动画模块：
 
@@ -771,28 +801,28 @@ Web Animations 这套新的规范在 FireFox、Chrome、Opera 里面得到了完
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/编写动效.png)
 
-flyIn 是这个动效的名称，后面我面就可以在组件里面引用 flynIn 这个名字了。
+`flyIn` 是这个动效的名称，后面我面就可以在组件里面引用 `flynIn` 这个名字了。
 
 动效整体上是由“状态”和“转场”两个部分构成的：
 
-- 以上代码里面的星号（*）表示“不可见状态”，void 表示任意状态。这是两种内置的状态，*=>void 表示是进场动画，而 void=>* 表示离场动画。当然你也可以定义自己的状态名称，注意不要和内置的状态名称发生冲突。
-- keyframes 里面的内容是关键帧的定义，语法和 CSS3 里面定义动画的方式非常类似。
+以上代码里面的星号（*）表示“不可见状态”，`void` 表示任意状态。这是两种内置的状态，`*=>void` 表示是进场动画，而 `void=>*` 表示离场动画。当然你也可以定义自己的状态名称，注意不要和内置的状态名称发生冲突。
 
-第三步，在组件里面使用 flyIn 这个动效：
+`keyframes` 里面的内容是关键帧的定义，语法和 CSS3 里面定义动画的方式非常类似。
+
+第三步，在组件里面使用 `flyIn` 这个动效：
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/使用flyIn.png)
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/使用flyIn2.png)
 
-### 动效小结
+**动效小结**
 
 - Angular 官方的动效文档在这里：[https://angular.io/guide/animations](https://angular.io/guide/animations)
 - 如果你不愿意自己编写动效，推荐这个开源项目，它和 Angular 之间结合得比较紧：[https://github.com/jiayihu/ng-animate](https://github.com/jiayihu/ng-animate)
+- 完整代码[示例](https://gitee.com/learn-angular-series/learn-component)
 
-完整代码[示例](https://gitee.com/learn-angular-series/learn-component)
+### 动态组件
 
-## 动态组件
-
-我们可以通过标签的方式使用组件，也可以通过代码的方式来动态创建组件。动态创建组件的过程是通过 ViewContainerRef 和 ComponentFactoryResolver 这两个工具类来配合完成的。
+我们可以通过标签的方式使用组件，也可以通过代码的方式来动态创建组件。动态创建组件的过程是通过 `ViewContainerRef` 和 `ComponentFactoryResolver` 这两个工具类来配合完成的。
 
 我们可以定义一个这样的模板：
 
@@ -800,17 +830,17 @@ flyIn 是这个动效的名称，后面我面就可以在组件里面引用 flyn
 <div #dyncomp></div>
 ```
 
-在组件定义里面需要首先 import 需要用到的工具类：
+在组件定义里面需要首先 `import` 需要用到的工具类：
 
 ```ts
-import { Component, OnInit,ViewChild,ViewContainerRef,ComponentFactoryResolver, ComponentRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentRef } from '@angular/core';
 ```
 
 组件内部这样写：
 
 ```ts
-//这里引用模板里面定义的 dyncomp 容器标签
-@ViewChild("dyncomp",{read:ViewContainerRef})
+// 这里引用模板里面定义的 dyncomp 容器标签
+@ViewChild("dyncomp", { read:ViewContainerRef })
 dyncomp:ViewContainerRef;
 
 comp1:ComponentRef<Child11Component>;
@@ -820,25 +850,25 @@ constructor(private resolver:ComponentFactoryResolver) {
 }
 ```
 
-然后我们就可以在 ngAfterContentInit 这个钩子里面用代码来动态创建组件了：
+然后我们就可以在 `ngAfterContentInit` 这个钩子里面用代码来动态创建组件了：
 
 ```ts
 ngAfterContentInit(){
-    const childComp=this.resolver.resolveComponentFactory(Child11Component);
-    this.comp1=this.dyncomp.createComponent(childComp);
+  const childComp = this.resolver.resolveComponentFactory(Child11Component);
+  this.comp1 = this.dyncomp.createComponent(childComp);
 }
 ```
 
-对于创建出来的 comp1 这个组件，可以通过代码直接访问它的 public 型属性，也可以通过代码来 subscribe（订阅）comp1 上面发出来的事件，就像这样：
+对于创建出来的 comp1 这个组件，可以通过代码直接访问它的 `public` 型属性，也可以通过代码来 `subscribe`（订阅）comp1 上面发出来的事件，就像这样：
 
 ```ts
-this.comp1.instance.title="父层设置的新标题";
-this.comp1.instance.btnClick.subscribe((param)=>{
-  console.log("--->"+param);
+this.comp1.instance.title = "父层设置的新标题";
+this.comp1.instance.btnClick.subscribe((param) => {
+  console.log("--->" + param);
 });
 ```
 
-对于用代码动态创建出来的组件，我们可以通过调用 destory() 方法来手动销毁：
+对于用代码动态创建出来的组件，我们可以通过调用 `destory()` 方法来手动销毁：
 
 ```ts
 public destoryChild():void{
@@ -847,42 +877,42 @@ public destoryChild():void{
 }
 ```
 
-**注意：用代码动态创建组件这种方式在一般的业务开发里面不常用，而且可能存在一些隐藏的坑，如果你一定要用，请小心避雷。**
+>注意：用代码动态创建组件这种方式在一般的业务开发里面不常用，而且可能存在一些隐藏的坑，如果你一定要用，请小心避雷。
 
 参考代码：[https://gitee.com/learn-angular-series/learn-component](https://gitee.com/learn-angular-series/learn-component)
 
-## ShadowDOM
+### ShadowDOM
 
-根据 Angular 官方的说法，Angular 组件的设计灵感来源于 Web Component，在 Web Component 里面，ShadowDOM 是重要的组成部分。在底层，Angular 渲染组件的方式有 3 种：
+根据 Angular 官方的说法，Angular 组件的设计灵感来源于 Web Component，在 Web Component 里面，`ShadowDOM` 是重要的组成部分。在底层，Angular 渲染组件的方式有 3 种：
 
-1. Native：采用 ShadowDOM 的模式来进行渲染。
-2. Emulated：模拟模式。对于不能支持 ShadowDOM 模式的浏览器，Angular 在底层会采用模拟的方式来渲染组件，**这是 Angular 默认的渲染模式**。
+1. Native：采用 `ShadowDOM` 的模式来进行渲染。
+2. Emulated：模拟模式。对于不能支持 `ShadowDOM` 模式的浏览器，Angular 在底层会采用模拟的方式来渲染组件，**这是 Angular 默认的渲染模式**。
 3. None：不采用任何渲染模式。直接把组件的 HTML 结构和 CSS 样式插入到 DOM 流里面，这种方式很容易导致组件互相之间出现 CSS 命名污染的问题。
 
-在定义组件的时候，可以通过 encapsulation 配置项手动指定组件的渲染模式，关键代码如下：
+在定义组件的时候，可以通过 `encapsulation` 配置项手动指定组件的渲染模式，关键代码如下：
 
 ```ts
 @Component({
   selector: 'emulate-mode',
-  encapsulation:ViewEncapsulation.Emulated,//默认模式
+  encapsulation: ViewEncapsulation.Emulated, // 默认模式
   templateUrl: './emulate-mode.component.html',
   styleUrls: ['./emulate-mode.component.scss']
 })
 ```
 
-请自己尝试修改 encapsulation 这个配置项来测试不同的效果。
+请自己尝试修改 `encapsulation` 这个配置项来测试不同的效果。
 
-**注意：Angular 官方在 2018 年的 NGConnet 大会上表示，在将来的某个版本中，会在内核里面把 ShadowDOM 设置为默认模式。因为这一变更会在内核层面进行，所以业务开发者不用改代码。**
+>注意：Angular 官方在 2018 年的 NGConnet 大会上表示，在将来的某个版本中，会在内核里面把 `ShadowDOM` 设置为默认模式。因为这一变更会在内核层面进行，所以业务开发者不用改代码。
 
 注意点：
 
-- ShadowDOM 模式的封装性更好，运行效率也更高。
-- ShadowDOM 在 W3C 的状态是 Working Draft（2017-09-22），如果你想深入研究参考以下链接：[https://developer.mozilla.org/en-US/docs/Web/Web_Components/Shadow_DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Shadow_DOM)、[https://www.w3.org/TR/shadow-dom/](https://www.w3.org/TR/shadow-dom/)。
-- ShadowDOM 目前只有 Chrome 和 Opera 支持得非常好，其它浏览器都非常糟糕：
+- `ShadowDOM` 模式的封装性更好，运行效率也更高。
+- `ShadowDOM` 在 W3C 的状态是 Working Draft（2017-09-22），如果你想深入研究参考以下链接：[https://developer.mozilla.org/en-US/docs/Web/Web_Components/Shadow_DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Shadow_DOM)、[https://www.w3.org/TR/shadow-dom/](https://www.w3.org/TR/shadow-dom/)。
+- `ShadowDOM` 目前只有 Chrome 和 Opera 支持得非常好，其它浏览器都非常糟糕：
   ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/ShadowDOM兼容性.png)
 - 一般来说，你不需要自己手动指定组件的渲染模式，除非你自己知道在做什么。
 
-## 内容投影
+### 内容投影
 
 你编写了一个这样的面板组件：
 
@@ -893,12 +923,8 @@ public destoryChild():void{
 ```html
 <div class="panel panel-primary">
   <div class="panel-heading">标题</div>
-  <div class="panel-body">
-      内容
-  </div>
-  <div class="panel-footer">
-      底部
-  </div>
+  <div class="panel-body">内容</div>
+  <div class="panel-footer">底部</div>
 </div>
 ```
 
@@ -909,12 +935,8 @@ public destoryChild():void{
   <div class="panel-heading">
     <ng-content></ng-content>
   </div>
-  <div class="panel-body">
-      内容
-  </div>
-  <div class="panel-footer">
-      底部
-  </div>
+  <div class="panel-body">内容</div>
+  <div class="panel-footer">底部</div>
 </div>
 ```
 
@@ -922,7 +944,7 @@ public destoryChild():void{
 
 ```html
 <test-child-two>
-    <h3>这是父层投影进来的内容</h3>
+  <h3>这是父层投影进来的内容</h3>
 </test-child-two>
 ```
 
@@ -932,7 +954,7 @@ public destoryChild():void{
 
 可以看到，标题的部分是由使用方从外部传递进来的。
 
-### 投影多块内容
+**投影多块内容**
 
 接着，问题又来了，你不仅希望面板的标题部分是动态的，你还希望面板的主体区域和底部区域全部都是动态的，应该怎么实现呢？
 
@@ -941,13 +963,13 @@ public destoryChild():void{
 ```html
 <div class="panel panel-primary">
   <div class="panel-heading">
-      <ng-content select="h3"></ng-content>
+    <ng-content select="h3"></ng-content>
   </div>
   <div class="panel-body">
-      <ng-content select=".my-class"></ng-content>
+    <ng-content select=".my-class"></ng-content>
   </div>
   <div class="panel-footer">
-      <ng-content select="p"></ng-content>
+    <ng-content select="p"></ng-content>
   </div>
 </div>
 ```
@@ -956,9 +978,9 @@ public destoryChild():void{
 
 ```html
 <test-child-two>
-    <h3>这是父层投影进来的内容</h3>
-    <p class="my-class">利用CSS选择器</p>
-    <p>这是底部内容</p>
+  <h3>这是父层投影进来的内容</h3>
+  <p class="my-class">利用CSS选择器</p>
+  <p>这是底部内容</p>
 </test-child-two>
 ```
 
@@ -966,11 +988,11 @@ public destoryChild():void{
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/投影多块内容.png)
 
-你可能已经猜出来了，`<ng-content></ng-content>` 里面的那个 select 参数，其作用和 CSS 选择器非常类似。
+你可能已经猜出来了，`<ng-content></ng-content>` 里面的那个 `select` 参数，其作用和 CSS 选择器非常类似。
 
-这种投影多块内容的方式叫“多插槽模式”（multi-slot），你可以把 `<ng-content></ng-content>` 想形成一个一个的插槽，内容会被插入到这些插槽里面。
+这种投影多块内容的方式叫 **多插槽模式**（multi-slot），你可以把 `<ng-content></ng-content>` 想形成一个一个的插槽，内容会被插入到这些插槽里面。
 
-### 投影一个复杂的组件
+**投影一个复杂的组件**
 
 到这里还没完，你不仅仅想投影简单的 HTML 标签到子层组件里面，你还希望把自己编写的一个组件投影进去，那又应该怎么办呢？
 
@@ -979,13 +1001,13 @@ public destoryChild():void{
 ```html
 <div class="panel panel-primary">
   <div class="panel-heading">
-      <ng-content select="h3"></ng-content>
+    <ng-content select="h3"></ng-content>
   </div>
   <div class="panel-body">
-      <ng-content select="test-child-three"></ng-content>
+    <ng-content select="test-child-three"></ng-content>
   </div>
   <div class="panel-footer">
-      <ng-content select="p"></ng-content>
+    <ng-content select="p"></ng-content>
   </div>
 </div>
 ```
@@ -994,9 +1016,9 @@ public destoryChild():void{
 
 ```html
 <test-child-two>
-    <h3>这是父层投影进来的内容</h3>
-    <test-child-three (sayhello)="doSomething()"></test-child-three>
-    <p>这是底部内容</p>
+  <h3>这是父层投影进来的内容</h3>
+  <test-child-three (sayhello)="doSomething()"></test-child-three>
+  <p>这是底部内容</p>
 </test-child-two>
 ```
 
@@ -1004,11 +1026,11 @@ public destoryChild():void{
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/投影一个复杂的组件.png)
 
-请注意 `<ng-content select="test-child-three"></ng-content>` 里面的内容，你把 select 属性设置成了子组件的名称。
+请注意 `<ng-content select="test-child-three"></ng-content>` 里面的内容，你把 `select` 属性设置成了子组件的名称。
 
 同时，对于被投影的组件 `<test-child-three></test-child-three>` 来说，我们同样可以利用小圆括号的方式来进行事件绑定，就像上面例子里的 `(sayhello)="doSomething()"` 这样。
 
-### 内容投影这个特性存在的意义是什么
+**内容投影这个特性存在的意义是什么**
 
 如果没有“内容投影”特性我们也能活得很好，那么它就没有存在的必要了，而事实并非如此，如果没有“内容投影”，有些事情我们就没法做了，典型的有两类：
 
@@ -1021,7 +1043,7 @@ public destoryChild():void{
 
 ```html
 <my-comp-1>
-    <my-comp-2></my-comp-2>
+  <my-comp-2></my-comp-2>
 </my-comp-1>
 ```
 
@@ -1039,9 +1061,9 @@ public destoryChild():void{
 
 ```html
 <tab>
-    <pane title="第一个标签页"/>
-    <pane title="第二个标签页"/>
-    <pane title="第三个标签页"/>
+  <pane title="第一个标签页"/>
+  <pane title="第二个标签页"/>
+  <pane title="第三个标签页"/>
 </tab>
 ```
 
@@ -1049,38 +1071,39 @@ public destoryChild():void{
 
 内容投影存在的第二个意义与组件的封装有关。
 
-虽然 Angular 提供了 @Component 装饰器让开发者可以自定义标签，但是请不要忘记，自定义标签毕竟与 HTML 原生标签不一样，原生 HTML 标签上面默认带有很多属性、事件，而你自己定义标签是没有的。原生 HTML 标签上面暴露的属性和事件列表请参见 [W3C 的规范](https://www.w3schools.com/tags/ref_attributes.asp)
+虽然 Angular 提供了 `@Component` 装饰器让开发者可以自定义标签，但是请不要忘记，自定义标签毕竟与 HTML 原生标签不一样，原生 HTML 标签上面默认带有很多属性、事件，而你自己定义标签是没有的。原生 HTML 标签上面暴露的属性和事件列表请参见 [W3C 的规范](https://www.w3schools.com/tags/ref_attributes.asp)
 
 从宏观的角度看，所有的自定义标签都只不过是一层“虚拟的壳子”，浏览器并不认识自定义标签，真正渲染出来的还是 div、form、input 之类的原生标签。所以，自定义标签只不过是一层逻辑上的抽象和包装，让人类更容易理解和组织自己的代码而已。
 
-既然如此，自定义标签和HTML原生标签之间的关系是什么呢？本质上说，这是“装饰模式”的一种应用，而内容投影存在的意义就是可以让这个“装饰”的过程做得更加省力、更加优雅一些。
+既然如此，自定义标签 和 HTML原生标签 之间的关系是什么呢？本质上说，这是“装饰模式”的一种应用，而内容投影存在的意义就是可以让这个“装饰”的过程做得更加省力、更加优雅一些。
 
 我们已经学会了内容投影最基本的用法，但是故事并没有结束，接下来的问题又来了：
 
-- 如何访问投影进来的复杂组件？比如：如何访问被监听组件上的 public 属性？如何监听被投影组件上的事件？接下来的小节就来解决这个问题。
+- 如何访问投影进来的复杂组件？比如：如何访问被监听组件上的 `public` 属性？如何监听被投影组件上的事件？接下来的小节就来解决这个问题。
+
 - 如何访问投影进来的 HTML 元素？比如：如何给被投影进来的 HTML 元素添加 CSS 样式？这个话题反而比访问被投影组件要复杂一些，我们在讲指令的那一个小节里面给例子来描述。
 
-## @ContentChild和@ContentChildren
+**`@ContentChild` 和 `@ContentChildren`**
 
 我们可以利用 `@ContentChild` 这个装饰器来操控被投影进来的组件。
 
 ```html
 <child-one>
-    <child-two></child-two>
+  <child-two></child-two>
 </child-one>
 ```
 
 ```ts
 import { Component, ContentChild, ContentChildren, ElementRef, OnInit, QueryList } from '@angular/core';
 
-//注解的写法
+// 注解的写法
 @ContentChild(ChildTwoComponent)
 childTwo:ChildTwoComponent;
 
-//在 ngAfterContentInit 钩子里面访问被投影进来的组件
+// 在 ngAfterContentInit 钩子里面访问被投影进来的组件
 ngAfterContentInit():void{
-    console.log(this.childTwo);
-    //这里还可以访问 this.childTwo的public 型方法，监听 this.childTwo 所派发出来的事件
+  console.log(this.childTwo);
+  // 这里还可以访问 this.childTwo 的 public 型方法，监听 this.childTwo 所派发出来的事件
 }
 ```
 
@@ -1102,11 +1125,11 @@ ngAfterContentInit():void{
 ```ts
 import { Component, ContentChild, ContentChildren, ElementRef, OnInit, QueryList } from '@angular/core';
 
-//这时候不是单个组件，是一个列表了 QueryList
+// 这时候不是单个组件，是一个列表了 QueryList
 @ContentChildren(ChildTwoComponent)
 childrenTwo:QueryList<ChildTwoComponent>;
 
-//遍历列表
+// 遍历列表
 ngAfterContentInit():void{
   this.childrenTwo.forEach((item)=>{
     console.log(item);
@@ -1114,7 +1137,7 @@ ngAfterContentInit():void{
 }
 ```
 
-## @ViewChild与@ViewChildren
+**`@ViewChild` 与 `@ViewChildren`**
 
 我们可以利用 `@ViewChild` 这个装饰器来操控直属的子组件。
 
@@ -1133,17 +1156,17 @@ import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/
 @ViewChild(ChildOneComponent,{static:false})
 childOne:ChildOneComponent;
 
-//在 ngAfterViewInit 这个钩子里面可以直接访问子组件
+// 在 ngAfterViewInit 这个钩子里面可以直接访问子组件
 ngAfterViewInit():void{
   console.log(this.childOne);
-  //用代码的方式订阅子组件上的事件
+  // 用代码的方式订阅子组件上的事件
   this.childOne.helloEvent.subscribe((param)=>{
     console.log(this.childOne.title);
   });
 }
 ```
 
-**注意：8.0 这里有一个 breaking change，@ViewChild 这里提供了第二个参数，增强了一些功能。这里有详细的描述：[https://angular.io/api/core/ViewChild](https://angular.io/api/core/ViewChild)**。
+>注意：8.0 这里有一个 breaking change，`@ViewChild` 这里提供了第二个参数，增强了一些功能。这里有详细的描述：[https://angular.io/api/core/ViewChild](https://angular.io/api/core/ViewChild)。
 
 ```html
 <div class="panel panel-primary">
@@ -1167,7 +1190,7 @@ children:QueryList<ChildOneComponent>;
 ngAfterViewInit():void{
   this.children.forEach((item)=>{
     // console.log(item);
-    //动态监听子组件的事件
+    // 动态监听子组件的事件
     item.helloEvent.subscribe((data)=>{
       console.log(data);
     });
@@ -1175,25 +1198,25 @@ ngAfterViewInit():void{
 }
 ```
 
-## 与Polymer封装组件的方式简单对比
+**与 `Polymer` 封装组件的方式简单对比**
 
-我看到了一些观点，一些开发者认为 Angular 的组件设计不如 Polymer 那种直接继承原生 HTMLElement 的方式优雅。
+我看到了一些观点，一些开发者认为 Angular 的组件设计不如 `Polymer` 那种直接继承原生 HTMLElement 的方式优雅。
 
-以下是 Polymer 组件的定义方式：
+以下是 `Polymer` 组件的定义方式：
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/Polymer组件的定义方式.png)
 
-以下是 Polymer 的根类 Polymer.Element 的源代码：
+以下是 `Polymer` 的根类 `Polymer.Element` 的源代码：
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/Polymer.Element的源代码.png)
 
-可以看到，在 Polymer 中，开发者自定义标签的地位与浏览器原生标签完全是平等的，属性、事件、行为，都是平等的，Polymer 组件的渲染由浏览器内核直接完成。
+可以看到，在 `Polymer` 中，开发者自定义标签的地位与浏览器原生标签完全是平等的，属性、事件、行为，都是平等的，`Polymer` 组件的渲染由浏览器内核直接完成。
 
 [Polymer](https://www.polymer-project.org/) 的这种封装方式和目前市面上的大部分前端框架都不一样，Polymer 直接继承原生 HTML 元素，而其它大部分框架都只是在“包装”、“装饰”原生 HTML 元素，这是两种完全不同的设计哲学。目前，使用 Polymer 最著名的网站是 Google 自家的 YouTube。
 
-## 封装并发布你自己的组件库
+### 封装并发布你自己的组件库
 
-### 市面上可用的 Angular 组件库介绍
+**市面上可用的 Angular 组件库介绍**
 
 开源免费的组件库：
 
@@ -1209,7 +1232,7 @@ ngAfterViewInit():void{
 
 - 来自 Telerik 的 KendoUI for Angular：[http://www.telerik.com/kendo-angular-ui/](http://www.telerik.com/kendo-angular-ui/)，Telerik 的这套组件库的特色是组件的功能比较强大，尤其是 Grid，做得非常强大。
 
-### 如何在你的项目里面引入开源组件库
+**如何在你的项目里面引入开源组件库**
 
 以 PrimeNG 为例，首先在 package.json 里面定义好依赖：
 
@@ -1219,9 +1242,9 @@ ngAfterViewInit():void{
 
 ![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/import组件模块.png)
 
-从 Angular 6.0 开始，@angular/cli 增加了一个 `ng add` 命令，所有支持 Schematics 语法的组件库都可以通过这个命令自动整合，并且在创建你自己组件的时候可以指定需要哪种风格，详细的例子和解释请参考“[Schematics 与代码生成器](#Schematics代码生成器)”这一小节。
+从 Angular 6.0 开始，`@angular/cli` 增加了一个 `ng add` 命令，所有支持 Schematics 语法的组件库都可以通过这个命令自动整合，并且在创建你自己组件的时候可以指定需要哪种风格，详细的例子和解释请参考“[Schematics 与代码生成器](#Schematics代码生成器)”这一小节。
 
-### 如何把你的组件库发布到 npm 上去
+**如何把你的组件库发布到 npm 上去**
 
 有朋友问过一个问题，他觉得 npm 很神奇，比如当我们在终端里面输入以下命令的时候：
 
@@ -1238,9 +1261,9 @@ npm 就会自动去找到 @angular/cli 并安装，看起来很神奇的样子�
 - 第 1 步：用 `npm init` 初始化项目（只要你的项目里面按照 npm 的规范编写一份 package.json 文件就可以了，不一定用 `npm init` 初始化）。
 - 第 2 步：编写你自己的代码。
 - 第 3 步：到 [https://www.npmjs.com/](https://www.npmjs.com/) 去注册一个账号。
-- 第 4 步：用 npm publish 把项目 push 上去。publish 之后，全球开发者都可以通过名字查找并安装你这个模块了。
+- 第 4 步：用 `npm publish` 把项目 push 上去。publish 之后，全球开发者都可以通过名字查找并安装你这个模块了。
 
-### 一些小小的经验供你参考
+**一些小小的经验供你参考**
 
 在我的上一家公司工作期间，我曾经参与、领导过公司两代前端框架的组件库设计和维护，涉及到 jQuery、Flex 等多个技术体系。从 2011 年开始计算，整个维护周期已经有 6 年多。
 
@@ -1248,10 +1271,11 @@ npm 就会自动去找到 @angular/cli 并安装，看起来很神奇的样子�
 
 因此，我特别想谈一谈两个常见的误区：
 
-- 第一个误区是：开源组件可以满足你的所有需求。我可以负责任地告诉你，这是不可能的！开源组件库都是通用型的组件，并不会针对任何特定的行业或者领域进行设计。无论选择哪一款开源组件库，组件的外观 CSS 你总要重新写一套的吧？组件里面缺的那些功能你总得自己去写吧？组件里面的那些 Bug 你总得自己去改掉吧？所以，千万不要幻想开源组件能帮你解决所有问题，二次开发是必然的。
-- 第二个误区是：开发组件库很简单，分分钟可以搞定。在 jQuery 时代，有一款功能极其强大树组件叫 [zTree](http://www.treejs.cn/v3/main.php#_zTreeInfo)。你能想到的那些功能 zTree 都实现了，而且运行效率特别高。但是你要知道，zTree 的作者已经花了超过 5 年的时间来维护这个组件。维护一个组件尚且如此，何况要长期维护一个庞大的库？所以，做好一个组件库并不像有些人想象的那么轻松，这件事是需要花钱、花时间的。做开源，最让使用者蛋疼的不是功能够不够强大，而是开发者突然弃坑，这也是很多企业宁愿花钱自己开发组件库的原因。所以，如果你只是单兵作战，最好选一款现有的开源库，在此基础上继续开发。强烈建议你只做一个组件，就像 zTree 的作者那样，把一个组件做好、做透，并且长期维护下去。这比搞一个庞大的组件库，每个组件做得都像个玩具，然后突然弃坑要好很多。
+第一个误区是：开源组件可以满足你的所有需求。我可以负责任地告诉你，这是不可能的！开源组件库都是通用型的组件，并不会针对任何特定的行业或者领域进行设计。无论选择哪一款开源组件库，组件的外观 CSS 你总要重新写一套的吧？组件里面缺的那些功能你总得自己去写吧？组件里面的那些 Bug 你总得自己去改掉吧？所以，千万不要幻想开源组件能帮你解决所有问题，二次开发是必然的。
 
-## 元数据(Metadata)
+第二个误区是：开发组件库很简单，分分钟可以搞定。在 jQuery 时代，有一款功能极其强大树组件叫 [zTree](http://www.treejs.cn/v3/main.php#_zTreeInfo)。你能想到的那些功能 zTree 都实现了，而且运行效率特别高。但是你要知道，zTree 的作者已经花了超过 5 年的时间来维护这个组件。维护一个组件尚且如此，何况要长期维护一个庞大的库？所以，做好一个组件库并不像有些人想象的那么轻松，这件事是需要花钱、花时间的。做开源，最让使用者蛋疼的不是功能够不够强大，而是开发者突然弃坑，这也是很多企业宁愿花钱自己开发组件库的原因。所以，如果你只是单兵作战，最好选一款现有的开源库，在此基础上继续开发。强烈建议你只做一个组件，就像 zTree 的作者那样，把一个组件做好、做透，并且长期维护下去。这比搞一个庞大的组件库，每个组件做得都像个玩具，然后突然弃坑要好很多。
+
+### 元数据(Metadata)
 
 元数据告诉 Angular 如何处理一个类。
 
@@ -3316,6 +3340,71 @@ npm install rxjs@6.3.3 --save
 yarn remove rxjs
 yarn add rxjs@6.3.3
 ```
+
+### 构建
+
+如果要发布在子网站下，需要做如下配置：
+
+**1、html中引用的静态文件要从assets开始写，不可以使用相对路径**
+
+```html
+<!-- 不可以，会出现路径引用错误，找不到此图片文件 -->
+<img src="../images/bg.png"/>
+<!-- 是可以的，正常显示 -->
+<img src="assets/images/bg.png"/>
+```
+
+**2、karma.conf.js**
+
+```js
+module.exports = function (config) {
+  config.set({
+    basePath: 'attd',  // 修改此处，部署在子网站[应用] attd 下
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
+    plugins: [
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-jasmine-html-reporter'),
+      require('karma-coverage-istanbul-reporter'),
+      require('@angular-devkit/build-angular/plugins/karma')
+    ],
+    // 其余配置...
+  })
+}
+```
+
+**3、index.html**
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>考勤管理</title>
+  <base href="/attd/"> <!-- 部署在子网站[应用] attd 下 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+```
+
+**4、angular.json**
+
+```json
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "options": {
+    "baseHref": "/attd/",  // 添加，调试时和部署时子目录统一
+    "browserTarget": "attence:build"
+  },
+  // ...
+}
+```
+
+## 总结
 
 ## 参考
 

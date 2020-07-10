@@ -1,9 +1,10 @@
 # 目录
 
-1. [简介](#简介)
+1. 简介
    - [索引](#索引)
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
+   - [常用语句](#常用语句)
 3. [总结](#总结)
    - [性能优化](#性能优化)
    - [压缩](#压缩)
@@ -56,31 +57,38 @@ data/dbname/tablename.TRG: 触发器
 
 MySQL索引中可以分为聚集索引与非聚集索引两类，在网络上也见过聚簇的说法
 
-#### 聚集索引
+**聚集索引**
 
-**索引的键值逻辑顺序决定了表数据行的物理存储顺序**，也就是在数据库上连接的记录在磁盘上的物理存储地址也是相邻的，注意这一点特性，我们可以分析出它的适用情况。由于聚集索引规定了数据项，也可以说是记录在表中的物理存储顺序，物理顺序唯一，自然每张表中的聚集索引也是唯一的，但是它可以包含多个列，多个字段。
+>索引的键值逻辑顺序决定了表数据行的物理存储顺序
 
->聚集索引类似于新华字典中用拼音去查找汉字，拼音检索表于书记顺序都是按照a~z排列的，就像相同的逻辑顺序于物理顺序一样，当你需要查找a,ai两个读音的字，或是想一次寻找多个傻(sha)的同音字时，也许向后翻几页，或紧接着下一行就得到结果了。
+也就是在数据库上连接的记录在磁盘上的物理存储地址也是相邻的，注意这一点特性，我们可以分析出它的适用情况。由于聚集索引规定了数据项，也可以说是记录在表中的物理存储顺序，物理顺序唯一，自然每张表中的聚集索引也是唯一的，但是它可以包含多个列，多个字段。
+
+>聚集索引类似于新华字典中用拼音去查找汉字
+
+拼音检索表于书记顺序都是按照a~z排列的，就像相同的逻辑顺序于物理顺序一样，当你需要查找a,ai两个读音的字，或是想一次寻找多个傻(sha)的同音字时，也许向后翻几页，或紧接着下一行就得到结果了。
 
 进一步来说，当你需要查询的数据经常被分组看待（分类），或是经常查询范围性的数据（本月，本周总结），不同值的小数目等情况时，可以使用聚集索引。
 
-#### 非聚集索引
+**非聚集索引**
 
-自然，非聚集索引也就是存储的键值逻辑连续，但是在表数据行物理存储顺序上不一定连续的索引，也就是**索引的逻辑顺序与磁盘上的物理存储顺序不同**。
+自然，非聚集索引也就是存储的键值逻辑连续，但是在表数据行物理存储顺序上不一定连续的索引
 
->非聚集索引类似在新华字典上通过偏旁部首来查询汉字，检索表也许是按照横、竖、撇来排列的，但是由于正文中是a~z的拼音顺序，所以就类似于逻辑地址于物理地址的不对应。同时适用的情况就在于分组，大数目的不同值，频繁更新的列中，这些情况即不适合聚集索引。
+>也就是索引的逻辑顺序与磁盘上的物理存储顺序不同。  
+>非聚集索引类似在新华字典上通过偏旁部首来查询汉字
 
-#### 索引扩展
+检索表也许是按照横、竖、撇来排列的，但是由于正文中是a~z的拼音顺序，所以就类似于逻辑地址于物理地址的不对应。同时适用的情况就在于分组，大数目的不同值，频繁更新的列中，这些情况即不适合聚集索引。
 
-**某些情况下索引与物理存储逻辑有关：**
+**索引扩展**
+
+>某些情况下索引与物理存储逻辑有关：
 
 其中存在一种情况，MySQL 的 MyISAM 引擎 B+ 树式的存储结构，把叶子结点上存放的并不是数据本身，而是存放数据的地址，所以在使用索引时，例如主索引、辅助索引有时达不到想要的效果，而且都是非聚集索引。
 
-**对于主键**
+>对于主键
 
 主键不一定适合加上聚集索引，有时甚至是一种对这个唯一的聚集索引的浪费（虽然在 SQLServer 中主键默认为聚集索引），并非在任何字段上加上聚集/非聚集索引都能提高查询效率。下面我们结合实际情况分析。
 
-**创建“索引”的利与弊**
+>创建“索引”的利与弊
 
 优势：
 
@@ -98,7 +106,7 @@ MySQL索引中可以分为聚集索引与非聚集索引两类，在网络上也
 
 总而言之，这只是 MySQL 查询时优化速度等方面的冰山一角，还是需要多分析，多考虑，根据实际情况去选择各种辅助功能的使用，才能得到相对最高的效率。
 
-参考：[https://www.cnblogs.com/zlcxbb/p/5757245.html](#https://www.cnblogs.com/zlcxbb/p/5757245.html)
+参考：[https://www.cnblogs.com/zlcxbb/p/5757245.html](https://www.cnblogs.com/zlcxbb/p/5757245.html)
 
 在 MySQL 中，主要有四种类型的索引，分别为：**B-Tree 索引**，**Hash 索引**，**Fulltext 索引** 和 **R-Tree 索引**。我们主要分析 B-Tree 索引。
 
@@ -106,11 +114,13 @@ B-Tree 索引是 MySQL 数据库中使用最为频繁的索引类型，除了 Ar
 
 不仅仅在 MySQL 中是如此，实际上在其他的很多数据库管理系统中 B-Tree 索引也同样是作为最主要的索引类型，这主要是因为 B-Tree 索引的存储结构在数据库的数据检索中有非常优异的表现。
 
-一般来说， MySQL 中的 B-Tree 索引的物理文件大多都是以 Balance Tree 的结构来存储的，也就是所有实际需要的数据都存放于 Tree 的 Leaf Node（叶子节点），而且**到任何一个 Leaf Node 的最短路径的长度都是完全相同的**，所以我们大家都称之为 B-Tree 索引。当然，可能各种数据库（或 MySQL 的各种存储引擎）在存放自己的 B-Tree 索引的时候会对存储结构稍作改造。如 **Innodb 存储引擎的 B-Tree 索引实际使用的存储结构实际上是 B+Tree**，也就是在 B-Tree 数据结构的基础上做了很小的改造，在每一个 Leaf Node 上面出了存放索引键的相关信息之外，还**存储了指向与该 Leaf Node 相邻的后一个 LeafNode 的指针信息（增加了顺序访问指针）**，这主要是为了加快检索多个相邻 Leaf Node 的效率考虑。
+一般来说， MySQL 中的 B-Tree 索引的物理文件大多都是以 Balance Tree 的结构来存储的，也就是所有实际需要的数据都存放于 Tree 的 Leaf Node（叶子节点），而且`到任何一个 Leaf Node 的最短路径的长度都是完全相同的`，所以我们大家都称之为 B-Tree 索引。
+
+当然，可能各种数据库（或 MySQL 的各种存储引擎）在存放自己的 B-Tree 索引的时候会对存储结构稍作改造。如 `Innodb 存储引擎的 B-Tree 索引实际使用的存储结构实际上是 B+Tree`，也就是在 B-Tree 数据结构的基础上做了很小的改造，在每一个 Leaf Node 上面出了存放索引键的相关信息之外，还`存储了指向与该 Leaf Node 相邻的后一个 LeafNode 的指针信息（增加了顺序访问指针）`，这主要是为了加快检索多个相邻 Leaf Node 的效率考虑。
 
 下面主要讨论 MyISAM 和 InnoDB 两个存储引擎的索引实现方式：
 
-**1、MyISAM 索引实现：MyISAM 索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。**
+>1、MyISAM 索引实现：MyISAM 索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。**
 
 在 MyISAM 中，主索引和辅助索引(Secondary key)在结构上没有任何区别，只是主索引要求 key 是唯一的，而辅助索引的 key 可以重复。
 
@@ -118,22 +128,22 @@ MyISAM 中索引检索的算法为首先按照 B+Tree 搜索算法搜索索引�
 
 MyISAM 的索引方式也叫做“非聚集”的，之所以这么称呼是为了与 InnoDB 的聚集索引区分。
 
-**2、InnoDB索引实现：也使用 B+Tree 作为索引结构，但具体实现方式却与 MyISAM 截然不同。**
+>2、InnoDB索引实现：也使用 B+Tree 作为索引结构，但具体实现方式却与 MyISAM 截然不同。
 
-在 InnoDB 中，表数据文件本身就是按 B+Tree 组织的一个索引结构，这棵树的叶节点 data 域保存了完整的数据记录。这个索引的 key 是数据表的主键，因此 InnoDB 表数据文件本身就是主索引。这种索引叫做**聚集索引**。
+在 InnoDB 中，表数据文件本身就是按 B+Tree 组织的一个索引结构，这棵树的叶节点 data 域保存了完整的数据记录。这个索引的 key 是数据表的主键，因此 InnoDB 表数据文件本身就是主索引。这种索引叫做 **聚集索引**。
 
 因为 InnoDB 的数据文件本身要按主键聚集，所以 InnoDB 要求表必须有主键（MyISAM可以没有），如果没有显式指定，则 MySQL 系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则 MySQL 自动为 InnoDB 表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。
 
 InnoDB 的所有辅助索引都引用主键作为 data 域。InnoDB 表是基于聚簇索引建立的。因此InnoDB 的索引能提供一种非常快速的主键查找性能。不过，它的辅助索引（Secondary Index，也就是非主键索引）也会包含主键列，所以，如果主键定义的比较大，其他索引也将很大。如果想在表上定义很多索引，则争取尽量把主键定义得小一些。InnoDB 不会压缩索引。
 
-**聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录**。
+>聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。
 
 不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了 InnoDB 的索引实现后，就很容易明白：
 
 1. 为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。
 2. 用非单调的字段作为主键在 InnoDB 中不是个好主意，因为 InnoDB 数据文件本身是一颗 B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持 B+Tree 的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。
 
-**InnoDB 索引和 MyISAM 索引的区别：**
+>InnoDB 索引和 MyISAM 索引的区别：
 
 - 一是主索引的区别，InnoDB 的数据文件本身就是索引文件。而 MyISAM 的索引和数据是分开的。
 
@@ -143,75 +153,76 @@ InnoDB 的所有辅助索引都引用主键作为 data 域。InnoDB 表是基于
 
 ### 安装与配置
 
-**windows环境：**
+>windows环境：
 
-#### 压缩包版
+**压缩包版**
 
-1. 设置环境变量  
+1、设置环境变量  
 
-   配置 `MYSQL_HOME` 为MySQL的解压路径，并设置path： `;%MYSQL_HOME%\bin`
+配置 `MYSQL_HOME` 为MySQL的解压路径，并设置path：`;%MYSQL_HOME%\bin`
 
-2. 在MySQL解压路径下，新建 `my.ini` 配置初始化参数：
+2、在MySQL解压路径下，新建 `my.ini` 配置初始化参数：
 
-   ```ini
-   [mysql]
-   # 设置mysql客户端默认字符集
-   default-character-set=utf8
-   [mysqld]
-   #设置3306端口
-   port = 3306
-   # 设置mysql的安装目录
-   basedir=D:\Arms\mysql-8.0.19-winx64
-   # 设置mysql数据库的数据的存放目录
-   datadir=D:\Arms\mysql-8.0.19-winx64\data
-   # 允许最大连接数
-   max_connections=2000
-   # 允许连接失败的次数。这是为了防止有人从该主机试图攻击数据库系统
-   max_connect_errors=10
-   # 服务端使用的字符集默认为8比特编码的latin1字符集
-   character-set-server=utf8
-   # 创建新表时将使用的默认存储引擎
-   default-storage-engine=INNODB
-   # 默认使用 "mysql_native_password" 插件认证
-   default_authentication_plugin=mysql_native_password
-   [client]
-   # 设置mysql客户端连接服务端时默认使用的端口
-   port=3306
-   default-character-set=utf8
-   ```
+```ini
+[mysql]
+# 设置mysql客户端默认字符集
+default-character-set=utf8
+[mysqld]
+#设置3306端口
+port = 3306
+# 设置mysql的安装目录
+basedir=D:\Arms\mysql-8.0.19-winx64
+# 设置mysql数据库的数据的存放目录
+datadir=D:\Arms\mysql-8.0.19-winx64\data
+# 允许最大连接数
+max_connections=2000
+# 允许连接失败的次数。这是为了防止有人从该主机试图攻击数据库系统
+max_connect_errors=10
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB
+# 默认使用 "mysql_native_password" 插件认证
+default_authentication_plugin=mysql_native_password
+[client]
+# 设置mysql客户端连接服务端时默认使用的端口
+port=3306
+default-character-set=utf8
+```
 
-   >my.ini文件格式要是 `ANSI` 格式，否则会报这种错误：`Found option without preceding group in config file`
+>my.ini 文件格式必须是 `ANSI` 格式，否则会报错：`Found option without preceding group in config file`
 
-3. 初始化数据库
+3、初始化数据库
 
-   以**管理员**的身份打开cmd命令窗口，输入 `mysqld --initialize --console` 命令初始化 mysql 的 data 数据目录，初始化完毕后，会在解压目录下生成一个data文件夹，cmd窗口中会有随机生成的密码：
+以 **管理员** 的身份打开cmd命令窗口，输入 `mysqld --initialize --console` 命令初始化 mysql 的 data 数据目录，初始化完毕后，会在解压目录下生成一个data文件夹，cmd窗口中会有随机生成的密码：
 
-   ![x](../Resource/mysql_install.png)
+![x](./Resources/mysql_install.png)
 
-   生成密码：XkJ-VegEY3cY
+生成密码：XkJ-VegEY3cY
 
-4. 安装服务  
-   - 注册服务：`mysqld --install mysql-master --defaults-file="D:\Arms\mysql-8.0.19-winx64\my.ini"`
-   - 启动服务：`net start mysql-master`
-   - 登录：`mysql -u root -p`
+4、安装服务  
 
-5. 更改密码
+- 注册服务：`mysqld --install mysql-master --defaults-file="D:\Arms\mysql-8.0.19-winx64\my.ini"`
+- 启动服务：`net start mysql-master`
+- 登录：`mysql -u root -p`
 
-   ```sql
-   set password for root@localhost='123456';
-   -- 或者
-   ALTER USER USER() IDENTIFIED BY '新密码';
-   ```
+5、更改密码
 
-**问题解决：**
+```sql
+set password for root@localhost='123456';
+-- 或者
+ALTER USER USER() IDENTIFIED BY '新密码';
+```
 
-1. 服务名无效  
+6、问题解决：
 
-   原因：没有注册 mysql 到服务中。  
+- 6.1 服务名无效  
 
-   解决：在命令行中输入`mysqld --install`，出现 Service successfully install 代表安装成功
+  原因：没有注册 mysql 到服务中。  
 
-2. cmd中能登录，Navicat中不能登录  
+  解决：在命令行中输入`mysqld --install`，出现 `Service successfully install` 代表安装成功
+
+- 6.2 cmd中能登录，Navicat中不能登录  
 
    错误提示：
 
@@ -233,41 +244,38 @@ InnoDB 的所有辅助索引都引用主键作为 data 域。InnoDB 表是基于
    1. 开启远程登录
    2. 把 mysql 用户登录密码加密规则还原成 `mysql_native_password`，或者升级 Navicat 驱动。  
 
-   ```sh
-   # 登录系统
-   mysql -u root -p 密码
-   # 切换数据库
-   mysql> use mysql;
-   # 更新，任意客户端可以使用root登录
-   mysql> update user set host = '%' where user = 'root';
+```sh
+# 登录系统
+mysql -u root -p 密码
+# 切换数据库
+mysql> use mysql;
+# 更新，任意客户端可以使用root登录
+mysql> update user set host = '%' where user = 'root';
 
-   # 修改加密规则
-   mysql> ALTER USER 'root'@'%' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER;
-   # 更新用户密码
-   mysql> ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+# 修改加密规则
+mysql> ALTER USER 'root'@'%' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER;
+# 更新用户密码
+mysql> ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 
-   # 刷新权限
-   mysql> flush privileges;
+# 刷新权限
+mysql> flush privileges;
 
-   # 上面的命令不行，可以试试下面的
-   mysql> grant all privileges on *.* to root@'%' identified by '密码';
-   # 如果是固定ip就这么写  
-   mysql> grant all privileges on *.* to 'root'@'192.168.0.49' identified by '密码' with grant option;
+# 上面的命令不行，可以试试下面的
+mysql> grant all privileges on *.* to root@'%' identified by '密码';
+# 如果是固定ip就这么写  
+mysql> grant all privileges on *.* to 'root'@'192.168.0.49' identified by '密码' with grant option;
 
-   mysql> flush privileges;
+mysql> flush privileges;
 
-   # 退出命令行
-   mysql> exit;
-   ```
+# 退出命令行
+mysql> exit;
+```
 
-#### 安装包版
+>安装包版，根据向导安装即可！
 
-根据向导安装即可！
-
-### linux环境
+### 常用语句
 
 ```sql
-
 -- 安全模式
 show variables like 'sql_safe_updates';
 set sql_safe_updates=1; --安全模式打开状态
@@ -297,14 +305,14 @@ CREATE PROCEDURE sp_get_shops_by_project(
     pageIndex INT,
     pageSize INT,
     searchCondition VARCHAR(60)
-) 
-BEGIN 
+)
+BEGIN
 DECLARE periodId INT;
 DECLARE mbdName VARCHAR(60);
 -- 获取总期数
 -- SELECT COUNT(id) INTO totalRounds FROM t_period_master WHERE ProjectId = projId AND Preview = 0 AND has_data = 1 AND has_users = 1;
 IF userType = 0 THEN -- 普通外部用户，需要根据mbd权限查看门店
-    SELECT IFNULL(u.period_id, 0) into periodId 
+    SELECT IFNULL(u.period_id, 0) into periodId
     FROM t_user u
     WHERE u.id = userId;
 
@@ -365,7 +373,7 @@ IF userType = 0 THEN -- 普通外部用户，需要根据mbd权限查看门店
     PREPARE tempQuery FROM @sql;
     EXECUTE tempQuery;
     DEALLOCATE PREPARE tempQuery;
-    ELSE -- SET totalShops = @totalShops; 
+    ELSE -- SET totalShops = @totalShops;
         SET @sql = CONCAT(
         'SELECT m.mbd_code mbdCode, m.mbd_name mbdName, m.mbd_title mbdTitle, c.fact_value factValue',
         ' FROM t_mbd_master m',
@@ -467,7 +475,7 @@ EXECUTE tempQuery;
 
 DEALLOCATE PREPARE tempQuery;
 
-ELSE -- SET totalShops = @totalShops; 
+ELSE -- SET totalShops = @totalShops;
 SET
     @sql = CONCAT(
         'SELECT m.mbd_code mbdCode, m.mbd_name mbdName, m.mbd_title mbdTitle, c.fact_value factValue',
@@ -493,7 +501,7 @@ FROM
     DEALLOCATE PREPARE tempQuery;
     END IF;
 END IF;
-END 
+END
 -- 调用
 CALL sp_get_shops_by_project(1, 1, 1, 0, 0, 900, '');
 
@@ -502,125 +510,74 @@ CALL sp_get_shops_by_project(1, 1, 1, 0, 0, 900, '');
  * 查询单店报表数据，使用中
  */
 CREATE PROCEDURE sp_get_stores_list(
-    columnConfig VARCHAR(2000),
-    -- 查询字段 
-    whereCondition VARCHAR(2000),
-    -- 查询条件
-    orderCondition VARCHAR(50),
-    projectCode VARCHAR(50),
-    pageSize INT,
-    -- pageSize为0时，不分页，供导出使用
-    startIndex INT
-) BEGIN DECLARE confirmFields VARCHAR(200);
-
+  columnConfig VARCHAR(2000), -- 查询字段
+  whereCondition VARCHAR(2000), -- 查询条件
+  orderCondition VARCHAR(50), projectCode VARCHAR(50),
+  pageSize INT, -- pageSize为0时，不分页，供导出使用
+  startIndex INT
+)
+BEGIN
+DECLARE confirmFields VARCHAR(200);
 DECLARE pageQuery VARCHAR(200);
 
-SET
-    confirmFields = '';
-
-SET
-    pageQuery = '';
-
-SET
-    @sql = CONCAT(
-        'CREATE TEMPORARY TABLE tmp_CanShowComplainDays',
-        ' SELECT MIN(sd.Date_Code) DateCode, sd.DataRound DataRoundCode FROM ',
-        '(SELECT Date_Code, DataRound FROM ',
-        projectCode,
-        '_t_storedata GROUP BY DataRound, Date_Code) sd',
-        ' LEFT JOIN t_disputeconfig dc ON sd.DataRound = dc.DataRoundCode ',
-        'AND dc.ProjectCode = ''',
-        projectCode,
-        ''' WHERE TIMESTAMPDIFF(DAY, sd.Date_Code, CURDATE()) <= ',
-        'dc.CanShowComplainDays - 1 + (SELECT COUNT(*) FROM t_holidays',
-        'WHERE sd.Date_Code <= holidays AND CURDATE() >= holidays ',
-        'AND years = YEAR(CURDATE())) GROUP BY sd.DataRound'
-    );
-
-PREPARE tmpData
-FROM
-    @sql;
-
+SET confirmFields = '';
+SET pageQuery = '';
+SET @sql = CONCAT(
+  'CREATE TEMPORARY TABLE tmp_CanShowComplainDays',
+  ' SELECT MIN(sd.Date_Code) DateCode, sd.DataRound DataRoundCode FROM ',
+  '(SELECT Date_Code, DataRound FROM ', projectCode,
+  '_t_storedata GROUP BY DataRound, Date_Code) sd',
+  ' LEFT JOIN t_disputeconfig dc ON sd.DataRound = dc.DataRoundCode ',
+  'AND dc.ProjectCode = ''', projectCode,
+  ''' WHERE TIMESTAMPDIFF(DAY, sd.Date_Code, CURDATE()) <= ',
+  'dc.CanShowComplainDays - 1 + (SELECT COUNT(*) FROM t_holidays',
+  'WHERE sd.Date_Code <= holidays AND CURDATE() >= holidays ',
+  'AND years = YEAR(CURDATE())) GROUP BY sd.DataRound'
+);
+PREPARE tmpData FROM @sql;
 DROP TABLE IF EXISTS tmp_CanShowComplainDays;
-
 EXECUTE tmpData;
-
 DEALLOCATE PREPARE tmpData;
-
-SET
-    @sql = CONCAT(
-        'CREATE TEMPORARY TABLE tmp_ComplainDays',
-        ' SELECT MIN(sd.Date_Code) DateCode, sd.DataRound DataRoundCode FROM (',
-        'SELECT Date_Code, DataRound FROM ',
-        projectCode,
-        '_t_storedata GROUP BY DataRound, Date_Code) sd',
-        ' LEFT JOIN t_disputeconfig dc ON sd.DataRound = dc.DataRoundCode ',
-        'AND dc.ProjectCode = ''',
-        projectCode,
-        ''' WHERE TIMESTAMPDIFF(DAY, sd.Date_Code, CURDATE()) <= ',
-        'dc.ComplainDays - 1 + (SELECT COUNT(*) FROM t_holidays ',
-        'WHERE sd.Date_Code <= holidays AND CURDATE() >= holidays ',
-        'AND years = YEAR(CURDATE())) GROUP BY sd.DataRound'
-    );
-
-PREPARE tmpData
-FROM
-    @sql;
-
+SET @sql = CONCAT(
+  'CREATE TEMPORARY TABLE tmp_ComplainDays',
+  ' SELECT MIN(sd.Date_Code) DateCode, sd.DataRound DataRoundCode FROM (',
+  'SELECT Date_Code, DataRound FROM ', projectCode,
+  '_t_storedata GROUP BY DataRound, Date_Code) sd',
+  ' LEFT JOIN t_disputeconfig dc ON sd.DataRound = dc.DataRoundCode ',
+  'AND dc.ProjectCode = ''', projectCode,
+  ''' WHERE TIMESTAMPDIFF(DAY, sd.Date_Code, CURDATE()) <= ',
+  'dc.ComplainDays - 1 + (SELECT COUNT(*) FROM t_holidays ',
+  'WHERE sd.Date_Code <= holidays AND CURDATE() >= holidays ',
+  'AND years = YEAR(CURDATE())) GROUP BY sd.DataRound'
+);
+PREPARE tmpData FROM @sql;
 DROP TABLE IF EXISTS tmp_ComplainDays;
-
 EXECUTE tmpData;
-
 DEALLOCATE PREPARE tmpData;
 
 IF pageSize != 0 THEN
-SET
-    confirmFields = ' DATE_FORMAT(sd.Date_Code, ''%Y-%m-%d'') 上传时间, sm.客户号 客户编号, sd.DataRound 轮次, sm.客户标准名称 客户名称, (CASE WHEN sd.Date_Code >= tc.DateCode THEN 0 ELSE 1 END) 能否申诉';
-
-SET
-    pageQuery = CONCAT(' LIMIT ', pageSize, ' OFFSET ', startIndex);
-
-IF columnConfig != ''
-AND columnConfig IS NOT NULL THEN
-SET
-    columnConfig = CONCAT(columnConfig, ',');
-
+  SET confirmFields = ' DATE_FORMAT(sd.Date_Code, ''%Y-%m-%d'') 上传时间, sm.客户号 客户编号, sd.DataRound 轮次, sm.客户标准名称 客户名称, (CASE WHEN sd.Date_Code >= tc.DateCode THEN 0 ELSE 1 END) 能否申诉';
+  SET pageQuery = CONCAT(' LIMIT ', pageSize, ' OFFSET ', startIndex);
+  IF columnConfig != '' AND columnConfig IS NOT NULL THEN
+    SET columnConfig = CONCAT(columnConfig, ',');
+  END IF;
 END IF;
 
-END IF;
-
-SET
-    @sql = CONCAT(
-        'SELECT ',
-        columnConfig,
-        confirmFields,
-        ' FROM ',
-        ProjectCode,
-        '_t_storedata sd',
-        ' INNER JOIN ',
-        ProjectCode,
-        '_t_storemaster sm ON sm.客户号 = sd.Store_Code',
-        ' LEFT JOIN tmp_CanShowComplainDays ts ON sd.DataRound = ts.DataRoundCode',
-        ' LEFT JOIN tmp_ComplainDays tc ON sd.DataRound = tc.DataRoundCode',
-        whereCondition,
-        ' AND sd.Date_Code >= ts.DateCode',
-        ' AND NOT EXISTS(SELECT Store_Code FROM t_storecomplain WHERE Project_Code = ''',
-        ProjectCode,
-        ''' AND DateRound = sd.DataRound AND Store_Code = sd.Store_Code)',
-        orderCondition,
-        pageQuery
-    );
-
-PREPARE tmpData
-FROM
-    @sql;
-
+SET @sql = CONCAT(
+  'SELECT ', columnConfig, confirmFields, ' FROM ', ProjectCode,
+  '_t_storedata sd', ' INNER JOIN ', ProjectCode,
+  '_t_storemaster sm ON sm.客户号 = sd.Store_Code',
+  ' LEFT JOIN tmp_CanShowComplainDays ts ON sd.DataRound = ts.DataRoundCode',
+  ' LEFT JOIN tmp_ComplainDays tc ON sd.DataRound = tc.DataRoundCode',
+  whereCondition, ' AND sd.Date_Code >= ts.DateCode',
+  ' AND NOT EXISTS(SELECT Store_Code FROM t_storecomplain WHERE Project_Code = ''', ProjectCode,
+  ''' AND DateRound = sd.DataRound AND Store_Code = sd.Store_Code)',
+  orderCondition, pageQuery);
+PREPARE tmpData FROM @sql;
 EXECUTE tmpData;
-
 DEALLOCATE PREPARE tmpData;
 
 END;
-
 --
 CALL sp_get_stores_list(
     '客户号,客户标准名称,客户简称,客户总部名称,地址,周围标志性建筑物,联络人,电话,全国,渠道类型,DSR_PSR_DWR,客户性质,客户级别,直辖市,城市代码,地级市,县级市,办事处,OTC总部,OTC_CODE,大区总监,大区总监编号,本级岗位_大区总监,大区总监负责人,MUDID_2,大区总监负责人MUDID,大区,大区编号,本级岗位_大区,大区负责人,MUDID_3,大区MUDID,所属团队,所属团队编号,本级岗位_团队代表,所属团队代表,MUDID_4,所属团队代表MUDID,销售代表,销售代表编号,本级岗位_销售代表,MUDID_5,销售代表MUDID,地区,工作地,报备,OTC_001,OTC_002,OTC_003,OTC_004,OTC_005,OTC_006,OTC_007,OTC_008,OTC_009,OTC_010,OTC_011,OTC_012',
@@ -629,7 +586,9 @@ CALL sp_get_stores_list(
     'p01',
     10,
     0
-) -- 字符串转成行
+)
+
+-- 字符串转成行
 /**
  * 字符串转换成数组行
  */
@@ -762,7 +721,7 @@ WHERE
 
 END IF;
 
-END 
+END
 
 -- 循环
 
@@ -799,7 +758,7 @@ IF holidays >= beginDateValue AND holidays <= endDateValue THEN
 END IF;
 
 RETURN counts;
-END 
+END
 
 -- 游标
 
@@ -823,7 +782,6 @@ DECLARE t_dateround VARCHAR(50);
 DECLARE t_storecode VARCHAR(50) DEFAULT '';
 
 DECLARE maxCnt INT DEFAULT 0;
-
 DECLARE i INT DEFAULT 0;
 
 DECLARE cursorDone INT DEFAULT 0;
@@ -882,211 +840,118 @@ DROP TABLE IF EXISTS tmp_MasterTable;
 EXECUTE storeMaster;
 
 -- 单店Data表处理
-SET
-    @sql = CONCAT(
-        'CREATE TEMPORARY TABLE tmp_DataRound ',
-        'SELECT Date_Code,DataRound FROM ',
-        ProjectCode,
-        '_t_storedata GROUP BY DataRound, Date_Code ORDER BY DataRound, Date_Code'
-    );
-
-PREPARE tmpData
-FROM
-    @sql;
-
+SET @sql = CONCAT(
+  'CREATE TEMPORARY TABLE tmp_DataRound ',
+  'SELECT Date_Code,DataRound FROM ', ProjectCode, '_t_storedata ', 'GROUP BY DataRound, Date_Code ORDER BY DataRound, Date_Code'
+);
+PREPARE tmpData FROM @sql;
 DROP TABLE IF EXISTS tmp_DataRound;
-
 EXECUTE tmpData;
 
-SET
-    @sql = CONCAT(
-        'CREATE TEMPORARY TABLE tmp_StoreTable SELECT ',
-        dataColumnQuery,
-        ' Store_Code StoreCode,DATE_FORMAT(Date_Code, ''%Y-%m-%d'') 上传时间,',
-        'DataRound 轮次 FROM ',
-        ProjectCode,
-        '_t_storedata WHERE 1 = 1 AND'
-    );
+SET @sql = CONCAT(
+  'CREATE TEMPORARY TABLE tmp_StoreTable ',
+  'SELECT ', dataColumnQuery, ' Store_Code StoreCode,DATE_FORMAT(Date_Code, ''%Y-%m-%d'') 上传时间,', 'DataRound 轮次 ',
+  'FROM ', ProjectCode, '_t_storedata WHERE 1 = 1 AND');
 
 OPEN cur;
-
-cursorLoop :LOOP FETCH cur INTO t_beginDate,
-t_dateround;
-
-IF cursorDone = 1 THEN LEAVE cursorLoop;
-
-END IF;
-
-SET
-    @sql = CONCAT(
-        @sql,
-        ' (DataRound = ''',
-        t_dateround,
-        ''' AND Date_Code > ''',
-        t_beginDate,
-        ''') OR'
-    );
-
+cursorLoop:
+LOOP
+  FETCH cur INTO t_beginDate, t_dateround;
+  IF cursorDone = 1 THEN
+    LEAVE cursorLoop;
+  END IF;
+  SET @sql = CONCAT(@sql, ' (DataRound = ''', t_dateround,
+    ''' AND Date_Code > ''', t_beginDate, ''') OR');
 END LOOP;
-
 CLOSE cur;
 
 IF RIGHT(@sql, 2) = 'OR' THEN
-SET
-    @sql = MID(@sql, 1, CHAR_LENGTH(@sql) -3);
-
+  SET @sql = MID(@sql, 1, CHAR_LENGTH(@sql) -3);
 ELSEIF RIGHT(@sql, 3) = 'AND' THEN
-SET
-    @sql = MID(@sql, 1, CHAR_LENGTH(@sql) -4);
-
+  SET @sql = MID(@sql, 1, CHAR_LENGTH(@sql) -4);
 END IF;
 
 DROP TABLE IF EXISTS Gather_Data_Tmp;
-
 CREATE TEMPORARY TABLE Gather_Data_Tmp(
-    Tmp_Id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    Store_Code VARCHAR(50) NOT NULL,
-    DateRound VARCHAR(8192) NOT NULL,
-    PRIMARY KEY (Tmp_Id)
+  Tmp_Id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  Store_Code VARCHAR(50) NOT NULL,
+  DateRound VARCHAR(8192) NOT NULL,
+  PRIMARY KEY (Tmp_Id)
 ) ENGINE = MyISAM DEFAULT CHARSET = utf8;
 
-SET
-    @cond = ' AND (';
-
-SET
-    @cond1 = '';
+SET @cond = ' AND (';
+SET @cond1 = '';
 
 OPEN curRound;
+cursorLoop:
+LOOP
+  FETCH curRound INTO t_dateround;
+  SET @cond = CONCAT(@cond, '(DataRound=''', t_dateround, ''' AND Store_Code NOT IN (');
+  SET @cond1 = CONCAT(@cond1, 'DataRound <> ''', t_dateround, ''' AND ');
+  
+  TRUNCATE TABLE Gather_Data_Tmp;
+  
+  INSERT INTO Gather_Data_Tmp (Store_Code, DateRound)
+  SELECT DISTINCT Store_Code, DateRound
+  FROM t_storecomplain
+  WHERE Project_Code = ProjectCode
+  AND DateRound = t_dateround
+  GROUP BY DateRound, Store_Code;
 
-cursorLoop :LOOP FETCH curRound INTO t_dateround;
+  SELECT MIN(Tmp_Id) INTO i FROM Gather_Data_Tmp;
+  SELECT MAX(Tmp_Id) INTO maxCnt FROM Gather_Data_Tmp;
 
-SET
-    @cond = CONCAT(
-        @cond,
-        '(DataRound=''',
-        t_dateround,
-        ''' AND Store_Code NOT IN ('
-    );
+  WHILE i <= maxCnt DO
+    SELECT Store_Code INTO t_storecode
+    FROM Gather_Data_Tmp
+    WHERE Tmp_Id = i;
 
-SET
-    @cond1 = CONCAT(
-        @cond1,
-        'DataRound <> ''',
-        t_dateround,
-        ''' AND '
-    );
+    SET @cond = CONCAT(@cond, '''', t_storecode, ''',');
 
-TRUNCATE TABLE Gather_Data_Tmp;
+    SET i = i + 1;
+  END WHILE;
 
-INSERT INTO
-    Gather_Data_Tmp (Store_Code, DateRound)
-SELECT
-    DISTINCT Store_Code,
-    DateRound
-FROM
-    t_storecomplain
-WHERE
-    Project_Code = ProjectCode
-    AND DateRound = t_dateround
-GROUP BY
-    DateRound,
-    Store_Code;
+  IF RIGHT(@cond, 1) = ',' THEN
+    SET @cond = MID(@cond, 1, CHAR_LENGTH(@cond) -1);
+  END IF;
 
-SELECT
-    MIN(Tmp_Id) INTO i
-FROM
-    Gather_Data_Tmp;
+  SET @cond = CONCAT(@cond, ')) OR ');
 
-SELECT
-    MAX(Tmp_Id) INTO maxCnt
-FROM
-    Gather_Data_Tmp;
-
-WHILE i <= maxCnt DO
-SELECT
-    Store_Code INTO t_storecode
-FROM
-    Gather_Data_Tmp
-WHERE
-    Tmp_Id = i;
-
-SET
-    @cond = CONCAT(@cond, '''', t_storecode, ''',');
-
-SET
-    i = i + 1;
-
-END WHILE;
-
-IF RIGHT(@cond, 1) = ',' THEN
-SET
-    @cond = MID(@cond, 1, CHAR_LENGTH(@cond) -1);
-
-END IF;
-
-SET
-    @cond = CONCAT(@cond, ')) OR ');
-
-IF cursorDone = 1 THEN LEAVE cursorLoop;
-
-END IF;
-
+  IF cursorDone = 1 THEN
+    LEAVE cursorLoop;
+  END IF;
 END LOOP;
-
 CLOSE curRound;
 
 IF RIGHT(@cond1, 4) = 'AND ' THEN
-SET
-    @cond1 = MID(@cond1, 1, CHAR_LENGTH(@cond1) -5);
-
+  SET @cond1 = MID(@cond1, 1, CHAR_LENGTH(@cond1) -5);
 END IF;
 
 IF RIGHT(@cond, 1) = '(' THEN
-SET
-    @cond = '';
-
+  SET @cond = '';
 ELSEIF RIGHT(@cond, 3) = 'OR ' THEN
-SET
-    @cond = CONCAT(@cond, '(', @cond1, '))');
-
+  SET @cond = CONCAT(@cond, '(', @cond1, '))');
 END IF;
 
-SET
-    @sql = CONCAT(@sql, @cond, dataWhereCondition);
+SET @sql = CONCAT(@sql, @cond, dataWhereCondition);
 
 -- SELECT @sql;
-PREPARE storeData
-FROM
-    @sql;
-
+PREPARE storeData FROM @sql;
 DROP TABLE IF EXISTS tmp_StoreTable;
-
 EXECUTE storeData;
 
 -- 两个临时表关联
-SET
-    @sql = 'ALTER TABLE tmp_MasterTable ADD INDEX tmp_MasterTable_客户编号 (客户编号);';
-
-PREPARE addIndex1
-FROM
-    @sql;
-
+SET @sql = 'ALTER TABLE tmp_MasterTable ADD INDEX tmp_MasterTable_客户编号 (客户编号);';
+PREPARE addIndex1 FROM @sql;
 EXECUTE addIndex1;
 
-SET
-    @sql = 'ALTER TABLE tmp_StoreTable ADD INDEX tmp_StoreTable_StoreCode (StoreCode);';
-
-PREPARE addIndex2
-FROM
-    @sql;
-
+SET @sql = 'ALTER TABLE tmp_StoreTable ADD INDEX tmp_StoreTable_StoreCode (StoreCode);';
+PREPARE addIndex2 FROM @sql;
 EXECUTE addIndex2;
 
-SELECT
-    COUNT(tm.客户编号)
-FROM
-    tmp_MasterTable tm
-    INNER JOIN tmp_StoreTable ts ON tm.客户编号 = ts.StoreCode INTO totalCount;
+SELECT COUNT(tm.客户编号)
+FROM tmp_MasterTable tm
+INNER JOIN tmp_StoreTable ts ON tm.客户编号 = ts.StoreCode INTO totalCount;
 
 SET
     @sql = CONCAT(

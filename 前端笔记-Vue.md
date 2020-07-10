@@ -30,6 +30,7 @@
    - [Vuex](#Vuex)
    - [ElementUI插件](#ElementUI插件)
    - [mint-ui](#mint-ui)
+   - [构建](#构建)
 3. 总结
 
 ## 简介
@@ -3009,5 +3010,68 @@ computed: {
 ### mint-ui
 
 饿了么出品，element-ui 在PC端使用，移动端版本 mint-ui：`https://mint-ui.github.io/#!/zh-cn`
+
+### 构建
+
+如果要发布在子网站下，需要做如下配置：
+
+**1、build/utils.js**
+
+```js
+// ...
+
+if (options.extract) {
+  return ExtractTextPlugin.extract({
+    use: loaders,
+    fallback: 'vue-style-loader',
+    publicPath: '../../'  // 修改此处
+  })
+} else {
+  return ['vue-style-loader'].concat(loaders)
+}
+
+// ...
+```
+
+**2、config/index.js**
+
+```js
+// ...
+
+build: {
+  // ...
+  /**
+    * You can set by youself according to actual condition
+    * You will need to set this if you plan to deploy your site under a sub path,
+    * for example GitHub pages. If you plan to deploy your site to https://foo.github.io/bar/,
+    * then assetsPublicPath should be set to "/bar/".
+    * In most cases please use '/' !!!
+    */
+  assetsPublicPath: '/pm/'  // 部署在子网站[应用] pm 下
+  // ...
+}
+
+// ...
+```
+
+**3、index.html**
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>电气研发项目管理系统</title>
+    <base href="/pm/"> <!-- 部署在子网站[应用] pm 下 -->
+    <script src="static/config.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=39a58452fda1df6d0c4426101f6326a4"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+```
 
 ## 总结

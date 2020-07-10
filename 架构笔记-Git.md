@@ -1,7 +1,9 @@
 # 目录
 
-1. [常用命令](#常用命令)
-2. [忽略文件](#忽略文件)
+- [目录](#目录)
+  - [常用命令](#常用命令)
+  - [忽略文件](#忽略文件)
+  - [下载速度](#下载速度)
 
 ## 常用命令
 
@@ -63,9 +65,16 @@ git remote add <alias> git://xxx/xxx.git
 # 拉取服务器新的分支
 git pull origin <branch>:<branch>
 # 新建分支
-git branch feature1
+git branch feature1 # 或者
+git checkout -b feature1
+# 推送到远程仓库
+git push origin feature1
 # 切换分支
 git checkout feature1
+# 设置上游分支
+git branch --set-upstream-to=origin/feature1
+# 查看上下游分支关系
+git branch -vv
 
 # 合并分支
 # 1、直接合并

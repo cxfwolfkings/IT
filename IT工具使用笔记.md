@@ -5,6 +5,9 @@
      - [快捷键](#JetBrain快捷键)
      - [激活](#JetBrain激活)
      - [修改Maven镜像](#修改Maven镜像)
+2. 运维工具
+   - [Sunny-Ngrok](#Sunny-Ngrok)
+   - [Vagrant](#Vagrant)
 
 ## 开发工具
 
@@ -147,19 +150,19 @@ C:\Users\23907\.m2\settings.xml
 
 注意：右下角的“覆盖”选项！
 
-## Sunny-Ngrok
+### Sunny-Ngrok
 
 内网穿透工具，让公网可以访问本机！
 
-隧道管理：https://www.ngrok.cc/user.html
+隧道管理：[https://www.ngrok.cc/user.html](https://www.ngrok.cc/user.html)
 
 申请一个免费隧道，然后下载客户端工具，打开，输入隧道Id即可！
 
-## shadowsocks
+### shadowsocks
 
 Shadowsocks是一个轻量级socks5代理，最初用 Python 编写。
 
-### 服务端设置
+**服务端设置**
 
 登录到ssh界面，切换到root用户。运行命令：
 
@@ -233,7 +236,7 @@ vi config.json
 }
 ```
 
-### Shadowsocks使用命令
+**Shadowsocks使用命令**
 
 - 启动：/etc/init.d/shadowsocks start
 - 停止：/etc/init.d/shadowsocks stop
@@ -241,65 +244,97 @@ vi config.json
 - 查看状态：/etc/init.d/shadowsocks status
 - 卸载：./shadowsocks.sh uninstall
 
-### 客户端设置
+**客户端设置**
 
-1. iphone下载wingy（免费的），app store里搜wingy（中国app store已经下架，可以换到美国账户下载）
+1、iphone下载wingy（免费的），app store里搜wingy（中国app store已经下架，可以换到美国账户下载）
 
-   https://itunes.apple.com/us/app/wingy-proxy-for-http-s-socks5/id1178584911?mt=8
+[https://itunes.apple.com/us/app/wingy-proxy-for-http-s-socks5/id1178584911?mt=8](https://itunes.apple.com/us/app/wingy-proxy-for-http-s-socks5/id1178584911?mt=8)
 
-   点击选择线路—新增线路—shadowsocks—依次填入刚才记录的信息就好—保存—点击连接就可以了
+点击选择线路—新增线路—shadowsocks—依次填入刚才记录的信息就好—保存—点击连接就可以了
 
-   这样就成功了
+这样就成功了
 
-2. windows下载
+2、windows下载
 
-   windows客户端更新（170925）：https://github.com/shadowsocks/shadowsocks-windows/releases
+windows客户端更新（170925）：[https://github.com/shadowsocks/shadowsocks-windows/releases](https://github.com/shadowsocks/shadowsocks-windows/releases)
 
-   下载Shadowsocks-4.0.6.zip
+下载Shadowsocks-4.0.6.zip
 
-3. android
+3、android
 
-   建议android参考下面这篇文章：https://www.dou-bi.co/androidkxsw/
+建议android参考下面这篇文章：[https://www.dou-bi.co/androidkxsw/](https://www.dou-bi.co/androidkxsw/)
 
-![x](./Resource/24.png)
+![x](./Resources/Shadowsocks.png)
 
-### 参考
+**参考**
 
-- http://www.525.life/article?id=1510739742371
+- [http://www.525.life/article?id=1510739742371](http://www.525.life/article?id=1510739742371)
 
-Vagrant
-官网：https://www.vagrantup.com
+### Vagrant
+
+官网：[https://www.vagrantup.com](https://www.vagrantup.com)
+
 Vagrant是一种在单个工作流程中构建和管理虚拟机环境的工具。通过易于使用的工作流程并专注于自动化，Vagrant降低了开发环境的设置时间，提高了生产效率，并使“在我的机器上能工作”成为过去式。
-为什么选择Vagrant
+
+#### 为什么选择Vagrant？
+
 Vagrant提供易于配置，可重复和便携的工作环境，基于行业标准技术构建，并由单一一致的工作流程控制，以帮助您和您的团队最大限度地提高生产力和灵活性。
+
 为了实现其魔力，Vagrant站在巨人的肩膀上。在VirtualBox，VMware，AWS或任何其他提供商之上配置计算机。然后，行业标准 配置工具 （如shell脚本，Chef或Puppet）可以在虚拟机上自动安装和配置软件。
-对于开发人员
-如果您是开发人员，Vagrant将在一个一致的，一致的环境中隔离依赖关系及其配置，而不会牺牲您习惯使用的任何工具（编辑器，浏览器，调试器等）。一旦您或其他人创建了单个 Vagrant文件，您只需要vagrant up安装并配置所有内容即可使用。团队的其他成员使用相同的配置创建他们的开发环境，因此无论您是在Linux，Mac OS X还是Windows上工作，您的所有团队成员都在同一环境中运行代码，针对相同的依赖项，所有组件都配置相同办法。告别“在我的机器上工作”的错误。
-对于运营商
+
+**对于开发人员**
+
+如果您是开发人员，Vagrant将在一个一致的，一致的环境中隔离依赖关系及其配置，而不会牺牲您习惯使用的任何工具（编辑器，浏览器，调试器等）。一旦您或其他人创建了单个 Vagrant 文件，您只需要vagrant up安装并配置所有内容即可使用。团队的其他成员使用相同的配置创建他们的开发环境，因此无论您是在 Linux，Mac OS X 还是 Windows 上工作，您的所有团队成员都在同一环境中运行代码，针对相同的依赖项，所有组件都配置相同办法。告别“在我的机器上工作”的错误。
+
+**对于运营商**
+
 如果您是运营工程师或DevOps工程师，Vagrant为您提供一次性环境和一致的工作流程，用于开发和测试基础架构管理脚本。您可以使用VirtualBox或VMware等本地虚拟化快速测试shell脚本，Chef cookbook，Puppet模块等内容。然后，使用相同的配置，您可以使用相同的工作流在远程云（如AWS或RackSpace）上测试这些脚本。抛弃自定义脚本以回收EC2实例，停止将SSH提示交给各种机器，并开始使用Vagrant为您的生活带来理智。
-对于设计师
+
+**对于设计师**
+
 如果您是设计师，Vagrant会自动设置该Web应用程序所需的所有内容，以便您专注于做您最擅长的事情：设计。一旦开发人员配置了Vagrant，您就不必担心如何让该应用程序再次运行。不再困扰其他开发人员来帮助您修复环境，以便您可以测试设计。只需查看代码 vagrant up，然后开始设计。
-适合所有人
-    Vagrant是为每个人设计的，是创建虚拟化环境的最简单，最快捷的方式！
-Vagrant与其它软件
-    Vagrant不是管理虚拟机和开发环境的唯一工具。本节将Vagrant与其他软件选择进行比较。
-Vagrant vs CLI工具
-VirtualBox和VMware等虚拟化软件带有命令行实用程序，用于管理其平台上机器的生命周期。许多人利用这些实用程序编写自己的自动化。Vagrant实际上在内部使用了许多这些实用程序。
-这些CLI工具与Vagrant之间的区别在于Vagrant以多种方式构建在这些实用程序之上，同时仍提供一致的工作流程。Vagrant支持多个同步文件夹类型，多个配置程序来设置机器，自动SSH设置，在您的开发环境中创建HTTP隧道等等。所有这些都可以使用一个简单的配置文件进行配置。
-即使您忽略了Vagrant提供的所有更高级功能，Vagrant仍然会对手动脚本进行一些改进。虚拟化软件提供的命令行实用程序通常会更改每个版本或具有解决方法的细微错误。Vagrant会自动检测版本，使用正确的标志，并可以解决已知问题。因此，如果您使用的是一个版本的VirtualBox，并且同事正在使用不同的版本，那么Vagrant仍然可以保持一致。
-    对于不经常更改的高度特定的工作流，维护自定义脚本仍然是有益的。Vagrant的目标是构建开发环境，但一些高级用户仍然使用下面的CLI工具来执行其他手动操作。
-Vagrant vs Docker
-Vagrant是一个专注于跨多个操作系统提供一致的开发环境工作流的工具。Docker是一种容器管理，只要存在容器化系统，就可以始终如一地运行软件。
-容器通常比虚拟机更轻，因此启动和停止容器非常快。Docker在macOS，Linux和Windows上使用本机容器化功能。
-目前，Docker缺乏对某些操作系统（如BSD）的支持。如果您的目标部署是这些操作系统之一，Docker将不会提供与Vagrant之类的工具相同的生产奇偶校验。Vagrant还允许您在Mac或Linux上运行Windows开发环境。
-对于微服务繁重的环境，Docker可能很有吸引力，因为您可以轻松启动单个Docker VM并快速启动多个容器。这是Docker的一个很好的用例。Vagrant也可以使用Docker提供程序执行此操作。Vagrant的主要好处是一致的工作流程，但在很多情况下，纯Docker工作流程确实有意义。
-    Vagrant和Docker都拥有庞大的社区贡献"images"或"boxes"库供您选择。
-Vagrant vs Terraform
-Vagrant和Terraform都是HashiCorp的项目。Vagrant是一个专注于管理开发环境的工具，Terraform是一个用于构建基础架构的工具。
-Terraform可以描述本地或远程存在的复杂基础设施集。它专注于随着时间的推移建立和改变基础设施。虚拟机生命周期的最小方面可以在Terraform中重现，有时会导致与Vagrant的混淆。
-Vagrant提供了许多Terraform没有的更高级功能。同步文件夹，自动网络，HTTP隧道等是Vagrant提供的功能，可以简化开发环境的使用。由于Terraform专注于基础架构管理而非开发环境，因此这些功能超出了该项目的范围。
-Terraform的主要用途是用于管理云提供商（如AWS）中的远程资源。Terraform旨在管理跨越多个云提供商的超大型基础架构。Vagrant主要设计用于最多只使用少量虚拟机的本地开发环境。
-    Vagrant适用于开发环境。Terraform用于更一般的基础架构管理。
+
+**适合所有人**
+
+Vagrant是为每个人设计的，是创建虚拟化环境的最简单，最快捷的方式！
+
+#### Vagrant与其它软件
+
+Vagrant不是管理虚拟机和开发环境的唯一工具。本节将Vagrant与其他软件选择进行比较。
+
+**Vagrant vs CLI工具**
+
+VirtualBox 和 VMware 等虚拟化软件带有命令行实用程序，用于管理其平台上机器的生命周期。许多人利用这些实用程序编写自己的自动化。Vagrant实际上在内部使用了许多这些实用程序。
+
+这些 CLI 工具与 Vagrant 之间的区别在于 Vagrant 以多种方式构建在这些实用程序之上，同时仍提供一致的工作流程。Vagrant 支持多个同步文件夹类型，多个配置程序来设置机器，自动 SSH 设置，在您的开发环境中创建 HTTP 隧道等等。所有这些都可以使用一个简单的配置文件进行配置。
+
+即使您忽略了 Vagrant 提供的所有更高级功能，Vagrant 仍然会对手动脚本进行一些改进。虚拟化软件提供的命令行实用程序通常会更改每个版本或具有解决方法的细微错误。Vagrant 会自动检测版本，使用正确的标志，并可以解决已知问题。因此，如果您使用的是一个版本的 VirtualBox，并且同事正在使用不同的版本，那么 Vagrant 仍然可以保持一致。
+
+对于不经常更改的高度特定的工作流，维护自定义脚本仍然是有益的。Vagrant 的目标是构建开发环境，但一些高级用户仍然使用下面的 CLI 工具来执行其他手动操作。
+
+**Vagrant vs Docker**
+
+Vagrant 是一个专注于跨多个操作系统提供一致的开发环境工作流的工具。Docker 是一种容器管理，只要存在容器化系统，就可以始终如一地运行软件。
+
+容器通常比虚拟机更轻，因此启动和停止容器非常快。Docker 在 macOS，Linux 和 Windows 上使用本机容器化功能。
+
+目前，Docker 缺乏对某些操作系统（如BSD）的支持。如果您的目标部署是这些操作系统之一，Docker 将不会提供与 Vagrant 之类的工具相同的生产奇偶校验。Vagrant 还允许您在 Mac 或 Linux 上运行 Windows 开发环境。
+
+对于微服务繁重的环境，Docker 可能很有吸引力，因为您可以轻松启动单个 Docker VM 并快速启动多个容器。这是 Docker 的一个很好的用例。Vagrant 也可以使用 Docker 提供程序执行此操作。Vagrant 的主要好处是一致的工作流程，但在很多情况下，纯 Docker 工作流程确实有意义。
+
+Vagrant 和 Docker 都拥有庞大的社区贡献 "images" 或 "boxes" 库供您选择。
+
+**Vagrant vs Terraform**
+
+Vagrant 和 Terraform 都是 HashiCorp 的项目。Vagrant 是一个专注于管理开发环境的工具，Terraform 是一个用于构建基础架构的工具。
+
+Terraform 可以描述本地或远程存在的复杂基础设施集。它专注于随着时间的推移建立和改变基础设施。虚拟机生命周期的最小方面可以在 Terraform 中重现，有时会导致与 Vagrant 的混淆。
+
+Vagrant 提供了许多 Terraform 没有的更高级功能。同步文件夹，自动网络，HTTP 隧道等是 Vagrant 提供的功能，可以简化开发环境的使用。由于 Terraform 专注于基础架构管理而非开发环境，因此这些功能超出了该项目的范围。
+
+Terraform 的主要用途是用于管理云提供商（如AWS）中的远程资源。Terraform 旨在管理跨越多个云提供商的超大型基础架构。Vagrant 主要设计用于最多只使用少量虚拟机的本地开发环境。
+
+Vagrant 适用于开发环境。Terraform 用于更一般的基础架构管理。
 入门
 Vagrant入门指南将引导您完成第一个Vagrant项目，并展示Vagrant提供的主要功能的基础知识。
 入门指南将使用Vagrant和VirtualBox，因为它是免费的，可在每个主要平台上使用，并内置于Vagrant。阅读本指南后，不要忘记Vagrant可以与许多其他提供商合作。
