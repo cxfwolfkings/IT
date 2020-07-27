@@ -989,212 +989,92 @@ SELECT
 
 -- 遍历父节点
 CREATE PROCEDURE sp_query_tree_nodes_up(
-    node VARCHAR(10),
-    -- 查询的某个节点值
-    tableName VARCHAR(20),
-    -- 查询表名
-    childAttr VARCHAR(20),
-    -- 子字段
-    parentAttr VARCHAR(20),
-    -- 父子段
-    searchAttr VARCHAR(20),
-    -- 查询字段
-    `condition` VARCHAR(200),
-    -- 查询条件
-    searchType INT,
-    -- 0:精确查找  1:模糊匹配
-    deepLevel INT,
-    -- 遍历层数，用于实现只取某一层级的节点
-    OUT treeNodes Text -- 返回查询字段
-) BEGIN DECLARE sTemp Text;
-
+  node VARCHAR(10), -- 查询的某个节点值
+  tableName VARCHAR(20), -- 查询表名
+  childAttr VARCHAR(20), -- 子字段
+  parentAttr VARCHAR(20), -- 父子段
+  searchAttr VARCHAR(20), -- 查询字段
+  `condition` VARCHAR(200), -- 查询条件
+  searchType INT, -- 0:精确查找  1:模糊匹配
+  deepLevel INT, -- 遍历层数，用于实现只取某一层级的节点
+  OUT treeNodes Text -- 返回查询字段
+)
+BEGIN
+DECLARE sTemp Text;
 DECLARE sTempChd Text;
-
 DECLARE sTempChdOfCondition Text;
-
 DECLARE beginTag INT;
-
 DECLARE deeps INT;
 
-SET
-    sTemp = '';
-
-SET
-    sTempChd = node;
-
-SET
-    beginTag = 1;
-
-SET
-    deeps = 1;
-
+SET sTemp = '';
+SET sTempChd = node;
+SET beginTag = 1;
+SET deeps = 1;
 IF searchType = 0 THEN
-SET
-    @whereQuery = CONCAT(' WHERE ', childAttr, ' = ''', sTempChd, '''');
-
+  SET @whereQuery = CONCAT(' WHERE ',childAttr,' = ''',sTempChd,'''');
 ELSE
-SET
-    @whereQuery = CONCAT(
-        ' WHERE ',
-        childAttr,
-        ' LIKE ''%',
-        sTempChd,
-        '%'''
-    );
-
+  SET @whereQuery = CONCAT(' WHERE ',childAttr,' LIKE ''%',sTempChd,'%''');
 END IF;
 
 -- 包含当前节点的值
-SET
-    @sql = CONCAT(
-        'SELECT ',
-        searchAttr,
-        ' INTO @s1 FROM ',
-        tableName,
-        @whereQuery,
-        `condition`
-    );
-
-PREPARE tempQuery
-FROM
-    @sql;
-
+SET @sql = CONCAT('SELECT ',searchAttr,' INTO @s1 FROM ',tableName,
+  @whereQuery,`condition`);
+PREPARE tempQuery FROM @sql;
 EXECUTE tempQuery;
-
 DEALLOCATE PREPARE tempQuery;
 
-SET
-    sTempChdOfCondition = @s1;
+SET sTempChdOfCondition = @s1;
+SET sTemp = CONCAT(sTemp, sTempChdOfCondition, ',');
 
-SET
-    sTemp = CONCAT(sTemp, sTempChdOfCondition, ',');
-
-out_label :BEGIN WHILE sTempChd IS NOT NULL
-AND sTempChd <> ''
-AND sTempChd <> '0' DO IF beginTag = 1 THEN
-SET
-    @sql = CONCAT(
-        'SELECT ',
-        parentAttr,
-        ' INTO @s1 FROM ',
-        tableName,
-        @whereQuery,
-        `condition`
-    );
-
-ELSE
-SET
-    @sql = CONCAT(
-        'SELECT ',
-        parentAttr,
-        ' INTO @s1 FROM ',
-        tableName,
-        ' WHERE ',
-        childAttr,
-        ' = ''',
-        sTempChd,
-        '''',
-        `condition`
-    );
-
-END IF;
-
--- SELECT @sql;
-PREPARE tempQuery
-FROM
-    @sql;
-
--- SET @s = sTempChd;
-EXECUTE tempQuery
-/*USING @s*/
-;
-
-DEALLOCATE PREPARE tempQuery;
-
-SET
-    sTempChd = @s1;
-
-IF sTempChd IS NOT NULL
-AND sTempChd <> ''
-AND sTempChd <> '0' THEN
-SET
-    @sql = CONCAT(
-        'SELECT ',
-        searchAttr,
-        ' INTO @s1 FROM ',
-        tableName,
-        ' WHERE ',
-        childAttr,
-        ' = ''',
-        sTempChd,
-        '''',
-        `condition`
-    );
-
-PREPARE tempQuery
-FROM
-    @sql;
-
-EXECUTE tempQuery;
-
-DEALLOCATE PREPARE tempQuery;
-
-SET
-    sTempChdOfCondition = @s1;
-
-IF sTempChdOfCondition IS NOT NULL
-AND sTempChdOfCondition <> '' THEN IF deepLevel = 0 THEN
-SET
-    sTemp = CONCAT(sTemp, sTempChdOfCondition, ',');
-
-ELSE IF deepLevel = deeps THEN
-SET
-    sTemp = CONCAT(sTemp, sTempChdOfCondition, ',');
-
-LEAVE out_label;
-
-END IF;
-
-END IF;
-
-END IF;
-
-END IF;
-
-SET
-    beginTag = beginTag + 1;
-
-SET
-    deeps = deeps + 1;
-
+out_label:
+BEGIN
+WHILE sTempChd IS NOT NULL AND sTempChd <> '' AND sTempChd <> '0' DO
+  IF beginTag = 1 THEN
+    SET @sql = CONCAT('SELECT ',parentAttr,' INTO @s1 FROM ',tableName,
+      @whereQuery,`condition`);
+  ELSE
+    SET @sql = CONCAT('SELECT ',parentAttr,' INTO @s1 FROM ',tableName,
+      ' WHERE ',childAttr,' = ''',sTempChd,'''',`condition`);
+  END IF;
+  -- SELECT @sql;
+  PREPARE tempQuery FROM @sql;
+  -- SET @s = sTempChd;
+  EXECUTE tempQuery /*USING @s*/;
+  DEALLOCATE PREPARE tempQuery;
+  SET sTempChd = @s1;
+  IF sTempChd IS NOT NULL AND sTempChd <> '' AND sTempChd <> '0' THEN
+    SET @sql = CONCAT('SELECT ',searchAttr,' INTO @s1 FROM ',tableName,
+      ' WHERE ',childAttr,' = ''',sTempChd,'''',`condition`);
+    PREPARE tempQuery FROM @sql;
+    EXECUTE tempQuery;
+    DEALLOCATE PREPARE tempQuery;
+    SET sTempChdOfCondition = @s1;
+    IF sTempChdOfCondition IS NOT NULL AND sTempChdOfCondition <> '' THEN
+      IF deepLevel = 0 THEN
+        SET sTemp = CONCAT(sTemp, sTempChdOfCondition, ',');
+      ELSE IF deepLevel = deeps THEN
+        SET sTemp = CONCAT(sTemp, sTempChdOfCondition, ',');
+        LEAVE out_label;
+      END IF;
+    END IF;
+  END IF;
+  SET beginTag = beginTag + 1;
+  SET deeps = deeps + 1;
 END WHILE;
-
 END out_label;
 
 IF RIGHT(sTemp, 1) = ',' THEN
-SET
-    sTemp = MID(sTemp, 1, CHAR_LENGTH(sTemp) -1);
-
+  SET sTemp = MID(sTemp, 1, CHAR_LENGTH(sTemp) -1);
 END IF;
+SET treeNodes = sTemp;
+END
 
-SET
-    treeNodes = sTemp;
+CALL sp_query_tree_nodes_up('福州路店','t_mbd_master','mbd_name','parent_name','id',' and project_id = 1 and period_id = 2',0,0,@treeNodes);
 
-END CALL sp_query_tree_nodes_up(
-    '福州路店',
-    't_mbd_master',
-    'mbd_name',
-    'parent_name',
-    'id',
-    ' and project_id = 1 and period_id = 2',
-    0,
-    0,
-    @treeNodes
-);
+SELECT @treeNodes
 
-SELECT
-    @treeNodes -- 遍历子节点
-    CREATE PROCEDURE sp_query_tree_nodes(
+-- 遍历子节点
+CREATE PROCEDURE sp_query_tree_nodes(
         node VARCHAR(100),
         -- 查询的某个节点值
         tableName VARCHAR(20),
@@ -1588,7 +1468,7 @@ END
 CREATE DEFINER=`root`@`%` PROCEDURE `debug`(
     IN `beginTime` int, 
     IN `checkTime` int
-) 
+)
 BEGIN
 DECLARE t_id VARCHAR(64) DEFAULT '';  
 DECLARE t_item TINYINT DEFAULT 0;  
@@ -1596,7 +1476,7 @@ DECLARE t_result VARCHAR(8192) DEFAULT '';
 
 DECLARE maxCnt INT DEFAULT 0;  
 DECLARE i INT DEFAULT 0;  
-      
+
 DROP TABLE IF EXISTS Gather_Data_Tmp;  
 CREATE TEMPORARY TABLE Gather_Data_Tmp(  
     `Tmp_Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,  
@@ -1605,24 +1485,24 @@ CREATE TEMPORARY TABLE Gather_Data_Tmp(
     `Check_Result` VARCHAR(8192) NOT NULL,  
     PRIMARY KEY (`Tmp_Id`)  
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;  
-      
+
 SET @tSql = CONCAT('INSERT INTO Gather_Data_Tmp (`Asset_Id`, `Check_Item`, `Check_Result`)
-SELECT Asset_Id, Check_Item, Check_Result   
-FROM IDC_Gather_Info   
+SELECT Asset_Id, Check_Item, Check_Result
+FROM IDC_Gather_Info
 WHERE Check_Time > ', beginTime,
 ' AND Check_Time <= ', checkTime);  
 
 PREPARE gatherData FROM @tSql;  
 EXECUTE gatherData;  
-      
+
 SELECT MIN(`Tmp_Id`) INTO i FROM Gather_Data_Tmp;  
 SELECT MAX(`Tmp_Id`) INTO maxCnt FROM Gather_Data_Tmp;  
-      
+
 WHILE i <= maxCnt DO
     -- 变量赋值
-    SELECT Asset_Id, Check_Item, Check_Result 
-    INTO t_id, t_item, t_result 
-    FROM Gather_Data_Tmp 
+    SELECT Asset_Id, Check_Item, Check_Result
+    INTO t_id, t_item, t_result
+    FROM Gather_Data_Tmp
     WHERE Tmp_Id = i;  
 
     SET i = i + 1;  
@@ -1635,11 +1515,11 @@ END
 
 可以看到Mysql的游标在处理大一点的数据量时还是比较乏力的，仅适合用于操作几百上千的小数据量。
 
-
-
 ```
 
 ## 总结
+
+1. 临时表只能查询一次！连接断开后，自动删除
 
 ### 性能优化
 

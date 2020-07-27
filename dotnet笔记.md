@@ -1,29 +1,5 @@
 # 目录
 
-## 第三部分 B/S开发
-
-### 第1天：[安全性概述](./3.1_安全性概述.md)
-
-### 第1天：[核心ASP.NET](./3.1_核心ASP.NET.md)
-
-### 第2天：[WebForms](./3.2_WebForms.md)
-
-### 第3天：[MVC](./3.3_MVC.md)
-
-### 第2天：[Session身份认证](./3.2_Session身份认证.md)
-
-- Cookie和Session简介
-- 扩展：ASP.NET页面之间传递值的方式
-
-### 第3天：[认证与授权](./3.3_认证与授权.md)
-
-- OAuth2 和 JWT - 如何设计安全的API？
-- 为什么要使用JWT / Json Web Token基础 / 认证流程 / .NET Core中使用JWT
-
-### 第5天：[WebForm](./3.5_WebForm.md)
-
-### 第6天：[MVC](./3.6_MVC.md)
-
 ## 第四部分 C/S开发
 
 ### 第1天：[核心XAML](./4.1_核心XAML.md)

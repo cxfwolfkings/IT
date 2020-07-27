@@ -1,6 +1,6 @@
 # 目录
 
-1. 入门
+1. 简介
    - [安装](安装)
    - [React的发展历史](#React的发展历史)
    - [React与Vue的对比](#React与Vue的对比)
@@ -10,17 +10,16 @@
    - [数据处理](#数据处理)
    - [前端路由](#前端路由)
    - [元素渲染](#元素渲染)
-2. [JSX简介](#JSX简介)
-   - [环境配置](#环境配置)
-   - [基本语法规则](#基本语法规则)
-   - [在JSX中嵌入JavaScript表达式](#在JSX中嵌入JavaScript表达式)
-   - [在JavaScript表达式中嵌入JSX](#在JavaScript表达式中嵌入JSX)
-   - [JSX中的节点属性](#JSX中的节点属性)
-   - [声明子节点](#声明子节点)
-   - [在JSX中使用注释](#在JSX中使用注释)
-   - [JSX防注入攻击](#JSX防注入攻击)
-   - [JSX原理](#JSX原理)
-3. 语法
+   - [JSX简介](#JSX简介)
+     - [环境配置](#环境配置)
+     - [基本语法规则](#基本语法规则)
+     - [在JSX中嵌入JavaScript表达式](#在JSX中嵌入JavaScript表达式)
+     - [在JavaScript表达式中嵌入JSX](#在JavaScript表达式中嵌入JSX)
+     - [JSX中的节点属性](#JSX中的节点属性)
+     - [声明子节点](#声明子节点)
+     - [在JSX中使用注释](#在JSX中使用注释)
+     - [JSX防注入攻击](#JSX防注入攻击)
+     - [JSX原理](#JSX原理)
    - [列表循环](#列表循环)
    - [条件渲染](#条件渲染)
    - [事件处理](#事件处理)
@@ -31,7 +30,9 @@
      - [提取组件](#提取组件)
      - [组件生命周期](#组件生命周期)
      - [组件属性](#组件属性)
-4. [参考](#参考)
+2. [实战](#实战)
+   - [Ajax请求](#Ajax请求)
+3. [参考](#参考)
 
 Github 上最流行的示例代码库 [todomvc](http://todomvc.com/)
 
@@ -1308,6 +1309,105 @@ npm install --save babel-standalone react react-dom
 > [https://github.com/facebook/react-devtools](https://github.com/facebook/react-devtools)
 
 ### create-react-app
+
+## 实战
+
+### Ajax请求
+
+**jQuery $.ajax**
+
+>这是一个快速又粗暴的方案。在旧版本的官方 React 教程（official React tutorial）中，他们使用了 jQuery $.ajax 来示范如何从服务器获取数据。如果你是刚刚开始学习和把玩 React，jQuery 可以节省你大量入门和开发的时间，因为我们都对 jQuery 非常熟悉了。这是 jQuery 实现 AJAX 的例子：
+
+```js
+loadCommentsFromServer: function() {
+    $.ajax({
+        url: this.props.url,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            this.setState({data: data});   // 注意这里
+        }.bind(this),
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+        }.bind(this)
+    });
+}
+```
+
+这里演示了如何在一个 React 组件里面使用 jQuery 的 $.ajax。唯一需要注意的是如何在 success 回调里面调用 this.setState() ，即当 jQuery 成功收到数据之后应该如何通过 React 的 API 更新 state 的。
+
+然而，jQuery 是一个包含很多功能的大头儿，只为了用一下 AJAX 功能而引入整个 jQuery 是没有意义的（除非你还使用 jQuery 做了很多别的事情）。So，用什么才好？答案是 fetch API。
+
+**[Fetch API](https://github.com/github/fetch)**
+
+>Fetch 是个新的、简单的、标准化的API，旨在统一Web通信机制，并替代 XMLHttpRequest。它已经被主流浏览器所支持，针对较旧的浏览器也有了一个 polyfill （Benz乱入：polyfill 直译是填充工具，就是旧浏览器本来不支持某个新的JS API，引入一段js代码后就支持了，这一段js代码给旧浏览器”填充“了一个API。这个单词我实在不知道怎么翻译 ，感觉反而保留原单词不翻译更能让读者理解。）。如果你在使用 Node.js ，你也可以通过 node-fetch 来使 Node.js 支持 Fetch。
+
+若把上述用 jQuery $.ajax 的代码段改成 fetch 实现的话，代码应该长这样子：
+
+```js
+loadCommentsFromServer: function() {
+  fetch(this.props.url).then(function(response){
+    // 在这儿实现 setState
+  });
+}
+```
+
+在一些流行的 React 教程中你也许会发现 fetch 的身影。要了解更多关于 fetch 的情况，可参考下列链接（全英文）：
+
+- Mozilla
+- David Walsh Blog
+- Google Developers
+- WHATWG
+
+**[SuperAgent](https://github.com/visionmedia/superagent)**
+
+>SuperAgent 是一个轻量级的 AJAX API 库，为更好的可读性和灵活性而生。如果某些原因让你不太想用 fetch，那么 SuperAgent 就几乎是必然的选择了。SuperAgent 的用法大概是这样的：
+
+```js
+loadCommentsFromServer: function() {
+  request.get(this.props.url).end(function(err,res){
+    // 在这儿实现 setState
+  });
+}
+```
+
+SuperAgent 也有 Node.js 版本，API 是一样的。如果你在用 Node.js 和 React 开发同构应用（Benz 乱入：这个链接是我加的，旨在照顾初学者），你可以用 webpack 之类的东西嵌入 superagent 并让它适用于浏览器端。因为浏览器端和服务器端的 API 是一样的，所以其 Node.js 版本不需要修改任何代码就可以在浏览器上运行。
+
+**[Axios](https://github.com/axios/axios)**
+
+>Axios 是一个基于 promise 对象（Benz 乱入：这个链接也是我加的）的 HTTP 客户端。与 fetch 和 superagent 一样，它同时支持浏览器端和 Node.js 端。另外你可以在其 Github 主页上发现，它有很多很实用的高级功能。
+
+这是 Axios 的大概用法：
+
+```js
+loadCommentsFromServer: function() {
+  axios.get(this.props.url).then(function(response){
+    // 在这儿实现 setState
+  }).catch(function(error){
+    // 处理请求出错的情况
+  });
+}
+```
+
+**[Request](https://github.com/request/request)**
+
+>若不介绍这个 request 库，感觉上本文会不太完整。这是一个在思想上追求极简设计的JS库，在 Github 上拥有超过 12k 的 star （Benz 乱入：我翻译这文章时已经 16k+ star 了）。它也是最流行的 Node.js 模块之一。进入它的 GitHub 主页 了解更多。
+
+用法示例：
+
+```js
+loadCommentsFromServer: function() {
+  request(this.props.url, function(err, response, body){
+    // 在这儿实现 setState
+  });
+}
+```
+
+**我的选择**
+
+因为 fetch 是新的标准化的API，所以，在任何需要 AJAX 的地方（不论在 React 里或是其他所有 JS 应用），我都更倾向于使用 fetch。
+
+原文链接：[https://blog.csdn.net/ZYC88888/java/article/details/82531610](https://blog.csdn.net/ZYC88888/java/article/details/82531610)
 
 ## 参考
 

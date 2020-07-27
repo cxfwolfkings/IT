@@ -1,41 +1,44 @@
 # 目录
 
-- Maven介绍 
-  - 依赖管理 
-  - 为什么使用？
-  - 三套生命周期
-  - Maven 的概念模型
-- Maven安装
-  - Maven仓库
-  - Maven项目工程目录约定
-- 常用 Maven 命令
-- Eclipse 与 Maven 集成
-  - 定义Maven坐标
-  - 构建Web工程
-  - 快照
-  - 依赖管理/依赖传递，版本冲突处理
-  - 单个Web工程实现SSH整合
-  - 分模块构建工程
-  - Maven自动化部署
-  - 使用Maven模板创建项目
-  - 使用Maven构建项目
-- 私服搭建
+1. 简介
+   - [Maven介绍](#Maven介绍)
+     - [依赖管理](#依赖管理)
+     - [为什么使用？](#为什么使用？)
+     - [三套生命周期](#三套生命周期)
+     - [Maven 的概念模型](#Maven的概念模型)
+   - [Maven安装](#Maven安装)
+     - [Maven仓库](#Maven仓库)
+     - [Maven项目工程目录约定](#Maven项目工程目录约定)
+   - [常用 Maven 命令](#常用Maven命令)
+2. 实战
+   - [Eclipse 与 Maven 集成](#Eclipse与Maven集成)
+     - [定义Maven坐标](#定义Maven坐标)
+     - [构建Web工程](#构建web工程)
+     - [快照](#快照)
+     - [依赖管理/依赖传递](#依赖管理/依赖传递)
+     - 单个Web工程实现SSH整合
+     - 分模块构建工程
+     - Maven自动化部署
+     - 使用Maven模板创建项目
+     - 使用Maven构建项目
+   - 私服搭建
+3. 总结
 
 ## Maven介绍
 
-Maven 翻译为”专家“，”内行“，是 Apache 下的一个纯 Java 开发的开源项目，它是一个项目管理工具，使用 maven 对 java 项目进行构建、依赖管理。当前使用 Maven 的项目在持续增长。
+Maven 翻译为“专家”，“内行”，是 Apache 下的一个纯 Java 开发的开源项目，它是一个项目管理工具，使用 maven 对 java 项目进行构建、依赖管理。当前使用 Maven 的项目在持续增长。
 
 项目构建是一个项目从编写源代码到编译、测试、运行、打包、部署、运行的过程。
 
 Maven 将项目构建的过程进行标准化， 每个阶段使用一个命令完成：
 
-![x](http://hyw6485860001.my3w.com/public/images/maven.jpg)
+![x](./Resources/maven.jpg)
 
 部分阶段对应命令如下：
 
-- 清理阶段对应maven的命令是clean，清理输出的class文件
-- 编译阶段对应maven的命令是compile，将java代码编译成class文件。
-- 打包阶段对应maven的命令是package，java工程可以打成jar包，web包可以打成war包
+- 清理阶段对应 maven 的命令是 clean，清理输出的class文件
+- 编译阶段对应 maven 的命令是 compile，将java代码编译成class文件。
+- 打包阶段对应 maven 的命令是 package，java工程可以打成jar包，web包可以打成war包
 
 运行一个maven 工程（web工程）需要一个命令：`tomcat:run`
 
@@ -114,7 +117,6 @@ maven 对项目构建过程分为三套相互独立的生命周期，这三套�
   - post-site 执行一些需要在生成站点文档之后完成的工作，并且为部署做准备
   - site-deploy 将生成的站点文档部署到特定的服务器上
 
-
 每个 maven 命令对应生命周期的某个阶段，例如：`mvn clean` 命令对应 clean 生命周期的 clean 阶段， mvn test 命令对应 default 生命周期的 test 阶段。
 执行命令会将该命令在的在生命周期当中之前的阶段自动执行，比如：执行 `mvn clean` 命令会自动执行 pre-clean 和 clean 两个阶段，`mvn test` 命令会自动执行 validate、compile、test 等阶段。
 
@@ -128,7 +130,7 @@ Maven 包含了一个项目对象模型(Project Object Model)，一组标准集�
 
 下图是maven的概念模型图：
 
-![x](http://hyw6485860001.my3w.com/public/images/maven_model.jpg)
+![x](./Resources/maven_model.jpg)
 
 1、项目对象模型(Project Object Model)
 
@@ -225,15 +227,15 @@ maven 管理项目生命周期过程都是基于插件完成的。
 
 - **本地仓库**：用来存储从远程仓库或中央仓库下载的插件和jar包，项目使用一些插件或jar包，优先从本地仓库查找。默认本地仓库位置在 `${user.dir}/.m2/repository`，${user.dir} 表示windows用户目录。
 - **远程仓库**：如果本地需要插件或者jar包，本地仓库没有，默认去远程仓库下载。远程仓库可以在互联网内也可以在局域网内。
-- **中央仓库**：在 maven 软件中内置一个远程仓库地址 http://repol.maven.org/maven2，它是中央仓库，服务于整个互联网，它由Maven团队自己维护，里面存储了非常全的jar包，包含了世界上大部分流行的开源项目构件。（Maven中心储存库网站已经改版本，目录浏览可能不再使用。这将直接被重定向到 http://search.maven.org/。这就好多了，现在有一个搜索功能）
+- **中央仓库**：在 maven 软件中内置一个远程仓库地址 [http://repol.maven.org/maven2](http://repol.maven.org/maven2)，它是中央仓库，服务于整个互联网，它由Maven团队自己维护，里面存储了非常全的jar包，包含了世界上大部分流行的开源项目构件。（Maven中心储存库网站已经改版本，目录浏览可能不再使用。这将直接被重定向到 [http://search.maven.org/](http://search.maven.org/)。这就好多了，现在有一个搜索功能）
 
   配置本地仓库：可以在 `MAVE_HOME/conf/settings.xml` 文件中配置本地仓库位置。假设位于 D:\maven\repo
 
-```
+```xml
 <localRepository>D:\maven\repo</localRepository>
 ```
 
-提示：中央仓库的网络不稳定，可以使用阿里的资源仓库：https://help.aliyun.com/document_detail/102512.html?spm=a2c4e.11153940.0.0.213c7bdeaNqmlq
+提示：中央仓库的网络不稳定，可以使用阿里的资源仓库：[https://help.aliyun.com/document_detail/102512.html?spm=a2c4e.11153940.0.0.213c7bdeaNqmlq](https://help.aliyun.com/document_detail/102512.html?spm=a2c4e.11153940.0.0.213c7bdeaNqmlq)
 
 ### Maven项目工程目录约定
 
@@ -246,7 +248,7 @@ maven 管理项目生命周期过程都是基于插件完成的。
 - target：项目输出位置，编译后的class文件会输出到此目录
 - pom.xml：maven项目核心配置文件
 
-## 常用 Maven 命令
+## 常用Maven命令
 
 | **命令** | **说明**                                                     |
 | -------- | ------------------------------------------------------------ |
@@ -256,7 +258,7 @@ maven 管理项目生命周期过程都是基于插件完成的。
 | package  | 打包命令。java 工程打成jar包，web工程打成war包。             |
 | install  | 安装命令。将maven 打成jar 包或war 包发布到本地仓库           |
 
-## Eclipse 与 Maven 集成
+## Eclipse与Maven集成
 
 Eclipse提供了一个很好的插件[m2eclipse](http://www.eclipse.org/m2e/)无缝将Maven和Eclipse集成在一起。Eclipse mars 2 版本自带maven 插件不用单独安装。
 
@@ -285,7 +287,7 @@ Maven 配置完成需要测试在 eclipse 中是否可以浏览 maven 的本地�
 
 您可以通过使用 Maven 的 maven-archetype-webapp 模板来创建一个快速启动 Java Web 应用程序的项目。在终端(* UNIX或Mac)或命令提示符(Windows)中，导航至您想要创建项目的文件夹。键入以下命令：
 
-```
+```sh
 mvn archetype:generate -DgroupId=com.colin -DartifactId=DemoWebApp -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
 ```
 
@@ -297,7 +299,7 @@ mvn archetype:generate -DgroupId=com.colin -DartifactId=DemoWebApp -DarchetypeAr
 
 在终端，进入到 "DemoWebApp" 文件夹中，键入以下命令：
 
-```
+```sh
 cd DemoWebApp
 mvn eclipse:eclipse -Dwtpversion=2.0
 ```
@@ -440,13 +442,13 @@ Maven 的 Tomcat 插件声明（加入到 pom.xml）：
 
 pom.xml：
 
-```
+```xml
 <!-- For Maven Tomcat Plugin -->
 ```
 
 键入以下命令（有时网络不通畅需要执行2-3次）：
 
-```
+```sh
 mvn tomcat:run
 ```
 
@@ -491,12 +493,12 @@ mvn tomcat:run
 
 **app-ui pom.xml**
 
-app-ui 项目使用数据服务（data-service）的 1.0-SNAPSHOT 
+app-ui 项目使用数据服务（data-service）的 1.0-SNAPSHOT
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
    http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>app-ui</groupId>
@@ -524,9 +526,9 @@ app-ui 项目使用数据服务（data-service）的 1.0-SNAPSHOT
 数据服务（data-service）项目对于每一个微小的变化释放 1.0 快照：
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
    http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>data-service</groupId>
@@ -555,7 +557,7 @@ mvn clean package -U
 
 Maven会下载数据服务的最新快照后并开始构建该项目。
 
-### 依赖管理
+### 依赖管理/依赖传递
 
 Maven提供了一个高程度的控制来管理依赖关系复杂的多模块项目。
 
@@ -607,15 +609,15 @@ Maven提供了一个高程度的控制来管理依赖关系复杂的多模块项
 我们将使用Maven发布插件来创建一个自动释放过程。例如：bus-core-api 项目POM.xml
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
    http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>bus-core-api</groupId>
    <artifactId>bus-core-api</artifactId>
    <version>1.0-SNAPSHOT</version>
-   <packaging>jar</packaging> 
+   <packaging>jar</packaging>
    <scm>
       <url>http://www.svn.com</url>
       <connection>scm:svn:http://localhost:8080/svn/jrepo/trunk/Framework</connection>
@@ -647,11 +649,11 @@ Maven提供了一个高程度的控制来管理依赖关系复杂的多模块项
 </project>
 ```
 
-| **元素**     | 描述                                                         |
-| ------------ | ------------------------------------------------------------ |
-| SCM          | Configures the SVN location from  where Maven will check out the source code. |
-| Repositories | Location where built WAR/EAR/JAR  or any other artifact will be stored after code build is successful. |
-| Plugin       | maven-release-plugin is  configured to automate the deployment process. |
+**元素** | 描述
+-- | --
+SCM | Configures the SVN location from  where Maven will check out the source code. |
+Repositories | Location where built WAR/EAR/JAR  or any other artifact will be stored after code build is successful.
+Plugin | maven-release-plugin is  configured to automate the deployment process.
 
 **Maven发布插件**
 
@@ -709,8 +711,11 @@ mvn release:perform
 如何使用 `mvn archetype:generate` 从现有的Maven模板列表中生成项目？
 
 通常情况下，我们只需要使用下面的两个模板：
-1.	maven-archetype-webapp – Java Web Project (WAR)
-2.	maven-archetype-quickstart – Java Project (JAR)
+
+```sh
+maven-archetype-webapp – Java Web Project (WAR)
+maven-archetype-quickstart – Java Project (JAR)
+```
 
 **Maven 1000+ 模板**
 
@@ -848,13 +853,13 @@ mvn site
 
 ```xml
 <build>
-	<extensions>
-		<extension>
-			<groupId>org.apache.maven.wagon</groupId>
-			<artifactId>wagon-webdav-jackrabbit</artifactId>
-			<version>1.0-beta-7</version>
-		</extension>
-	</extensions>
+  <extensions>
+    <extension>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-webdav-jackrabbit</artifactId>
+      <version>1.0-beta-7</version>
+    </extension>
+  </extensions>
 </build>
 ```
 
@@ -864,11 +869,11 @@ mvn site
 
 ```xml
 <servers>
-	<server>
-		<id>yiibaiserver</id>
-		<username>admin</username>
-		<password>123456</password>
-	</server>
+  <server>
+    <id>yiibaiserver</id>
+    <username>admin</username>
+    <password>123456</password>
+  </server>
 </servers>
 ```
 
@@ -894,9 +899,9 @@ mvn tomcat6:deploy
 ```xml
 <?xml version='1.0' encoding='utf-8'?>
 <tomcat-users>
-	<role rolename="manager-gui"/>
-	<role rolename="manager-script"/>
-	<user username="admin" password="password" roles="manager-gui,manager-script" />
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <user username="admin" password="password" roles="manager-gui,manager-script" />
 </tomcat-users>
 ```
 
@@ -909,13 +914,13 @@ mvn tomcat6:deploy
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <settings ...>
-	<servers>
-		<server>
-			<id>TomcatServer</id>
-			<username>admin</username>
-			<password>password</password>
-		</server>
-	</servers>
+  <servers>
+    <server>
+      <id>TomcatServer</id>
+      <username>admin</username>
+      <password>password</password>
+    </server>
+  </servers>
 </settings>
 ```
 
@@ -925,14 +930,14 @@ Tomcat7：
 
 ```xml
 <plugin>
-    <groupId>org.apache.tomcat.maven</groupId>
-	<artifactId>tomcat7-maven-plugin</artifactId>
-	<version>2.2</version>
-	<configuration>
-		<url>http://localhost:8080/manager/text</url>
-		<server>TomcatServer</server>
-		<path>/yiibaiWebApp</path>
-	</configuration>
+  <groupId>org.apache.tomcat.maven</groupId>
+  <artifactId>tomcat7-maven-plugin</artifactId>
+  <version>2.2</version>
+  <configuration>
+    <url>http://localhost:8080/manager/text</url>
+    <server>TomcatServer</server>
+    <path>/yiibaiWebApp</path>
+  </configuration>
 </plugin>
 ```
 
@@ -940,27 +945,26 @@ Tomcat6：
 
 ```xml
 <plugin>
-	<groupId>org.apache.tomcat.maven</groupId>
-	<artifactId>tomcat6-maven-plugin</artifactId>
-	<version>2.2</version>
-	<configuration>
-		<url>http://localhost:8080/manager</url>
-		<server>TomcatServer</server>
-		<path>/yiibaiWebApp</path>
-	</configuration>
-</plugin>	
+  <groupId>org.apache.tomcat.maven</groupId>
+  <artifactId>tomcat6-maven-plugin</artifactId>
+  <version>2.2</version>
+  <configuration>
+    <url>http://localhost:8080/manager</url>
+    <server>TomcatServer</server>
+    <path>/yiibaiWebApp</path>
+  </configuration>
+</plugin>
 ```
 
 **4、发布到 Tomcat**
 
 ```sh
 # tomcat7
-mvn tomcat7:deploy 
-mvn tomcat7:undeploy 
+mvn tomcat7:deploy
+mvn tomcat7:undeploy
 mvn tomcat7:redeploy
 # tomcat6
-mvn tomcat6:deploy 
-mvn tomcat6:undeploy 
+mvn tomcat6:deploy
+mvn tomcat6:undeploy
 mvn tomcat6:redeploy
 ```
-

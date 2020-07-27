@@ -2,15 +2,21 @@
 
 1. 简介
    - [webForm](#webForm)
+   - [MVC](#MVC)
 2. 实战
 3. 总结
    - [nuget包管理](#nuget包管理)
    - [应用程序池](#应用程序池)
 4. 练习
 
+
+>第1天：[安全性概述](#安全性概述)  
+>第2天：[Session身份认证](#Session身份认证)  
+>第3天：[认证与授权](#认证与授权)
+
 ## 简介
 
-### winForm
+### webForm
 
 **IsPostBack：** 判断页面是否是回传，`if(!IsPostback)` 表示页面是首次加载。
 
@@ -9719,3 +9725,17 @@ false：使用 .NET Framework 4 及更高版本的默认激活策略，即允许
 ASP.NET配置系统的功能是一个可扩展的基础结构，该基础结构使您能够在一些容易部署的XML文件中定义配置设置。这些文件(每个文件都名为Web.config)可以存在于ASP.NET应用程序中的多个位置中。在任何时候都可以添加或修订配置设置，且对运行的Web应用程序和服务器产生的影响会最小。
 ASP.NET配置系统的功能仅应用于ASP.NET资源。例如，Forms身份验证只限制对ASP.NET文件的访问，而不限制对静态文件或经典的Active Server Pages (ASP)文件的访问，除非将这些资源映射到ASP.NET扩展。请使用Microsoft Internet信息服务(IIS)的配置功能来配置非ASP.NET资源。
 
+## 安全性概述
+
+## Session身份认证
+
+- Cookie和Session简介
+- 扩展：ASP.NET页面之间传递值的方式
+
+## 认证与授权
+
+- OAuth2 和 JWT - 如何设计安全的API？
+- 为什么要使用JWT
+- Json Web Token基础
+- 认证流程
+- .NET Core中使用JWT

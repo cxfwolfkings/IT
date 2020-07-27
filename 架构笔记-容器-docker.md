@@ -632,6 +632,14 @@ None|该模式关闭了容器的网络功能
 Container|创建的容器不会创建自己的网卡，配置自己的 IP，而是和一个指定的容器共享 IP、端口范围
 自定义网络|略
 
+>Docker有三种网络模式，bridge、host、none，在你创建容器的时候，`不指定--network默认是bridge`。
+>
+>bridge：为每一个容器分配IP，并将容器连接到一个 `docker0` 虚拟网桥，通过 `docker0` 网桥与宿主机通信。也就是说，此模式下，你不能用 `宿主机的IP+容器映射端口` 来进行Docker容器之间的通信。
+>
+>host：容器不会虚拟自己的网卡，配置自己的IP，而是使用宿主机的IP和端口。这样一来，Docker容器之间的通信就可以用 `宿主机的IP+容器映射端口`
+>
+>none：无网络。
+
 ```sh
 # 列出网络
 docker network ls
@@ -1726,6 +1734,7 @@ rm /usr/local/bin/docker-compose
 
 ```sh
 docker-compose up -d
+docker-compose -f docker-compose.yml up -d
 ```
 
 3、查看有哪些服务，使用 `docker-compose ps` 命令，非常类似于 docker 的 ps 命令。
@@ -1737,7 +1746,7 @@ docker-compose logs web
 docker-compose logs redis
 ```
 
-5、停止 compose 服务。服务状态：Exit 0
+5、停止 compose 服务。服务状态：Exit 0（所有关联的活动容器也被停止）
 
 ```sh
 docker-compose stop
@@ -1758,7 +1767,7 @@ docker-compose kill
 docker-compose ps
 ```
 
-8、删除 compose 服务
+8、删除 compose 服务（删除所有已停止的关联容器）
 
 ```sh
 docker-compose rm
@@ -1769,6 +1778,19 @@ docker-compose rm
 ```sh
 docker-compose --help
 ```
+
+>注意：yaml文件里不能有tab，只能有空格。关于 version 与 Docker 版本的关系如下：
+
+Compose file format | Docker engine
+-|-
+1|1.9.0+
+2.0|1.10.0+
+2.1|1.12.0+
+2.2, 3.0, 3.1, 3.2|1.13.0+
+2.3, 3.3, 3.4, 3.5|17.06.0+
+2.4|17.12.0+
+3.6|18.02.0+
+3.7|18.06.0+
 
 ## docker&nbsp;Machine
 
