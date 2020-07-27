@@ -633,7 +633,7 @@ venv\Scripts\activate
 在已激活的虚拟环境中可以使用如下命令安装 Flask：
 
 ```sh
-pip install Flask
+pip install Flask -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 Flask 现在已经安装完毕。
@@ -681,7 +681,27 @@ sudo python2 -m pip install virtualenv
 
 **快速上手**
 
-一个最小的 [Flask 应用](./Codes/Projects/hello.py)
+一个最小的 Flask 应用（）:
+
+```py
+# 1、首先我们导入了Flask类。该类的实例将会成为我们的WSGI应用。
+from flask import Flask
+'''
+2、
+接着我们创建一个该类的实例。
+第一个参数是应用模块或者包的名称。
+如果你使用 一个单一模块（就像本例），那么应当使用 __name__ ，
+  因为名称会根据这个模块是按应用方式使用还是作为一个模块导入而发生变化
+  （可能是 '__main__' ， 也可能是实际导入的名称）。
+这个参数是必需的，这样 Flask 才能知道在哪里可以找到模板和静态文件等东西。
+'''
+app = Flask(__name__)
+# 3、然后我们使用route()装饰器来告诉Flask触发函数的URL。
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+# 4、上面的函数名称被用于生成相关联的URL。函数最后返回需要在用户浏览器中显示的信息。
+```
 
 <b style="color:red">请不要使用 `flask.py` 作为应用名称，这会与 Flask 本身发生冲突</b>。
 
