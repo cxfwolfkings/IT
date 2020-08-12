@@ -5,6 +5,7 @@
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
    - [常用语句](#常用语句)
+   - [Handler](#Handler)
 3. [总结](#总结)
    - [性能优化](#性能优化)
    - [压缩](#压缩)
@@ -1516,6 +1517,226 @@ END
 可以看到Mysql的游标在处理大一点的数据量时还是比较乏力的，仅适合用于操作几百上千的小数据量。
 
 ```
+
+### Handler
+
+```sql
+DECLARE {EXIT | CONTINUE}
+HANDLER FOR
+{error-number | SQLSTATE error-string | condition}
+SQL statement
+```
+
+上述定义包括：
+
+- Handler Type (CONTINUE,EXIT) 处理类型 继续或退出
+- Handler condition (SQLSTATE,MYSQL ERROR,CONDITION) 触发条件
+- Handler actions（错误触发的操作）
+
+>注意：
+>
+>1、exit只退出当前的block。exit 意思是当动作成功提交后，退出所在的复合语句。即declare exit handler for... 所在的复合语句。  
+>2、如果定义了handler action，会在 continue 或 exit 之前执行
+>
+>发生错误的条件有：
+>
+>1、MYSQL错误代码  
+>2、ANSI-standard SQLSTATE code  
+>3、命名条件。可使用系统内置的SQLEXCEPTION,SQLWARNING和NOT FOUND
+
+例1：
+
+当错误代码为1062时将duplicate_key的值设为1，并继续执行当前任务
+
+declare continue handler for 1062 set duplicate_key=1;
+
+下面的跟上面一样，只是使用的条件为ANSI标准错误代码
+
+declare continue handler for sqlstate '23000' set duplicate_key=1;
+
+当发生SQLEXCEPTION时，将L_error设为1，并继续
+
+declare continue handler for SQLEXCEPTION set L_error=1;
+
+小提示：
+
+当你在MYSQL客户端执行命令并产生错误时，会得到MYSQL和ANSI的SQLSTATE code，
+
+附常见错误号对照表
+
+MySQL error code SQLSTATE code Error message
+
+1011 HY000 Error on delete of '%s' (errno: %d)
+1021 HY000 Disk full (%s); waiting for someone to free some space . . .
+1022 23000 Can't write; duplicate key in table '%s'
+1027 HY000 '%s' is locked against change
+1036 HY000 Table '%s' is read only
+1048 23000 Column '%s' cannot be null
+1062 23000 Duplicate entry '%s' for key %d
+1099 HY000 Table '%s' was locked with a READ lock and can't be updated
+1100 HY000 Table '%s' was not locked with LOCK TABLES
+1104 42000 The SELECT would examine more than MAX_JOIN_SIZE rows; check your WHERE and use SET SQL_BIG_SELECTS=1 or SET SQL_MAX_JOIN_SIZE=# if the SELECT is okay
+1106 42000 Incorrect parameters to procedure '%s'
+1114 HY000 The table '%s' is full
+1150 HY000 Delayed insert thread couldn't get requested lock for table %s
+1165 HY000 INSERT DELAYED can't be used with table '%s' because it is locked with LOCK TABLES
+1242 21000 Subquery returns more than 1 row
+1263 22004 Column set to default value; NULL supplied to NOT NULL column '%s' at row %ld
+1264 22003 Out of range value adjusted for column '%s' at row %ld
+1265 1000 Data truncated for column '%s' at row %ld
+1312 0A000 SELECT in a stored program must have INTO
+1317 70100 Query execution was interrupted
+1319 42000 Undefined CONDITION: %s
+1325 24000 Cursor is already open
+1326 24000 Cursor is not open
+1328 HY000 Incorrect number of FETCH variables
+1329 2000 No data to FETCH
+1336 42000 USE is not allowed in a stored program
+1337 42000 Variable or condition declaration after cursor or handler declaration
+1338 42000 Cursor declaration after handler declaration
+1339 20000 Case not found for CASE statement
+1348 HY000 Column '%s' is not updatable
+1357 HY000 Can't drop a %s from within another stored routine
+1358 HY000 GOTO is not allowed in a stored program handler
+1362 HY000 Updating of %s row is not allowed in %s trigger
+1363 HY000 There is no %s row in %s trigger
+
+命名条件：
+
+declare conditon_name condition for {SQLSTATE sqlstate_code | MYSQL_ERROR_CODE};
+
+例如：
+
+declare foreign_key_error condition for 1216;
+
+declare continue handler for foreign_key_error mysql_statements;
+
+优先级：当同时使用MYSQL错误码，标准SQLSTATE错误码，命名条件（SQLEXCEPTION）来定义错误处理时，其捕获顺序是（只捕获一条错误）：MYSQL码->SQLSTATE->命名条件
+
+作用域：
+
+1、包括begin...end内的语句
+
+declare continue handler for 1048 select 'attempt to insert a null value';
+begin
+  insert into a values(6,null);
+end;
+ 
+
+若a表第二字段定义为非空，则会触发1048错误
+
+2、若错误处理在begin...end内定义，则在之外的语句不会触发错误发生
+
+BEGIN
+  BEGIN
+    DECLARE CONTINUE HANDLER FOR 1216 select 'Foreign key constraint violated';
+  END;
+  INSERT INTO departments (department_name,manager_id,location) VALUES ('Elbonian HR','Catbert','Catbertia');
+END;
+3、能够捕获其它存储过程抛出的错误
+
+下面再通过几个例子来掌握MySQL存储过程中异常处理的使用。
+
+例一：error-number
+
+准备工作
+
+CREATE TABLE `t1` (
+`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,PRIMARY KEY (`id`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB;
+复制代码
+CREATE TABLE `t2` (
+  `cid` INT(10) UNSIGNED NULL DEFAULT NULL,
+  INDEX `FK__t1` (`cid`),
+  CONSTRAINT `FK__t1` FOREIGN KEY (`cid`) REFERENCES `t1` (`id`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB;
+复制代码
+创建存储过程 
+
+复制代码
+delimiter //
+create procedure a(var1 int)
+begin
+  declare exit handler for 1452 insert into error_log values(
+    concat('time:',current_date,'.Foreign Key Reference Failure For Value=',var1)
+  );
+  insert into t2 values(var1);
+end;//
+复制代码
+如果有1452错误，则当插入到表error_log这个语句完成后，退出（exit），这里申明异常处理的语句在上面begin...end的复合语句中，所以这里退出，其实就表示退出了该存储过程。
+
+例二：sqlstate error-string
+
+准备工作
+
+CREATE TABLE `t4` (
+  `id` INT(10) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB;
+ 
+
+复制代码
+create procedure p23()
+begin
+  begin
+  declare exit handler for sqlstate '23000' set @x2=1;
+    set @x=1;
+    insert into t4 values(1);
+    set @x=2;
+  end;
+  begin
+    declare exit handler for sqlstate '23000' set @x2=9;
+    insert into t4 values(1);
+  end;
+  set @x=3;
+end
+
+例三：
+
+begin
+  declare exit handler for sqlstate '23000' set @x2=1;
+  set @x=1;
+  insert into t4 values(1);
+  set @x=2;
+  begin
+    declare exit handler for sqlstate '23000' set @x2=9;
+    insert into t4 values(1);
+  end;
+  set @x=3;
+end
+
+error-number的例子
+create procedure p22(var1 int)
+begin
+  declare exit handler for 1216 insert into error_log values(
+    concat('time:' , current_date , '.Foreign Key Reference Failure For Value='
+    ,var1)
+  );
+  insert into t3 values(var1);
+end;//
+
+sqlstate error-string的例子
+
+create procedure p23()
+begin
+  declare continue handler for sqlstate '23000' set @x2=1;
+  set @x=1;
+  insert into t4 values(1);
+  set @x=2;
+  insert into t4 values(1);
+  set @x=3;
+end;//
+
+condition的例子
+
+declare 'name' condition for sqlstate '23000';
+declare exit handler for 'name' rollback;
 
 ## 总结
 
