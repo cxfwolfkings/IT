@@ -10,6 +10,7 @@
 2. 实战
    - [搭建私有镜像仓库](#搭建私有镜像仓库)
    - [docker-compose](#docker-compose)
+   - [docker-machine](#docker-machine)
 3. 总结
    - [常见问题](#常见问题)
    - [Windows容器](#Windows容器)
@@ -1710,7 +1711,7 @@ systemctl daemon-reload
 
 ### docker-compose
 
-Docker Compose 是一个用来定义和运行复杂应用的 Docker 工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器。（通过 docker-compose.yml 配置）
+Docker Compose 是一个用来定义和运行复杂应用的 Docker 工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器（通过 docker-compose.yml 配置）。
 
 **安装：**
 
@@ -1792,47 +1793,47 @@ Compose file format | Docker engine
 3.6|18.02.0+
 3.7|18.06.0+
 
-## docker&nbsp;Machine
+### docker-machine
 
-1.什么是DockerMachine？
+**1、什么是 Docker Machine？**
 
-Docker Machine是一个工具，它可以帮你在虚拟主机安装docker，并且通过docker-machine 相关命令控制主机。你可以用docker machine在mac、windows、单位的网络、数据中心、云提供商（AWS或Digital Ocean）创建docker主机。
+Docker Machine是一个工具，它可以帮你在虚拟主机安装 docker，并且通过 `docker-machine` 相关命令控制主机。你可以用 docker machine 在 mac、windows、单位的网络、数据中心、云提供商（AWS 或 Digital Ocean）创建 docker 主机。
 
-通过docker-machine commands，你能启动、进入、停止、重启主机，也可以升级docker，还可以配置docker client。
+通过 docker-machine commands，你能启动、进入、停止、重启主机，也可以升级 docker，还可以配置 docker client。
 
-2.为什么要用Docker Machine？
+**2、为什么要用 Docker Machine？**
 
-Docker Machine是当前docker运行在mac或者windows上的唯一方式，并且操作多种不同linux 系统的docker主机的最佳方式。
+Docker Machine 是当前 docker 运行在 mac 或者 windows 上的唯一方式，并且操作多种不同 linux 系统的 docker 主机的最佳方式。
 
-3.Docker machine之安装
+**3、Docker Machine之安装**
 
 参考：[https://github.com/docker/machine/](https://github.com/docker/machine/)
 
-下载docker-machine 二进制文件
+下载 docker-machine 二进制文件
 
-- Mac Or linux
+Mac Or linux
 
-  ```sh
-  curl -Lhttps://github.com/docker/machine/releases/download/v0.8.0/docker-machine-`uname\ -s`-`uname -m` > /usr/local/bin/docker-machine \ && chmod +x/usr/local/bin/docker-machine
-  ```
+```sh
+curl -Lhttps://github.com/docker/machine/releases/download/v0.8.0/docker-machine-`uname\ -s`-`uname -m` > /usr/local/bin/docker-machine \ && chmod +x/usr/local/bin/docker-machine
+```
 
-- Windows with git bash
+Windows with git bash
 
-  ```sh
-  if [[ ! -d"$HOME/bin" ]]; then mkdir -p "$HOME/bin"; fi && \curl -Lhttps://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Windows-x86_64.exe\ "$HOME/bin/docker-machine.exe" && \ chmod +x"$HOME/bin/docker-machine.exe"
-  ```
+```sh
+if [[ ! -d"$HOME/bin" ]]; then mkdir -p "$HOME/bin"; fi && \curl -Lhttps://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Windows-x86_64.exe\ "$HOME/bin/docker-machine.exe" && \ chmod +x"$HOME/bin/docker-machine.exe"
+```
 
-  黑魔法（离线安装）：
+黑魔法（离线安装）：
 
-  下载地址：[https://github.com/docker/machine/releases/](https://github.com/docker/machine/releases/)
+下载地址：[https://github.com/docker/machine/releases/](https://github.com/docker/machine/releases/)
 
-  直接在csdn下载：[https://download.csdn.net/download/zhugeaming2018/10404327](https://download.csdn.net/download/zhugeaming2018/10404327)
+直接在csdn下载：[https://download.csdn.net/download/zhugeaming2018/10404327](https://download.csdn.net/download/zhugeaming2018/10404327)
 
-4.Docker machine之使用(macor windows)
+**4、Docker Machine之使用(macor windows)**
 
 使用准备：
 
-安装最新版的virtualbox([https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads))
+安装最新版的 virtualbox([https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads))
 
 ```sh
 cd /etc/yum.repos.d
@@ -1840,19 +1841,19 @@ wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
 yum install -y  VirtualBox-5.2
 ```
 
-- Create a machine
+Create a machine
 
-  ```sh
-  docker-machine create –driver virtualbox default
-  ```
+```sh
+docker-machine create –driver virtualbox default
+```
 
-  在上面你会发现这么句话“error in driver during machine creation: This computer doesn't have VT-X/AMD-v enabled.Enabling it in the BIOS is mandatory"意思就是说你没有开启虚拟化。
+在上面你会发现这么句话 "error in driver during machine creation: This computer doesn't have VT-X/AMD-v enabled.Enabling it in the BIOS is mandatory" 意思就是说你没有开启虚拟化。
 
-  有朋友说创建虚拟主机太慢，我提供一个阿里云加速命令很快很暴力：
+有朋友说创建虚拟主机太慢，我提供一个阿里云加速命令很快很暴力：
 
-  ```sh
-  docker-machine create –driver virtualbox –engine-registry-mirror https://xu176fzy.mirror.aliyuncs.com default
-  ```
+```sh
+docker-machine create –driver virtualbox –engine-registry-mirror https://xu176fzy.mirror.aliyuncs.com default
+```
 
 - Get the environmentcommands for your new VM
 
@@ -1874,7 +1875,7 @@ yum install -y  VirtualBox-5.2
 
 - Docker machine之使用(Iaas)
 
-## docker&nbsp;swarm
+### docker-swarm
 
 1.什么是Docker Swarm？
     容器集群管理工具。

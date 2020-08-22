@@ -277,6 +277,16 @@ mysql> exit;
 ### 常用语句
 
 ```sql
+/*
+ * 控制外键约束
+ */
+-- 禁用
+SET FOREIGN_KEY_CHECKS = 0;
+-- 启用
+SET FOREIGN_KEY_CHECKS = 1;
+-- 查看当前值
+SELECT @@FOREIGN_KEY_CHECKS;
+
 -- 安全模式
 show variables like 'sql_safe_updates';
 set sql_safe_updates=1; --安全模式打开状态
