@@ -72,7 +72,7 @@ git push origin feature1
 # 切换分支
 git checkout feature1
 # 设置上游分支
-git branch --set-upstream-to=origin/feature1
+git branch --set-upstream-to=origin/feature1 [feature1]
 # 查看上下游分支关系
 git branch -vv
 
