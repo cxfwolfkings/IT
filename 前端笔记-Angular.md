@@ -30,6 +30,7 @@
    - [元数据(Metadata)](#元数据(Metadata))
    - [构建](#构建)
 3. 总结
+   - [环境变量](#环境变量)
 4. 参考
 
 ## 简介
@@ -3405,6 +3406,32 @@ module.exports = function (config) {
 ```
 
 ## 总结
+
+### 环境变量
+
+首先在 angular.json 文件中复制 production 部分代码，然后放在当前代码的后面，将 `production` 更改为 `test`, 文件引用更改为`environment.test.ts`。
+
+**构建所需环境的项目：**
+
+```sh
+# 1. 构建生产环境项目
+# 默认使用的就是environment.prod.ts
+ng build
+ng build --configuration=production
+
+# 2. 构建测试环境项目
+ng build --configuration=test
+
+# 3. 开发环境
+# 直接启动默认就是开发环境
+ng serve
+
+# 4. 压缩文件
+# --prod: 压缩构建文件
+ng build --prod
+```
+
+
 
 ## 参考
 
