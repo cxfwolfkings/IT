@@ -1,15 +1,26 @@
 # 目录
 
 1. 理论
+   
    - [索引](#索引)
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
-   - [常用语句](#常用语句)
+   - [常用命令语句](#常用命令语句)
+     - [控制外键约束](#控制外键约束)
+     - [控制安全模式](#控制安全模式)
+   - [常用SQL语句](#常用SQL语句)
+     - [复制表结构或数据](#复制表结构或数据)
+     - [字符串分割](#字符串分割)
+   - [常见错误](#常见错误)
+     - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
+   
    - [Handler](#Handler)
+   - [事件调度器](#事件调度器)
 3. [总结](#总结)
+   
    - [性能优化](#性能优化)
-   - [压缩](#压缩)
-
+- [压缩](#压缩)
+   
 4. 升华
 
 ## 理论
@@ -274,35 +285,71 @@ mysql> exit;
 
 >安装包版，根据向导安装即可！
 
-### 常用语句
+### 常用命令语句
+
+
+
+#### 控制外键约束
 
 ```sql
-/*
- * 控制外键约束
- */
 -- 禁用
 SET FOREIGN_KEY_CHECKS = 0;
 -- 启用
 SET FOREIGN_KEY_CHECKS = 1;
 -- 查看当前值
 SELECT @@FOREIGN_KEY_CHECKS;
+```
 
--- 安全模式
+#### 控制安全模式
+
+```sql
 show variables like 'sql_safe_updates';
 set sql_safe_updates=1; --安全模式打开状态
 set sql_safe_updates=0; --安全模式关闭状态
+```
 
-1. 复制表结构及其数据：
+
+
+### 常用SQL语句
+
+
+
+#### 复制表结构或数据
+
+```sql
+-- 1. 复制表结构及其数据：
 create table table_name_new as select * from table_name_old
-2. 只复制表结构：
+-- 2. 只复制表结构：
 create table table_name_new as select * from table_name_old where 1=2;
-或者：
+-- 或者：
 create table table_name_new like table_name_old
-3. 只复制表数据：
-如果两个表结构一样：
+-- 3. 只复制表数据：
+-- 如果两个表结构一样：
 insert into table_name_new select * from table_name_old
-如果两个表结构不一样：
+-- 如果两个表结构不一样：
 insert into table_name_new(column1,column2...) select column1,column2... from table_name_old
+```
+
+#### 字符串分割
+
+```sql
+-- ","分割
+SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321,30001',',',help_topic_id+1),',',-1) AS num 
+FROM mysql.help_topic 
+WHERE help_topic_id < LENGTH('10321,30001')-LENGTH(REPLACE('10321,30001',',',''))+1;
+
+-- "|"分割
+SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321|30001','|',help_topic_id+1),'|',-1) AS num 
+FROM mysql.help_topic 
+WHERE help_topic_id < LENGTH('10321|30001')-LENGTH(REPLACE('10321|30001','|',''))+1;
+```
+
+
+
+
+
+```sql
+
 
 -- 分页
 /**
@@ -1528,6 +1575,32 @@ END
 
 ```
 
+
+
+### 常见错误
+
+
+
+#### 1、This function has none of DETERMINISTIC, NOSQL, ...
+
+```sql
+set global log_bin_trust_function_creators = TRUE;
+```
+
+这是我们开启了bin-log, 我们就必须指定我们的函数是否是：
+
+1. DETERMINISTIC 不确定的
+2. NO SQL 没有SQl语句，当然也不会修改数据
+3. READS SQL DATA 只是读取数据，当然也不会修改数据
+4. MODIFIES SQL DATA 要修改数据
+5. CONTAINS SQL 包含了SQL语句
+
+其中在 function 里面，只有 DETERMINISTIC, NO SQL 和 READS SQL DATA 被支持。如果我们开启了 bin-log, 我们就必须为我们的 function 指定一个参数。
+
+
+
+
+
 ### Handler
 
 ```sql
@@ -1574,12 +1647,12 @@ declare continue handler for SQLEXCEPTION set L_error=1;
 
 附常见错误号对照表
 
-MySQL error code SQLSTATE code Error message
-
-1011 HY000 Error on delete of '%s' (errno: %d)
-1021 HY000 Disk full (%s); waiting for someone to free some space . . .
-1022 23000 Can't write; duplicate key in table '%s'
-1027 HY000 '%s' is locked against change
+| MySQL error code | SQLSTATE code | Error message                                                |
+| ---------------- | ------------- | ------------------------------------------------------------ |
+| 1011             | HY000         | Error on delete of '%s' (errno: %d)                          |
+| 1021             | HY000         | Disk full (%s); waiting for someone to free some space . . . |
+| 1022             | 23000         | Can't write; duplicate key in table '%s'                     |
+|                  |               | 1027 HY000 '%s' is locked against change
 1036 HY000 Table '%s' is read only
 1048 23000 Column '%s' cannot be null
 1062 23000 Duplicate entry '%s' for key %d
@@ -1609,7 +1682,7 @@ MySQL error code SQLSTATE code Error message
 1357 HY000 Can't drop a %s from within another stored routine
 1358 HY000 GOTO is not allowed in a stored program handler
 1362 HY000 Updating of %s row is not allowed in %s trigger
-1363 HY000 There is no %s row in %s trigger
+1363 HY000 There is no %s row in %s trigger |
 
 命名条件：
 
@@ -1748,9 +1821,17 @@ condition的例子
 declare 'name' condition for sqlstate '23000';
 declare exit handler for 'name' rollback;
 
+
+
+### 事件调度器
+
+https://www.cnblogs.com/ctaixw/p/5660531.html
+
+
+
 ## 总结
 
-1. 临时表只能查询一次！连接断开后，自动删除
+1. 在1个SQL语句中临时表只能查询一次！连接断开后，自动删除
 
 ### 性能优化
 
