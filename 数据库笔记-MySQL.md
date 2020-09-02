@@ -1,6 +1,6 @@
 # 目录
 
-1. 简介
+1. 理论
    - [索引](#索引)
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
@@ -10,13 +10,13 @@
    - [性能优化](#性能优化)
    - [压缩](#压缩)
 
-## 简介
+4. 升华
 
-一款开源、免费的数据库软件。
+## 理论
 
-MySql官网: [https://www.mysql.com/](https://www.mysql.com/)
+1、一款开源、免费的数据库软件。MySql官网: [https://www.mysql.com/](https://www.mysql.com/)
 
-MySQL不足：
+2、MySQL不足：
 
 - MyISAM格式的数据表只有数据表锁定，没有数据行锁定，可以使用InnoDB格式数据表绕过这个问题
 - MyISAM数据表不能热备份，即无需锁定数据表就可以在对数据表进行处理时同时对其进行备份。InnoDB可以，但是收费
@@ -26,18 +26,18 @@ MySQL不足：
 - 从5.0版本开始支持的存储过程和触发器并不成熟
 - 从4.1版本开始支持的GIS也不成熟
 
-MySQL版本：
+3、MySQL版本：
 
 - Alpha：开发
 - Beta：基本完成
 - Gamma：更加稳定
 - Production 或 Generally Available(GA)：足够成熟和稳定
 
-MySQL许可证：GPL(GNU Public License)
+4、MySQL许可证：GPL(GNU Public License)
 
-SQL兼容性：MySQL 支持 SQL，SQL 有许多种“方言”，可以通过调整 MySQL 服务器的配置开关 sql-mode 使它在行为上与 IBM DB2 和 Oracle 等多种数据库系统保持最大限度的兼容
+5、SQL兼容性：MySQL 支持 SQL，SQL 有许多种“方言”，可以通过调整 MySQL 服务器的配置开关 sql-mode 使它在行为上与 IBM DB2 和 Oracle 等多种数据库系统保持最大限度的兼容
 
-MySQL数据文件：
+6、MySQL数据文件：
 
 - Linux: /var/lib/mysql
 - Windows: %MySQL%/data
@@ -1631,7 +1631,7 @@ declare continue handler for 1048 select 'attempt to insert a null value';
 begin
   insert into a values(6,null);
 end;
- 
+
 
 若a表第二字段定义为非空，则会触发1048错误
 
@@ -1689,7 +1689,7 @@ CREATE TABLE `t4` (
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB;
- 
+
 
 复制代码
 create procedure p23()
