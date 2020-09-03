@@ -13,14 +13,15 @@
      - [字符串分割](#字符串分割)
    - [常见错误](#常见错误)
      - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
-   
+   - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
+     
    - [Handler](#Handler)
    - [事件调度器](#事件调度器)
 3. [总结](#总结)
    
    - [性能优化](#性能优化)
+   - [编码设置](#编码设置)
 - [压缩](#压缩)
-   
 4. 升华
 
 ## 理论
@@ -1597,6 +1598,14 @@ set global log_bin_trust_function_creators = TRUE;
 
 其中在 function 里面，只有 DETERMINISTIC, NO SQL 和 READS SQL DATA 被支持。如果我们开启了 bin-log, 我们就必须为我们的 function 指定一个参数。
 
+#### 2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...
+
+```sql
+CONVERT('xxx' USING utf8) COLLATE utf8_unicode_ci
+```
+
+存储过程中给字符串变量设置了超出长度的值，也有可能报此异常
+
 
 
 
@@ -1832,6 +1841,47 @@ https://www.cnblogs.com/ctaixw/p/5660531.html
 ## 总结
 
 1. 在1个SQL语句中临时表只能查询一次！连接断开后，自动删除
+2. 存储过程（函数）的迁移不要使用 Navicat，会引起 **编码** 异常！！！用自己的脚本创建。
+
+
+
+### 编码设置
+
+```sql
+-- gbk: create database `test2` default character set gbk collate gbk_chinese_ci;
+-- utf8: create database `test2` default character set utf8 collate utf8_general_ci;
+
+show variables like '%character%';
+set character_set_client = utf8;
+set character_set_connection = utf8;
+set character_set_database = utf8;
+set character_set_results = utf8;/*这里要注意很有用*/
+set character_set_server = utf8;
+
+show variables like '%collation%';
+set collation_connection = utf8_unicode_ci;
+set collation_database = utf8_unicode_ci;
+set collation_server = utf8_unicode_ci;
+
+-- 查看数据表的编码格式
+show create table <表名>;
+-- 修改数据库的编码格式
+alter database <数据库名> character set utf8;
+-- 修改数据表格编码格式
+alter table <表名> character set utf8;
+-- 修改字段编码格式
+alter table <表名> change <字段名> <字段名> <类型> character set utf8;
+
+-- my.ini中配置默认编码
+default-character-set=utf8
+
+-- 数据库连接串中指定字符集：
+url=jdbc:mysql://yourip/college?user=root&password=yourpassword&useunicode=true&characterencoding=gbk
+```
+
+
+
+
 
 ### 性能优化
 

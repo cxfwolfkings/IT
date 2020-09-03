@@ -1,11 +1,20 @@
 # 目录
 
-1. [Web应用机制和术语](#Web应用机制和术语)
-   - [HTTP协议](#HTTP协议)
-2. [Django快速上手](#Django快速上手)
-3. [Flask入门](#Flask入门)
+1. 理论
+   - [Web应用机制和术语](#Web应用机制和术语)
+2. 实战
+   - [Django快速上手](#Django快速上手)
+   - [Flask入门](#Flask入门)
+3. 总结
+4. 升华
 
-## Web应用机制和术语
+
+
+## 理论
+
+
+
+### Web应用机制和术语
 
 Web开发的早期阶段，开发者需要手动编写每个页面，例如一个新闻门户网站，每天都要修改它的HTML页面，随着网站规模和体量的增大，这种方式就变得极度糟糕。
 
@@ -32,7 +41,7 @@ HTTP|超文本传输协议，构建在TCP之上的应用级协议，万维网数
 Web服务器|接受HTTP请求，然后返回HTML文件、纯文本文件、图像等资源给请求者
 Nginx|高性能的Web服务器，也可以用作[反向代理](https://zh.wikipedia.org/wiki/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86)，[负载均衡](https://zh.wikipedia.org/wiki/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1) 和 [HTTP缓存](https://zh.wikipedia.org/wiki/HTTP%E7%BC%93%E5%AD%98)
 
-### HTTP协议
+**HTTP协议：**
 
 这里我们稍微费一些笔墨来谈谈上面提到的HTTP。HTTP（超文本传输协议）是构建于TCP（传输控制协议）之上应用级协议，它利用了TCP提供的可靠的传输服务实现了Web应用中的数据交换。按照维基百科上的介绍，设计HTTP最初的目的是为了提供一种发布和接收[HTML](https://zh.wikipedia.org/wiki/HTML)页面的方法，也就是说这个协议是浏览器和Web服务器之间传输的数据的载体。
 
@@ -92,10 +101,13 @@ cd oa
 
 ```sh
 python3 -m venv venv
+# 激活虚拟环境 Linux
 source venv/bin/activate
+# 激活虚拟环境 Windows
+venv\Scripts\activate
 ```
 
->说明：上面使用了 Python 自带的 venv 模块完成了虚拟环境的创建，当然也可以使用 virtualenv 或 pipenv 这样的工具。要激活虚拟环境，在 Windows 环境下可以通过 `venv\Scripts\activate` 执行批处理文件来实现。
+>说明：上面使用了 Python 自带的 venv 模块完成了虚拟环境的创建，当然也可以使用 virtualenv 或 pipenv 这样的工具。
 
 4、更新包管理工具pip。
 
@@ -552,6 +564,8 @@ Operations to perform:
 Running migrations:
   Applying hrs.0001_initial... OK
 ```
+
+
 
 ## Flask入门
 
