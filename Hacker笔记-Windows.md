@@ -2,4 +2,4 @@
 
 ## 取消管理员权限升级提示
 
-![x](./Resource/1.png)
+![x](./Resources/windows-auth.png)
