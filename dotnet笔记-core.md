@@ -23,7 +23,7 @@
 
 .NET Core支持从一个字节到八个字节的不同范围的有符号和无符号整数。所有整数都是值类型。下表列出了整体类型及其大小：
 
-![x](./Resource/35.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/35.png)
 
 每个整型支持一组标准的算术，比较，等式，显式转换和隐式转换运算符。
 
@@ -33,7 +33,7 @@
 
 .NET Core包含三种基本浮点类型，如下表所示。
 
-![x](./Resource/36.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/36.png)
 
 每个浮点类型都支持一组标准的算术，比较，相等，显式转换和隐式转换运算符。
 
@@ -204,7 +204,7 @@ RefA is not null
 - 使对象尽可能地小，不要创建过度冗长的代码
 - 使对象的引用最少
 
-![x](./Resource/37.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/37.png)
 
 垃圾收集是.NET托管代码平台最重要的特性之一。 垃圾收集器(GC)管理内存的分配和释放。 垃圾收集器用作自动内存管理器。
 
@@ -270,7 +270,7 @@ GC还为开发人员提供了一些方法来影响其行为，这对提高性能
 
 .NET Framework被管理的执行过程包括以下步骤。
 
-![x](./Resource/38.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/38.png)
 
 1. 选择一个编译器
 
@@ -300,7 +300,7 @@ GC还为开发人员提供了一些方法来影响其行为，这对提高性能
 
 现在来看看一下如何使用`.NET Core`与`.NET Framework`进行代码执行。在`.NET Core`中，这些组件的很多替代品都是`.NET Framework`的一部分。执行流程图如下所示：
 
-![x](./Resource/39.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/39.png)
 
 - 现在在`.NET Core`中，我们有了一个新的编译器系列，就像用于 C# 和VB的Roslyn一样。
 - 如果想在`.NET Core`中使用F#，也可以使用新的F# 4.1编译器。
@@ -424,27 +424,27 @@ C# 是运行在 .NET Framework 平台上的一种面向对象语言。.NET Frame
 
 向托管执行发展：
 
-![x](./Resource/40.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/40.png)
 
 .NET语言特征：
 
-![x](./Resource/41.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/41.png)
 
 CLR程序存在模块(module)中，CLR模块包含代码、元数据和资源。代码一般以公共中间语言(common intermediate language, CIL)的格式存放。CLR模块格式：
 
-![x](./Resource/42.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/42.png)
 
 模块输出选项：
 
-![x](./Resource/43.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/43.png)
 
 模块和程序集：
 
-![x](./Resource/44.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/44.png)
 
 使用CSC.EXE和NMAKE编译多模块程序集
 
-![x](./Resource/45.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/45.png)
 
 ```sh
 # code.netmodule cannot be loaded as is until an assembly is created
@@ -531,7 +531,7 @@ dll文件的加载顺序：
   kestrel是默认的web server，通过UseKestrel()这个方法来启用的。  
 
   开发的时候可以使用IIS Express，调用UseIISIntegration()这个方法启用IIS Express，它作为Kestrel的Reverse Proxy server来用。
-  
+
   如果在windows服务器上部署的话，就应该使用 IIS 作为 Kestrel 的反向代理服务器来管理和代理请求。  
 
   如果在linux上的话，可以使用 apache，nginx 等等的作为 kestrel 的 proxy server。  
@@ -542,7 +542,7 @@ dll文件的加载顺序：
 
 在之前的Asp.Net里，主要的管道模型流程如下图所示：
 
-![pipeline](../Resource/2.png)
+![pipeline](E:/WorkingDir/Office/Resource/2.png)
 
 1. 请求进入 Asp.Net 工作进程后，由进程创建 HttpWorkRequest 对象，封装此次请求有关的所有信息，然后进入 HttpRuntime 类进行进一步处理。  
 2. HttpRuntime 通过请求信息创建 HttpContext 上下文对象，此对象将贯穿整个管道，直到响应结束。
@@ -554,7 +554,7 @@ dll文件的加载顺序：
 
 而在 Asp.Net Core 里面，管道模型流程发生了很大的变化
 
-![pipeline](../Resource/3.png)
+![pipeline](E:/WorkingDir/Office/Resource/3.png)
 
 - HttpModule 和 IHttpHandler 不复存在，取而代之的是一个个中间件(Middleware)。  
 - Server将接收到的请求直接向后传递，依次经过每一个中间件进行处理，然后由最后一个中间件处理并生成响应内容后回传，再反向依次经过每个中间件，直到由Server发送出去。  
@@ -567,11 +567,14 @@ dll文件的加载顺序：
 Middleware支持Run、Use和Map三种方法进行注册。
 
 1. Run方法：表示注册的此中间件为管道内的最后一个中间件，由它处理完请求后直接返回。
+
 2. Use方法：通过Use方法注册的中间件，如果不调用next方法，效果等同于Run方法。当调用next方法后，此中间件处理完后将请求传递下去，由后续的中间件继续处理。当注册中间件顺序不一样时，处理的顺序也不一样，这一点很重要，当注册的自定义中间件数量较多时，需要考虑哪些中间件先处理请求，哪些中间件后处理请求。
+
 3. Map方法：Map方法主要通过请求路径和其他自定义条件过滤来指定注册的中间件，看起来更像一个路由。
+
 4. 其他内置的中间件
 
-   ![pipeline](../Resource/4.png)
+   ![pipeline](E:/WorkingDir/Office/Resource/4.png)
 
 ## 开发
 
@@ -579,7 +582,7 @@ Middleware支持Run、Use和Map三种方法进行注册。
 
 在.Net Core框架里，日志功能主要由 ILoggerFactory, ILoggerProvider, ILogger 这三个接口体现。
 
-![Logger](./Resource/1.png)
+![Logger](E:/WorkingDir/Office/Dotnet/Resource/1.png)
 
 1. ILoggerFactory：工厂接口。只提供注册LoggerProvider的方法和创建单实例Logger对象的方法。
 2. ILoggerProvider：提供真正具有日志输出功能的Logger对象的接口。每一种日志输出方式对应一个不同的LoggerProvider类。
@@ -595,15 +598,16 @@ dotnet add package Microsoft.Extensions.Logging.Filter
 ```
 
 日志级别从低到高一共六级，默认情况下，控制台上输出的日志会采取下面的格式：  
-日志等级 | 显示文字 |  前景色 | 背景色 | 说明  
--|-|-|-|-
-Trace | trce | Gray | Black | 包含最详细消息的日志。 这些消息可能包含敏感的应用程序数据。 默认情况下禁用这些消息，并且不应在生产环境中启用这些消息。
-Debug | dbug | Gray | Black | 在开发过程中用于交互式调查的日志。 这些日志应主要包含对调试有用的信息，不具有长期价值。
-Information | info | DarkGreen | Black | 跟踪应用程序的一般流程的日志。 这些日志应具有长期价值。
-Warning | warn | Yellow | Black | 突出显示应用程序流中异常或意外事件的日志，但是否则不会导致应用程序执行停止。
-Error | fail | Red | Black | 当当前执行流程由于失败而停止时，会突出显示的日志。这些应该指示当前活动中的故障，而不是应用程序范围的故障。
-Critical | cril | White | Red | 描述不可恢复的应用程序或系统崩溃或灾难性的日志失败需要立即关注。
-None |  |  |  | 不用于写日志消息。 指定记录类别不应写任何消息。
+
+| 日志等级    | 显示文字 | 前景色    | 背景色 | 说明                                                         |
+| ----------- | -------- | --------- | ------ | ------------------------------------------------------------ |
+| Trace       | trce     | Gray      | Black  | 包含最详细消息的日志。 这些消息可能包含敏感的应用程序数据。 默认情况下禁用这些消息，并且不应在生产环境中启用这些消息。 |
+| Debug       | dbug     | Gray      | Black  | 在开发过程中用于交互式调查的日志。 这些日志应主要包含对调试有用的信息，不具有长期价值。 |
+| Information | info     | DarkGreen | Black  | 跟踪应用程序的一般流程的日志。 这些日志应具有长期价值。      |
+| Warning     | warn     | Yellow    | Black  | 突出显示应用程序流中异常或意外事件的日志，但是否则不会导致应用程序执行停止。 |
+| Error       | fail     | Red       | Black  | 当当前执行流程由于失败而停止时，会突出显示的日志。这些应该指示当前活动中的故障，而不是应用程序范围的故障。 |
+| Critical    | cril     | White     | Red    | 描述不可恢复的应用程序或系统崩溃或灾难性的日志失败需要立即关注。 |
+| None        |          |           |        | 不用于写日志消息。 指定记录类别不应写任何消息。              |
 
 #### NLog
 
@@ -622,7 +626,7 @@ dotnet add package NLog.Web.AspNetCore
 
 下图展示了 Asp.Net Core MVC 框架默认实现的过滤器的执行顺序：
 
-![Filter](../Resource/5.png)
+![Filter](E:/WorkingDir/Office/Resource/5.png)
 
 - Authorization Filters：身份验证过滤器，处在整个过滤器通道的最顶层。对应的类型为：AuthorizeAttribute.cs
 - Resource Filters：资源过滤器。因为所有的请求和响应都将经过这个过滤器，所以在这一层可以实现类似缓存的功能。对应的接口有同步和异步两个版本：IResourceFilter.cs、IAsyncResourceFilter.cs
@@ -633,16 +637,16 @@ dotnet add package NLog.Web.AspNetCore
 #### 2、过滤器的引用
 
 1. 作为特性标识引用  
-标识在控制器上，则访问这个控制器下的所有方法都将调用这个过滤器；也可以标识在方法上，则只有被标识的方法被调用时才会调用过滤器。
+   标识在控制器上，则访问这个控制器下的所有方法都将调用这个过滤器；也可以标识在方法上，则只有被标识的方法被调用时才会调用过滤器。
 
 2. 全局过滤器  
-使用了全局过滤器后，所有的控制器下的所有方法被调用时都将调用这个过滤器。
+   使用了全局过滤器后，所有的控制器下的所有方法被调用时都将调用这个过滤器。
 
 3. 通过ServiceFilter引用  
-通过在控制器或者Action方法上使用ServiceFilter特性标识引用过滤器。通过此方法可以将通过构造方法进行注入并实例化的过滤器引入框架内。
+   通过在控制器或者Action方法上使用ServiceFilter特性标识引用过滤器。通过此方法可以将通过构造方法进行注入并实例化的过滤器引入框架内。
 
 4. 通过TypeFilter引入  
-用TypeFilter引用过滤器不需要将类型注入到DI容器。另外，也可以通过TypeFilter引用需要通过构造方法注入进行实例化的过滤器。
+   用TypeFilter引用过滤器不需要将类型注入到DI容器。另外，也可以通过TypeFilter引用需要通过构造方法注入进行实例化的过滤器。
 
 #### 3、自定义过滤器执行顺序
 
@@ -685,11 +689,11 @@ Dependency Injection：又称依赖注入，简称DI。在以前的开发方式�
 
 如果以上两点都不满足，则抛出 System.InvalidOperationException 异常。
 
-![DI](../Resource/6.png)
+![DI](E:/WorkingDir/Office/Resource/6.png)
 
 Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以直接在构造函数和 Startup.cs 的方法里注入使用
 
-![DI](../Resource/7.png)
+![DI](E:/WorkingDir/Office/Resource/7.png)
 
 #### 3、生命周期管理
 
@@ -702,190 +706,191 @@ Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以�
 #### 4、第三方DI容器
 
 除了使用框架默认的DI容器外，还可以引入其他第三方的DI容器。比如：Autofac，引入Autofac的nuget包：
+
 > dotnet add package Autofac.Extensions.DependencyInjection
 
 ### 异常处理
 
 1. 配置HTTP错误代码页
 
-    ```C#
-    // 在 Startup.cs 文件的 Configure 方法中添加如下代码
-    app.UseStatusCodePagesWithReExecute("/errors/{0}");
-
-    // 创建 Errors 控制器返回指定错误页
-    public class ErrorsController : Controller
-    {
-        private IHostingEnvironment _env;
-
-        public ErrorsController(IHostingEnvironment env)
-        {
-            _env = env;
-        }
-
-        [Route("errors/{statusCode}")]
-        public IActionResult CustomError(int statusCode)
-        {
-            var filePath = $"{_env.WebRootPath}/errors/{(statusCode == 404 ? 404 : 500)}.html";
-            return new PhysicalFileResult(filePath, new MediaTypeHeaderValue("text/html"));
-        }
-    }
-    ```
+   ```C#
+   // 在 Startup.cs 文件的 Configure 方法中添加如下代码
+   app.UseStatusCodePagesWithReExecute("/errors/{0}");
+   
+   // 创建 Errors 控制器返回指定错误页
+   public class ErrorsController : Controller
+   {
+       private IHostingEnvironment _env;
+   
+       public ErrorsController(IHostingEnvironment env)
+       {
+           _env = env;
+       }
+   
+       [Route("errors/{statusCode}")]
+       public IActionResult CustomError(int statusCode)
+       {
+           var filePath = $"{_env.WebRootPath}/errors/{(statusCode == 404 ? 404 : 500)}.html";
+           return new PhysicalFileResult(filePath, new MediaTypeHeaderValue("text/html"));
+       }
+   }
+   ```
 
 2. 使用MVC过滤器
 
-    ```C#
-    public class CustomerExceptionAttribute : ExceptionFilterAttribute
-    {
-        private readonly IHostingEnvironment _hostingEnvironment;
-
-        public CustomerExceptionAttribute(
-            IHostingEnvironment hostingEnvironment)
-        {
-            _hostingEnvironment = hostingEnvironment;
-        }
-
-        public override void OnException(ExceptionContext filterContext)
-        {
-            if (!_hostingEnvironment.IsDevelopment())
-            {
-                return;
-            }
-            HttpRequest request = filterContext.HttpContext.Request;
-            Exception exception = filterContext.Exception;
-            // 异常是否处理
-            if (filterContext.ExceptionHandled == true)
-            {
-                return;
-            }
-            if (exception is UserFriendlyException)
-            {
-                //filterContext.Result = new ApplicationErrorResult
-                filterContext.HttpContext.Response.StatusCode = 400;
-                filterContext.HttpContext.Response.WriteAsync(exception.Message);
-            }
-
-            // 下面进行异常处理的逻辑，可以记录日志、返回前端友好提示等
-            // ...
-
-            // 设置异常已经处理,否则会被其他异常过滤器覆盖
-            filterContext.ExceptionHandled = true;
-            // 在派生类中重写时，获取或设置一个值，该值指定是否禁用IIS自定义错误。
-            filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
-        }
-    }
-    ```
+   ```C#
+   public class CustomerExceptionAttribute : ExceptionFilterAttribute
+   {
+       private readonly IHostingEnvironment _hostingEnvironment;
+   
+       public CustomerExceptionAttribute(
+           IHostingEnvironment hostingEnvironment)
+       {
+           _hostingEnvironment = hostingEnvironment;
+       }
+   
+       public override void OnException(ExceptionContext filterContext)
+       {
+           if (!_hostingEnvironment.IsDevelopment())
+           {
+               return;
+           }
+           HttpRequest request = filterContext.HttpContext.Request;
+           Exception exception = filterContext.Exception;
+           // 异常是否处理
+           if (filterContext.ExceptionHandled == true)
+           {
+               return;
+           }
+           if (exception is UserFriendlyException)
+           {
+               //filterContext.Result = new ApplicationErrorResult
+               filterContext.HttpContext.Response.StatusCode = 400;
+               filterContext.HttpContext.Response.WriteAsync(exception.Message);
+           }
+   
+           // 下面进行异常处理的逻辑，可以记录日志、返回前端友好提示等
+           // ...
+   
+           // 设置异常已经处理,否则会被其他异常过滤器覆盖
+           filterContext.ExceptionHandled = true;
+           // 在派生类中重写时，获取或设置一个值，该值指定是否禁用IIS自定义错误。
+           filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
+       }
+   }
+   ```
 
 3. 异常捕获中间件(Middleware)
 
-    使用MVC自带中间件：
+   使用MVC自带中间件：
 
-    ```C#
-    // 在Startup.cs中添加如下代码
-    if (env.IsDevelopment())
-    {   // 开发模式
-        app.UseDeveloperExceptionPage();
-    }
-    else
-    {   // 使用默认的异常处理
-        // app.UseExceptionHandler();
-        // 使用自定义处理
-        app.UseExceptionHandler(build =>
-        build.Run(async context =>
-        {
-                var ex = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
-                if (ex != null)
-                {
-                    string innerException = String.Empty;
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        innerException += ex.InnerException?.Message + "\r\n" + ex.InnerException?.StackTrace + "\r\n";
-                    }
-                    string message = $@"【{ex.Message}】内部错误【{ex.InnerException?.Message}】";
-                    // 这里可以进行异常记录和针对异常做不同处理，我这里示例返回500
-                    context.Response.StatusCode = 500;
-                    context.Response.ContentType = "text/plain;charset=utf-8";
-                    await context.Response.WriteAsync("服务器变成蝴蝶飞走了！");
-                }
-                else
-                {
-                    context.Response.StatusCode = 500;
-                    if (context.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
-                    {
-                        context.Response.ContentType = "text/html";
-                        await context.Response.SendFileAsync($@"{env.WebRootPath}/errors/500.html");
-                    }
-                }
-            }
-        ));
-    }
-    ```
+   ```C#
+   // 在Startup.cs中添加如下代码
+   if (env.IsDevelopment())
+   {   // 开发模式
+       app.UseDeveloperExceptionPage();
+   }
+   else
+   {   // 使用默认的异常处理
+       // app.UseExceptionHandler();
+       // 使用自定义处理
+       app.UseExceptionHandler(build =>
+       build.Run(async context =>
+       {
+               var ex = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+               if (ex != null)
+               {
+                   string innerException = String.Empty;
+                   while (ex.InnerException != null)
+                   {
+                       ex = ex.InnerException;
+                       innerException += ex.InnerException?.Message + "\r\n" + ex.InnerException?.StackTrace + "\r\n";
+                   }
+                   string message = $@"【{ex.Message}】内部错误【{ex.InnerException?.Message}】";
+                   // 这里可以进行异常记录和针对异常做不同处理，我这里示例返回500
+                   context.Response.StatusCode = 500;
+                   context.Response.ContentType = "text/plain;charset=utf-8";
+                   await context.Response.WriteAsync("服务器变成蝴蝶飞走了！");
+               }
+               else
+               {
+                   context.Response.StatusCode = 500;
+                   if (context.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+                   {
+                       context.Response.ContentType = "text/html";
+                       await context.Response.SendFileAsync($@"{env.WebRootPath}/errors/500.html");
+                   }
+               }
+           }
+       ));
+   }
+   ```
 
-    自定义中间件（可以进行日志记录）：
+   自定义中间件（可以进行日志记录）：
 
-    ```C#
-    public class ExceptionHandlerMiddleware
-    {
-        private readonly RequestDelegate _next;
-
-        public ExceptionHandlerMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task Invoke(HttpContext context)
-        {
-            try
-            {
-                // 这里也可以进行请求和响应日志的的记录
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                var statusCode = context.Response.StatusCode;
-                // 进行异常处理
-            }
-            finally
-            {
-                var statusCode = context.Response.StatusCode;
-                var msg = String.Empty;
-                switch (statusCode)
-                {
-                    case 500:
-                        msg = "服务器系统内部错误";
-                        break;
-
-                    case 401:
-                        msg = "未登录";
-                        break;
-
-                    case 403:
-                        msg = "无权限执行此操作";
-                        break;
-
-                    case 408:
-                        msg = "请求超时";
-                        break;
-                }
-                if (!string.IsNullOrWhiteSpace(msg))
-                {
-                    await HandleExceptionAsync(context, statusCode, msg);
-                }
-            }
-        }
-        private static Task HandleExceptionAsync(HttpContext context, int statusCode, string msg)
-        {
-            context.Response.ContentType = "application/json;charset=utf-8";
-            context.Response.StatusCode = statusCode;
-            return context.Response.WriteAsync(msg);
-        }
-    }
-    ```
+   ```C#
+   public class ExceptionHandlerMiddleware
+   {
+       private readonly RequestDelegate _next;
+   
+       public ExceptionHandlerMiddleware(RequestDelegate next)
+       {
+           _next = next;
+       }
+   
+       public async Task Invoke(HttpContext context)
+       {
+           try
+           {
+               // 这里也可以进行请求和响应日志的的记录
+               await _next(context);
+           }
+           catch (Exception ex)
+           {
+               var statusCode = context.Response.StatusCode;
+               // 进行异常处理
+           }
+           finally
+           {
+               var statusCode = context.Response.StatusCode;
+               var msg = String.Empty;
+               switch (statusCode)
+               {
+                   case 500:
+                       msg = "服务器系统内部错误";
+                       break;
+   
+                   case 401:
+                       msg = "未登录";
+                       break;
+   
+                   case 403:
+                       msg = "无权限执行此操作";
+                       break;
+   
+                   case 408:
+                       msg = "请求超时";
+                       break;
+               }
+               if (!string.IsNullOrWhiteSpace(msg))
+               {
+                   await HandleExceptionAsync(context, statusCode, msg);
+               }
+           }
+       }
+       private static Task HandleExceptionAsync(HttpContext context, int statusCode, string msg)
+       {
+           context.Response.ContentType = "application/json;charset=utf-8";
+           context.Response.StatusCode = statusCode;
+           return context.Response.WriteAsync(msg);
+       }
+   }
+   ```
 
 ### 模块化
 
 - .NET Core的另一个考虑是构建和实现模块化的应用程序。
-  
+
   现在，应用程序现在可以只安装所需的内容，而不是安装整个`.NET Framework`。下面来看看解决方案浏览器中的模块化。
 
   ![x](../Resource/19.png)
@@ -941,11 +946,11 @@ Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以�
 ### 多环境开发
 
 - 在一个正规的开发流程里，软件开发部署将要经过三个阶段：开发、测试、上线，对应了三个环境：开发、测试、生产。
-  
+
   在不同的环境里，需要编写不同的代码，比如，在开发环境里，为了方便开发和调试，前端 js 文件和 css 文件不会被压缩，异常信息将会暴露得更加明显，缓存一般也不会使用等等。
-  
+
   而在测试环境里，为了更加接近生产环境，在开发采取的调试手段将会被屏蔽，同时为了能更好的测试发现问题，通常也会添加一些测试专用的服务和代码。
-  
+
   最终在生产环境上，因为高效性、容错和友好性或者安全性等原因，某些功能会被屏蔽，某些功能将会被更加谨慎或者有效的手段代替。在这种情况下，需要能通过某种手段，使一套代码在不同环境下部署时能体现不同的特性。
 
 1. 多环境标识
@@ -1060,7 +1065,7 @@ Asp.Net Core 框架提供了但不限于以下几个接口，某些接口可以�
    public void ConfigureDevelopmentServices(IServiceCollection services) {
        System.Console.WriteLine($"ConfigureDevelopmentServices Excuted.");
    }
-
+   
    // Development环境下执行的Configure方法
    public void ConfigureDevelopment(IApplicationBuilder app, ILoggerFactory loggerFactory, IHostingEnvironment env) {
        app.Run(async context =>  {
@@ -1146,13 +1151,13 @@ update-database
        {
             optionsBuilder.UseMySQL("server=localhost;userid=root;pwd=123456;port=3306;database=test;sslmode=none;");
        }
-
+   
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<City>().HasData(
                 new City{ Id = 1, Name = "成都" }, new City { Id =5, Name = "北京" });
         }
-
+   
         public  DbSet<City> Citys { get; set; }
    }
    ```
@@ -1193,9 +1198,10 @@ update-database
 ### IActionResult
 
 - ActionResult继承了IActionResult
+
 - JsonResult、RedirectResult、FileResult、ViewResult、ContentResult均继承了ActionResult
 
-  ![x](./Resource/52.png)
+  ![x](E:/WorkingDir/Office/Dotnet/Resource/52.png)
 
 ### StatusCodePagesMiddleware中间件
 

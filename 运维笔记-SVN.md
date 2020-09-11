@@ -2,7 +2,7 @@
 
 ## SVN的架构
 
-![x](./Resource/svn_install.png)
+![x](E:/WorkingDir/Office/Arts/Resource/svn_install.png)
 
 安装
 一、准备工作
@@ -35,11 +35,17 @@ sc create svnserve binPath= "c:\svn\bin\svnserve.exe --service  -r e:\svnroot\re
 五、配置用户和权限
 (1) 修改svnserve.conf，在e:\svn\repos1\conf目录下，用文本编辑器打开svnserve.conf：
 将：
+
 # anon-access = read
+
 # auth-access = write
+
 # password-db = passwd
+
 # authz-db = authz
+
 # realm = My First Repository
+
 改为
 anon-access = read    # 匿名登录用户拥有读取权限
 auth-access = write   # 非匿名登录用户拥有写权限
@@ -53,12 +59,18 @@ password-db = passwd表示可以通过“用户名=密码”的方式在passwd�
 (2) 修改同目录的passwd文件，增加用户帐号：
 将：
 [users]
+
 # harry = harryssecret
+
 # sally = sallyssecret
+
 添加帐号：
 [users]
+
 # harry = harryssecret
+
 # sally = sallyssecret
+
 admin = admin
 添加一个admin账户，密码是admin。
 (3) 修改同目录的authz文件，增加用户权限：
@@ -69,12 +81,13 @@ admin = wolfkings      # 添加admin组，组里面增加一个wolfkings用户
 上面一个也可以这么写：
 [SVNRoot:/]             # SVNRoot版本库
 @admin = rw             # admin组有读写权限
+
 * = r                    # 所有组都有读取权限
-六、初始化SVN，导入数据
-选中要上传SVN的文件夹，“右键 ->TortoiseSVN -> Import...”，在弹出对话框的"URL of repository"输入"svn://localhost/project1/"。在"Importmessage"输入注释，点击OK，要求输入帐号，输入账户admin和密码admin。
-七，测试SVN
-本地测试：新建一空文件夹test1，单击右键，选择"SVN Checkout"，在"URL of repository"中输入"svn://localhost/project1"。
-其他机器测试：如果运行svnserve的主机IP地址是1.2.3.4，则URL输入的内容就是"svn://1.2.3.4/project1"。
+  六、初始化SVN，导入数据
+  选中要上传SVN的文件夹，“右键 ->TortoiseSVN -> Import...”，在弹出对话框的"URL of repository"输入"svn://localhost/project1/"。在"Importmessage"输入注释，点击OK，要求输入帐号，输入账户admin和密码admin。
+  七，测试SVN
+  本地测试：新建一空文件夹test1，单击右键，选择"SVN Checkout"，在"URL of repository"中输入"svn://localhost/project1"。
+  其他机器测试：如果运行svnserve的主机IP地址是1.2.3.4，则URL输入的内容就是"svn://1.2.3.4/project1"。
 
 API
 hacking指南，可以在http://subversion.tigris.org/hacking.html找到，这个文档包含了有用的信息，同时满足Subversion本身的开发者和将Subversion作为第三方库的开发者。
@@ -101,39 +114,41 @@ Subversion的语言绑定缺乏Subversion核心模块的关注，但是通常可
 使用版本库层中包含了一段C代码（C编写）描述了我们讨论的概念，它使用了版本库和文件系统接口（可以通过方法名svn_repos_和svn_fs_分辨）创建了一个添加目录的修订版本。你可以看到APR库的使用，为了内存分配而传递，这些代码也揭开了一些关于Subversion错误处理的晦涩事实—所有的Subversion错误必须需要明确的处理以防止内存泄露（在某些情况下，应用失败）。
 /* Convert a Subversion error into a simple boolean error code.
  *
+
  * NOTE:  Subversion errors must be cleared (using svn_error_clear())
- *        because they are allocated from the global pool, else memory
- *        leaking occurs.
- */
-#define INT_ERR(expr)                           \
-  do {                                          \
-    svn_error_t *__temperr = (expr);            \
-    if (__temperr)                              \
-      {                                         \
-        svn_error_clear(__temperr);             \
-        return 1;                               \
-      }                                         \
-    return 0;                                   \
-  } while (0)
+ * because they are allocated from the global pool, else memory
+ * leaking occurs.
+    */
+   #define INT_ERR(expr)                           \
+     do {                                          \
+   svn_error_t *__temperr = (expr);            \
+   if (__temperr)                              \
+     {                                         \
+       svn_error_clear(__temperr);             \
+       return 1;                               \
+     }                                         \
+   return 0;                                   \
+     } while (0)
 
 /* Create a new directory at the path NEW_DIRECTORY in the Subversion
+
  * repository located at REPOS_PATH.  Perform all memory allocation in
  * POOL.  This function will create a new revision for the addition of
  * NEW_DIRECTORY.  Return zero if the operation completes
  * successfully, non-zero otherwise.
- */
-static int
-make_new_directory(const char *repos_path,
-                   const char *new_directory,
-                   apr_pool_t *pool)
-{
-  svn_error_t *err;
-  svn_repos_t *repos;
-  svn_fs_t *fs;
-  svn_revnum_t youngest_rev;
-  svn_fs_txn_t *txn;
-  svn_fs_root_t *txn_root;
-  const char *conflict_str;
+   */
+   static int
+   make_new_directory(const char *repos_path,
+                  const char *new_directory,
+                  apr_pool_t *pool)
+   {
+     svn_error_t *err;
+     svn_repos_t *repos;
+     svn_fs_t *fs;
+     svn_revnum_t youngest_rev;
+     svn_fs_txn_t *txn;
+     svn_fs_root_t *txn_root;
+     const char *conflict_str;
 
   /* Open the repository located at REPOS_PATH. 
    */
@@ -144,39 +159,46 @@ make_new_directory(const char *repos_path,
   fs = svn_repos_fs(repos);
 
   /* Ask the filesystem to tell us the youngest revision that
+
    * currently exists. 
-   */
-  INT_ERR(svn_fs_youngest_rev(&youngest_rev, fs, pool));
+     */
+       INT_ERR(svn_fs_youngest_rev(&youngest_rev, fs, pool));
 
   /* Begin a new transaction that is based on YOUNGEST_REV.  We are
+
    * less likely to have our later commit rejected as conflicting if we
    * always try to make our changes against a copy of the latest snapshot
    * of the filesystem tree. 
-   */
-  INT_ERR(svn_fs_begin_txn(&txn, fs, youngest_rev, pool));
+     */
+       INT_ERR(svn_fs_begin_txn(&txn, fs, youngest_rev, pool));
 
   /* Now that we have started a new Subversion transaction, get a root
+
    * object that represents that transaction. 
-   */
-  INT_ERR(svn_fs_txn_root(&txn_root, txn, pool));
-  
+     */
+       INT_ERR(svn_fs_txn_root(&txn_root, txn, pool));
+
   /* Create our new directory under the transaction root, at the path
+
    * NEW_DIRECTORY. 
-   */
-  INT_ERR(svn_fs_make_dir(txn_root, new_directory, pool));
+     */
+       INT_ERR(svn_fs_make_dir(txn_root, new_directory, pool));
 
   /* Commit the transaction, creating a new revision of the filesystem
+
    * which includes our added directory path.
-   */
-  err = svn_repos_fs_commit_txn(&conflict_str, repos, 
-                                &youngest_rev, txn, pool);
-  if (! err)
+     */
+       err = svn_repos_fs_commit_txn(&conflict_str, repos, 
+                             &youngest_rev, txn, pool);
+       if (! err)
+
     {
       /* No error?  Excellent!  Print a brief report of our success.
        */
       printf("Directory '%s' was successfully added as new revision "
              "'%ld'.\n", new_directory, youngest_rev);
     }
+
   else if (err->apr_err == SVN_ERR_FS_CONFLICT)
     {
       /* Uh-oh.  Our commit failed as the result of a conflict
@@ -220,13 +242,13 @@ def crawl_filesystem_dir(root, directory):
     
     # Get the directory entries for DIRECTORY.
     entries = svn.fs.svn_fs_dir_entries(root, directory)
-
+    
     # Loop over the entries.
     names = entries.keys()
     for name in names:
         # Calculate the entry's full path.
         full_path = directory + '/' + name
-
+    
         # If the entry is a directory, recurse.  The recursion will return
         # a list with the entry and all its children, which we will add to
         # our running list of paths.
@@ -240,20 +262,21 @@ def crawl_youngest(repos_path):
     """Open the repository at REPOS_PATH, and recursively crawl its
     youngest revision."""
     
+
     # Open the repository at REPOS_PATH, and get a reference to its
     # versioning filesystem.
     repos_obj = svn.repos.svn_repos_open(repos_path)
     fs_obj = svn.repos.svn_repos_fs(repos_obj)
-
+    
     # Query the current youngest revision.
     youngest_rev = svn.fs.svn_fs_youngest_rev(fs_obj)
     
     # Open a root object representing the youngest (HEAD) revision.
     root_obj = svn.fs.svn_fs_revision_root(fs_obj, youngest_rev)
-
+    
     # Do the recursive crawl.
     crawl_filesystem_dir(root_obj, "")
-    
+
 if __name__ == "__main__":
     # Check for sane usage.
     if len(sys.argv) != 2:
@@ -263,9 +286,10 @@ if __name__ == "__main__":
 
     # Canonicalize the repository path.
     repos_path = svn.core.svn_path_canonicalize(sys.argv[1])
-
+    
     # Do the real work.
     crawl_youngest(repos_path)
+
 一个Python状态爬虫
 Subversion的Python绑定也可以用来进行工作拷贝的操作，在本章前面的小节中，我们提到过libsvn_client接口，它存在的目的就是简化编写Subversion客户端的难度，例 8.3 “一个Python状态爬虫”是一个例子，讲的是如何使用SWIG绑定创建一个扩展版本的svn status命令。
 #!/usr/bin/env python
@@ -303,10 +327,10 @@ def do_status(wc_path, verbose):
 
     # Build a client context baton.
     ctx = svn.client.svn_client_ctx_t()
-
+    
     def _status_callback(path, status, root_path_len=wc_path_len):
         """A callback function for svn_client_status."""
-
+    
         # Print the path, minus the bit that overlaps with the root of
         # the status crawl
         text_status = generate_status_code(status.text_status)
@@ -342,15 +366,17 @@ if __name__ == '__main__':
     if len(args) != 1:
         usage_and_exit(2)
             
+
     # Canonicalize the repository path.
     wc_path = svn.core.svn_path_canonicalize(args[0])
-
+    
     # Do the real work.
     try:
         do_status(wc_path, verbose)
     except svn.core.SubversionException, e:
         sys.stderr.write("Error (%d): %s\n" % (e[1], e[0]))
         sys.exit(1)
+
 就像例 8.2 “使用 Python 处理版本库层”中的例子，这个程序是池自由的，而且最重要的是使用Python的数据类型。svn_client_ctx_t()是欺骗，因为Subversion的API没有这个方法—这仅仅是SWIG自动语言生成中的一点问题（这是对应复杂C结构的一种工厂方法）。也需要注意传递给程序的路径（象最后一个）是通过 svn_path_canonicalize()执行的，因为要防止触发Subversion底层C库的断言，也就是防止导致程序立刻随意退出。
 参考资料
 关于SVN API 可以参考:
@@ -477,9 +503,13 @@ perl /home/backup/svn/deletDir.pl  #运行删除脚本，对过期备份进行�
 在上面指定的地方/home/backup/svn/下建立一个perl脚本：backup_check.pl 
 备份完整性检查的思路是：对备份的库运行 svnlook youngest，如果能正确打印出最新的版本号，则表明备份文件没有缺失；如果运行报错，则说明备份不完整。我试过如果备份中断，则运行svnlook youngest会出错。 perl脚本代码如下： 
 #! /usr/bin/perl 
+
 ## Author:xuejiang 
+
 ## 2007-11-10 
+
 ## http://www.scmbbs.com 
+
 use strict; 
 use Carp; 
 use Net::SMTP; 
@@ -589,29 +619,30 @@ svnadmin hotcopy --clean-logs d:/SVNRepository c:/SVNRepository
 这样备份后版本库从3.34G变为3.24G。
 3.dump需要保留的版本 
 我最初选择保留700-755的版本，但是在这一步运行过程中出现这样一段话：
+
 * 已转存版本 739。
 * 已转存版本 740。
-警告: 版本 535 的参考数据比最旧的转存数据版本 (700)还旧。装载这个转存到空的版本库会失败。
+  警告: 版本 535 的参考数据比最旧的转存数据版本 (700)还旧。装载这个转存到空的版本库会失败。
 * 已转存版本 741。 
-我没有太在意，结果从dump恢复版本库时出现错误，屏幕显示：svnadmin: 当前版本库不存在相对源版本 -164，并终止运行。导致我使用备份库进行dump。
-跳过这段，直接说正确的方法。输入：
-svnadmin dump c:/SVNRepository -r 745:755 > d:/repo_dump_745_755.dmp
-3.24G的版本库dump出来后变成760M，苗条不少。
-4.删除旧版本库 
-输入命令：
-rmdir /s/q d:/SVNRepository
-删除旧版本库。也可以直接在资源管理器里删除。
-5.创建空的版本库 
-输入命令：
-svnadmin create d:/SVNRepository
-检查空的版本库大概31.2K大小。
-6.把dump文件导入版本库 
-输入命令：
-svnadmin load d:/SVNRepository < d:/repo_dump_745_755.dmp
-这时屏幕上会显示正在载入版本库中的文件或正在提交/装载的版本。完成后，用命令
-svnlook youngest d:/SVNRepository
-查看，显示当前版本库最新版本号是11，整个版本库大小501M。
-至此，SVN版本库瘦身成功，腾出空间2.7G，大致相当于腾出原SVN库近5/6的空间！
+  我没有太在意，结果从dump恢复版本库时出现错误，屏幕显示：svnadmin: 当前版本库不存在相对源版本 -164，并终止运行。导致我使用备份库进行dump。
+  跳过这段，直接说正确的方法。输入：
+  svnadmin dump c:/SVNRepository -r 745:755 > d:/repo_dump_745_755.dmp
+  3.24G的版本库dump出来后变成760M，苗条不少。
+  4.删除旧版本库 
+  输入命令：
+  rmdir /s/q d:/SVNRepository
+  删除旧版本库。也可以直接在资源管理器里删除。
+  5.创建空的版本库 
+  输入命令：
+  svnadmin create d:/SVNRepository
+  检查空的版本库大概31.2K大小。
+  6.把dump文件导入版本库 
+  输入命令：
+  svnadmin load d:/SVNRepository < d:/repo_dump_745_755.dmp
+  这时屏幕上会显示正在载入版本库中的文件或正在提交/装载的版本。完成后，用命令
+  svnlook youngest d:/SVNRepository
+  查看，显示当前版本库最新版本号是11，整个版本库大小501M。
+  至此，SVN版本库瘦身成功，腾出空间2.7G，大致相当于腾出原SVN库近5/6的空间！
 
 
 SVN服务器几种备份策略
@@ -733,9 +764,13 @@ perl /home/backup/svn/deletDir.pl  #运行删除脚本，对过期备份进行�
 在上面指定的地方/home/backup/svn/下建立一个perl脚本：backup_check.pl 
 备份完整性检查的思路是：对备份的库运行 svnlook youngest，如果能正确打印出最新的版本号，则表明备份文件没有缺失；如果运行报错，则说明备份不完整。我试过如果备份中断，则运行svnlook youngest会出错。 perl脚本代码如下： 
 #! /usr/bin/perl 
+
 ## Author:xuejiang 
+
 ## 2007-11-10 
+
 ## http://www.scmbbs.com 
+
 use strict; 
 use Carp; 
 use Net::SMTP; 
@@ -857,7 +892,7 @@ SVN Client版本：TortoiseSVN-1.6.16.21511
 方法二，建立空目录e:\svnroot\repos2，进入DOS命令行，输入如下命令：
 svnadmincreate e:\svnroot\repos2
 
-![x](./Resource/1.jpg)
+![x](E:/WorkingDir/Office/Arts/Resource/1.jpg)
 
 
 
@@ -914,5 +949,4 @@ password-db = passwd表示可以通过“用户名=密码”的方式在passwd�
 七，测试SVN
 本地测试：新建一空文件夹test1，单击右键，选择“SVN Checkout”，在“URL of repository”中输入“svn://localhost/project1”。
 其他机器测试：如果运行svnserve的主机IP地址是1.2.3.4，则URL输入的内容就是“svn://1.2.3.4/project1”。
-
 

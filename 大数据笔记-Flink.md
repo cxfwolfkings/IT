@@ -35,7 +35,7 @@
 
 总结一下大概有下面这四类：
 
-![x](./Resource/实时计算场景.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/实时计算场景.jpg)
 
 1. 实时数据存储
 
@@ -55,17 +55,17 @@
 
 说到实时计算，这里不得不讲一下和传统的离线计算的区别！再讲这两个区别之前，我们先来看看流处理和批处理的区别：
 
-![x](./Resource/流处理和批处理的区别.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/流处理和批处理的区别.jpg)
 
 抽象一下实时计算的场景需求：
 
-![x](./Resource/SrubtS.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/SrubtS.jpg)
 
 实时计算需要不断的从 MQ 中读取采集的数据，然后处理计算后往 DB 里存储，在计算这层你无法感知到会有多少数据量过来、要做一些简单的操作（过滤、聚合等）、及时将数据下发。
 
 传统的**离线计算**，它却是这样的：
 
-![x](./Resource/eseUjV.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/eseUjV.jpg)
 
 在计算这层，它从 DB 里面读取数据，该数据一般就是固定的（前一天、前一星期、前一个月），然后再做一些复杂的计算或者统计分析，最后生成可供直观查看的报表（dashboard）。
 
@@ -89,7 +89,7 @@
 - 数据规模大且无法预知容量
 - 原始数据一经处理，除非特意保存，否则不能被再次取出处理，或者再次提取数据代价昂贵
 
-![x](./Resource/g4OSIs.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/g4OSIs.jpg)
 
 实时计算的优势：
 
@@ -138,12 +138,12 @@
 
 Flink 是一个针对流数据和批数据的分布式处理引擎，代码主要是由 Java 实现，部分代码是 Scala。它可以处理有界的批量数据集、也可以处理无界的实时数据集。对 Flink 而言，其所要处理的主要场景就是流数据，批数据只是流数据的一个极限特例而已，所以 Flink 也是一款真正的流批统一的计算引擎。
 
-![x](./Resource/pRMhfm.jpg)
-![x](./Resource/vY6T3M.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/pRMhfm.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/vY6T3M.jpg)
 
 ### Flink整体架构
 
-![x](./Resource/Drsi9h.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/Drsi9h.jpg)
 
 从下至上：
 
@@ -154,14 +154,14 @@ Flink 是一个针对流数据和批数据的分布式处理引擎，代码主�
 
 ### Flink支持多种方式部署
 
-![x](./Resource/2019-05-19-061658.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-05-19-061658.jpg)
 
 - Local：直接在 IDE 中运行 Flink Job 时则会在本地启动一个 mini Flink 集群
 - Standalone：在 Flink 目录下执行 `bin/start-cluster.sh` 脚本则会启动一个 Standalone 模式的集群
 - YARN：YARN 是 Hadoop 集群的资源管理系统，它可以在群集上运行各种分布式应用程序，Flink 可与其他应用并行于 YARN 中，Flink on YARN 的架构如下：
-  ![x](./Resource/2019-05-19-062400.jpg)
+  ![x](E:/WorkingDir/Office/DataScience/Resource/2019-05-19-062400.jpg)
 - Kubernetes：Kubernetes 是 Google 开源的容器集群管理系统，在 Docker 技术的基础上，为容器化的应用提供部署运行、资源调度、服务发现和动态伸缩等一系列完整功能，提高了大规模容器集群管理的便捷性，Flink 也支持部署在 Kubernetes 上，在 [GitHub](https://github.com/Aleksandr-Filichkin/flink-k8s/blob/master/flow.jpg) 看到有下面这种运行架构的。
-  ![x](./Resource/2019-05-19-071249.jpg)
+  ![x](E:/WorkingDir/Office/DataScience/Resource/2019-05-19-071249.jpg)
 
 通常上面四种居多，另外还支持 AWS、MapR、Aliyun OSS 等。
 
@@ -169,7 +169,7 @@ Flink 是一个针对流数据和批数据的分布式处理引擎，代码主�
 
 Flink 作业提交架构流程可见下图：
 
-![x](./Resource/p92UrK.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/p92UrK.jpg)
 
 1. Program Code：我们编写的 Flink 应用程序代码
 2. Job Client：Job Client 不是 Flink 程序执行的内部部分，但它是任务执行的起点。 Job Client 负责接受用户的程序代码，然后创建数据流，将数据流提交给 Job Manager 以便进一步执行。 执行完成后，Job Client 将结果返回给用户
@@ -180,7 +180,7 @@ Flink 作业提交架构流程可见下图：
 
 ### Flink&nbsp;API
 
-![x](./Resource/ozmU46.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/ozmU46.jpg)
 
 Flink 提供了不同的抽象级别的 API 以开发流式或批处理应用。
 
@@ -195,8 +195,8 @@ Flink 除了 DataStream 和 DataSet API，它还支持 Table/SQL API，Flink 也
 
 ### Flink程序与数据流结构
 
-![x](./Resource/u3RagR.jpg)
-![x](./Resource/2019-05-19-070817.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/u3RagR.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-05-19-070817.jpg)
 
 一个完整的 Flink 应用程序结构就是如上两图所示：
 
@@ -206,7 +206,7 @@ Flink 除了 DataStream 和 DataSet API，它还支持 Table/SQL API，Flink 也
 
 ### Flink支持丰富的Connector
 
-![x](./Resource/2019-10-10-101956.png)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-10-10-101956.png)
 
 通过源码可以发现不同版本的 Kafka、不同版本的 ElasticSearch、Cassandra、HBase、Hive、HDFS、RabbitMQ 都是支持的，除了流应用的 Connector 是支持的，另外还支持 SQL。
 
@@ -226,17 +226,17 @@ Flink 除了 DataStream 和 DataSet API，它还支持 Table/SQL API，Flink 也
 
 ### Flink提供事件时间&处理时间语义
 
-![x](./Resource/jvnREW.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/jvnREW.jpg)
 
 ### Flink提供灵活的窗口机制
 
-![x](./Resource/2019-05-19-074304.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-05-19-074304.jpg)
 
 ### Flink并行的执行任务
 
 Flink 的程序内在是并行和分布式的，数据流可以被分区成 stream partitions，operators 被划分为 operator subtasks; 这些 subtasks 在不同的机器或容器中分不同的线程独立运行； operator subtasks 的数量在具体的 operator 就是并行计算数，程序不同的 operator 阶段可能有不同的并行数；如下图所示，source operator 的并行数为 2，但最后的 sink operator 为 1：
 
-![x](./Resource/ggMHCK.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/ggMHCK.jpg)
 
 ### Flink支持状态存储和容错
 
@@ -306,31 +306,31 @@ Spark 可作为独立集群部署（需要相应存储层的配合），或可�
 
 #### Spark Streaming
 
-![x](./Resource/2019-07-06-154210.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-07-06-154210.jpg)
 
 [Spark Streaming](https://spark.apache.org/docs/latest/streaming-programming-guide.html) 是 Spark API 核心的扩展，可实现实时数据的快速扩展，高吞吐量，容错处理。数据可以从很多来源（如 Kafka、Flume、Kinesis 等）中提取，并且可以通过很多函数来处理这些数据，处理完后的数据可以直接存入数据库或者 Dashboard 等。
 
-![x](./Resource/2019-07-06-134257.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-07-06-134257.jpg)
 
 **Spark Streaming 的内部实现原理**是接收实时输入数据流并将数据分成批处理，然后由 Spark 引擎处理以批量生成最终结果流，也就是常说的 micro-batch 模式。
 
-![x](./Resource/2019-07-06-134430.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-07-06-134430.jpg)
 
 #### Spark DStreams
 
 DStreams 是 Spark Streaming 提供的基本的抽象，它代表一个连续的数据流。。它要么是从源中获取的输入流，要么是输入流通过转换算子生成的处理后的数据流。在内部实现上，DStream 由连续的序列化 RDD 来表示，每个 RDD 含有一段时间间隔内的数据：
 
-![x](./Resource/2019-07-06-140956.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-07-06-140956.jpg)
 
 任何对 DStreams 的操作都转换成了对 DStreams 隐含的 RDD 的操作。例如 flatMap 操作应用于 lines 这个 DStreams 的每个 RDD，生成 words 这个 DStreams 的 RDD 过程如下图所示：
 
-![x](./Resource/2019-07-06-134718.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-07-06-134718.jpg)
 
 通过 Spark 引擎计算这些隐含 RDD 的转换算子。DStreams 操作隐藏了大部分的细节，并且为了更便捷，为开发者提供了更高层的 API。
 
 #### Spark 支持的滑动窗口
 
-![x](./Resource/2019-07-06-134915.jpg)
+![x](E:/WorkingDir/Office/DataScience/Resource/2019-07-06-134915.jpg)
 
 它和 Flink 的滑动窗口类似，支持传入两个参数，一个代表窗口长度，一个代表滑动间隔。
 

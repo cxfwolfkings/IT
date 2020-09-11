@@ -11,7 +11,7 @@ NServiceBus是.Net平台下的开源的消息服务框架，已经支持.Net Cor
 官方网站：[https://particular.net/](https://particular.net/)  
 官方示例：[https://docs.particular.net/get-started/](https://docs.particular.net/get-started/)
 
-![x](./Resource/NServiceBus的4个Endpoint.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/NServiceBus的4个Endpoint.png)
 
 如图所示，项目一共包括4个端点(Endpoint)，也就是四个单独的项目，端点是NServiceBus中的核心概念，发送消息和事件发布订阅的基础都是Endpoint。这个项目中包括发送消息和事件的发布订阅。
 

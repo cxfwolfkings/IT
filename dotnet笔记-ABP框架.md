@@ -211,7 +211,7 @@ public class SimpleTaskAppDbContext : AbpDbContext
 
 我们将创建一个初始数据库迁移来创建数据库和AppTasks表。我从Visual Studio打开包管理器控制台并运行Add-Migration命令（默认项目必须是.EntityFrameworkCore项目）：
 
-![x](./Resource/13.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/13.png)
 
 自动生成的“初始”迁移类如下所示：
 
@@ -251,7 +251,7 @@ public partial class Initial : Migration
 
 要创建数据库，从Package Manager控制台运行Update-Database命令：
 
-![x](./Resource/14.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/14.png)
 
 此命令在本地SQL Server中创建了一个名为SimpleTaskAppDb的数据库并执行了迁移（目前，只有一个“初始”迁移）：
 
@@ -295,7 +295,7 @@ public class TaskListDto : EntityDto, IHasCreationTime
 - GetAllTasksInput DTO定义GetAll应用服务方法的输入参数。我没有直接将状态定义为方法参数，而是将其添加到DTO对象中。因此，我可以在不破坏现有客户端的情况下将其他参数添加到此DTO中（我们可以直接向该方法添加状态参数）。
 - TaskListDto用于返回Task数据。它来自EntityDto，它只定义了Id属性（我们可以将Id添加到我们的Dto而不是从EntityDto派生）。我们定义了[AutoMapFrom]属性来创建从Task实体到TaskListDto的AutoMapper映射。此属性在Abp.AutoMapper nuget包中定义。
 - 最后，ListResultDto是一个包含项列表的简单类（我们可以直接返回`List<TaskListDto>`）。
-现在，我们可以实现ITaskAppService，如下所示：
+  现在，我们可以实现ITaskAppService，如下所示：
 
 ```C#
 using System.Collections.Generic;
@@ -476,7 +476,7 @@ public class TasksController : SimpleTaskAppControllerBase
 
 - 我派生自SimpleTaskAppControllerBase（派生自AbpController），它包含此应用程序中控制器的公共基本代码。
 - 我注入了ITaskAppService以获取任务列表。
-我没有直接将GetAll方法的结果传递给视图，而是在.Web项目中创建了一个IndexViewModel类，如下所示：
+  我没有直接将GetAll方法的结果传递给视图，而是在.Web项目中创建了一个IndexViewModel类，如下所示：
 
 ```C#
 public class IndexViewModel
@@ -651,7 +651,7 @@ public async Task<ActionResult> Index(GetAllTasksInput input)
 
 在将此JavaScript文件包含到我的视图中之前，我使用了Bundler和Minifier VS扩展（这是在`ASP.NET Core`项目中缩小文件的默认方式）来缩小脚本：
 
-![x](./Resource/15.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/15.png)
 
 这将以下行添加到.Web项目中的bundleconfig.json文件中：
 
@@ -666,7 +666,7 @@ public async Task<ActionResult> Index(GetAllTasksInput input)
 
 并创建一个缩小版本的脚本：
 
-![x](./Resource/16.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/16.png)
 
 每当我更改index.js时，都会自动重新生成index.min.js。现在，我可以将JavaScript文件包含到我的页面中：
 
@@ -718,7 +718,7 @@ GetResponseAsStringAsync和GetUrl方法是ABP 的AbpAspNetCoreIntegratedTestBase
 
 当我调试测试时，我可以看到响应HTML：
 
-![x](./Resource/17.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/17.png)
 
 这表明Index页面返回了一个没有任何异常的响应。但是......我们可能想要更多，并检查返回的HTML是否符合我们的预期。有一些库可用于解析HTML。AngleSharp就是其中之一，并且预先安装在ABP启动模板的.Web.Tests项目中。所以，我用它来检查创建的HTML代码：
 
@@ -840,7 +840,7 @@ public class SimpleTaskAppDbContext : AbpDbContext
 
 现在，我在Package Manager控制台中运行以下命令：
 
-![x](./Resource/18.png)
+![x](E:/WorkingDir/Office/Dotnet/Resource/18.png)
 
 它在项目中创建了一个新的迁移类：
 
@@ -1384,13 +1384,13 @@ namespace Acme.SimpleTaskApp.Web.Controllers
       }
   }
   ```
-  
+
   如果需要，模块定义类负责通过依赖注入来注册其类 （它可以按常规方式完成，如上所示）。它还可以配置应用程序和其他模块，为应用程序添加新功能，等等......
 
 ### 生命周期方法
 
 - `ASP.NET Boilerplate`在应用程序启动和关闭时调用某些特定的模块方法。您可以覆盖这些方法以执行某些特定任务。
-  
+
   `ASP.NET Boilerplate`调用依赖项排序的这些方法。如果模块A依赖于模块B，则模块B在模块A之前初始化。
 
   启动方法的确切顺序：PreInitialize-B，PreInitialize-A，Initialize-B，Initialize-A，PostInitialize-B 和 PostInitialize-A。所有依赖图都是如此。该关闭方法也相似，但在相反的顺序。
@@ -1439,13 +1439,13 @@ namespace Acme.SimpleTaskApp.Web.Controllers
 **什么是多租户？**
 
 - 软件多租户是指软件架构，其中单个软件实例在服务器上运行并为多个租户提供服务。
-  
+
   租户是一组用户，他们共享具有软件实例特定权限的公共访问权限。
-  
+
   使用多租户架构，软件应用程序旨在为每个租户提供实例的专用共享，包括其数据，配置，用户管理，租户个人功能和非功能属性。
-  
+
   多租户与多实例架构形成对比，其中单独的软件实例代表不同的操作租户。
-  
+
   简而言之，多租户是一种用于创建SaaS （软件即服务）应用程序的技术。
 
 ***数据库和部署架构***

@@ -1,7 +1,5 @@
 # 入门
 
-
-
 ## 目录
 
 1. 理论
@@ -15,12 +13,320 @@
    - [字符串和正则](#字符串和正则)
    - [文件和异常](#文件和异常)
    - [图形用户界面](#图形用户界面)
+   - [进程和线程](#进程和线程)
+   - [网络编程](#网络编程)
+   - [图像和文档处理](#图像和文档处理)
+   - [异步任务和定时任务](#异步任务和定时任务)
 2. 实战
    - [搭建编程环境](#搭建编程环境)
    - [Python开发工具](#Python开发工具)
    - [练习](#练习)
 3. 总结
 4. 升华
+
+## 
+
+1. 第一部分 python语言概述
+2. 第二部分 b/s开发
+3. 第三部分 爬虫开发
+4. 第四部分 数据处理和机器学习
+5. 第五部分 项目总结和附录
+
+## 第一部分 python语言概述
+
+### 第1天：[初识Python](./1.1_初识python.md)
+
+- 程序语言和自然语言
+- Python简介 - Python的历史 / Python的优缺点 / Python的应用领域 / 蟒之禅（Python哲学）
+- 搭建编程环境 - Windows环境 / Linux环境 / MacOS环境
+- 从终端运行Python程序 - Hello, world / print函数 / 运行程序
+- 使用IDLE - 交互式环境(REPL) / 编写多行代码 / 运行程序 / 退出IDLE
+- 注释 - 注释的作用 / 单行注释 / 多行注释
+
+### 第2天：[Python基本语法](./1.2_python基本语法.md)
+
+- 语言元素
+  - 程序和进制 - 指令和程序 / 冯诺依曼机 / 二进制和十进制 / 八进制和十六进制
+  - 变量和类型 - 变量的命名 / 变量的使用 / input函数 / 检查变量类型 / 类型转换
+  - 数字和字符串 - 整数 / 浮点数 / 复数 / 字符串 / 字符串基本操作 / 字符编码
+  - 运算符 - 数学运算符 / 赋值运算符 / 比较运算符 / 逻辑运算符 / 身份运算符 / 运算符的优先级
+  - 应用案例 - 华氏温度转换成摄氏温度 / 输入圆的半径计算周长和面积 / 输入年份判断是否是闰年
+- 分支结构
+  - 分支结构的应用场景 - 条件 / 缩进 / 代码块 / 流程图
+  - if语句 - 简单的if / if-else结构 / if-elif-else结构 / 嵌套的if
+  - 应用案例 - 用户身份验证 / 英制单位与公制单位互换 / 掷骰子决定做什么 / 百分制成绩转等级制 / 分段函数求值 / 输入三条边的- 长度如果能构成三角形就计算周长和面积
+- 循环结构
+  - 循环结构的应用场景 - 条件 / 缩进 / 代码块 / 流程图
+  - while循环 - 基本结构 / break语句 / continue语句
+  - for循环 - 基本结构 / range类型 / 循环中的分支结构 / 嵌套的循环 / 提前结束程序
+  - 应用案例 - 1~100求和 / 判断素数 / 猜数字游戏 / 打印九九表 / 打印三角形图案 / 猴子吃桃 / 百钱百鸡
+- 构造程序逻辑
+  - 经典案例：水仙花数 / 百钱百鸡 / Craps赌博游戏
+  - 练习题目：斐波那契数列 / 完美数 / 素数
+- 函数和模块的使用
+  - 函数的作用 - 代码的坏味道 / 用函数封装功能模块
+  - 定义函数 - def语句 / 函数名 / 参数列表 / return语句 / 调用自定义函数
+  - 调用函数 - Python内置函数 / 导入模块和函数
+  - 函数的参数 - 默认参数 / 可变参数 / 关键字参数 / 命名关键字参数
+  - 函数的返回值 - 没有返回值 / 返回单个值 / 返回多个值
+  - 作用域问题 - 局部作用域 / 嵌套作用域 / 全局作用域 / 内置作用域 / 和作用域相关的关键字
+  - 用模块管理函数 - 模块的概念 / 用自定义模块管理函数 / 命名冲突的时候会怎样（同一个模块和不同的模块）
+
+### 第3天：[python数据结构](./1.3_python数据结构.md)
+
+- 字符串的使用 - 计算长度 / 下标运算 / 切片 / 常用方法
+- 列表基本用法 - 定义列表 / 用下表访问元素 / 下标越界 / 添加元素 / 删除元素 / 修改元素 / 切片 / 循环遍历
+- 列表常用操作 - 连接 / 复制(复制元素和复制数组) / 长度 / 排序 / 倒转 / 查找
+- 生成列表 - 使用range创建数字列表 / 生成表达式 / 生成器
+- 元组的使用 - 定义元组 / 使用元组中的值 / 修改元组变量 / 元组和列表转换
+- 集合基本用法 - 集合和列表的区别 / 创建集合 / 添加元素 / 删除元素 / 清空
+- 集合常用操作 - 交集 / 并集 / 差集 / 对称差 / 子集 / 超集
+- 字典的基本用法 - 字典的特点 / 创建字典 / 添加元素 / 删除元素 / 取值 / 清空
+- 字典常用操作 - keys()方法 / values()方法 / items()方法 / setdefault()方法
+- 基础练习 - 跑马灯效果 / 列表找最大元素 / 统计考试成绩的平均分 / Fibonacci数列 / 杨辉三角
+- 综合案例 - 双色球选号 / 井字棋
+
+### 第4天：[面向对象](./1.4_面向对象.md)
+
+- 类和对象 - 什么是类 / 什么是对象 / 面向对象其他相关概念
+- 定义类 - 基本结构 / 属性和方法 / 构造器 / 析构器 / __str__方法
+- 使用对象 - 创建对象 / 给对象发消息
+- 面向对象的四大支柱 - 抽象 / 封装 / 继承 / 多态
+- 基础练习 - 定义学生类 / 定义时钟类 / 定义图形类 / 定义汽车类
+- 属性 - 类属性 / 实例属性 / 属性访问器 / 属性修改器 / 属性删除器 / 使用__slots__
+- 类中的方法 - 实例方法 / 类方法 / 静态方法
+- 运算符重载 - \_\_add__ / \_\_sub__ / \_\_or__ /\_\_getitem__ / \_\_setitem__ / \_\_len__ / \_\_repr__ / \_\_gt__ / \_\_lt__ / \_\_le__ / \_\_ge__ / \_\_eq__ / \_\_ne__ / \_\_contains__
+- 类(的对象)之间的关系 - 关联 / 继承 / 依赖
+- 继承和多态 - 什么是继承 / 继承的语法 / 调用父类方法 / 方法重写 / 类型判定 / 多重继承 / 菱形继承(钻石继承)和C3算法
+- 综合案例 - 工资结算系统 / 图书自动折扣系统 / 自定义分数类
+
+### 第5天：[图形用户界面和游戏开发](./1.5_图形用户界面和游戏开发.md)
+
+- 使用tkinter开发GUI
+- 使用pygame三方库开发游戏应用
+- “大球吃小球”游戏
+
+### 第6天：[文件和异常](./1.6_文件和异常.md)
+
+- 读文件 - 读取整个文件 / 逐行读取 / 文件路径
+- 写文件 - 覆盖写入 / 追加写入 / 文本文件 / 二进制文件
+- 异常处理 - 异常机制的重要性 / try-except代码块 / else代码块 / finally代码块 / 内置异常类型 / 异常栈 / raise语句
+- 数据持久化 - CSV文件概述 / csv模块的应用 / JSON数据格式 / json模块的应用
+
+### 第7天：[字符串和正则表达式](./1.7_字符串和正则表达式.md)
+
+- 字符串高级操作 - 转义字符 / 原始字符串 / 多行字符串 / in和 not in运算符 / is开头的方法 / join和split方法 / strip相关方法 / pyperclip模块 / 不变字符串和可变字符串 / StringIO的使用
+- 正则表达式入门 - 正则表达式的作用 / 元字符 / 转义 / 量词 / 分组 / 零宽断言 /贪婪匹配与惰性匹配懒惰 / 使用re模块实现正则表达式操作（匹配、搜索、替换、捕获）
+- 使用正则表达式 - re模块 / compile函数 / group和groups方法 / match方法 / search方法 / findall和finditer方法 / sub和subn方法 / split方法
+- 应用案例 - 使用正则表达式验证输入的字符串
+
+### 第8天：[进程和线程](./1.8_进程和线程.md)
+
+- 进程和线程的概念 - 什么是进程 / 什么是线程 / 多线程的应用场景
+- 使用进程 - fork函数 / multiprocessing模块 / 进程池 / 进程间通信
+- 使用线程 - thread模块 / threading模块 / Thread类 / Lock类 / Condition类 / 线程池
+
+### 第9天：[网络编程入门](./1.9_网络编程入门.md)
+
+- 计算机网络基础 - 计算机网络发展史 / “TCP-IP”模型 / IP地址 / 端口 / 协议 / 其他相关概念
+- 网络应用模式 - “客户端-服务器”模式 / “浏览器-服务器”模式
+- 基于HTTP协议访问网络资源 - 网络API概述 / 访问URL / requests模块 / 解析JSON格式数据
+- Python网络编程 - 套接字的概念 / socket模块 / socket函数 / 创建TCP服务器 / 创建TCP客户端 / 创建UDP服务器 / 创建UDP客户端 / SocketServer模块
+- 电子邮件 - SMTP协议 / POP3协议 / IMAP协议 / smtplib模块 / poplib模块 / imaplib模块
+- 短信服务 - 调用短信服务网关
+
+### 第10天：[图像和文档处理](./1.10_图像和文档处理.md)
+
+- 用Pillow处理图片 - 图片读写 / 图片合成 / 几何变换 / 色彩转换 / 滤镜效果
+- 读写Word文档 - 文本内容的处理 / 段落 / 页眉和页脚 / 样式的处理
+- 读写Excel文件 - xlrd模块 / xlwt模块
+- 生成PDF文件 - pypdf2模块 / reportlab模块
+
+### 第11天：[Python语言进阶](./1.11_Python语言进阶.md)
+
+## 第二部分 b/s开发
+
+### 第1天：[Django快速上手](./2.1_Django快速上手.md)
+
+- Web应用工作原理和HTTP协议
+- Django框架概述
+- 5分钟快速上手
+- 使用视图模板
+- 关系型数据库配置
+- 管理后台的使用
+- 使用ORM完成对模型的CRUD操作
+- Django模型最佳实践
+- 模型定义参考
+
+### 第2天：[Ajax和表单](./2.2_Ajax和表单.md)
+
+- 加载静态资源
+- 用Ajax请求获取数据
+- 表单和表单控件
+- 跨站请求伪造和CSRF令牌
+- Form和ModelForm
+- 表单验证
+
+### 第3天：[身份认证&报表&日志&中间件](./2.3_身份认证&报表&日志&中间件.md)
+
+- 实现用户跟踪
+- cookie和session的关系
+- Django框架对session的支持
+- 视图函数中的cookie读写操作
+- 通过HttpResponse修改响应头
+- 使用StreamingHttpResponse处理大文件
+- 使用xlwt生成Excel报表
+- 使用reportlab生成PDF报表
+- 使用ECharts生成前端图表
+- 配置日志和Django-Debug-Toolbar
+
+### 第4天：[前后端分离](./2.4_前后端分离.md)
+
+### 第5天：[RESTful架构和DRF](./2.5_RESTful架构和DRF.md)
+
+### 第6天：[使用缓存](./2.6_使用缓存.md)
+
+- 网站优化第一定律
+- 在Django项目中使用Redis提供缓存服务
+- 在视图函数中读写缓存
+- 使用装饰器实现页面缓存
+- 为数据接口提供缓存服务
+
+### 第7天：[上传 & 通知](./2.7_上传&通知.md)
+
+- 文件上传表单控件和图片文件预览
+- 服务器端如何处理上传的文件
+- 富文本编辑器概述
+- wangEditor的使用
+- 常用短信网关平台介绍
+- 使用螺丝帽发送短信
+- Django框架对邮件服务的支持
+
+### 第8天：[异步任务和定时任务](./2.8_异步任务和定时任务.md)
+
+- 网站优化第二定律
+- 配置消息队列服务
+- 在项目中使用celery实现任务异步化
+- 在项目中使用celery实现定时任务
+
+### 第9天：[单元测试和项目上线](./2.9_单元测试和项目上线.md)
+
+- Python中的单元测试
+- Django框架对单元测试的支持
+- 使用版本控制系统
+- 配置和使用uWSGI
+- 动静分离和Nginx配置
+- 配置HTTPS
+
+### 第10天：[Flask入门](./2.10_Flask入门.md)
+
+- 安装
+- 快速上手
+- 模板的使用
+- 表单的处理
+- 数据库操作
+- 项目实战
+
+### 第11天：[实战Tornado](./2.11_实战Tornado.md)
+
+1. 预备知识 - 并发编程 | I/O模式和事件驱动
+2. Tornado入门 - 5分钟上手 | 路由解析 | 请求处理器
+3. 异步化 - aiomysql和aioredis的使用
+4. WebSocket的应用 - 简介 | 服务器端 | 客户端 | 项目：Web聊天室
+5. 项目实战
+
+   - 前后端分离开发和接口文档的撰写
+   - 使用Vue.js实现前端渲染
+   - 使用ECharts实现报表功能
+   - 使用WebSocket实现推送服务
+
+## 第三部分 [爬虫开发](./3_爬虫开发.md)
+
+### 第1天：[网络爬虫和相关工具](./3.1_网络爬虫和相关工具.md)
+
+- 网络爬虫的概念及其应用领域
+- 网络爬虫的合法性探讨
+- 开发网络爬虫的相关工具
+- 一个爬虫程序的构成
+- 数据采集的标准和三方库
+- 页面解析的三种方式：正则表达式解析 / XPath解析 / CSS选择器解析
+
+### 第2天：[存储数据和并发下载](./3.2_存储数据和并发下载.md)
+
+- 如何存储海量数据
+- 实现数据的缓存
+- 多线程和多进程
+- 异步I/O和协程
+- async和await关键字的使用
+- 三方库aiohttp的应用
+
+### 第3天：[解析动态内容 & 表单交互 & 验证码处理](./3.3_解析动态内容&表单交互&验证码处理.md)
+
+- JavaScript逆向工程
+- 使用Selenium获取动态内容
+- 自动提交表单
+- Cookie池的应用
+- 验证码处理
+
+### 第4天：[Scrapy爬虫应用](./3.4_Scrapy爬虫应用.md)
+
+- Scrapy爬虫框架概述
+- 安装和使用Scrapy
+- Spider的用法
+- 中间件的应用：下载中间件 / 蜘蛛中间件
+- Scrapy对接Selenium抓取动态内容
+- Scrapy部署到Docker
+- 分布式爬虫的原理
+- Scrapy分布式实现
+- 使用Scrapyd实现分布式部署
+
+### 第5天：[爬虫项目实战](。/3.5_爬虫项目实战.md)
+
+- 爬取招聘网站数据
+- 爬取房地产行业数据
+- 爬取二手车交易平台数据
+
+## 第四部分 数据处理和机器学习
+
+### 第1天：机器学习基础
+
+### 第2天：[Pandas](./4.2_Pandas.md)
+
+### 第3天：[NumPy和SciPy的应用](./4.3_NumPy和SciPy的应用.md)
+
+### 第4天：Matplotlib和数据可视化
+
+### 第5天：k最近邻(KNN)分类
+
+### 第6天：决策树
+
+### 第7天：贝叶斯分类
+
+### 第8天：支持向量机(SVM)
+
+### 第9天：K-均值聚类
+
+### 第10天：回归分析
+
+### 第11天：大数据分析入门
+
+### 第12天：大数据分析进阶
+
+### 第13天：Tensorflow入门
+
+### 第14天：Tensorflow实战
+
+### 第15天：推荐系统
+
+## 第五部分 项目总结和附录
+
+### 第1天：[附录](./Resource/5.1_附录.md)
+
+## 参考
+
+- [100天从新手到大师](https://github.com/jackfrued/Python-100-Days)
+
+
 
 
 
@@ -1883,6 +2189,803 @@ if __name__ == '__main__':
 如果希望获得更好的用户体验，我们还可以在游戏中加入背景音乐以及在球与球发生碰撞时播放音效，利用pygame的mixer和music模块，我们可以很容易的做到这一点，大家可以自行了解这方面的知识。
 
 事实上，想了解更多的关于pygame的知识，最好的教程是pygame的[官方网站](https://www.pygame.org/news)，如果英语没毛病就可以赶紧去看看啦。如果想开发[3D游戏](https://zh.wikipedia.org/wiki/3D%E6%B8%B8%E6%88%8F)，pygame就显得力不从心了，对3D游戏开发如果有兴趣的读者不妨看看[Panda3D](https://www.panda3d.org/)。
+
+
+
+### 进程和线程
+
+
+
+## 目录
+
+1. [Python中的多进程](#多进程)
+2. [Python中的多线程](#多线程)
+3. [Python中的协程](#协程)
+
+今天我们使用的计算机早已进入多CPU或多核时代，而我们使用的操作系统都是支持“多任务”的操作系统，这使得我们可以同时运行多个程序，也可以将一个程序分解为若干个相对独立的子任务，让多个子任务并发的执行，从而缩短程序的执行时间，同时也让用户获得更好的体验。因此在当下不管是用什么编程语言进行开发，实现让程序同时执行多个任务也就是常说的“并发编程”，应该是程序员必备技能之一。为此，我们需要先讨论两个概念，一个叫进程，一个叫线程。
+
+## 概念
+
+进程就是操作系统中执行的一个程序，操作系统以进程为单位分配存储空间，每个进程都有自己的地址空间、数据栈以及其他用于跟踪进程执行的辅助数据，操作系统管理所有进程的执行，为它们合理的分配资源。进程可以通过fork或spawn的方式来创建新的进程来执行其他的任务，不过新的进程也有自己独立的内存空间，因此必须通过进程间通信机制（IPC，Inter-Process Communication）来实现数据共享，具体的方式包括管道、信号、套接字、共享内存区等。
+
+一个进程还可以拥有多个并发的执行线索，简单的说就是拥有多个可以获得CPU调度的执行单元，这就是所谓的线程。由于线程在同一个进程下，它们可以共享相同的上下文，因此相对于进程而言，线程间的信息共享和通信更加容易。当然在单核CPU系统中，真正的并发是不可能的，因为在某个时刻能够获得CPU的只有唯一的一个线程，多个线程共享了CPU的执行时间。使用多线程实现并发编程为程序带来的好处是不言而喻的，最主要的体现在提升程序的性能和改善用户体验，今天我们使用的软件几乎都用到了多线程技术，这一点可以利用系统自带的进程监控工具（如macOS中的“活动监视器”、Windows中的“任务管理器”）来证实，如下图所示。
+
+![x](E:/WorkingDir/Office/python/Resource/macos-monitor.png)
+
+当然多线程也并不是没有坏处，站在其他进程的角度，多线程的程序对其他程序并不友好，因为它占用了更多的CPU执行时间，导致其他程序无法获得足够的CPU执行时间；另一方面，站在开发者的角度，编写和调试多线程的程序都对开发者有较高的要求，对于初学者来说更加困难。
+
+Python既支持多进程又支持多线程，因此使用Python实现并发编程主要有3种方式：多进程、多线程、多进程+多线程。
+
+## 多进程
+
+Unix和Linux操作系统上提供了`fork()`系统调用来创建进程，调用fork()函数的是父进程，创建出的是子进程，子进程是父进程的一个拷贝，但是子进程拥有自己的PID。fork()函数非常特殊它会返回两次，父进程中可以通过fork()函数的返回值得到子进程的PID，而子进程中的返回值永远都是0。Python的os模块提供了fork()函数。由于Windows系统没有fork()调用，因此要实现跨平台的多进程编程，可以使用`multiprocessing`模块的Process类来创建子进程，而且该模块还提供了更高级的封装，例如批量启动进程的进程池（Pool）、用于进程间通信的队列（Queue）和管道（Pipe）等。
+
+下面用一个下载文件的例子来说明使用多进程和不使用多进程到底有什么差别，先看看下面的代码。
+
+![x](./Codes/1.8.1_downloadSync.py)
+
+从上面的例子可以看出，如果程序中的代码只能按顺序一点点的往下执行，那么即使执行两个毫不相关的下载任务，也需要先等待一个文件下载完成后才能开始下一个下载任务，很显然这并不合理也没有效率。接下来我们使用多进程的方式将两个下载任务放到不同的进程中，代码如下所示。
+
+![x](./Codes/1.8.2_downloadMultiPros.py)
+
+在上面的代码中，我们通过`Process`类创建了进程对象，通过`target`参数我们传入一个函数来表示进程启动后要执行的代码，后面的`args`是一个元组，它代表了传递给函数的参数。`Process`对象的`start`方法用来启动进程，而`join`方法表示等待进程执行结束。运行上面的代码可以明显发现两个下载任务“同时”启动了，而且程序的执行时间将大大缩短，不再是两个任务的时间总和。
+
+我们也可以使用`subprocess`模块中的类和函数来创建和启动子进程，然后通过管道来和子进程通信，这些内容我们不在此进行讲解，有兴趣的读者可以自己了解这些知识。
+
+接下来我们将重点放在如何实现两个进程间的通信。我们启动两个进程，一个输出Ping，一个输出Pong，两个进程输出的Ping和Pong加起来一共10个。听起来很简单吧，但是如果[这样](./Codes/1.8.3_communication.py)写可是错的哦。
+
+看起来没毛病，但是最后的结果是Ping和Pong各输出了10个，Why？当我们在程序中创建进程的时候，子进程复制了父进程及其所有的数据结构，每个子进程有自己独立的内存空间，这也就意味着两个子进程中各有一个counter变量，所以结果也就可想而知了。要解决这个问题比较简单的办法是使用`multiprocessing`模块中的`Queue`类，它是可以被多个进程共享的队列，底层是通过管道和[信号量(semaphore)](https://github.com/jackfrued/Python-100-Days/blob/master/Day01-15)机制来实现的，有兴趣的读者可以自己尝试一下。
+
+## 多线程
+
+在Python早期的版本中就引入了`thread`模块（现在名为_thread）来实现多线程编程，然而该模块过于底层，而且很多功能都没有提供，因此目前的多线程开发我们推荐使用`threading`模块，该模块对多线程编程提供了更好的面向对象的封装。我们把刚才下载文件的例子用[多线程](./Codes/1.8.4_threading.py)的方式来实现一遍。
+
+我们可以直接使用`threading`模块的`Thread`类来创建线程，但是我们之前讲过一个非常重要的概念叫“继承”，我们可以从已有的类创建新类，因此也可以通过继承Thread类的方式来创建自定义的线程类，然后再创建线程对象并启动线程。查看[代码](./Codes/1.8.5_customthread.py)。
+
+因为多个线程可以共享进程的内存空间，因此要实现多个线程间的通信相对简单，大家能想到的最直接的办法就是设置一个全局变量，多个线程共享这个全局变量即可。但是当多个线程共享同一个变量（我们通常称之为“资源”）的时候，很有可能产生不可控的结果从而导致程序失效甚至崩溃。如果一个资源被多个线程竞争使用，那么我们通常称之为“临界资源”，对“临界资源”的访问需要加上保护，否则资源会处于“混乱”的状态。
+
+这个[例子](./Codes/1.8.6_resource.py)演示了100个线程向同一个银行账户转账（转入1元钱）的场景，在这个例子中，银行账户就是一个临界资源，在没有保护的情况下我们很有可能会得到错误的结果。
+
+运行程序，结果让人大跌眼镜，100个线程分别向账户中转入1元钱，结果居然远远小于100元。之所以出现这种情况是因为我们没有对银行账户这个“临界资源”加以保护，多个线程同时向账户中存钱时，会一起执行到`new_balance = self._balance + money`这行代码，多个线程得到的账户余额都是初始状态下的0，所以都是0上面做了+1的操作，因此得到了错误的结果。
+
+在这种情况下，“锁”就可以派上用场了。我们可以通过“锁”来保护“临界资源”，只有获得“锁”的线程才能访问“临界资源”，而其他没有得到“锁”的线程只能被阻塞起来，直到获得“锁”的线程释放了“锁”，其他线程才有机会获得“锁”，进而访问被保护的“临界资源”。这里的[代码](./Codes/1.8.7_lock.py)演示了如何使用“锁”来保护对银行账户的操作，从而获得正确的结果。
+
+比较遗憾的一件事情是Python的多线程并不能发挥CPU的多核特性，这一点只要启动几个执行死循环的线程就可以得到证实了。之所以如此，是因为Python的解释器有一个“全局解释器锁”(GIL)的东西，任何线程执行前必须先获得GIL锁，然后每执行100条字节码，解释器就自动释放GIL锁，让别的线程有机会执行，这是一个历史遗留问题，但是即便如此，就如我们之前举的例子，使用多线程在提升执行效率和改善用户体验方面仍然是有积极意义的。
+
+## 多进程还是多线程
+
+无论是多进程还是多线程，只要数量一多，效率肯定上不去，为什么呢？我们打个比方，假设你不幸正在准备中考，每天晚上需要做语文、数学、英语、物理、化学这5科的作业，每项作业耗时1小时。如果你先花1小时做语文作业，做完了，再花1小时做数学作业，这样，依次全部做完，一共花5小时，这种方式称为单任务模型。如果你打算切换到多任务模型，可以先做1分钟语文，再切换到数学作业，做1分钟，再切换到英语，以此类推，只要切换速度足够快，这种方式就和单核CPU执行多任务是一样的了，以旁观者的角度来看，你就正在同时写5科作业。
+
+但是，切换作业是有代价的，比如从语文切到数学，要先收拾桌子上的语文书本、钢笔（这叫保存现场），然后，打开数学课本、找出圆规直尺（这叫准备新环境），才能开始做数学作业。操作系统在切换进程或者线程时也是一样的，它需要先保存当前执行的现场环境（CPU寄存器状态、内存页等），然后，把新任务的执行环境准备好（恢复上次的寄存器状态，切换内存页等），才能开始执行。这个切换过程虽然很快，但是也需要耗费时间。如果有几千个任务同时进行，操作系统可能就主要忙着切换任务，根本没有多少时间去执行任务了，这种情况最常见的就是硬盘狂响，点窗口无反应，系统处于假死状态。所以，多任务一旦多到一个限度，反而会使得系统性能急剧下降，最终导致所有任务都做不好。
+
+是否采用多任务的第二个考虑是任务的类型，可以把任务分为计算密集型和I/O密集型。计算密集型任务的特点是要进行大量的计算，消耗CPU资源，比如对视频进行编码解码或者格式转换等等，这种任务全靠CPU的运算能力，虽然也可以用多任务完成，但是任务越多，花在任务切换的时间就越多，CPU执行任务的效率就越低。计算密集型任务由于主要消耗CPU资源，这类任务用Python这样的脚本语言去执行效率通常很低，最能胜任这类任务的是C语言，我们之前提到了Python中有嵌入C/C++代码的机制。
+
+除了计算密集型任务，其他的涉及到网络、存储介质I/O的任务都可以视为I/O密集型任务，这类任务的特点是CPU消耗很少，任务的大部分时间都在等待I/O操作完成（因为I/O的速度远远低于CPU和内存的速度）。对于I/O密集型任务，如果启动多任务，就可以减少I/O等待时间从而让CPU高效率的运转。有一大类的任务都属于I/O密集型任务，这其中包括了我们很快会涉及到的网络应用和Web应用。
+
+>说明：上面的内容和例子来自于廖雪峰官方网站的[《Python教程》](https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000)，因为对作者文中的某些观点持有不同的看法，对原文的文字描述做了适当的调整。
+
+## 协程
+
+协程(coroutine)，又称微线程，纤程，是一种用户级的轻量级线程。协程拥有自己的寄存器上下文和栈。协程调度切换时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈。因此协程能保留上一次调用时的状态，每次过程重入时，就相当于进入上一次调用的状态。在并发编程中，协程与线程类似，每个协程表示一个执行单元，有自己的本地数据，与其他协程共享全局数据和其他资源。
+
+协程需要用户自己来编写调度逻辑。对于CPU 来说，协程其实是单线程，所以CPU 不用去考虑怎么调度、切换上下文，这就省去了CPU的切换开销，所以协程在一定程度上又好于多线程。看一个[例子](./Codes/1.8.8_coroutine.py)
+
+## 单线程+异步I/O
+
+现代操作系统对I/O操作的改进中最为重要的就是支持异步I/O。如果充分利用操作系统提供的异步I/O支持，就可以用单进程单线程模型来执行多任务，这种全新的模型称为事件驱动模型。Nginx就是支持异步I/O的Web服务器，它在单核CPU上采用单进程模型就可以高效地支持多任务。在多核CPU上，可以运行多个进程（数量与CPU核心数相同），充分利用多核CPU。用Node.js开发的服务器端程序也使用了这种工作模式，这也是当下实现多任务编程的一种趋势。
+
+在Python语言中，单线程+异步I/O的编程模型称为协程，有了协程的支持，就可以基于事件驱动编写高效的多任务程序。协程最大的优势就是极高的执行效率，因为子程序切换不是线程切换，而是由程序自身控制，因此，没有线程切换的开销。协程的第二个优势就是不需要多线程的锁机制，因为只有一个线程，也不存在同时写变量冲突，在协程中控制共享资源不用加锁，只需要判断状态就好了，所以执行效率比多线程高很多。如果想要充分利用CPU的多核特性，最简单的方法是多进程+协程，既充分利用多核，又充分发挥协程的高效率，可获得极高的性能。关于这方面的内容，我稍后会做一个专题来进行讲解。
+
+## 应用案例
+
+### 例子1：将耗时间的任务放到线程中以获得更好的用户体验
+
+如下所示的界面中，有“下载”和“关于”两个按钮，用休眠的方式模拟点击“下载”按钮会联网下载文件需要耗费10秒的时间，如果不使用“多线程”，我们会发现，当点击“下载”按钮后整个程序的其他部分都被这个耗时间的任务阻塞而无法执行了，这显然是非常糟糕的用户体验，代码如下所示。
+
+```python
+import time
+import tkinter
+import tkinter.messagebox
+
+
+def download():
+    # 模拟下载任务需要花费10秒钟时间
+    time.sleep(10)
+    tkinter.messagebox.showinfo('提示', '下载完成!')
+
+
+def show_about():
+    tkinter.messagebox.showinfo('关于', '作者: 骆昊(v1.0)')
+
+
+def main():
+    top = tkinter.Tk()
+    top.title('单线程')
+    top.geometry('200x150')
+    top.wm_attributes('-topmost', True)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+如果使用多线程将耗时间的任务放到一个独立的线程中执行，这样就不会因为执行耗时间的任务而阻塞了主线程，修改后的代码如下所示。
+
+```python
+import time
+import tkinter
+import tkinter.messagebox
+from threading import Thread
+
+
+def main():
+
+    class DownloadTaskHandler(Thread):
+
+        def run(self):
+            time.sleep(10)
+            tkinter.messagebox.showinfo('提示', '下载完成!')
+            # 启用下载按钮
+            button1.config(state=tkinter.NORMAL)
+
+    def download():
+        # 禁用下载按钮
+        button1.config(state=tkinter.DISABLED)
+        # 通过daemon参数将线程设置为守护线程(主程序退出就不再保留执行)
+        # 在线程中处理耗时间的下载任务
+        DownloadTaskHandler(daemon=True).start()
+
+    def show_about():
+        tkinter.messagebox.showinfo('关于', '作者: 骆昊(v1.0)')
+
+    top = tkinter.Tk()
+    top.title('单线程')
+    top.geometry('200x150')
+    top.wm_attributes('-topmost', 1)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+### 例子2：使用多进程对复杂任务进行“分而治之”
+
+我们来完成1~100000000求和的计算密集型任务，这个问题本身非常简单，有点循环的知识就能解决，代码如下所示。
+
+```python
+from time import time
+
+
+def main():
+    total = 0
+    number_list = [x for x in range(1, 100000001)]
+    start = time()
+    for number in number_list:
+        total += number
+    print(total)
+    end = time()
+    print('Execution time: %.3fs' % (end - start))
+
+
+if __name__ == '__main__':
+    main()
+```
+
+在上面的代码中，我故意先去创建了一个列表容器然后填入了100000000个数，这一步其实是比较耗时间的，所以为了公平起见，当我们将这个任务分解到8个进程中去执行的时候，我们暂时也不考虑列表切片操作花费的时间，只是把做运算和合并运算结果的时间统计出来，代码如下所示。
+
+```python
+from multiprocessing import Process, Queue
+from random import randint
+from time import time
+
+
+def task_handler(curr_list, result_queue):
+    total = 0
+    for number in curr_list:
+        total += number
+    result_queue.put(total)
+
+
+def main():
+    processes = []
+    number_list = [x for x in range(1, 100000001)]
+    result_queue = Queue()
+    index = 0
+    # 启动8个进程将数据切片后进行运算
+    for _ in range(8):
+        p = Process(target=task_handler,
+                    args=(number_list[index:index + 12500000], result_queue))
+        index += 12500000
+        processes.append(p)
+        p.start()
+    # 开始记录所有进程执行完成花费的时间
+    start = time()
+    for p in processes:
+        p.join()
+    # 合并执行结果
+    total = 0
+    while not result_queue.empty():
+        total += result_queue.get()
+    print(total)
+    end = time()
+    print('Execution time: ', (end - start), 's', sep='')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+比较两段代码的执行结果（在我目前使用的MacBook上，上面的代码需要大概6秒左右的时间，而下面的代码只需要不到1秒的时间，再强调一次我们只是比较了运算的时间，不考虑列表创建及切片操作花费的时间），使用多进程后由于获得了更多的CPU执行时间以及更好的利用了CPU的多核特性，明显的减少了程序的执行时间，而且计算量越大效果越明显。当然，如果愿意还可以将多个进程部署在不同的计算机上，做成分布式进程，具体的做法就是通过multiprocessing.managers模块中提供的管理器将Queue对象通过网络共享出来（注册到网络上让其他计算机可以访问），这部分内容也留到爬虫的专题再进行讲解。
+
+
+
+### 网络编程
+
+# 网络编程入门
+
+## 计算机网络基础
+
+计算机网络是独立自主的计算机互联而成的系统的总称，组建计算机网络最主要的目的是实现多台计算机之间的通信和资源共享。今天计算机网络中的设备和计算机网络的用户已经多得不可计数，而计算机网络也可以称得上是一个“复杂巨系统”，对于这样的系统，我们不可能用一两篇文章把它讲清楚，有兴趣的读者可以自行阅读Andrew S.Tanenbaum老师的经典之作《计算机网络》或Kurose和Ross老师合著的《计算机网络:自顶向下方法》来了解计算机网络的相关知识。
+
+### 计算机网络发展史
+
+1. 1960s - 美国国防部ARPANET项目问世，奠定了分组交换网络的基础。
+
+   ![x](E:/WorkingDir/Office/python/Resource/arpanet.png)
+
+2. 1980s - 国际标准化组织（ISO）发布OSI/RM，奠定了网络技术标准化的基础。
+
+   ![x](E:/WorkingDir/Office/python/Resource/osimodel.png)
+
+3. 1990s - 英国人[蒂姆·伯纳斯-李](https://zh.wikipedia.org/wiki/%E6%8F%90%E5%A7%86%C2%B7%E6%9F%8F%E5%85%A7%E8%8C%B2-%E6%9D%8E)发明了图形化的浏览器，浏览器的简单易用性使得计算机网络迅速被普及。
+
+   在没有浏览器的年代，上网是这样的。
+
+   ![x](E:/WorkingDir/Office/python/Resource/before-browser.jpg)
+
+   有了浏览器以后，上网是这样的。
+
+   ![x](E:/WorkingDir/Office/python/Resource/after-browser.jpg)
+
+### TCP/IP模型
+
+实现网络通信的基础是网络通信协议，这些协议通常是由[互联网工程任务组(IETF)](https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E5%B7%A5%E7%A8%8B%E4%BB%BB%E5%8A%A1%E7%BB%84)制定的。所谓“协议”就是通信计算机双方必须共同遵从的一组约定，例如怎样建立连接、怎样互相识别等，网络协议的三要素是：语法、语义和时序。构成我们今天使用的Internet的基础的是TCP/IP协议族，所谓协议族就是一系列的协议及其构成的通信模型，我们通常也把这套东西称为TCP/IP模型。与国际标准化组织发布的OSI/RM这个七层模型不同，TCP/IP是一个四层模型，也就是说，该模型将我们使用的网络从逻辑上分解为四个层次，自底向上依次是：网络接口层、网络层、传输层和应用层，如下图所示。
+
+![x](E:/WorkingDir/Office/python/Resource/TCP-IP-model.png)
+
+IP通常被翻译为网际协议，它服务于网络层，主要实现了寻址和路由的功能。接入网络的每一台主机都需要有自己的IP地址，IP地址就是主机在计算机网络上的身份标识。当然由于IPv4地址的匮乏，我们平常在家里、办公室以及其他可以接入网络的公共区域上网时获得的IP地址并不是全球唯一的IP地址，而是一个[局域网（LAN）](https://zh.wikipedia.org/zh-hans/%E5%B1%80%E5%9F%9F%E7%BD%91)中的内部IP地址，通过[网络地址转换（NAT）服务](https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2)我们也可以实现对网络的访问。计算机网络上有大量的被我们称为“[路由器](https://zh.wikipedia.org/wiki/%E8%B7%AF%E7%94%B1%E5%99%A8)”的网络中继设备，它们会存储转发我们发送到网络上的数据分组，让从源头发出的数据最终能够找到传送到目的地通路，这项功能就是所谓的路由。
+
+TCP全称传输控制协议，它是基于IP提供的寻址和路由服务而建立起来的负责实现端到端可靠传输的协议，之所以将TCP称为可靠的传输协议是因为TCP向调用者承诺了三件事情：
+
+1. 数据不传丢不传错（利用握手、校验和重传机制可以实现）。
+2. 流量控制（通过滑动窗口匹配数据发送者和接收者之间的传输速度）。
+3. 拥塞控制（通过RTT时间以及对滑动窗口的控制缓解网络拥堵）。
+
+### 网络应用模式
+
+1. C/S模式和B/S模式。这里的C指的是Client（客户端），通常是一个需要安装到某个宿主操作系统上的应用程序；而B指的是Browser（浏览器），它几乎是所有图形化操作系统都默认安装了的一个应用软件；通过C或B都可以实现对S（服务器）的访问。关于二者的比较和讨论在网络上有一大堆的文章，在此我们就不再浪费笔墨了。
+2. 去中心化的网络应用模式。不管是B/S还是C/S都需要服务器的存在，服务器就是整个应用模式的中心，而去中心化的网络应用通常没有固定的服务器或者固定的客户端，所有应用的使用者既可以作为资源的提供者也可以作为资源的访问者。
+
+## 基于HTTP协议的网络资源访问
+
+### HTTP（超文本传输协议）
+
+HTTP是超文本传输协议（Hyper-Text Transfer Proctol）的简称，维基百科上对HTTP的解释是：超文本传输协议是一种用于分布式、协作式和超媒体信息系统的应用层协议，它是[万维网](https://zh.wikipedia.org/wiki/%E5%85%A8%E7%90%83%E8%B3%87%E8%A8%8A%E7%B6%B2)数据通信的基础，设计HTTP最初的目的是为了提供一种发布和接收[HTML](https://zh.wikipedia.org/wiki/HTML)页面的方法，通过HTTP或者[HTTPS](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE)（超文本传输安全协议）请求的资源由[URI（统一资源标识符）](https://zh.wikipedia.org/wiki/%E7%B5%B1%E4%B8%80%E8%B3%87%E6%BA%90%E6%A8%99%E8%AD%98%E7%AC%A6)来标识。关于HTTP的更多内容，我们推荐阅读阮一峰老师的[《HTTP 协议入门》](http://www.ruanyifeng.com/blog/2016/08/http.html)，简单的说，通过HTTP我们可以获取网络上的（基于字符的）资源，开发中经常会用到的网络API（有的地方也称之为网络数据接口）就是基于HTTP来实现数据传输的。
+
+### JSON格式
+
+JSON（JavaScript Object Notation）是一种轻量级的数据交换语言，该语言以易于让人阅读的文字（纯文本）为基础，用来传输由属性值或者序列性的值组成的数据对象。尽管JSON是最初只是Javascript中一种创建对象的字面量语法，但它在当下更是一种独立于语言的数据格式，很多编程语言都支持JSON格式数据的生成和解析，Python内置的json模块也提供了这方面的功能。由于JSON是纯文本，它和[XML](https://zh.wikipedia.org/wiki/XML)一样都适用于异构系统之间的数据交换，而相较于XML，JSON显得更加的轻便和优雅。下面是表达同样信息的XML和JSON，而JSON的优势是相当直观的。
+
+XML的例子：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<message>
+	<from>Alice</from>
+	<to>Bob</to>
+	<content>Will you marry me?</content>
+</message>
+```
+
+JSON的例子：
+
+```json
+{
+    "from": "Alice",
+    "to": "Bob",
+    "content": "Will you marry me?"
+}
+```
+
+### requests库
+
+requests是一个基于HTTP协议来使用网络的第三库，其[官方网站](http://cn.python-requests.org/zh_CN/latest/)有这样的一句介绍它的话：“Requests是唯一的一个**非转基因**的Python HTTP库，人类可以安全享用。”简单的说，使用requests库可以非常方便的使用HTTP，避免安全缺陷、冗余代码以及“重复发明轮子”（行业黑话，通常用在软件工程领域表示重新创造一个已有的或是早已被优化過的基本方法）。前面的文章中我们已经使用过这个库，下面我们还是通过requests来实现一个访问网络数据接口并从中获取美女图片下载链接然后下载美女图片到本地的例子程序，程序中使用了[天行数据](https://www.tianapi.com/)提供的网络API。
+
+我们可以先通过pip安装requests及其依赖库。
+
+```sh
+pip install requests
+```
+
+如果使用PyCharm作为开发工具，可以直接在代码中书写import requests，然后通过代码修复功能来自动下载安装requests。
+
+```py
+from time import time
+from threading import Thread
+
+import requests
+
+
+# 继承Thread类创建自定义的线程类
+class DownloadHanlder(Thread):
+
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+
+    def run(self):
+        filename = self.url[self.url.rfind('/') + 1:]
+        resp = requests.get(self.url)
+        with open('/Users/Hao/' + filename, 'wb') as f:
+            f.write(resp.content)
+
+
+def main():
+    # 通过requests模块的get函数获取网络资源
+    # 下面的代码中使用了天行数据接口提供的网络API
+    # 要使用该数据接口需要在天行数据的网站上注册
+    # 然后用自己的Key替换掉下面代码的中APIKey即可
+    resp = requests.get(
+        'http://api.tianapi.com/meinv/?key=APIKey&num=10')
+    # 将服务器返回的JSON格式的数据解析为字典
+    data_model = resp.json()
+    for mm_dict in data_model['newslist']:
+        url = mm_dict['picUrl']
+        # 通过多线程的方式实现图片下载
+        DownloadHanlder(url).start()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+## 基于传输层协议的套接字编程
+
+套接字这个词对很多不了解网络编程的人来说显得非常晦涩和陌生，其实说得通俗点，套接字就是一套用[C语言](https://zh.wikipedia.org/wiki/C%E8%AF%AD%E8%A8%80)写成的应用程序开发库，主要用于实现进程间通信和网络编程，在网络应用开发中被广泛使用。在Python中也可以基于套接字来使用传输层提供的传输服务，并基于此开发自己的网络应用。实际开发中使用的套接字可以分为三类：流套接字（TCP套接字）、数据报套接字和原始套接字。
+
+### TCP套接字
+
+所谓TCP套接字就是使用TCP协议提供的传输服务来实现网络通信的编程接口。在Python中可以通过创建socket对象并指定type属性为SOCK_STREAM来使用TCP套接字。由于一台主机可能拥有多个IP地址，而且很有可能会配置多个不同的服务，所以作为服务器端的程序，需要在创建套接字对象后将其绑定到指定的IP地址和端口上。这里的端口并不是物理设备而是对IP地址的扩展，用于区分不同的服务，例如我们通常将HTTP服务跟80端口绑定，而MySQL数据库服务默认绑定在3306端口，这样当服务器收到用户请求时就可以根据端口号来确定到底用户请求的是HTTP服务器还是数据库服务器提供的服务。端口的取值范围是0~65535，而1024以下的端口我们通常称之为“著名端口”（留给像FTP、HTTP、SMTP等“著名服务”使用的端口，有的地方也称之为“周知端口”），自定义的服务通常不使用这些端口，除非自定义的是HTTP或FTP这样的著名服务。
+
+下面的代码实现了一个提供时间日期的服务器。
+
+```py
+from socket import socket, SOCK_STREAM, AF_INET
+from datetime import datetime
+
+
+def main():
+    # 1.创建套接字对象并指定使用哪种传输服务
+    # family=AF_INET - IPv4地址
+    # family=AF_INET6 - IPv6地址
+    # type=SOCK_STREAM - TCP套接字
+    # type=SOCK_DGRAM - UDP套接字
+    # type=SOCK_RAW - 原始套接字
+    server = socket(family=AF_INET, type=SOCK_STREAM)
+    # 2.绑定IP地址和端口(端口用于区分不同的服务)
+    # 同一时间在同一个端口上只能绑定一个服务否则报错
+    server.bind(('192.168.1.2', 6789))
+    # 3.开启监听 - 监听客户端连接到服务器
+    # 参数512可以理解为连接队列的大小
+    server.listen(512)
+    print('服务器启动开始监听...')
+    while True:
+        # 4.通过循环接收客户端的连接并作出相应的处理(提供服务)
+        # accept方法是一个阻塞方法如果没有客户端连接到服务器代码不会向下执行
+        # accept方法返回一个元组其中的第一个元素是客户端对象
+        # 第二个元素是连接到服务器的客户端的地址(由IP和端口两部分构成)
+        client, addr = server.accept()
+        print(str(addr) + '连接到了服务器.')
+        # 5.发送数据
+        client.send(str(datetime.now()).encode('utf-8'))
+        # 6.断开连接
+        client.close()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+运行服务器程序后我们可以通过Windows系统的telnet来访问该服务器，结果如下图所示。
+
+```bat
+telnet 192.168.1.2 6789
+```
+
+![x](E:/WorkingDir/Office/python/Resource/telnet.png)
+
+当然我们也可以通过Python的程序来实现TCP客户端的功能，相较于实现服务器程序，实现客户端程序就简单多了，代码如下所示。
+
+```py
+from socket import socket
+
+
+def main():
+    # 1.创建套接字对象默认使用IPv4和TCP协议
+    client = socket()
+    # 2.连接到服务器(需要指定IP地址和端口)
+    client.connect(('192.168.1.2', 6789))
+    # 3.从服务器接收数据
+    print(client.recv(1024).decode('utf-8'))
+    client.close()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+需要注意的是，上面的服务器并没有使用多线程或者异步I/O的处理方式，这也就意味着当服务器与一个客户端处于通信状态时，其他的客户端只能排队等待。很显然，这样的服务器并不能满足我们的需求，我们需要的服务器是能够同时接纳和处理多个用户请求的。下面我们来设计一个使用多线程技术处理多个用户请求的服务器，该服务器会向连接到服务器的客户端发送一张图片。
+
+服务器端代码：
+
+```python
+from socket import socket, SOCK_STREAM, AF_INET
+from base64 import b64encode
+from json import dumps
+from threading import Thread
+
+
+def main():
+    
+    # 自定义线程类
+    class FileTransferHandler(Thread):
+
+        def __init__(self, cclient):
+            super().__init__()
+            self.cclient = cclient
+
+        def run(self):
+            my_dict = {}
+            my_dict['filename'] = 'guido.jpg'
+            # JSON是纯文本不能携带二进制数据
+            # 所以图片的二进制数据要处理成base64编码
+            my_dict['filedata'] = data
+            # 通过dumps函数将字典处理成JSON字符串
+            json_str = dumps(my_dict)
+            # 发送JSON字符串
+            self.cclient.send(json_str.encode('utf-8'))
+            self.cclient.close()
+
+    # 1.创建套接字对象并指定使用哪种传输服务
+    server = socket()
+    # 2.绑定IP地址和端口(区分不同的服务)
+    server.bind(('192.168.1.2', 5566))
+    # 3.开启监听 - 监听客户端连接到服务器
+    server.listen(512)
+    print('服务器启动开始监听...')
+    with open('guido.jpg', 'rb') as f:
+        # 将二进制数据处理成base64再解码成字符串
+        data = b64encode(f.read()).decode('utf-8')
+    while True:
+        client, addr = server.accept()
+        # 启动一个线程来处理客户端的请求
+        FileTransferHandler(client).start()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+客户端代码：
+
+```py
+from socket import socket
+from json import loads
+from base64 import b64decode
+
+
+def main():
+    client = socket()
+    client.connect(('192.168.1.2', 5566))
+    # 定义一个保存二进制数据的对象
+    in_data = bytes()
+    # 由于不知道服务器发送的数据有多大每次接收1024字节
+    data = client.recv(1024)
+    while data:
+        # 将收到的数据拼接起来
+        in_data += data
+        data = client.recv(1024)
+    # 将收到的二进制数据解码成JSON字符串并转换成字典
+    # loads函数的作用就是将JSON字符串转成字典对象
+    my_dict = loads(in_data.decode('utf-8'))
+    filename = my_dict['filename']
+    filedata = my_dict['filedata'].encode('utf-8')
+    with open('/Users/Hao/' + filename, 'wb') as f:
+        # 将base64格式的数据解码成二进制数据并写入文件
+        f.write(b64decode(filedata))
+    print('图片已保存.')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+在这个案例中，我们使用了JSON作为数据传输的格式（通过JSON格式对传输的数据进行了序列化和反序列化的操作），但是JSON并不能携带二进制数据，因此对图片的二进制数据进行了Base64编码的处理。Base64是一种用64个字符表示所有二进制数据的编码方式，通过将二进制数据每6位一组的方式重新组织，刚好可以使用0~9的数字、大小写字母以及“+”和“/”总共64个字符表示从000000到111111的64种状态。[维基百科](https://zh.wikipedia.org/wiki/Base64)上有关于Base64编码的详细讲解，不熟悉Base64的读者可以自行阅读。
+
+>说明： 上面的代码主要为了讲解网络编程的相关内容因此并没有对异常状况进行处理，请读者自行添加异常处理代码来增强程序的健壮性。
+
+### UDP套接字
+
+传输层除了有可靠的传输协议TCP之外，还有一种非常轻便的传输协议叫做用户数据报协议，简称UDP。TCP和UDP都是提供端到端传输服务的协议，二者的差别就如同打电话和发短信的区别，后者不对传输的可靠性和可达性做出任何承诺从而避免了TCP中握手和重传的开销，所以在强调性能和而不是数据完整性的场景中（例如传输网络音视频数据），UDP可能是更好的选择。可能大家会注意到一个现象，就是在观看网络视频时，有时会出现卡顿，有时会出现花屏，这无非就是部分数据传丢或传错造成的。在Python中也可以使用UDP套接字来创建网络应用，对此我们不进行赘述，有兴趣的读者可以自行研究。
+
+## 网络应用开发
+
+### 发送电子邮件
+
+在即时通信软件如此发达的今天，电子邮件仍然是互联网上使用最为广泛的应用之一，公司向应聘者发出录用通知、网站向用户发送一个激活账号的链接、银行向客户推广它们的理财产品等几乎都是通过电子邮件来完成的，而这些任务应该都是由程序自动完成的。
+
+就像我们可以用HTTP（超文本传输协议）来访问一个网站一样，发送邮件要使用SMTP（简单邮件传输协议），SMTP也是一个建立在TCP（传输控制协议）提供的可靠数据传输服务的基础上的应用级协议，它规定了邮件的发送者如何跟发送邮件的服务器进行通信的细节，而Python中的smtplib模块将这些操作简化成了几个简单的函数。
+
+下面的代码演示了如何在Python发送邮件。
+
+```python
+from smtplib import SMTP
+from email.header import Header
+from email.mime.text import MIMEText
+
+
+def main():
+    # 请自行修改下面的邮件发送者和接收者
+    sender = 'abcdefg@126.com'
+    receivers = ['uvwxyz@qq.com', 'uvwxyz@126.com']
+    message = MIMEText('用Python发送邮件的示例代码.', 'plain', 'utf-8')
+    message['From'] = Header('王大锤', 'utf-8')
+    message['To'] = Header('骆昊', 'utf-8')
+    message['Subject'] = Header('示例代码实验邮件', 'utf-8')
+    smtper = SMTP('smtp.126.com')
+    # 请自行修改下面的登录口令
+    smtper.login(sender, 'secretpass')
+    smtper.sendmail(sender, receivers, message.as_string())
+    print('邮件发送完成!')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+如果要发送带有附件的邮件，那么可以按照下面的方式进行操作。
+
+```python
+from smtplib import SMTP
+from email.header import Header
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+
+import urllib
+
+
+def main():
+    # 创建一个带附件的邮件消息对象
+    message = MIMEMultipart()
+    
+    # 创建文本内容
+    text_content = MIMEText('附件中有本月数据请查收', 'plain', 'utf-8')
+    message['Subject'] = Header('本月数据', 'utf-8')
+    # 将文本内容添加到邮件消息对象中
+    message.attach(text_content)
+
+    # 读取文件并将文件作为附件添加到邮件消息对象中
+    with open('/Users/Hao/Desktop/hello.txt', 'rb') as f:
+        txt = MIMEText(f.read(), 'base64', 'utf-8')
+        txt['Content-Type'] = 'text/plain'
+        txt['Content-Disposition'] = 'attachment; filename=hello.txt'
+        message.attach(txt)
+    # 读取文件并将文件作为附件添加到邮件消息对象中
+    with open('/Users/Hao/Desktop/汇总数据.xlsx', 'rb') as f:
+        xls = MIMEText(f.read(), 'base64', 'utf-8')
+        xls['Content-Type'] = 'application/vnd.ms-excel'
+        xls['Content-Disposition'] = 'attachment; filename=month-data.xlsx'
+        message.attach(xls)
+    
+    # 创建SMTP对象
+    smtper = SMTP('smtp.126.com')
+    # 开启安全连接
+    # smtper.starttls()
+    sender = 'abcdefg@126.com'
+    receivers = ['uvwxyz@qq.com']
+    # 登录到SMTP服务器
+    # 请注意此处不是使用密码而是邮件客户端授权码进行登录
+    # 对此有疑问的读者可以联系自己使用的邮件服务器客服
+    smtper.login(sender, 'secretpass')
+    # 发送邮件
+    smtper.sendmail(sender, receivers, message.as_string())
+    # 与邮件服务器断开连接
+    smtper.quit()
+    print('发送完成!')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+### 发送短信
+
+发送短信也是项目中常见的功能，网站的注册码、验证码、营销信息基本上都是通过短信来发送给用户的。在下面的代码中我们使用了[互亿无线](http://www.ihuyi.com/)短信平台（该平台为注册用户提供了50条免费短信以及常用开发语言发送短信的demo，可以登录该网站并在用户自服务页面中对短信进行配置）提供的API接口实现了发送短信的服务，当然国内的短信平台很多，读者可以根据自己的需要进行选择（通常会考虑费用预算、短信达到率、使用的难易程度等指标），如果需要在商业项目中使用短信服务建议购买短信平台提供的套餐服务。
+
+```python
+import urllib.parse
+import http.client
+import json
+
+
+def main():
+    host  = "106.ihuyi.com"
+    sms_send_uri = "/webservice/sms.php?method=Submit"
+    # 下面的参数需要填入自己注册的账号和对应的密码
+    params = urllib.parse.urlencode({'account': '你自己的账号', 'password' : '你自己的密码', 'content': '您的验证码是：147258。请不要把验证码泄露给其他人。', 'mobile': '接收者的手机号', 'format':'json' })
+    print(params)
+    headers = {'Content-type': 'application/x-www-form-urlencoded', 'Accept': 'text/plain'}
+    conn = http.client.HTTPConnection(host, port=80, timeout=30)
+    conn.request('POST', sms_send_uri, params, headers)
+    response = conn.getresponse()
+    response_str = response.read()
+    jsonstr = response_str.decode('utf-8')
+    print(json.loads(jsonstr))
+    conn.close()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+
+
+### 图像和文档处理
+
+# 
+
+用程序来处理图像和办公文档经常出现在实际开发中，Python的标准库中虽然没有直接支持这些操作的模块，但我们可以通过Python生态圈中的第三方模块来完成这些操作。
+
+## 操作图像
+
+### 计算机图像相关知识
+
+1. 颜色。如果你有使用颜料画画的经历，那么一定知道混合红、黄、蓝三种颜料可以得到其他的颜色，事实上这三种颜色就是被我们称为美术三原色的东西，它们是不能再分解的基本颜色。在计算机中，我们可以将红、绿、蓝三种色光以不同的比例叠加来组合成其他的颜色，因此这三种颜色就是色光三原色，所以我们通常会将一个颜色表示为一个RGB值或RGBA值（其中的A表示Alpha通道，它决定了透过这个图像的像素，也就是透明度）。
+
+   | 名称  | RGBA值               | 名称   | RGBA值             |
+   | ----- | -------------------- | ------ | ------------------ |
+   | White | (255, 255, 255, 255) | Red    | (255, 0, 0, 255)   |
+   | Green | (0, 255, 0, 255)     | Blue   | (0, 0, 255, 255)   |
+   | Gray  | (128, 128, 128, 255) | Yellow | (255, 255, 0, 255) |
+   | Black | (0, 0, 0, 255)       | Purple | (128, 0, 128, 255) |
+
+2. 像素。对于一个由数字序列表示的图像来说，最小的单位就是图像上单一颜色的小方格，这些小方块都有一个明确的位置和被分配的色彩数值，而这些一小方格的颜色和位置决定了该图像最终呈现出来的样子，它们是不可分割的单位，我们通常称之为像素（pixel）。每一个图像都包含了一定量的像素，这些像素决定图像在屏幕上所呈现的大小。
+
+### 用Pillow操作图像
+
+Pillow是由从著名的Python图像处理库PIL发展出来的一个分支，通过Pillow可以实现图像压缩和图像处理等各种操作。可以使用下面的命令来安装Pillow。
+
+```sh
+pip install pillow
+```
+
+Pillow中最为重要的是Image类，读取和处理图像都要通过这个类来完成。
+
+```py
+>>> from PIL import Image
+>>>
+>>> image = Image.open('./res/guido.jpg')
+>>> image.format, image.size, image.mode
+('JPEG', (500, 750), 'RGB')
+>>> image.show()
+```
+
+![x](E:/WorkingDir/Office/python/Resource/image-show.png)
+
+1. 剪裁图像
+
+   ```py
+   >>> image = Image.open('./res/guido.jpg')
+   >>> rect = 80, 20, 310, 360
+   >>> image.crop(rect).show()
+   ```
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-crop.png)
+
+2. 生成缩略图
+
+   ```py
+   >>> image = Image.open('./res/guido.jpg')
+   >>> size = 128, 128
+   >>> image.thumbnail(size)
+   >>> image.show()
+   ```
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-thumbnail.png)
+
+3. 缩放和黏贴图像
+
+   ```py
+   >>> image1 = Image.open('./res/luohao.png')
+   >>> image2 = Image.open('./res/guido.jpg')
+   >>> rect = 80, 20, 310, 360
+   >>> guido_head = image2.crop(rect)
+   >>> width, height = guido_head.size
+   >>> image1.paste(guido_head.resize((int(width / 1.5), int(height / 1.5))), (172, 40))
+   ```
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-paste.png)
+
+4. 旋转和翻转
+
+   ```py
+   >>> image = Image.open('./res/guido.png')
+   >>> image.rotate(180).show()
+   >>> image.transpose(Image.FLIP_LEFT_RIGHT).show()
+   ```
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-rotate.png)
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-transpose.png)
+
+5. 操作像素
+
+   ```py
+   >>> image = Image.open('./res/guido.jpg')
+   >>> for x in range(80, 310):
+   ...     for y in range(20, 360):
+   ...         image.putpixel((x, y), (128, 128, 128))
+   ... 
+   >>> image.show()
+   ```
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-putpixel.png)
+
+6. 滤镜效果
+
+   ```py
+   >>> from PIL import Image, ImageFilter
+   >>>
+   >>> image = Image.open('./res/guido.jpg')
+   >>> image.filter(ImageFilter.CONTOUR).show()
+   ```
+
+   ![x](E:/WorkingDir/Office/python/Resource/image-filter.png)
+
+## 处理Excel电子表格
+
+Python的openpyxl模块让我们可以在Python程序中读取和修改Excel电子表格，当然实际工作中，我们可能会用LibreOffice Calc和OpenOffice Calc来处理Excel的电子表格文件，这就意味着openpyxl模块也能处理来自这些软件生成的电子表格。关于openpyxl的使用手册和使用文档可以查看它的[官方文档](https://openpyxl.readthedocs.io/en/stable/#)。
+
+## 处理Word文档
+
+利用python-docx模块，Pytho 可以创建和修改Word文档，当然这里的Word文档不仅仅是指通过微软的Office软件创建的扩展名为docx的文档，LibreOffice Writer和OpenOffice Writer都是免费的字处理软件。
+
+## 处理PDF文档
+
+PDF是Portable Document Format的缩写，使用.pdf作为文件扩展名。接下来我们就研究一下如何通过Python实现从PDF读取文本内容和从已有的文档生成新的PDF文件。
+
+
+
+### 异步任务和定时任务
 
 
 
