@@ -1,6 +1,6 @@
 # 目录
 
-1. 简介
+1. 理论
    - [镜像命令](#镜像命令)
    - [容器命令](#容器命令)
      - [生命周期](#生命周期)
@@ -16,6 +16,10 @@
    - [Windows容器](#Windows容器)
    - [基于Docker的DevOps方案](#基于Docker的DevOps方案)
    - [容器云平台的构建实践](#容器云平台的构建实践)
+
+4. 升华
+
+
 
 ## 简介
 
@@ -2719,3 +2723,17 @@ docker-machine create --driver virtualbox myvm2
 ```
 
 如果报错：`yum -y install kernel-devel-3.10.0-862.el7.x86_64`
+
+***\*参考\****
+
+[容器在2019年必将碾压VMware ！](https://mp.weixin.qq.com/s/vl3fmI1-vVWhWn5T6TZ31Q)
+
+知乎 [点击链接](https://www.zhihu.com/question/28300645)
+
+谷歌图片 [点击链接](#imgrc=gziAQRUGLNM7rM:)
+
+Docker官网 [点击链接](https://www.docker.com/what-docker)
+
+Docker的一本电子书（英文资源可能需要科学上网）[点击链接](https://www.tutorialspoint.com/docker/docker_tutorial.pdf)
+
+Docker教程 [点击链接](http://www.runoob.com/docker/docker-tutorial.html)
