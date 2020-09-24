@@ -1,29 +1,322 @@
 # 目录
 
 1. 理论
-   - [镜像命令](#镜像命令)
-   - [容器命令](#容器命令)
+
+2. 实战
+   
+   - [安装](#安装)
+   - [MySQL示例](#MySQL示例)
+   - [wordpress示例](#wordpress示例)
+   - [常用命令](#常用命令)
      - [生命周期](#生命周期)
      - [查看日志](#查看日志)
    - [数据管理](#数据管理)
    - [网络模式](#网络模式)
-2. 实战
-   - [搭建私有镜像仓库](#搭建私有镜像仓库)
    - [docker-compose](#docker-compose)
    - [docker-machine](#docker-machine)
+   
+   - [搭建私有镜像仓库](#搭建私有镜像仓库)
+   
 3. 总结
    - [常见问题](#常见问题)
    - [Windows容器](#Windows容器)
    - [基于Docker的DevOps方案](#基于Docker的DevOps方案)
    - [容器云平台的构建实践](#容器云平台的构建实践)
+   - [参考](#参考)
 
 4. 升华
 
 
 
-## 简介
+## 理论
+
+[Docker](https://www.docker.com/) 是一个开源的引擎，可以轻松的为任何应用创建一个轻量级的、可移植的、自给自足的容器。
+
+- 创始人Solomon Hykes，法国dotCloud公司
+
+- 2013年3月以 Apache2.0 协议开源，在 [GitHub上](https://github.com/docker/docker) 维护
+
+- 使用 Go 语言实现，在Linux操作系统上提供了一个软件抽象层和操作系统层虚拟化的自动管理机制。
+
+  > Docker 利用了 Linux 的资源分托机制（cgroups 以及 namespace）来创建独立的软件容器。Linux 对 namespace（命名空间）的支持完全隔离工作环境中的应用程序，包括进程树，网络，用户ID挂载文件系统；而 cgroups 则提供了资源隔离，包括CPU，内存等。
+
+- 初衷：创建软件程序可移植的轻量容器，让软件可以在任何安装了 Docker 的主机上运行，而不用关心底层操作系统。
+
+**简单类比：**
+
+20 世纪 50 年代，还没有处理器这个词，而复印机无处不在（某种程度上）。假设你负责按要求快速发出成批的信件、将这些信件邮寄给客户、使用纸张和信封以物理方式寄送到每个客户的地址（那时还没有电子邮件）。在某个时候，你意识到，这些信件只是由一大组段落组合而成的，根据信件的用途对其进行所需的选取和排列，因此，你设计了一个系统，以快速发送这些信件，希望能大幅提高效率。这个系统很简单：
+
+1. 先从一副透明薄片开始，每个薄片包含一个段落。
+
+2. 若要发送一组信件，你选择包含所需段落的薄片，然后堆栈并对齐它们，使其外观一致且易于阅读。
+
+3. 最后，你将其置于复印机中并按开始，以生成所需的多个信件。
+
+简而言之，这就是 Docker 的核心理念。在 Docker 中，**每层都是在执行命令（例如，安装程序）后在文件系统所发生的一组更改**。因此，当你在复制层后“查看”文件系统时，你将看到所有文件，包括在安装程序时的层。你可以将映像视为要在“计算机”中安装的辅助只读硬盘，其中操作系统已经安装。同样，你可以将容器视为已安装映像硬盘的“计算机”。与计算机一样，可以打开或关闭容器电源。
+
+**优越性：**如果你在一台机器上可以开10个虚拟机，那么用 docker 可以开100个容器！
+
+**基本概念：**
+
+- 虚拟化：一种资源管理技术，将计算机的各种实体资源予以抽象、转换后呈现出来，打破实体结构间的不可切割的障碍，使用户可以比原本的配置更好的方式来应用这些资源。
+
+  这些资源的新虚拟部分是不受现有资源的架设方式，地域或物理配置所限制。一般所指的虚拟化资源包括计算能力和数据存储。
+
+- 系统虚拟化，Hypervisor Virtualization，全虚拟化。
+
+  在 Host 中通过 Hypervisor 层实现安装多个 GuestOS，每个 GuestOS 都有自己的内核，和主机的内核不同，GuestOS 之间完全隔离。
+
+- 容器虚拟化，Operating System Virtualization ，使用 Linux 内核中的 namespaces 和 cgroups 实现进程组之间的隔离。是用内核技术实现的隔离，所以它是一个共享内核的虚拟化技术。
+
+  容器虚拟化没有 GuestOS，使用 Docker 时下载的镜像，只是为运行 App 提供的一个依赖的环境，是一个删减版本的系统镜像。**一般情况下系统虚拟化没有容器虚拟化的运行效率高，但是系统安全性高很多**。
+
+![x](./Resources/docker7.png)
+
+注册一个docker账号：[https://hub.docker.com/](https://hub.docker.com/)
+
+**为什么使用Docker？**
+
+Docker是一种新兴的虚拟化方式，但是，Docker不是虚拟机。传统的虚拟机是先虚拟硬件资源，然后在虚拟的硬件资源之上运行操作系统。而Docker容器作为一个进程，直接运行于宿主主机内核，因此Docker更加快捷。
+
+Docker具有很多优势：
+
+- 高效利用系统资源（没有虚拟硬件的额外开销）。
+- 更快的启动时间（通常可以在1秒内启动）。
+- 便于部署（镜像包含了应用和相关依赖，可以运行在任何配置了Docker的主机上）。
+- 轻松迁移。
+- 分层存储，提高存储效率。
+
+![x](./Resources/docker8.png)
+
+
+
+![x](./Resources/docker9.png)
+
+**Docker术语**
+
+- **存储库(repo)**：相关的 Docker 映像集合，带有指示映像版本的标记。某些存储库包含特定映像的多个变量，例如包含 SDK（较重）的映像，包含唯一运行时（较轻）的映像等等。这些变量可以使用标记进行标记。单个存储库中可包含平台变量，如 Linux 映像和 Windows 映像。
+
+- **注册表**：提供存储库访问权限的服务。大多数公共映像的默认注册表是[Docker 中心](https://hub.docker.com/)（归作为组织的 Docker 所有）。注册表通常包含来自多个团队的存储库。公司通常使用私有注册表来存储和管理其创建的映像。 另一个示例是 Azure 容器注册表。
+
+- **Docker中心**：上传并使用映像的公共注册表。 Docker 中心提供 Docker 映像托管、公共或私有注册表，生成触发器和 Web 挂钩，以及与 GitHub 和 Bitbucket 集成。
+
+- **Azure容器注册表**：用于在 Azure 中使用 Docker 映像及其组件的公共资源。这提供了与 Azure 中的部署接近的注册表，使你可以控制访问权限，从而可以使用 Azure Active Directory 组和权限。
+
+- **Docker受信任注册表(DTR)**：Docker注册表服务（来自Docker），可以安装在本地，因此它存在于组织的数据中心和网络中。这对于应该在企业内部管理的私有映像来说很方便。Docker受信任注册表是Docker数据中心产品的一部分。有关详细信息，请参阅[Docker受信任注册表(DTR)](https://docs.docker.com/docker-trusted-registry/overview/)。
+
+- **Docker社区版(CE)**：适用于 Windows 和 macOS、用于在本地生成、运行和测试容器的开发工具。适用于 Windows 的 Docker CE 为 Linux 和 Windows 容器提供了开发环境。Windows 上的 Linux Docker 主机基于 [Hyper-V](https://www.microsoft.com/cloud-platform/server-virtualization)虚拟机。适用于 Windows 容器的主机直接基于 Windows。适用于 Mac 的 Docker CE 基于 Apple 虚拟机监控程序框架和[xhyve虚拟机监控程序](https://github.com/mist64/xhyve)，在 Mac OS X 上提供了 Linux Docker 主机虚拟机。适用于 Windows 和 Mac 的 Docker CE 替换了 Docker 工具箱，后者基于 Oracle VirtualBox。
+
+- **Docker企业版(EE)**：适用于 Linux 和 Windows 开发的 Docker 工具企业级版本。
+
+
+
+## 实战
+
+
+
+### 安装
+
+**环境介绍：**
+
+操作系统：64bit CentOS7
+docker版本：最新版本
+版本新功能：[https://github.com/docker/docker/blob/master/CHANGELOG.md](https://github.com/docker/docker/blob/master/CHANGELOG.md)
+
+**安装步骤：**
 
 ```sh
+# 查看当前内核版本
+uname -r
+# 更改网卡配置
+vi /etc/sysconfig/network-scripts/ifcfg-enp0s3  
+---
+ONBOOT=yes
+---  
+# 更改完后重启服务：
+service network restart  
+# 注意：如果ifconfig命令不识别的话需要安装：  
+yum install net-tools
+```
+
+**阿里云安装：**
+
+1、确保服务器连网，配置网络Yum源，安装docker需要extra源
+
+```sh
+cd /etc/yum.repos.d/
+# 将阿里云的Centos-7.repo下载保存到该目录
+wget http://mirrors.aliyun.com/repo/Centos-7.repo
+sed -i 's/$releasever/7/g' Centos-7.repo
+```
+
+2、安装Docker依赖
+
+```sh
+yum install -y yum-utils device-mapper-persistent-data lvm2
+```
+
+3、配置Docker的Yum源
+
+```sh
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum-config-manager --enable docker-ce-nightly
+yum-config-manager --enable docker-ce-test
+yum-config-manager --disable docker-ce-nightly
+```
+
+4、安装Docker CE
+
+```sh
+yum -y install docker-ce docker-ce-cli containerd.io
+```
+
+5、启动Docker
+
+```sh
+systemctl start docker
+# 查看docker安装版本信息
+docker info
+```
+
+另一种：
+
+```sh
+# 增加docker的yum源
+vi /etc/yum.repos.d/docker.repo
+--------------------------------------------------------------------
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/        
+enabled=1        
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+--------------------------------------------------------------------
+# 安装docker
+yum install docker-engine
+```
+
+**加速器：**
+
+注册：[daocloud](https://www.daocloud.io/) 或者 [阿里巴巴](#/accelerator) 这里我用的是daocloud
+
+```sh
+curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://b81aace9.m.daocloud.io
+```
+
+**配置**
+
+docker配置（docker控制应该有个专门的用户）：
+
+```sh
+adduser Colin #添加用户
+passwd Colin #更改密码
+su Colin #切换用户
+#将用户Colin加入sudo files
+sudo groupadd docker     #添加docker用户组
+sudo gpasswd -a $USER docker     #将登陆用户加入到docker用户组中
+newgrp docker     #更新用户组
+docker ps    #测试docker命令是否可以使用sudo正常使用
+# 验证在不使用sudo的情况下docker是否正常工作：
+docker run hello-world
+# 设置docker开机启动
+chkconfig docker on
+```
+
+**卸载**
+
+```sh
+# 查看安装包
+yum list installed | grep docker
+# 移除安装包：
+sudo yum -y remove docker-engine.x86_64
+# 清除所有docker依赖文件：
+rm -rf /var/lib/docker
+# 删除用户创建的配置文件
+```
+
+
+
+### MySQL示例
+
+```sh
+# 运行命令
+docker run --name colin-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1234 -itd mysql:5.7
+# 进入MySQL容器
+docker exec -it colin-mysql /bin/bash
+# 进入MySQL
+mysql -u root -p
+```
+
+docker run是启动容器的命令；  
+
+- --name：指定了容器的名称，方便之后进入容器的命令行  
+- -itd：其中，i是交互式操作，t是一个终端，d指的是在后台运行  
+- -p：指在本地生成一个随机端口，用来映射mysql的3306端口  
+- -e：设置环境变量 `MYSQL_ROOT_PASSWORD=emc123123`：指定了mysql的root密码  
+- mysql：指运行mysql镜像
+
+**进行配置，使外部工具可以连接：**
+
+```sql
+-- 设置root帐号的密码：
+update user set authentication_string = password('1234') where user = 'root';
+-- 接着，由于mysql中root执行绑定在了localhost，因此需要对root进行授权
+grant all privileges on *.* to 'root'@'%' identified by '1234' with grant option;
+flush privileges;
+```
+
+
+
+### wordpress示例
+
+```sh
+# 1. 准备目录
+mkdir myblog && cd myblog
+# 2. 编辑文件
+vi docker-compose.yml
+----------------------------------------------------------
+version: '2'
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: your-mysql-root-password
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     volumes:
+        - wp_site:/var/www/html
+     ports:
+       - "80:80"
+       - "443:443"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+volumes:
+    db_data:
+    wp_site:
+----------------------------------------------------------
+# 3. 执行安装命令
+docker-compose up -d
+```
+
+
+
+### 常用命令
+
+
+
+```sh
+
 # 启动docker服务
 service docker start
 # 查看帮助信息
@@ -39,6 +332,8 @@ Docker环境信息|info、version
 容器运维操作|attach、export、inspect、port、ps、rename、stats、top、wait、cp、diff、update
 容器资源管理|volume、network
 系统日志信息| events、history、logs
+
+
 
 ### 镜像命令
 
@@ -1496,6 +1791,219 @@ Docker 日志机制已经没有什么技巧可以优化。这个也证明了容�
 - [HA AlertManager setup (slide)](http://calcotestudios.com/talks/slides-understanding-and-extending-prometheus-alertmanager.html#/1/9)
 - [https://fabxc.org/tsdb/](https://fabxc.org/tsdb/)
 
+
+
+### docker-compose
+
+Docker Compose 是一个用来定义和运行复杂应用的 Docker 工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器（通过 docker-compose.yml 配置）。
+
+**安装：**
+
+```sh
+curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# 授予执行权限
+chmod +x /usr/local/bin/docker-compose
+```
+
+**卸载：**
+
+```sh
+rm /usr/local/bin/docker-compose
+```
+
+**命令：**
+
+1、Docker compose 的使用非常类似于 docker 命令的使用，但是需要注意的是**大部分的 compose 命令都需要到 docker-compose.yml 文件所在的目录下才能执行**。
+
+2、compose 以守护进程模式运行加 `-d` 选项。服务状态：Up
+
+```sh
+docker-compose up -d
+docker-compose -f docker-compose.yml up -d
+```
+
+3、查看有哪些服务，使用 `docker-compose ps` 命令，非常类似于 docker 的 ps 命令。
+
+4、查看 compose 日志
+
+```sh
+docker-compose logs web
+docker-compose logs redis
+```
+
+5、停止 compose 服务。服务状态：Exit 0（所有关联的活动容器也被停止）
+
+```sh
+docker-compose stop
+docker-compose ps
+```
+
+6、重启 compose 服务
+
+```sh
+docker-compose restart
+docker-compose ps
+```
+
+7、`kill compose` 服务。服务状态：Exit 137
+
+```sh
+docker-compose kill
+docker-compose ps
+```
+
+8、删除 compose 服务（删除所有已停止的关联容器）
+
+```sh
+docker-compose rm
+```
+
+9、帮助命令
+
+```sh
+docker-compose --help
+```
+
+>注意：yaml文件里不能有tab，只能有空格。关于 version 与 Docker 版本的关系如下：
+
+| Compose file format | Docker engine |
+| ------------------- | ------------- |
+| 1                   | 1.9.0+        |
+| 2.0                 | 1.10.0+       |
+| 2.1                 | 1.12.0+       |
+| 2.2, 3.0, 3.1, 3.2  | 1.13.0+       |
+| 2.3, 3.3, 3.4, 3.5  | 17.06.0+      |
+| 2.4                 | 17.12.0+      |
+| 3.6                 | 18.02.0+      |
+| 3.7                 | 18.06.0+      |
+
+
+
+### docker-machine
+
+**1、什么是 Docker Machine？**
+
+Docker Machine是一个工具，它可以帮你在虚拟主机安装 docker，并且通过 `docker-machine` 相关命令控制主机。你可以用 docker machine 在 mac、windows、单位的网络、数据中心、云提供商（AWS 或 Digital Ocean）创建 docker 主机。
+
+通过 docker-machine commands，你能启动、进入、停止、重启主机，也可以升级 docker，还可以配置 docker client。
+
+**2、为什么要用 Docker Machine？**
+
+Docker Machine 是当前 docker 运行在 mac 或者 windows 上的唯一方式，并且操作多种不同 linux 系统的 docker 主机的最佳方式。
+
+**3、Docker Machine之安装**
+
+参考：[https://github.com/docker/machine/](https://github.com/docker/machine/)
+
+下载 docker-machine 二进制文件
+
+Mac Or linux
+
+```sh
+curl -Lhttps://github.com/docker/machine/releases/download/v0.8.0/docker-machine-`uname\ -s`-`uname -m` > /usr/local/bin/docker-machine \ && chmod +x/usr/local/bin/docker-machine
+```
+
+Windows with git bash
+
+```sh
+if [[ ! -d"$HOME/bin" ]]; then mkdir -p "$HOME/bin"; fi && \curl -Lhttps://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Windows-x86_64.exe\ "$HOME/bin/docker-machine.exe" && \ chmod +x"$HOME/bin/docker-machine.exe"
+```
+
+黑魔法（离线安装）：
+
+下载地址：[https://github.com/docker/machine/releases/](https://github.com/docker/machine/releases/)
+
+直接在csdn下载：[https://download.csdn.net/download/zhugeaming2018/10404327](https://download.csdn.net/download/zhugeaming2018/10404327)
+
+**4、Docker Machine之使用(macor windows)**
+
+使用准备：
+
+安装最新版的 virtualbox([https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads))
+
+```sh
+cd /etc/yum.repos.d
+wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
+yum install -y  VirtualBox-5.2
+```
+
+Create a machine
+
+```sh
+docker-machine create –driver virtualbox default
+```
+
+在上面你会发现这么句话 "error in driver during machine creation: This computer doesn't have VT-X/AMD-v enabled.Enabling it in the BIOS is mandatory" 意思就是说你没有开启虚拟化。
+
+有朋友说创建虚拟主机太慢，我提供一个阿里云加速命令很快很暴力：
+
+```sh
+docker-machine create –driver virtualbox –engine-registry-mirror https://xu176fzy.mirror.aliyuncs.com default
+```
+
+- Get the environmentcommands for your new VM
+
+  docker-machine env default
+
+- List available machines again to see your newly minted machine
+
+  docker-machine ls
+
+- Connect your shedocker-machinessh defaultll to the new machine
+
+  docker-machine ssh default
+
+- Start and stop machines
+
+  docker-machine stop default
+
+  docker-machine start default
+
+- Docker machine之使用(Iaas)
+
+
+
+### docker-swarm
+
+1.什么是Docker Swarm？
+    容器集群管理工具。
+    通过docker swarm可以将多台机器连接在一起，通过swarm的调度可以实现服务的多台机器的部署，服务的伸缩。
+    docker-swarm的场景因为需要多台docker虚拟机，在虚拟机中创建docker-machine会发现一个很重要的问题，无法创建多个docker的虚拟器，虚拟主机报错"Wrapper DockerMachine process exiting due to closed plugin server ..." 该问题是在 Vmware Workstation Pro 14.1.1 & centos10 上出现的，用真实机器测试不会出现。
+    所以下面的演示就在Vmware Workstation下演示1台机器。
+    docker-machine create –driver virtualbox manager
+    docker-machine ssh manager
+    docker version
+2.Docker Swarm 使用入门
+    注意：docker engine版本为1.18.05.0-ce
+    docker swarm manager 节点初始化
+    docker swarm init --advertise-addr <hostIP>
+    说明：init命令初始化后生成结果如下：
+To add a worker to this swarm, run the following command:
+    docker swarm join --token SWMTKN-1-5t5n2lcqsal12tmhsngww28njm1qcz6917u9bomgmy6bdyw3o0-8gf8jgpb83b22oae92aiamlel 192.168.101.13:2377
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+    开启另一台虚拟机，使用上面的命令将docker加入该集群
+    查看集群：docker info
+    docker node ls
+    删除work节点
+    docker swarm leave
+    通过swarm创建服务
+    docker service create –replicas 1 --name helloworld alpine ping docker.com
+    查看服务列表
+    docker service ls
+    查看服务详情
+    docker service inspect –pretty helloworld
+    服务弹性扩展
+    docker service scale =
+    Ex:docker service scale helloworld=5
+    查看服务列表
+    docker service ps
+    Ex:docker service ps helloworld
+    服务删除
+    docker service remove
+    Ex:docker service rm helloworld
+
+
+
 ## 自动化部署分布式容器云平台实践
 
 当前云计算场景中部署一套 Kubernetes 集群系统是最常见的容器需求。在初期阶段，大量的部署经验都依赖于前人设计实现的自动化部署工具之上，比如 Ansible。但是为什么这样的自动化工具并不能彻底解决所有 Kubernetes 集群的安装问题呢，主要的矛盾在于版本的升级更新动作在分布式系统的部署过程中，由于步骤复杂，无法提供统一的自动化框架来支持。
@@ -1712,211 +2220,6 @@ systemctl daemon-reload
 **总结：**
 
 从 Ansible 自动化工具开始，K8S 集群作为典型的分布式集群系统安装范本，社区在不断的优化用户体验。我们期望集群能够自举的完成系统级配置，并且通过 kubeadm 的方式帮助用户简单的、平滑的升级集群。实现这个 kubeadm，可以帮助任意系统管理员不在为分布式系统的安装犯愁，只需要一行命令就可以完成集群的搭建。所有生产级别的经验都被固化在 kubeadm 的代码中，我们通过参数加以调优，实现集群的生产级别的部署工作。
-
-### docker-compose
-
-Docker Compose 是一个用来定义和运行复杂应用的 Docker 工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器（通过 docker-compose.yml 配置）。
-
-**安装：**
-
-```sh
-curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-# 授予执行权限
-chmod +x /usr/local/bin/docker-compose
-```
-
-**卸载：**
-
-```sh
-rm /usr/local/bin/docker-compose
-```
-
-**命令：**
-
-1、Docker compose 的使用非常类似于 docker 命令的使用，但是需要注意的是**大部分的 compose 命令都需要到 docker-compose.yml 文件所在的目录下才能执行**。
-
-2、compose 以守护进程模式运行加 `-d` 选项。服务状态：Up
-
-```sh
-docker-compose up -d
-docker-compose -f docker-compose.yml up -d
-```
-
-3、查看有哪些服务，使用 `docker-compose ps` 命令，非常类似于 docker 的 ps 命令。
-
-4、查看 compose 日志
-
-```sh
-docker-compose logs web
-docker-compose logs redis
-```
-
-5、停止 compose 服务。服务状态：Exit 0（所有关联的活动容器也被停止）
-
-```sh
-docker-compose stop
-docker-compose ps
-```
-
-6、重启 compose 服务
-
-```sh
-docker-compose restart
-docker-compose ps
-```
-
-7、`kill compose` 服务。服务状态：Exit 137
-
-```sh
-docker-compose kill
-docker-compose ps
-```
-
-8、删除 compose 服务（删除所有已停止的关联容器）
-
-```sh
-docker-compose rm
-```
-
-9、帮助命令
-
-```sh
-docker-compose --help
-```
-
->注意：yaml文件里不能有tab，只能有空格。关于 version 与 Docker 版本的关系如下：
-
-Compose file format | Docker engine
--|-
-1|1.9.0+
-2.0|1.10.0+
-2.1|1.12.0+
-2.2, 3.0, 3.1, 3.2|1.13.0+
-2.3, 3.3, 3.4, 3.5|17.06.0+
-2.4|17.12.0+
-3.6|18.02.0+
-3.7|18.06.0+
-
-### docker-machine
-
-**1、什么是 Docker Machine？**
-
-Docker Machine是一个工具，它可以帮你在虚拟主机安装 docker，并且通过 `docker-machine` 相关命令控制主机。你可以用 docker machine 在 mac、windows、单位的网络、数据中心、云提供商（AWS 或 Digital Ocean）创建 docker 主机。
-
-通过 docker-machine commands，你能启动、进入、停止、重启主机，也可以升级 docker，还可以配置 docker client。
-
-**2、为什么要用 Docker Machine？**
-
-Docker Machine 是当前 docker 运行在 mac 或者 windows 上的唯一方式，并且操作多种不同 linux 系统的 docker 主机的最佳方式。
-
-**3、Docker Machine之安装**
-
-参考：[https://github.com/docker/machine/](https://github.com/docker/machine/)
-
-下载 docker-machine 二进制文件
-
-Mac Or linux
-
-```sh
-curl -Lhttps://github.com/docker/machine/releases/download/v0.8.0/docker-machine-`uname\ -s`-`uname -m` > /usr/local/bin/docker-machine \ && chmod +x/usr/local/bin/docker-machine
-```
-
-Windows with git bash
-
-```sh
-if [[ ! -d"$HOME/bin" ]]; then mkdir -p "$HOME/bin"; fi && \curl -Lhttps://github.com/docker/machine/releases/download/v0.7.0/docker-machine-Windows-x86_64.exe\ "$HOME/bin/docker-machine.exe" && \ chmod +x"$HOME/bin/docker-machine.exe"
-```
-
-黑魔法（离线安装）：
-
-下载地址：[https://github.com/docker/machine/releases/](https://github.com/docker/machine/releases/)
-
-直接在csdn下载：[https://download.csdn.net/download/zhugeaming2018/10404327](https://download.csdn.net/download/zhugeaming2018/10404327)
-
-**4、Docker Machine之使用(macor windows)**
-
-使用准备：
-
-安装最新版的 virtualbox([https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads))
-
-```sh
-cd /etc/yum.repos.d
-wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
-yum install -y  VirtualBox-5.2
-```
-
-Create a machine
-
-```sh
-docker-machine create –driver virtualbox default
-```
-
-在上面你会发现这么句话 "error in driver during machine creation: This computer doesn't have VT-X/AMD-v enabled.Enabling it in the BIOS is mandatory" 意思就是说你没有开启虚拟化。
-
-有朋友说创建虚拟主机太慢，我提供一个阿里云加速命令很快很暴力：
-
-```sh
-docker-machine create –driver virtualbox –engine-registry-mirror https://xu176fzy.mirror.aliyuncs.com default
-```
-
-- Get the environmentcommands for your new VM
-
-  docker-machine env default
-
-- List available machines again to see your newly minted machine
-
-  docker-machine ls
-
-- Connect your shedocker-machinessh defaultll to the new machine
-
-  docker-machine ssh default
-
-- Start and stop machines
-
-  docker-machine stop default
-
-  docker-machine start default
-
-- Docker machine之使用(Iaas)
-
-### docker-swarm
-
-1.什么是Docker Swarm？
-    容器集群管理工具。
-    通过docker swarm可以将多台机器连接在一起，通过swarm的调度可以实现服务的多台机器的部署，服务的伸缩。
-    docker-swarm的场景因为需要多台docker虚拟机，在虚拟机中创建docker-machine会发现一个很重要的问题，无法创建多个docker的虚拟器，虚拟主机报错"Wrapper DockerMachine process exiting due to closed plugin server ..." 该问题是在 Vmware Workstation Pro 14.1.1 & centos10 上出现的，用真实机器测试不会出现。
-    所以下面的演示就在Vmware Workstation下演示1台机器。
-    docker-machine create –driver virtualbox manager
-    docker-machine ssh manager
-    docker version
-2.Docker Swarm 使用入门
-    注意：docker engine版本为1.18.05.0-ce
-    docker swarm manager 节点初始化
-    docker swarm init --advertise-addr <hostIP>
-    说明：init命令初始化后生成结果如下：
-To add a worker to this swarm, run the following command:
-    docker swarm join --token SWMTKN-1-5t5n2lcqsal12tmhsngww28njm1qcz6917u9bomgmy6bdyw3o0-8gf8jgpb83b22oae92aiamlel 192.168.101.13:2377
-To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
-    开启另一台虚拟机，使用上面的命令将docker加入该集群
-    查看集群：docker info
-    docker node ls
-    删除work节点
-    docker swarm leave
-    通过swarm创建服务
-    docker service create –replicas 1 --name helloworld alpine ping docker.com
-    查看服务列表
-    docker service ls
-    查看服务详情
-    docker service inspect –pretty helloworld
-    服务弹性扩展
-    docker service scale =
-    Ex:docker service scale helloworld=5
-    查看服务列表
-    docker service ps
-    Ex:docker service ps helloworld
-    服务删除
-    docker service remove
-    Ex:docker service rm helloworld
 
 ## 监控日志和日志管理
 
@@ -2724,16 +3027,18 @@ docker-machine create --driver virtualbox myvm2
 
 如果报错：`yum -y install kernel-devel-3.10.0-862.el7.x86_64`
 
-***\*参考\****
+### 参考
 
-[容器在2019年必将碾压VMware ！](https://mp.weixin.qq.com/s/vl3fmI1-vVWhWn5T6TZ31Q)
+- [https://idig8.com](https://idig8.com)
 
-知乎 [点击链接](https://www.zhihu.com/question/28300645)
+- [容器在2019年必将碾压VMware ！](https://mp.weixin.qq.com/s/vl3fmI1-vVWhWn5T6TZ31Q)
 
-谷歌图片 [点击链接](#imgrc=gziAQRUGLNM7rM:)
+- 知乎 [点击链接](https://www.zhihu.com/question/28300645)
 
-Docker官网 [点击链接](https://www.docker.com/what-docker)
+- 谷歌图片 [点击链接](#imgrc=gziAQRUGLNM7rM:)
 
-Docker的一本电子书（英文资源可能需要科学上网）[点击链接](https://www.tutorialspoint.com/docker/docker_tutorial.pdf)
+- Docker官网 [点击链接](https://www.docker.com/what-docker)
 
-Docker教程 [点击链接](http://www.runoob.com/docker/docker-tutorial.html)
+- Docker的一本电子书（英文资源可能需要科学上网）[点击链接](https://www.tutorialspoint.com/docker/docker_tutorial.pdf)
+
+- Docker教程 [点击链接](http://www.runoob.com/docker/docker-tutorial.html)
