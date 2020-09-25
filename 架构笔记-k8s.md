@@ -1,6 +1,36 @@
-# k8s入门
+# Kubenetes
 
-## 目录
+1. 理论
+2. 实战
+3. 总结
+
+
+
+## 理论
+
+Kubernetes 单词起源于希腊语，是 **舵手** 或者 **领航员** 的意思，是 **管理者** 和 **控制论** 的根源。K8s是把用8代替8个字符 ubernete 而成的缩写。
+
+**Docker Swarm 和 k8s的前世今生**
+
+  可以很明确的说：先有的k8s，后有的docker swarm。
+
+\1. 容器编排工具Kubernetes诞生，并迅速得到Google和RedHat的支持。2014年7月，Docker收购Orchard Labs，由此Docker公司开始涉足容器编排领域，Orchard Labs这家2013年由两位牛逼的年轻人创建的公司，有一个当时非常著名的容器编排工具fig，而这个fig就是docker-compose的前身。Docker Compose虽然能编排多容器的APP，但是却不能实现在多个机器上进行容器的创建和管理。所以此时Docker公司和Kubernetes并未开始正面竞争和冲突。
+
+\2. 10月17日，Docker公司在其丹麦哥本哈根举行的 DockerCon大会上宣布，将扩大其Docker平台并拥抱支持Kubernetes。显然，在容器编排领域的战火已然分出结果，尘埃落定，Kubernetes得到了包括Google、Huawei、Microsoft、IBM、AWS、Rancher、Redhat、CoreOS等容器玩家的一致认可。
+
+\3. Docker容器不关心用户使用哪种编排框架，它的工作是让用户轻松地选择最喜欢的编排框架，无论Kubernetes、Mesos、Docker Swarm还是其他。这个选择在价值上无关紧要，真正的价值在于平台，那才是钱。因此，将Kubernetes与Docker容器进行比较是没有意义的，Docker的真正的竞争对手是VMWare、CloudFoundry等平台。
+
+  另外，k8s的热度远高于Docker Swarm
+
+### ***\*回顾下docker Swarm\****
+
+  docker Swarm分为Manager节点和Worker节点，Manager具备管理功能，维持这个cls的状态，提供对外的接口，可以通过manager部署我们的application，部署service，部署stack。
+
+
+
+## 实战
+
+
 
 1. 安装部署
 2. [安装问题](#安装问题)
