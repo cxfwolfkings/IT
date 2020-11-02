@@ -67,6 +67,8 @@ git pull origin <branch>:<branch>
 # 新建分支
 git branch feature1 # 或者
 git checkout -b feature1
+# 推送到远程新分支
+git push --set-upstream origin [feature1]
 # 推送到远程仓库
 git push origin feature1
 # 切换分支
