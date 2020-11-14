@@ -2,9 +2,13 @@
 
 1. 理论
    - [docker架构](#docker架构)
+   - [核心技术](#核心技术)
    - [镜像概述](#镜像概述)
    - [容器概述](#容器概述)
    - [数据管理](#数据管理)
+   - [网络模式](#网络模式)
+   - [挂载点](#挂载点)
+   - [仓库](#仓库)
 2. 实战
 
    - [安装](#安装)
@@ -13,8 +17,12 @@
    - [常用命令](#常用命令)
      - [镜像命令](#镜像命令)
      - [容器命令](#容器命令)
-   - [网络模式](#网络模式)
+   
+   - [编写Dockerfile](#编写Dockerfile)
+   
+   - [Portainer管理集群部署](#Portainer管理集群部署)
    - [docker-compose](#docker-compose)
+   - [docker-swarm](#docker-swarm)
    - [docker-machine](#docker-machine)
    - [搭建私有镜像仓库](#搭建私有镜像仓库)
 3. 总结
@@ -28,6 +36,74 @@
 
 
 ## 理论
+
+NIST(National Institute of Standards and Technology)对云计算平台的定义：云计算是一种资源的服务模式，该模式可以实现随时随地、便捷按需地从可配直计算资源共享池中获取所需的资源（如网络、服务器、存储、应用及服务)，资源能够快速供应并释放，大大减少了资源管理工作开销，你甚至可以再也不用理会那些令人头痛的传统服务供应商了。
+
+经典云计算架构（三层服务模型）：
+
+- IaaS（Infrastructure as a Service，基础设施即服务）：客户关系管理、邮件、虚拟桌面、通信、游戏......
+
+- PaaS（P1atform as a Service，平台即服务）：运行时环境、数据库、Web服务器、开发工具......
+
+- SaaS（Software as a Service，软件即服务）：虚拟机、存储、负载均衡、网络......
+
+云时代应用生命周期管理机制(Application Lifecycle Management, ALM) 和十二要素应用规范(The Twelve-Factor App)也随之应运而生。
+
+Docker的设计理念是希望用户能够保证一个容器只运行一个进程，即只提供一种服务。然而，对于用户而言，单一容器是无法满足需求的。通常用户需要利用多个容器，分别提供不同的服务，并在不同容器间互连通信，最后形成一个Docker集群，以实现特定的功能。
+
+**为什么需要docker？**
+
+首先，Docker 的出现一定是因为目前的后端在开发和运维阶段确实需要一种虚拟化技术解决开发环境和生产环境环境一致的问题，通过 Docker 我们可以将程序运行的环境也纳入到版本控制中，排除因为环境造成不同运行结果的可能。但是上述需求虽然推动了虚拟化技术的产生，但是如果没有合适的底层技术支撑，那么我们仍然得不到一个完美的产品。
+
+不论IaaS还是PaaS都有各自适用的场景，但依旧存在诸多缺陷，人们亟需一个真正可用的解决方案。每一场革命背后都有着深刻的历史背景和矛盾冲突，新陈代谢是历史的必然结果，新生取代陈旧得益于理念的飞跃和对时代发展需求的契合，很显然Docker抓住了这个契机。作为一种新兴的虚拟化方式，Docker 跟传统的虚拟化方式相比具有众多的优势。
+
+Docker 在如下几个方面具有较大的优势：
+
+- 更快速的交付和部署
+
+  Docker在整个开发周期都可以完美的辅助你实现快速交付。Docker允许开发者在装有应用和服务本地容器做开发。可以直接集成到可持续开发流程中。
+
+  例如：开发者可以使用一个标准的镜像来构建一套开发容器，开发完成之后，运维人员可以直接使用这个容器来部署代码。 Docker 可以快速创建容器，快速迭代应用程序，并让整个过程全程可见，使团队中的其他成员更容易理解应用程序是如何创建和工作的。 Docker 容器很轻很快！容器的启动时间是秒级的，大量地节约开发、测试、部署的时间。
+
+- 高效的部署和扩容
+
+  Docker 容器几乎可以在任意的平台上运行，包括物理机、虚拟机、公有云、私有云、个人电脑、服务器等。这种兼容性可以让用户把一个应用程序从一个平台直接迁移到另外一个。
+
+  Docker的兼容性和轻量特性可以很轻松的实现负载的动态管理。你可以快速扩容或方便的下线的你的应用和服务，这种速度趋近实时。
+
+- 更高的资源利用率
+
+  Docker 对系统资源的利用率很高，一台主机上可以同时运行数千个 Docker 容器。容器除了运行其中应用外，基本不消耗额外的系统资源，使得应用的性能很高，同时系统的开销尽量小。传统虚拟机方式运行 10 个不同的应用就要起 10 个虚拟机，而Docker 只需要启动 10 个隔离的应用即可。
+
+- 更简单的管理
+
+  使用 Docker，只需要小小的修改，就可以替代以往大量的更新工作。所有的修改都以增量的方式被分发和更新，从而实现自动化并且高效的管理。
+
+**开发、测试、发布一体化**
+
+通过Docker提供的虚拟化方式，可以快速建立起一套可复用的开发环境，以镜像的形式将开发环境分发给所有开发成员，达到了简化开发环境搭建过程的目的。Docker的优点在于可以简化CI（持续集成）和CD（持续交付）的构建流程，让开发者集中精力在应用开发上，同时运维和测试也可以并行进行，并保持整个开发、测试、发布和运维的一体化。
+
+Docker以镜像和在镜像基础上构建的容器为基础，以容器为开发、测试和发布的单元，将与应用相关的所有组件和环境进行封装，避免了应用在不同平台间迁移时所带来的依赖性问题，确保了应用在生产环境的各阶段达到高度一致的实际效果。
+
+在开发阶段，镜像的使用使得构建开发环境变得简单和统一。随着Docker的发展，镜像资源也日益丰富，开发人员可以轻易地找到适合的镜像加以利用。同时，利用Dockerfile也可以将一切可代码化的东西进行自动化运行。Docker最佳实践是将应用分割成大量彼此松散耦合的Docker容器，应用的不同组件在不同的容器中同步开发，互不影响，为实现持续集成和持续交付提供了先天的便利。
+
+在测试阶段，可以直接使用开发所构建的镜像进行测试，直接免除了测试环境构建的烦恼，也消除了因为环境不一致所带来的漏洞问题。
+
+在部署和运维阶段，与以往代码级别的部署不同，利用Docker可以进行容器级别的部署，把应用及其依赖环境打包成跨平台、轻量级、可移植的容器来进行部署。
+
+Docker已经逐渐发展成为一个构建、发布、运行分布式应用的开放平台，以轻量级容器为核心建立起了一套完整的生态系统，它重新定义了应用开发、测试、交付和部署的过程。在当前云计算飞速发展的背景下，Docker 将引领着云时代进入一个崭新的发展阶段。
+
+**docker是什么？**
+
+根据官方的定义，Docker是以Docker容器为资源分割和调度的基本单位，封装整个软件运行时环境，为开发者和系统管理员设计的，用于构建、发布和运行分布式应用的平台。
+
+它是一个跨平台、可移植并且简单易用的容器解决方案。
+
+Docker的源代码托管在GitHub上，基于Go语言开发，并遵从Apache 2.0协议。
+
+Docker可在容器内部快速自动化地部署应用，并通过操作系统内核技术（namespaces、cgroups等）为容器提供资源隔离与安全保障。
+
+**讲故事**
 
 首先你有一个 100 平方的房子（服务器），已知你（PHP 应用）需要吃喝拉撒睡觉，所以整个房子划分了卧室、厨房、卫生间等，然后供你一个人享用，但其实挺浪费的，你一个人并不需要 100 平方这么大，可能需要 20 平方（服务器占用 20%）就好了。
 
@@ -137,6 +213,20 @@ Docker具有很多优势：
 
 - **Docker企业版(EE)**：适用于 Linux 和 Windows 开发的 Docker 工具企业级版本。
 
+Docker 目前已经成为了非常主流的技术，已经在很多成熟公司的生产环境中使用，但是 Docker 的核心技术其实已经有很多年的历史了，Linux 命名空间、控制组和 UnionFS 三大技术支撑了目前 Docker 的实现，也是 Docker 能够出现的最重要原因。
+
+由于 Docker 目前的代码库实在是太过庞大，想要从源代码的角度完全理解 Docker 实现的细节已经是非常困难的了，但是如果各位读者真的对其实现细节感兴趣，可以从 [Docker CE](https://github.com/docker/docker-ce) 的源代码开始了解 Docker 的原理。
+
+**容器云概念**
+
+**为什么出现？**
+
+容器为用户打开了一扇通往新世界的大门，真正进入这个容器的世界后，却发现新的生态系统如此庞大。在生产使用中，不论是个人还是企业，都会提出更复杂的需求。这时，我们需要众多跨主机的容器协同工作，需要支持各种类型的工作负载，企业级应用开发更是需要基于容器技术，实现支持多人协作的持续集成、持续交付平台。从容器到容器云的进化便应运而生。
+
+**什么是容器云？**
+
+容器云以容器为资源分割和调度的基本单位，封装整个软件运行时环境，为开发者和系统管理员提供用于构建、发布和运行分布式应用的平台。
+
 
 
 ### docker架构
@@ -155,6 +245,8 @@ Docker具有很多优势：
 
 **Docker的组织架构**
 
+Docker使用C/S架构，Client 通过接口与Server进程通信实现容器的构建，运行和发布。client和server可以运行在同一台集群，也可以通过跨主机实现远程通信。
+
 ![x](./Resources/docker11.png)
 
 **Docker的底层技术支持**
@@ -163,7 +255,162 @@ Docker具有很多优势：
 
 
 
+### 核心技术
+
+#### Namespaces
+
+命名空间 (namespaces)是 Linux 为我们提供的用于分离进程树、网络接口、挂载点以及进程间通信等资源的方法。在日常使用 Linux 或者 macOS 时，我们并没有运行多个完全分离的服务器的需要，但是如果我们在服务器上启动了多个服务，这些服务其实会相互影响的，每一个服务都能看到其他服务的进程，也可以访问宿主机器上的任意文件，这是很多时候我们都不愿意看到的，我们更希望运行在同一台机器上的不同服务能做到完全隔离，就像运行在多台不同的机器上一样。
+
+在这种情况下，一旦服务器上的某一个服务被入侵，那么入侵者就能够访问当前机器上的所有服务和文件，这也是我们不想看到的，而Docker其实就通过Linux的Namespaces对不同的容器实现了隔离。
+
+Linux的命名空间机制提供了七种不同的命名空间，通过这七个选项我们能在创建新的进程时设置新进程应该在哪些资源上与宿主机器进行隔离。
+
+| **namespaces** | **系统调用参数** | **隔离内容**               |
+| -------------- | ---------------- | -------------------------- |
+| UTS            | CLONE_NEWUTS     | 主机名与域名               |
+| IPC            | CLONE_NEWIPC     | 信号量、消息队列和共享内存 |
+| PID            | CLONE_NEWPID     | 进程编号                   |
+| Network        | CLONE_NEWNET     | 网络设备、网络栈、端口等   |
+| Mount          | CLONE_NEWNS      | 挂载点（文件系统）         |
+| User           | CLONE_NEWUSER    | 用户和用户组               |
+|                | CLONE_NEWCGROUP  |                            |
+
+实际上，Linux内核实现namespace的一个主要目的，就是实现轻量级虚拟化（容器）服务。在同一个namespace下的进程可以感知彼此的变化，而对外界的进程一无所知。这样就可以让容器中的进程产生错觉，仿佛自己置身于一个独立的系统环境中，以达到独立和隔离的目的。
+
+本节所讨论的namespace实现针对的均是Linux内核3.8及以后的版本。
+
+进行 namespace API 操作的方式：
+
+1、 通过 clone() 在创建新进程的同时创建namespace
+
+2、 查看 /proc/[pid]/ns 文件
+
+3、 通过 setns() 加入一个已经存在的 namespace
+
+4、 通过 unshare() 在原先进程上进行 namespace 隔离
+
+5、 fork() 系统调用
+
+#### 进程
+
+进程是 Linux 以及现在操作系统中非常重要的概念，它表示一个正在执行的程序，也是在现代分时系统中的一个任务单元。在每一个 *nix 的操作系统上，我们都能够通过 ps 命令打印出当前操作系统中正在执行的进程，比如在 Ubuntu 上，使用该命令就能得到以下的结果：
+
+```sh 
+ps -ef
+
+UID     PID  PPID  C STIME TTY      TIME CMD
+root     1   0  0 Apr08 ?     00:00:09 /sbin/init
+root     2   0  0 Apr08 ?     00:00:00 [kthreadd]
+root     3   2  0 Apr08 ?     00:00:05 [ksoftirqd/0]
+root     5   2  0 Apr08 ?     00:00:00 [kworker/0:0H]
+root     7   2  0 Apr08 ?     00:07:10 [rcu_sched]
+root     39   2  0 Apr08 ?     00:00:00 [migration/0]
+root     40   2  0 Apr08 ?     00:01:54 [watchdog/0]
+...
+```
+
+当前机器上有很多的进程正在执行，在上述进程中有两个非常特殊，一个是 pid 为 1 的 /sbin/init 进程，另一个是 pid 为 2 的 kthreadd 进程，这两个进程都是被 Linux 中的上帝进程 idle 创建出来的，其中前者负责执行内核的一部分初始化工作和系统配置，也会创建一些类似 getty 的注册进程，而后者负责管理和调度其他的内核进程。
+
+![x](./Resources/docker14.png)
+
+如果我们在当前的 Linux 操作系统下运行一个新的 Docker 容器，并通过 exec 进入其内部的 bash 并打印其中的全部进程，我们会得到以下的结果：
+
+```sh
+root@iZ255w13cy6Z:~# docker run -it -d ubuntu
+b809a2eb3630e64c581561b08ac46154878ff1c61c6519848b4a29d412215e79
+root@iZ255w13cy6Z:~# docker exec -it b809a2eb3630 /bin/bash
+root@b809a2eb3630:/# ps -ef
+
+UID     PID  PPID  C STIME TTY      TIME CMD
+root     1   0  0 15:42 pts/0   00:00:00 /bin/bash
+root     9   0  0 15:42 pts/1   00:00:00 /bin/bash
+root     17   9  0 15:43 pts/1   00:00:00 ps -ef
+```
+
+在新的容器内部执行 ps 命令打印出了非常干净的进程列表，只有包含当前 ps -ef 在内的三个进程，在宿主机器上的几十个进程都已经消失不见了。
+
+当前的 Docker 容器成功将容器内的进程与宿主机器中的进程隔离，如果我们在宿主机器上打印当前的全部进程时，会得到下面三条与 Docker 相关的结果：
+
+```sh
+UID     PID  PPID  C STIME TTY      TIME CMD
+root   29407   1  0 Nov16 ?     00:08:38 /usr/bin/dockerd --raw-logs
+root    1554 29407  0 Nov19 ?     00:03:28 docker-containerd -l unix:///var/run/docker/libcontainerd/docker-containerd.sock --metrics-interval=0 --start-timeout 2m --state-dir /var/run/docker/libcontainerd/containerd --shim docker-containerd-shim --runtime docker-runc
+root    5006  1554  0 08:38 ?     00:00:00 docker-containerd-shim b809a2eb3630e64c581561b08ac46154878ff1c61c6519848b4a29d412215e79 /var/run/docker/libcontainerd/b809a2eb3630e64c581561b08ac46154878ff1c61c6519848b4a29d412215e79 docker-runc
+```
+
+在当前的宿主机器上，可能就存在由上述的不同进程构成的进程树：
+
+![x](./Resources/docker15.png)
+
+这就是在使用 clone(2) 创建新进程时传入 CLONE_NEWPID 实现的，也就是使用 Linux 的命名空间实现进程的隔离，Docker 容器内部的任意进程都对宿主机器的进程一无所知。
+
+containerRouter.postContainersStart
+
+└── daemon.ContainerStart
+
+  └── daemon.createSpec
+
+​    └── setNamespaces
+
+​      └── setNamespace
+
+Docker 的容器就是使用上述技术实现与宿主机器的进程隔离，当我们每次运行 docker run 或者 docker start时，都会在下面的方法中创建一个用于设置进程间隔离的 Spec：
+
+```go
+func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) {
+	s := oci.DefaultSpec()
+	// ...
+	if err := setNamespaces(daemon, &s, c); err != nil {
+		return nil, fmt.Errorf("linux spec namespaces: %v", err)
+	}
+	return &s, nil
+}
+```
+
+在 setNamespaces 方法中不仅会设置进程相关的命名空间，还会设置与用户、网络、IPC 以及 UTS 相关的命名空间：
+
+```go
+func setNamespaces(daemon *Daemon, s *specs.Spec, c *container.Container) error {
+	// user
+	// network
+	// ipc
+	// uts
+	// pid
+	if c.HostConfig.PidMode.IsContainer() {
+		ns := specs.LinuxNamespace{Type: "pid"}
+		pc, err := daemon.getPidContainer(c)
+		if err != nil {
+			return err
+		}
+		ns.Path = fmt.Sprintf("/proc/%d/ns/pid", pc.State.GetPID())
+		setNamespace(s, ns)
+	} else if c.HostConfig.PidMode.IsHost() {
+		oci.RemoveNamespace(s, specs.LinuxNamespaceType("pid"))
+	} else {
+		ns := specs.LinuxNamespace{Type: "pid"}
+		setNamespace(s, ns)
+	}
+	return nil
+}
+```
+
+所有命名空间相关的设置 Spec 最后都会作为 Create 函数的入参在创建新的容器时进行设置：
+
+daemon.containerd.Create(context.Background(), container.ID, spec, createOptions)
+
+所有与命名空间的相关的设置都是在上述的两个函数中完成的，Docker 通过命名空间成功完成了与宿主机进程和网络的隔离。
+
+
+
 ### 镜像概述
+
+Docker镜像(Image)就是一个只读的模板。例如：一个镜像可以包含一个完整的操作系统环境，里面仅安装了Apache或用户需要的其它应用程序。镜像可以用来创建Docker容器，一个镜像可以创建很多容器。
+
+Docker提供了一个很简单的机制来创建镜像或者更新现有的镜像，用户甚至可以直接从其他人那里下载一个已经做好的镜像来直接使用。
+
+镜像(Image)就是一堆只读层(read-only layer)的统一视角！
+
+多个只读层重叠在一起。除了最下面一层，其它层都会有一个指针指向下一层。这些层是Docker内部的实现细节，并且能够在docker宿主机的文件系统上访问到。统一文件系统(Union File System)技术能够将不同的层整合成一个文件系统，为这些层提供了一个统一的视角，这样就隐藏了多层的存在，在用户的角度看来，只存在一个文件系统。
 
 **什么是Image？**
 
@@ -300,6 +547,12 @@ docker container ls -a
 
 镜像(Image)，跟你装操作系统的 iso 镜像一个概念。容器(Container)，就是基于这个镜像启动的操作系统。一个镜像，可以用来在各种地方启动任意多个容器，也就是一个镜像可以装很多个操作系统。当然，镜像，不一定是操作系统的镜像，也可能是软件的镜像。等你以后明白了，你就知道我这解释也是不完全对的。但是，你可以先这么理解。
 
+Docker 利用容器(Container)来运行应用。容器是从镜像创建的运行实例。它可以被启动、开始、停止、删除。每个容器都是相互隔离的、保证安全的平台。可以把容器看做是一个简易版的 Linux 环境（包括root用户权限、进程空间、用户空间和网络空间等）和运行在其中的应用程序。
+
+容器的定义和镜像几乎一模一样，也是一堆层的统一视角，唯一区别在于容器的最上面那一层是可读可写的。
+
+一个运行态容器被定义为一个可读写的统一文件系统加上隔离的进程空间和包含其中的进程。
+
 **什么是Container？**
 
 - 通过 Image 创建的
@@ -340,7 +593,7 @@ Docker 数据管理主要有两种方式：**数据卷** 和 **数据卷容器**
 
 卷：提供一个容器可以使用的可写文件系统。由于映像只可读取，而多数程序需要写入到文件系统，因此卷在容器映像顶部添加了一个可写层，这样程序就可以访问可写文件系统。 程序并不知道它正在访问的是分层文件系统，此文件系统就是往常的文件系统。卷位于主机系统中，由 Docker 管理。
 
-**数据卷（Data Volume）**
+#### 数据卷（Data Volume）
 
 数据卷的使用其实和 Linux 挂载文件目录是很相似的。简单来说，数据卷就是一个可以供容器使用的特殊目录。
 
@@ -378,7 +631,7 @@ Docker 数据管理主要有两种方式：**数据卷** 和 **数据卷容器**
 
   直接挂载宿主主机目录作为数据卷到容器内的方式在测试的时候很有用，你可以在本地目录放置一些程序，用来测试容器工作是否正确。当然，Docker也可以挂载宿主主机的一个文件到容器，但是这会出现很多问题，所以不推荐这样做。如果你要挂载某个文件，最简单的办法就是挂载它的父目录。
 
-### 数据卷容器（Data Volume Container）
+#### 数据卷容器（Data Volume Container）
 
 所谓数据卷容器，其实就是一个普通的容器，只不过这个容器专门作为数据卷供其它容器挂载。
 
@@ -402,6 +655,10 @@ docker run -ti --volumes-from v0 --name v1 ubuntu:16.04 bash
 
 ### 网络模式
 
+如果 Docker 的容器通过 Linux 的命名空间完成了与宿主机进程的网络隔离，但是却有没有办法通过宿主机的网络与整个互联网相连，就会产生很多限制，所以 Docker 虽然可以通过命名空间创建一个隔离的网络环境，但是 Docker 中的服务仍然需要与外界相连才能发挥作用。
+
+每一个使用 docker run 启动的容器其实都具有单独的网络命名空间，Docker 为我们提供了四种不同的网络模式，Host、Container、None 和 Bridge 模式。
+
 安装 Docker 时，它会自动创建三个网络，bridge（创建容器默认连接到此网络）、none、host
 
 | 网络模式   | 简介                                                         |
@@ -412,9 +669,9 @@ docker run -ti --volumes-from v0 --name v1 ubuntu:16.04 bash
 | Container  | 创建的容器不会创建自己的网卡，配置自己的 IP，而是和一个指定的容器共享 IP、端口范围 |
 | 自定义网络 | 略                                                           |
 
->Docker有三种网络模式，bridge、host、none，在你创建容器的时候，`不指定--network默认是bridge`。
+>Docker有三种网络模式，bridge、host、none，在你创建容器的时候，不指定 --network 默认是bridge。
 >
->bridge：为每一个容器分配IP，并将容器连接到一个 `docker0` 虚拟网桥，通过 `docker0` 网桥与宿主机通信。也就是说，此模式下，你不能用 `宿主机的IP+容器映射端口` 来进行Docker容器之间的通信。
+>bridge：为每一个容器分配IP，并将容器连接到一个  docker0 虚拟网桥，通过 docker0 网桥与宿主机通信。也就是说，此模式下，你不能用 **宿主机的IP + 容器映射端口** 来进行Docker容器之间的通信。
 >
 >host：容器不会虚拟自己的网卡，配置自己的IP，而是使用宿主机的IP和端口。这样一来，Docker容器之间的通信就可以用 `宿主机的IP+容器映射端口`
 >
@@ -475,7 +732,7 @@ docker run -it --network host ubuntu
 
 该模式将容器放置在它自己的网络栈中，但是并不进行任何配置。实际上，该模式关闭了容器的网络功能，在以下情况下是有用的：容器并不需要网络（例如只需要写磁盘卷的批处理任务）
 
-#### overlay
+#### overlay模式
 
 在 docker1.7 代码进行了重构，单独把网络部分独立出来编写，所以在 docker1.8 新加入一个 overlay 网络模式。Docker 对于网络访问的控制也是在逐渐完善的。
 
@@ -486,6 +743,78 @@ docker run -it --network host ubuntu
 通过 docker0 网桥以及 Iptables nat 表配置与宿主机通信；bridge 模式是 Docker 默认的网络设置。
 
 此模式会为每一个容器分配 Network Namespace、设置 IP 等，并将一个主机上的 Docker 容器连接到一个虚拟网桥上。下面着重介绍一下此模式：
+
+在默认情况下，每一个容器在创建时都会创建一对虚拟网卡，两个虚拟网卡组成了数据的通道，其中一个会放在创建的容器中，会加入到名为 docker0 网桥中。我们可以使用如下的命令来查看当前网桥的接口：
+
+```sh
+$ brctl show
+bridge name	bridge id		STP enabled	 interfaces
+docker0		8000.0242a6654980	no		 veth3e84d4f
+							       veth9953b75
+```
+
+docker0会为每一个容器分配一个新的IP地址并将docker0的IP地址设置为默认的网关。网桥docker0通过iptables中的配置与宿主机器上的网卡相连，所有符合条件的请求都会通过iptables转发到 docker0并由网桥分发给对应的机器。
+
+```sh
+$ iptables -t nat -L
+
+Chain PREROUTING (policy ACCEPT)
+target   prot opt source        destination
+DOCKER   all  --  anywhere       anywhere       ADDRTYPE match dst-type LOCAL
+Chain DOCKER (2 references)
+target   prot opt source        destination
+RETURN   all  --  anywhere       anywhere
+```
+
+我们在当前的机器上使用 docker run -d -p 6379:6379 redis 命令启动了一个新的 Redis 容器，在这之后我们再查看当前 iptables 的 NAT 配置就会看到在 DOCKER 的链中出现了一条新的规则：
+
+```sh
+DNAT    tcp  --  anywhere       anywhere       tcp dpt:6379 to:192.168.0.4:6379
+```
+
+上述规则会将从任意源发送到当前机器 6379 端口的 TCP 包转发到 192.168.0.4:6379 所在的地址上。
+
+这个地址其实也是 Docker 为 Redis 服务分配的 IP 地址，如果我们在当前机器上直接 ping 这个 IP 地址就会发现它是可以访问到的：
+
+```sh
+$ ping 192.168.0.4
+
+PING 192.168.0.4 (192.168.0.4) 56(84) bytes of data.
+64 bytes from 192.168.0.4: icmp_seq=1 ttl=64 time=0.069 ms
+64 bytes from 192.168.0.4: icmp_seq=2 ttl=64 time=0.043 ms
+^C
+--- 192.168.0.4 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 999ms
+rtt min/avg/max/mdev = 0.043/0.056/0.069/0.013 ms
+```
+
+从上述一系列现象，我们就可以推测出 Docker 是如何将容器的内部的端口暴露出来并对数据包进行转发的了；当有 Docker 的容器需要将服务暴露给宿主机器，就会为容器分配一个 IP 地址，同时向 iptables 中追加一条新的规则。
+
+![x](./Resources/docker16.png)
+
+当我们使用 redis-cli 在宿主机器的命令行中访问 127.0.0.1:6379 的地址时，经过 iptables 的 NAT PREROUTING 将 ip 地址定向到了 192.168.0.4，重定向过的数据包就可以通过 iptables 中的 FILTER 配置，最终在 NAT POSTROUTING 阶段将 ip 地址伪装成 127.0.0.1，到这里虽然从外面看起来我们请求的是 127.0.0.1:6379，但是实际上请求的已经是 Docker 容器暴露出的端口了。
+
+```sh
+$ redis-cli -h 127.0.0.1 -p 6379 ping
+
+PONG
+```
+
+Docker 通过 Linux 的命名空间实现了网络的隔离，又通过 iptables 进行数据包转发，让 Docker 容器能够优雅地为宿主机器或者其他容器提供服务。
+
+**libnetwork**
+
+整个网络部分的功能都是通过 Docker 拆分出来的 libnetwork 实现的，它提供了一个连接不同容器的实现，同时也能够为应用给出一个能够提供一致的编程接口和网络层抽象的**容器网络模型**。
+
+**The goal of libnetwork is to deliver a robust Container Network Model that provides a consistent programming interface and the required network abstractions for applications.**
+
+libnetwork 中最重要的概念，容器网络模型由以下的几个主要组件组成，分别是 Sandbox、Endpoint 和 Network：
+
+![x](./Resources/docker17.png)
+
+在容器网络模型中，每一个容器内部都包含一个 Sandbox，其中存储着当前容器的网络栈配置，包括容器的接口、路由表和 DNS 设置，Linux 使用网络命名空间实现这个 Sandbox，每一个 Sandbox 中都可能会有一个或多个 Endpoint，在 Linux 上就是一个虚拟的网卡 veth，Sandbox 通过 Endpoint 加入到对应的网络中，这里的网络可能就是我们在上面提到的 Linux 网桥或者 VLAN。
+
+想要获得更多与 libnetwork 或者容器网络模型相关的信息，可以阅读 [Design·libnetwork](https://github.com/docker/libnetwork/blob/master/docs/design.md) 了解更多信息，当然也可以阅读源代码了解不同 OS 对容器网络模型的不同实现。
 
 **Bridge模式的拓扑：**
 
@@ -937,6 +1266,162 @@ Docker 可以通过 docker0 或者你自定义的网络桥接，让容器通过�
 这样，当宿主主机 DNS 信息发生变化的时候，容器的 DNS 配置会通过 /etc/resolv.conf 文件立刻得到更新。
 
 如果你希望自己配置 DNS 信息，可以在使用 docker run 命令的时候加上 --hostname=HOSTNAME 参数设定容器的主机名，使用 --dns=IP_ADDRESS 添加 DNS 服务器到容器的 /etc/resolv.conf 文件中。
+
+
+
+### 挂载点
+
+虽然我们已经通过 Linux 的命名空间解决了进程和网络隔离的问题，在 Docker 进程中我们已经没有办法访问宿主机器上的其他进程并且限制了网络的访问，但是 Docker 容器中的进程仍然能够访问或者修改宿主机器上的其他目录，这是我们不希望看到的。
+
+在新的进程中创建隔离的挂载点命名空间需要在 clone 函数中传入 CLONE_NEWNS，这样子进程就能得到父进程挂载点的拷贝，如果不传入这个参数子进程对文件系统的读写都会同步回父进程以及整个主机的文件系统。
+
+如果一个容器需要启动，那么它一定需要提供一个根文件系统(rootfs)，容器需要使用这个文件系统来创建一个新的进程，所有二进制的执行都必须在这个根文件系统中。
+
+![x](./Resources/docker18.png)
+
+想要正常启动一个容器就需要在 rootfs 中挂载以上的几个特定的目录，除了上述的几个目录需要挂载之外我们还需要建立一些符号链接保证系统 IO 不会出现问题。
+
+![x](./Resources/docker19.png)
+
+为了保证当前的容器进程没有办法访问宿主机器上其他目录，我们在这里还需要通过 libcontainer 提供的 pivot_root 或者 chroot 函数改变进程能够访问个文件目录的根节点。
+
+```go
+// pivor_root
+put_old = mkdir(...);
+pivot_root(rootfs, put_old);
+chdir("/");
+unmount(put_old, MS_DETACH);
+rmdir(put_old);
+
+// chroot
+mount(rootfs, "/", NULL, MS_MOVE, NULL);
+chroot(".");
+chdir("/");
+```
+
+到这里我们就将容器需要的目录挂载到了容器中，同时也禁止当前的容器进程访问宿主机器上的其他目录，保证了不同文件系统的隔离。
+
+这一部分的内容是作者在 libcontainer 中的[SPEC.md](https://github.com/opencontainers/runc/blob/master/libcontainer/SPEC.md) 文件中找到的，其中包含了 Docker 使用的文件系统的说明，对于 Docker 是否真的使用 **chroot** 来确保当前的进程无法访问宿主机器的目录，作者其实也没有确切的答案，一是 Docker 项目的代码太庞大，不知道该从何入手，作者尝试通过 Google 查找相关的结果，但是既找到了无人回答的[问题](https://forums.docker.com/t/does-the-docker-engine-use-chroot/25429)，也得到了与 SPEC 中的描述有冲突的[答案](https://www.quora.com/Do-Docker-containers-use-a-chroot-environment) ，如果各位读者有明确的答案可以在博客下面留言，非常感谢。
+
+
+
+### 仓库
+
+仓库(Repository)是集中存放镜像文件的场所。有时候会把仓库和仓库注册服务器(Registry)混为一谈，并不严格区分。实际上，仓库注册服务器上往往存放着多个仓库，每个仓库中又包含了多个镜像，每个镜像有不同的标签(tag)。
+
+仓库分为公开仓库(Public)和私有仓库(Private)两种形式。最大的公开仓库是 Docker Hub，存放了数量庞大的镜像供用户下载。国内的公开仓库包括时速云、网易云等，可以提供大陆用户更稳定快速的访问。当然，用户也可以在本地网络内创建一个私有仓库。
+
+当用户创建了自己的镜像之后就可以使用 push 命令将它上传到公有或者私有仓库，这样下次在另外一台机器上使用这个镜像时候，只需要从仓库上 pull 下来就可以了。
+
+Docker 仓库的概念跟 Git 类似，注册服务器可以理解为 GitHub 这样的托管服务。
+
+#### Docker Hub
+
+仓库是集中存放镜像的地方。目前Docker官方仓库维护了一个[公共仓库](https://hub.docker.com)，其中已经包括15000多个的镜像。大部分需求都可以通过在Docker Hub中直接下来镜像来实现。
+
+**登录：**
+
+可以通过执行 `docker login` 命令来输入用户名、密码和邮箱来完成注册登录。
+
+**基本操作：**
+
+用户无需登录可以通过 `docker search` 命令来查找官方仓库中的镜像，并利用 `docker pull` 下载到本地，可以通过 `docker push` 命令将本地镜像推送到 docker hub。
+
+先tag一下复制一个镜像，然后把镜像push到服务器上
+
+```sh
+docker images
+docker tag <ImageID> <ImageName> #复制镜像
+docker push <ImageName> #推送到服务器
+```
+
+#### 创建和使用私有仓库
+
+**使用registry镜像创建私有仓库：**
+
+可以通过docker官方提供的registry镜像来搭建一套本地私有仓库。镜像地址：[https://hub.docker.com/_/registry/](https://hub.docker.com/_/registry/)
+
+命令：
+
+```sh
+docker run -e SEARCH_BACKEND=sqlalchemy -e SQLALCHEMY_INDEX_DATABASE=sqlite:////tmp/docker-registry.db -d –name registry -p 5000:5000 registry
+```
+
+- -e设定环境变量
+- -d从后台启动的方式启动镜像
+- -name 启动的容器名字
+- -p 暴露端口，容器内部的5000绑定到宿主机的5000端口上。
+
+**registry镜像本身：**
+
+SEARCH_BACKEND=sqlalchemy默认索引是可以查询的
+
+参考地址：
+
+- [https://github.com/docker/docker-registry#search-engine-options](https://github.com/docker/docker-registry#search-engine-options)
+- [https://hub.docker.com/_/registry/](https://hub.docker.com/_/registry/)
+
+自动下载并启动一个registry容器，创建本地的私有仓库服务。默认仓库创建在/tmp/registry目录下。上传到本地的私有仓库中
+
+```sh
+docker tag <ImageId> <IP:port/ImageName>
+docker push <IP:port/ImageName>
+```
+
+报错了：http:server gave HTTP response to HTTPS client 后面会告诉你如何解决往下看。
+
+docker启动参数配置：
+
+- 环境：centos7解决上边的问题
+
+- 配置文件：/lib/systemd/system/docker.service 修改成：
+
+  ```conf
+  #ExecStart=/usr/bin/dockerd
+  ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --insecure-registry 192.168.100.146:5000
+  ```
+
+  （此处默认2375为主管理端口，unix:///var/run/docker.sock用于本地管理，7654是备用的端口）
+
+  重启服务，在启动一个私有仓库的容器，然后push到私有仓库中
+
+  ```sh
+  systemctl daemon-reload && service docker restart
+  ps -ef|grep docker
+  docker run -e SEARCH_BACKEND=sqlalchemy -e SQLALCHEMY_INDEX_DATABASE=sqlite:////tmp/docker-registry.db -d –name registry -p 5000:5000 registry
+  docker push <IP:port/ImageName>
+  ```
+
+参考地址：[https://docs.docker.com/engine/admin/configuring/](https://docs.docker.com/engine/admin/configuring/)
+
+#### 仓库加速服务
+
+加速下载官方镜像：
+
+- 推荐服务：[https://dashboard.daocloud.io/](https://dashboard.daocloud.io/)
+- 点击加速器：[https://dashboard.daocloud.io/mirror](https://dashboard.daocloud.io/mirror)
+
+配置Docker加速器：
+
+```sh
+curl -sSL https://dashboard.daocloud.io/daotools/set_mirror.sh | sh -s http://b8laace9.m.daocloud.io
+```
+
+![x](E:/WorkingDir/Office/devops/Resource/配置Docker加速器.jpg)
+
+#### 仓库管理
+
+Registry Web UI 用于镜像的查询，删除。镜像地址：[https://hub.docker.com/r/atcol/docker-registry-ui/](https://hub.docker.com/r/atcol/docker-registry-ui/)
+
+启动命令：运行下面的命令的时候建议先配置上边讲的加速哦，因为要下载的东西有点多。
+
+```sh
+docker run -d –name registry_ui -p 8080:8080 -e REG1=http://172.17.0.2:5000/v1/atcol/docker-registry-ui
+```
+
+- 查看端口是否启用：`netstat -nlp|grep 8080`
+- 查看logs：`docker logs -f registry_ui`
+- 访问地址：`http://IP地址:8080`
 
 
 
@@ -2093,6 +2578,212 @@ Docker 日志机制已经没有什么技巧可以优化。这个也证明了容�
 
 
 
+### 编写Dockerfile
+
+Dockerfile 是构建 Docker 镜像最好的方式，也是最推荐使用的方式。通过本文，读者将了解 Dockerfile 的构成以及如何通过 Dockerfile 构建 Docker 镜像，同时也将更深入理解 Docker 的分层存储机制。
+
+**Docker的分层存储进阶**
+
+在开篇中，对于 Docker 的分层存储是这么介绍的：
+
+Docker 镜像是一个特殊的文件系统，类似于 Linux 的 root 文件系统，镜像提供了容器运行时所需的程序、库、资源、配置等文件，还包含了一些为运行时准备的一些配置参数。镜像是一个静态的概念，镜像不包含任何动态数据，其内容在构建之后也不会被改变。
+
+由于镜像包含完整的 Linux root 文件系统，所以它可能会很庞大。因此，Docker 的设计者充分利用 Unions FS 技术，把 Docker 设计为分层存储的结构。什么意思呢？也就是说，镜像是分层构建的，每一层是上面一层的基础，每一层在构建完成之后都不会再发生变化。
+
+这提醒我们，构建镜像的时候我们要保证每一层都只包含我们的应用需要的东⻄，不要包含不需要的文件，***因为每一层在构建之后不再发生变化，所以即使你在之上的层删除了那些不需要的文件，这些文件也只是被标记为删除，实际上并没有真正删除。***如果每一层都包含一些可有可无的文件，就会使得我们的镜像越来越臃肿。一个镜像实际上并不是一个文件，而是一组分层文件。分层存储还使得不同的镜像可以共享某些层，便于镜像的复用。
+
+现在，我们对这段话做一个更加通俗和深入的解释。
+
+这里，我们用到了 **写时拷贝(Copy On Write)** 的思想。现在，让我们用几幅 COW 的图片来说明写时拷贝的工作原理。首先，我们有一张没有斑点的奶牛图片（相当于我们有一个**基础镜像**）：
+
+![x](./Resources/docker25.png)
+
+现在，我希望从这张图片得到一张有斑点的奶牛图像，我不是直接在这个原始图片画斑点，而是将斑点单独作为一层，把斑点层和原始图片叠加，就得到了斑点奶牛：
+
+![x](./Resources/docker26.png)
+
+![x](./Resources/docker27.png)
+
+这样做有什么好处呢？设想一下，如果你直接把你想要的黑色斑点画到原图上，那么其他人想在原始的无斑点奶牛图片上做一些其它的创作就会很麻烦。但是，如果采取分层的方式，他们也只需要设计自己想要的斑点就可以了，从而原始的无斑点奶牛图片可以**共享**：
+
+![x](./Resources/docker28.png)
+
+这样，每次你想查看自己的斑点奶牛的时候，就会把原始的无斑点奶牛复制一份给你，然后叠加你的斑点图层，你就可以看到你的斑点奶牛了。而你不查看的时候，原始的无斑点奶牛图片是共享存储的，这就是**写时拷贝**——只有在需要叠加斑点图给你看效果的时候才把原图拷贝一份给你，在拷贝的上面叠加一层来画斑点，否则，你与其他人的无斑点奶牛图层是共享存储的。
+
+我们之前提到 Docker 镜像的分层存储和这个过程是很相似的。首先，你有一个**基础镜像（无斑点奶牛）**，你可以从这个基础镜像构建**自定义的新镜像（画斑点）**。你在构建新镜像的时候，并不是对原始镜像直接做修改，而是在其上创建一个新的存储层，在这个新的存储层上面作自定义的修改从而得到新的镜像。为了后面表述方便，我们姑且把原始镜像称为镜像 0，把你叠加一层新的存储层得到的新镜像称为镜像 1。
+
+**注意：**现在我们仅仅在原始镜像叠加了一层，比如在镜像 1 的存储层安装了一些软件，添加了一些文本文件。现在，你希望以镜像 1 为基础镜像，再创建一个新镜像 2。在镜像 2 的存储层，你希望把在镜像 1 里安装的一些软件卸载，把一些文件删除，提交后得到新镜像 2。但是，你发现，新镜像 2 的体积根本就没有变小，甚至还多了几 MB，为什么会出现这种情况呢？这是因为，镜像是分层存储的，你在镜像 2 的存储层只是把你需要删除的内容**标记为删除**，实际上你并不能修改基础镜像 1 的存储层，也就是说，你想删除的内容依旧还在，只不过你在镜像 2 的存储层看不到它们了。
+
+这就好比，你现在把褐色斑点奶牛作为基础图片，希望在褐色斑点奶牛的基础上设计新的斑点，那么你不能直接擦除黑色斑点奶牛的斑点，你只能在你的图层用白色把这些斑点覆盖，然后再画新的斑点。
+
+![x](./Resources/docker29.png)
+
+从镜像的 pull 过程或者 commit 过程也可以看出镜像是**分层下载和提交**的：
+
+![x](./Resources/docker30.png)
+
+运行容器的时候，实际是以镜像为基础层，在其上创建一个**容器的存储层**。容器存储层的生命周期和容器是一样的，所以我们**建议使用数据卷存储数据**，而**不要直接在容器的存储层写入数据**。
+
+值得一提的是，分层存储机制使得镜像之间可以共享很多层，节约大量存储空间！
+
+好了，相信介绍到这里，读者对于分层存储应该有一个清晰的理解了。之所以在这里介绍分层存储，是因为后文的 Dockerfile 的一些编写注意事项的提出需要在读者理解分层存储的基础上才能理解为什么我们会要求这些注意事项！
+
+**Dockerfile初步**
+
+Dockerfile 是一个文本文件，包含构建镜像的一条条指令，每一条指令构建一层，每一条指令描述当前层如何构建。
+
+以 [Docker网络](#Docker网络) 的 net:v1.0 为例，如果使用 Dockerfile 构建的话应该按照如下步骤，首先新建一个空白目录，在这个目录下使用 `touch Dockerfile` 命令新建一个文本文件，文件内容如下：
+
+```sh
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install -y apt-utils
+RUN apt-get install -y vim 
+RUN apt-get install -y net-tools
+RUN apt-get install -y iputils-ping
+RUN apt-get install -y apache2
+RUN apt-get install -y apache2-utils
+RUN apt-get install -y openssh-server
+RUN apt-get install -y openssh-client
+
+RUN mkdir /var/run/sshd
+RUN echo 'root:root' |chpasswd
+
+RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
+```
+
+下面，我们对这个 Dockerfile 里面用到的命令做一些解释：
+
+**FROM**
+
+FROM 指令指定基础镜像，我们定制的镜像是在基础镜像之上进行修改的。FROM 指令必须是Dockerfile文件的第一条指令。
+
+**RUN**
+
+RUN 是用来执行命令的，这条指令的格式有两种：
+
+Shell 格式是 `RUN <命令>`，我们的 Dockerfile 就是使用的 Shell 格式。
+
+exec 格式：`RUN [<可执行文件>，<参数1>，<参数2>，... ]`，和函数调用的格式很相似。
+
+**EXPOSE**
+
+EXPOSE 用来暴露端口，格式为：`EXPOSE <端口1> [<端口2>……]`
+
+值得注意的是，EXPOSE 只是声明运行容器时提供的服务端口，这**仅仅是一个声明**，在运行容器的时候并不会因为这个声明就会开启端口服务，你依旧需要使用 -P 或者 -p 参数映射端口。在 Dockerfile 中写这样的端口声明有助于使用者理解这个镜像开放哪些服务端口，以便配置映射。并且，可以在 docker run 命令执行的时候使用 -P 参数随机映射宿主主机端口到 EXPOSE 的容器端口。
+
+**CMD**
+
+CMD是容器启动命令，和 RUN 命令类似，它也有两种格式：
+
+shell 格式： CMD <命令>
+
+exec格式： CMD [<可执行文件>，<参数1>，<参数2>，... ]
+
+记得我们早就说过，***容器不是虚拟机，容器的本质是进程***。既然是进程，就需要指定进程运行的时候的参数和程序。CMD 就是为容器主进程启动命令而存在的。比如，在我们的文件中，我们使用 CMD 开启了 ssh 进程。
+
+使用 CMD 命令的时候，初学者容易混淆 **前台运行** 和 **后台运行**。再强调一遍，Docker 不是虚拟机，容器是进程，所以容器中的应用都应该以前台模式运行，比如，如果你把我们的 Dockerfile 的最后一行写成 `CMD service ssh start`，那么我们使用 `docker run` 从镜像运行容器后，容器马上就退出了。这是因为，容器就是为了主进程而存在的，一旦执行完我们的 `service ssh start`，主进程就认为完成了任务，于是就退出了。所以，注意应该直接执行 sshd 可执行文件，并以前台模式执行：`CMD ["/usr/sbin/sshd", "-D"]`
+
+现在，让我们开始 **构建镜像** 吧，在 **Dockerfile所在的目录下** 执行以下指令：
+
+```sh
+docker build -t net:v1.2 .
+```
+
+ -t 参数后面指定镜像的名字。最后一个 "." 指的是当前目录。执行后，会得到类似下面的输出。
+
+如果之前构建过这个镜像，你可以看到 step 中，都是"using cache"，并没有下载 apt install 需要的文件。如果你是第一次构建，可能会输出很多文件下载，更新等信息，并且构建速度取决于你的网速（因为要下载好多文件）。在这里，我想多讲一点，如果你使用一个 Dockerfile 构建过镜像，并且你没有删除这个镜像，那么在你第 2 次使用同一个 Dockerfile 构建镜像的时候，Docker不会重新下载文件，而是使用之前构建好的"cache"。那么，请读者思考一下，这些"cache"是什么呢？没错，就是我们之前说的**分层存储的层**。
+
+**重点来了**，这就告诉我们，我们应该将 Dockerfile 里很少变动的部分写在前面，因为每一行指令都构建一层，层层叠加，如果 Dockerfile 里开始若干行是相同的话，那么即使是新的 Dockerfile 也可以在构建的时候共享之前的"cache"。换句话说，一个 Dockerfile 在构建的时候，如果发现本地有可用的"cache"，就不会去重新下载和构建这些层，直到遇到第一处不同的指令，无法使用"cache"，才会下载和构建。（全新的构建是从 Dockerfile 的第一处改动开始的，在此之前只是在使用之前构建好的层！）
+
+好了，现在让我们从这个镜像运行一个容器：
+
+```sh
+docker run --name sshtest --rm -d -p 6666:22 net:v1.2
+```
+
+这里的 --rm 参数的作用是容器终止后立刻删除。
+
+然后使用 `docker inspect sshtest` 查看容器网址为172.17.0.3，现在使用 ssh 登录（密码：root）：
+
+![image-20201112153752540](C:\Users\23907\AppData\Roaming\Typora\typora-user-images\image-20201112153752540.png)
+
+在 ssh 的时候你可能会遇到如下问题：
+
+![x](./Resources/docker32.png)
+
+解决的办法是：`ssh-keygen -R yourIP`（上图有具体例子）
+
+好了，第一个Dockerfile定制镜像到此为止就完成了，但是，还记得我们之前提到过的吗？我们不推荐使用commit来构建镜像，给的理由之一是会使我们的镜像越来越臃肿！但是，现在我们的新镜像真的比原来使用commit得到的镜像更精简吗？看下图：
+
+![x](./Resources/docker33.png)
+
+net:v1.0是我们commit得到的镜像，net:v1.2是我们使用Dockerfile定制的镜像，可是使用Dockerfile得到的镜像竟然更大！！！现在你的心里一定有一句 MMP 要跟我说吧！？ “宝宝费了这么大劲学习Dockerfile，最后结果竟然更差？”下面，我就来解释一下为什么吧。
+
+使用commit提交镜像的缺点我们之前提到过，现在复习一下。使用docker commit提交镜像主要有两个缺点：其一，你的镜像会变成一个黑盒，除了本人，别人很难知道镜像里发生过的操作；其二，由于镜像的分层存储，会有大量冗余数据，使得镜像越来越臃肿。
+
+而Dockerfile解决了这些问题。首先，编写Dockerfile可以很清楚地表述镜像构建的过程；第二，可以让我们的镜像很清爽，不会很臃肿。
+
+可是刚才我们使用Dockerfile构建的镜像甚至比使用commit构建的同样功能镜像还要臃肿，这又怎么解释呢？这其实是因为我们的Dockerfile写得太随意了！！之前说过，Dockerfile的每一条指令都会构建一层，RUN命令也不例外，每一个RUN命令都会像我们手动构建的过程一样，新建立一层，在这个新的一层上做修改后提交，所以我们刚刚的例子构建的镜像足足有15层！！！这种写法是很不好的，会把很多容器运行时不需要的东西装到镜像里面，结果就让镜像很臃肿。解决的办法是把可以在同一层执行的命令尽可能放在一层去执行，并且执行完的同时在这一层清理不需要的东西，所以我们的 Dockerfile推荐下面这种写法（使用&&符号把命令串联起来）：
+
+```sh
+FROM ubuntu:16.04
+
+RUN softwares='apt-utils vim net-tools iputils-ping apache2 apache2-utils openssh-server openssh-client' && apt-get update && apt-get install -y $softwares && rm -rf /var/lib/apt/lists/* 
+
+RUN mkdir /var/run/sshd
+RUN echo 'root:root' |chpasswd
+
+RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
+```
+
+
+
+### Portainer管理集群部署
+
+之前都是通过命令的方式，管理docker的，其实docker还是有图形界面的。使用图形界面如何管理docker，其实业界很多公司都对docker进行了图形化的封装。之前在初级和中级的时候也有界面marathon。这里说下业界比较出名的portainer。
+
+官网：https://www.portainer.io
+
+Portainer的开发是为了帮助客户采用Docker容器技术，加快交付价值的时间。构建、管理和维护Docker环境从来没有这么容易。Portainer易于使用为软件开发人员和IT操作提供直观界面的软件。Portainer为您提供了Docker环境的详细概述，并允许您管理容器、图像、网络和卷。Portainer很容易部署——您只需要一个Docker命令就可以在任何地方运行Portainer。
+
+写了那么多命令，现在才说有一个开源Portainer，其实我的目的就是先学会走，在学会跑。如果直接用图形界面对docker的运行，理解不深入，网络原理也不理解。通过图形界面运行后，可以透过图形界面，理解后台是如何运行命令的。
+
+**portainer安装**
+
+开放Docker网络管理端口（四台机器都需要执行）
+
+```sh
+vim /lib/systemd/system/docker.service#找到 ExecStart行  ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock  systemctl daemon-reload systemctl restart docker  
+```
+
+启动容器（四台机器）
+
+```sh
+# 66.100机器执行
+docker run -d -p 9000:9000 portainer/portainer -H tcp://192.168.66.100:2375
+# 66.101机器执行
+docker run -d -p 9000:9000 portainer/portainer -H tcp://192.168.66.101:2375
+# 66.102机器执行
+docker run -d -p 9000:9000 portainer/portainer -H tcp://192.168.66.102:2375
+# 66.103机器执行
+docker run -d -p 9000:9000 portainer/portainer -H tcp://192.168.66.103:2375
+```
+
+功能页面：http://192.168.66.100:9000/#/init/admin
+
+可能设置完密码会崩了容器，重新 `docker start 容器ID`
+
 
 
 ### docker-compose
@@ -2255,6 +2946,120 @@ sudo docker-compose ps
 **参考：**
 
 - 官网：[https://docs.docker.com/compose/compose-file/](https://docs.docker.com/compose/compose-file/)
+
+
+
+### docker-swarm
+
+![x](./Resources/docker20.png)
+
+ 
+
+为了让学习的知识融汇贯通，目前是把所有的集群都放在了一个虚拟机上，如果这个虚拟机宕机了怎么办？俗话说鸡蛋不要都放在一个篮子里面，把各种集群的节点拆分部署，应该把各种节点分机器部署，多个宿主机，这样部署随便挂哪个主机我们都不担心。
+
+源码：https://github.com/limingios/netFuture/blob/master/docker-swarm/
+
+swarm 是docker的三剑客一员，之前都说过了，可以看中级和高级啊 。
+
+1. docker machine 容器服务
+
+2. docker compose 脚本服务
+
+3. docker swarm 容器集群技术
+
+**去中心化的设计**
+
+- Swarm Manager 也承担worker节点的作用。
+- Swarm Worker 运行容器部署项目
+
+![x](./Resources/docker21.png)
+
+Swarm是没有中心节点的，挂掉其中一个其他是不会挂掉的。Swarm Manager 如果master挂了，立马选举一个新的master。
+
+**创建集群环境**
+
+首先机器已经安装了docker环境
+
+```sh
+docker swarm init
+```
+
+**加入swarm集群**
+
+```sh
+# 加入到 manager 中
+docker swarm join-token manager
+# 加入到 worker 中
+docker swarm join-token worker
+```
+
+**环境搭建**
+
+![x](./Resources/docker21.png)
+
+一共4个节点，2个manager节点，2个work节点，manager不光是管理，而且也干活，说白了一共4个干活的节点。
+
+**创建 docker swarm 集群**
+
+```sh
+docker swarm init
+```
+
+报错注意：如果你在新建集群时遇到双网卡情况，可以指定使用哪个 IP，例如上面的例子会有可能遇到下面的错误。
+
+Error response from daemon: could not choose an IP address to advertise since this system has multiple addresses on different interfaces (10.0.2.15 on enp0s3 and 192.168.66.100 on enp0s8) 
+\- specify one with --advertise-addr
+
+再次创建 docker swarm 集群 192.168.66.100
+
+```sh
+docker swarm init --advertise-addr 192.168.66.100 --listen-addr 192.168.66.100:2377docker swarm join-token manager
+```
+
+再次创建 docker swarm 集群192.168.66.101当前节点以manager的身份加入swarm集群
+
+```sh
+docker swarm join --token SWMTKN-1-4itumtscktomolcau8a8cte98erjn2420fy2oyj18ujuvxkkzx-9qutkvpzk87chtr4pv8770mcb 192.168.66.100:2377
+```
+
+再次创建 docker swarm 集群 192.168.66.102 当前节点以 worker 的身份加入 swarm 集群
+
+```sh
+docker swarm join --token SWMTKN-1-4itumtscktomolcau8a8cte98erjn2420fy2oyj18ujuvxkkzx-f2dlt8g3hg86gyc9x6esewtwl 192.168.66.100:2377
+```
+
+再次创建 docker swarm 集群 192.168.66.103 当前节点以 worker 的身份加入 swarm 集群
+
+```sh
+docker swarm join --token SWMTKN-1-4itumtscktomolcau8a8cte98erjn2420fy2oyj18ujuvxkkzx-f2dlt8g3hg86gyc9x6esewtwl 192.168.66.100:2377
+```
+
+**查看swarm集群**
+
+只能在 manager 节点内执行，leader 挂掉后，reachable 就可以管理集群了。
+
+```sh
+docker node ls
+```
+
+![x](./Resources/docker23.png)
+
+**创建容器间的共享网络**
+
+只能在manager节点内执行
+
+```sh
+docker network create -d overlay --attachable swarm_test
+docker network ls
+```
+
+目前是4台机器，如果想让4台机器内的容器可以进行共享，overlay的网络就可以了，只需要在创建容器的时候 `–net=swarm_test`
+
+![x](./Resources/docker24.png)
+
+**创建5个pxc容器**
+
+
 
 
 
@@ -3120,115 +3925,7 @@ RUN apt-get upgrade -y
 
 除非你正在用Docker做实验，否则你应当通过-t选项来docker build新的镜像以便于标记构建的镜像。一个简单的可读标签将帮助你管理每个创建的镜像。
 
-## 仓库
-
-### Docker Hub
-
-仓库是集中存放镜像的地方。目前Docker官方仓库维护了一个[公共仓库](https://hub.docker.com)，其中已经包括15000多个的镜像。大部分需求都可以通过在Docker Hub中直接下来镜像来实现。
-
-**登录：**
-
-可以通过执行 `docker login` 命令来输入用户名、密码和邮箱来完成注册登录。
-
-**基本操作：**
-
-用户无需登录可以通过 `docker search` 命令来查找官方仓库中的镜像，并利用 `docker pull` 下载到本地，可以通过 `docker push` 命令将本地镜像推送到 docker hub。
-
-先tag一下复制一个镜像，然后把镜像push到服务器上
-
-```sh
-docker images
-docker tag <ImageID> <ImageName> #复制镜像
-docker push <ImageName> #推送到服务器
-```
-
-### 创建和使用私有仓库
-
-**使用registry镜像创建私有仓库：**
-
-可以通过docker官方提供的registry镜像来搭建一套本地私有仓库。镜像地址：[https://hub.docker.com/_/registry/](https://hub.docker.com/_/registry/)
-
-命令：
-
-```sh
-docker run -e SEARCH_BACKEND=sqlalchemy -e SQLALCHEMY_INDEX_DATABASE=sqlite:////tmp/docker-registry.db -d –name registry -p 5000:5000 registry
-```
-
-- -e设定环境变量
-- -d从后台启动的方式启动镜像
-- -name 启动的容器名字
-- -p 暴露端口，容器内部的5000绑定到宿主机的5000端口上。
-
-**registry镜像本身：**
-
-SEARCH_BACKEND=sqlalchemy默认索引是可以查询的
-
-参考地址：
-
-- [https://github.com/docker/docker-registry#search-engine-options](https://github.com/docker/docker-registry#search-engine-options)
-- [https://hub.docker.com/_/registry/](https://hub.docker.com/_/registry/)
-
-自动下载并启动一个registry容器，创建本地的私有仓库服务。默认仓库创建在/tmp/registry目录下。上传到本地的私有仓库中
-
-```sh
-docker tag <ImageId> <IP:port/ImageName>
-docker push <IP:port/ImageName>
-```
-
-报错了：http:server gave HTTP response to HTTPS client 后面会告诉你如何解决往下看。
-
-docker启动参数配置：
-
-- 环境：centos7解决上边的问题
-
-- 配置文件：/lib/systemd/system/docker.service 修改成：
-
-  ```conf
-  #ExecStart=/usr/bin/dockerd
-  ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --insecure-registry 192.168.100.146:5000
-  ```
-
-  （此处默认2375为主管理端口，unix:///var/run/docker.sock用于本地管理，7654是备用的端口）
-
-  重启服务，在启动一个私有仓库的容器，然后push到私有仓库中
-
-  ```sh
-  systemctl daemon-reload && service docker restart
-  ps -ef|grep docker
-  docker run -e SEARCH_BACKEND=sqlalchemy -e SQLALCHEMY_INDEX_DATABASE=sqlite:////tmp/docker-registry.db -d –name registry -p 5000:5000 registry
-  docker push <IP:port/ImageName>
-  ```
-
-参考地址：[https://docs.docker.com/engine/admin/configuring/](https://docs.docker.com/engine/admin/configuring/)
-
-### 仓库加速服务
-
-加速下载官方镜像：
-
-- 推荐服务：[https://dashboard.daocloud.io/](https://dashboard.daocloud.io/)
-- 点击加速器：[https://dashboard.daocloud.io/mirror](https://dashboard.daocloud.io/mirror)
-
-配置Docker加速器：
-
-```sh
-curl -sSL https://dashboard.daocloud.io/daotools/set_mirror.sh | sh -s http://b8laace9.m.daocloud.io
-```
-
-![x](E:/WorkingDir/Office/devops/Resource/配置Docker加速器.jpg)
-
-### 仓库管理
-
-Registry Web UI 用于镜像的查询，删除。镜像地址：[https://hub.docker.com/r/atcol/docker-registry-ui/](https://hub.docker.com/r/atcol/docker-registry-ui/)
-
-启动命令：运行下面的命令的时候建议先配置上边讲的加速哦，因为要下载的东西有点多。
-
-```sh
-docker run -d –name registry_ui -p 8080:8080 -e REG1=http://172.17.0.2:5000/v1/atcol/docker-registry-ui
-```
-
-- 查看端口是否启用：`netstat -nlp|grep 8080`
-- 查看logs：`docker logs -f registry_ui`
-- 访问地址：`http://IP地址:8080`
+- 
 
 ## 附录
 
@@ -3535,3 +4232,29 @@ docker-machine create --driver virtualbox myvm2
 - Docker的一本电子书（英文资源可能需要科学上网）[点击链接](https://www.tutorialspoint.com/docker/docker_tutorial.pdf)
 
 - Docker教程 [点击链接](http://www.runoob.com/docker/docker-tutorial.html)
+
+
+
+## 升华
+
+最早系统部署到自己的服务器，有虚拟IP，可以完成热备，大概是2013年的时候，公司的服务器要升级到云端放到阿里云上，阿里云没有虚拟ip，keepalived没办法完成热备。只能通过nginx来进行负载完成十几台机器的负载。也有nginx挂的时候，2014年，面试认识了个大哥，建议接触下docker。于是自己搭建虚拟网络，学习至今，发现 docker-swarm 实在方便想热备就可以热备。通过 docker-swarm 得虚拟网络 –net 多台机器轻松互联，容器挂了自动重启。如果知道 Docker 可以这样用，你就会彻底爱上Docker！
+
+有老铁问我，买电脑thinkpad还是mac，我强烈用建议使用mac，安装个docker环境，随时安装各种容器，方便自己用，自己写写shell，美滋滋比 windows10 老更新开心多了，100g的C盘过几天就没了。
+
+1. 这次主要做的前后端分离的项目，高级的专辑说的是微服务的项目
+
+2. 编排真的需要吗？没用服务编排就没排面吗？老铁看你个人需求，没有最好的只有最适合的。
+
+3. docker太省事了，站在别人的镜像里面搬自己砖
+
+4. 良好的移植性，你做好的镜像打成包稳，到其他环境继续执行
+
+5. 应用 Docker 时，你不仅是在分布你的代码，也是在分布你的代码所运行的环境
+
+6. 用Docker的logo来解释，鲸鱼和集装箱，鱼中的大哥鲸鱼，慢慢的运载集装箱。
+
+7. 服务的容灾性好，挂了自动重启，重启只是一个点
+
+8. 古人云：有容乃大。是吧，容器就是docker哦
+
+9. 未来在应用的开发测试，编译构建，和部署运行等环境，都使用Docker容器，并利用服务编排来管理容器集群。

@@ -16,6 +16,9 @@
    - [DevOps工具链](#DevOps工具链)
    - [收益](#收益)
 
+3. 总结
+4. 升华
+
 原文：[https://www.infoq.cn/article/detail-analysis-of-devops](https://www.infoq.cn/article/detail-analysis-of-devops)
 
 
@@ -729,6 +732,7 @@ DevOps 实际上是向着大规模敏捷(Scaling Agility)迈出的另一步！
 
 ### 总结
 
-    使用现代化的DevOps工具，如Chef、Docker、Ansible、Packer、Troposphere、Consul、Jenkins、SonarQube、AWS等，并不代表你就在正确的应用DevOps的原则。DevOps是一种思维方式。我们所有人都是该系统流程的一部分，我们一起分享共同的时光和交付价值。每个参加到这个软件交付流程上来的成员都能够加速或减缓整个系统的运作速度。系统出现的一个缺陷，以及错误配置的团队之间的“防火墙”，都可能会使得整个系统瘫痪，
-    
-    所有的人都是DevOps的一部分，一旦你的组织明白了这一点，能够帮你管理好这些的工具和技术栈就自然而然的会出现在你眼前了。
+使用现代化的DevOps工具，如Chef、Docker、Ansible、Packer、Troposphere、Consul、Jenkins、SonarQube、AWS等，并不代表你就在正确的应用DevOps的原则。DevOps是一种思维方式。我们所有人都是该系统流程的一部分，我们一起分享共同的时光和交付价值。每个参加到这个软件交付流程上来的成员都能够加速或减缓整个系统的运作速度。系统出现的一个缺陷，以及错误配置的团队之间的“防火墙”，都可能会使得整个系统瘫痪，
+
+所有的人都是DevOps的一部分，一旦你的组织明白了这一点，能够帮你管理好这些的工具和技术栈就自然而然的会出现在你眼前了。
+

@@ -11,7 +11,9 @@
 
 2. 实战
 
-   [BIO/NIO/AIO](#BIO/NIO/AIO)
+   - [BIO/NIO/AIO](#BIO/NIO/AIO)
+
+   - [Netty](#Netty)
 
 3. 总结
 
@@ -316,6 +318,8 @@ NIO和BIO的区别主要是在第一步：在BIO中，等待客户端发数据�
 
 以上摘自[Linux IO模式及 select、poll、epoll详解](https://links.jianshu.com/go?to=https%3A%2F%2Fsegmentfault.com%2Fa%2F1190000003063859)
 
+### Netty
+
 **Netty为什么传输快？**
 
 Netty的传输快其实也是依赖了NIO的一个特性——**零拷贝**。
@@ -326,9 +330,221 @@ Netty针对这种情况，使用了NIO中的另一大特性——零拷贝，当
 
 下两图就介绍了两种拷贝方式的区别，摘自[Linux 中的零拷贝技术，第 1 部分](https://links.jianshu.com/go?to=https%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Flinux%2Fl-cn-zerocopy1%2Findex.html)
 
+![x](./Resources/java-netty01.png)
 
+![x](./Resources/java-netty02.png)
 
+上文介绍的ByteBuf是Netty的一个重要概念，他是netty数据处理的容器，也是Netty封装好的一个重要体现，将在下一部分做详细介绍。
 
+**为什么说Netty封装好？**
+
+要说Netty为什么封装好，这种用文字是说不清的，直接上代码：
+
+阻塞I/O：
+
+```java
+public class PlainOioServer {
+
+    public void serve(int port) throws IOException {
+        final ServerSocket socket = new ServerSocket(port); //1
+        try {
+            for (;;) {
+                final Socket clientSocket = socket.accept(); //2
+                System.out.println("Accepted connection from " + clientSocket);
+                new Thread(new Runnable() { //3
+                    @Override
+                    public void run() {
+                        OutputStream out;
+                        try {
+                            out = clientSocket.getOutputStream();
+                            out.write("Hi!\r\n".getBytes(Charset.forName("UTF-8"))); //4
+                            out.flush();
+                            clientSocket.close(); //5
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            try {
+                                clientSocket.close();
+                            } catch (IOException ex) {
+                                // ignore on close
+                            }
+                        }
+                    }
+                }).start(); //6
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+非阻塞IO：
+
+```java
+public class PlainNioServer {
+    public void serve(int port) throws IOException {
+        ServerSocketChannel serverChannel = ServerSocketChannel.open();
+        serverChannel.configureBlocking(false);
+        ServerSocket ss = serverChannel.socket();
+        InetSocketAddress address = new InetSocketAddress(port);
+        ss.bind(address); //1
+        Selector selector = Selector.open(); //2
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT); //3
+        final ByteBuffer msg = ByteBuffer.wrap("Hi!\r\n".getBytes());
+        for (;;) {
+            try {
+                selector.select(); //4
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // handle exception
+                break;
+            }
+            Set<SelectionKey> readyKeys = selector.selectedKeys(); //5
+            Iterator<SelectionKey> iterator = readyKeys.iterator();
+            while (iterator.hasNext()) {
+                SelectionKey key = iterator.next();
+                iterator.remove();
+                try {
+                    if (key.isAcceptable()) { //6
+                        ServerSocketChannel server =
+                                (ServerSocketChannel)key.channel();
+                        SocketChannel client = server.accept();
+                        client.configureBlocking(false);
+                        client.register(selector, SelectionKey.OP_WRITE |
+                                SelectionKey.OP_READ, msg.duplicate()); //7
+                        System.out.println(
+                                "Accepted connection from " + client);
+                    }
+                    if (key.isWritable()) {  //8
+                        SocketChannel client =
+                                (SocketChannel)key.channel();
+                        ByteBuffer buffer =
+                                (ByteBuffer)key.attachment();
+                        while (buffer.hasRemaining()) {
+                            if (client.write(buffer) == 0) { //9
+                                break;
+                            }
+                        }
+                        client.close(); //10
+                    }
+                } catch (IOException ex) {
+                    key.cancel();
+                    try {
+                        key.channel().close();
+                    } catch (IOException cex) {
+                        // 在关闭时忽略
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Netty：
+
+```java
+public class NettyOioServer {
+
+    public void server(int port) throws Exception {
+        final ByteBuf buf = Unpooled.unreleasableBuffer(
+                Unpooled.copiedBuffer("Hi!\r\n", Charset.forName("UTF-8")));
+        EventLoopGroup group = new OioEventLoopGroup();
+        try {
+            ServerBootstrap b = new ServerBootstrap(); //1
+            b.group(group) //2
+             .channel(OioServerSocketChannel.class)
+             .localAddress(new InetSocketAddress(port))
+             .childHandler(new ChannelInitializer<SocketChannel>() { //3
+                 @Override
+                 public void initChannel(SocketChannel ch) 
+                     throws Exception {
+                     ch.pipeline().addLast(new ChannelInboundHandlerAdapter() { //4
+                         @Override
+                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                             ctx.writeAndFlush(buf.duplicate()).addListener(ChannelFutureListener.CLOSE); //5
+                         }
+                     });
+                 }
+             });
+            ChannelFuture f = b.bind().sync(); //6
+            f.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully().sync(); //7
+        }
+    }
+}
+```
+
+从代码量上来看，Netty就已经秒杀传统Socket编程了，但是这一部分博大精深，仅仅贴几个代码岂能说明问题，在这里给大家介绍一下Netty的一些重要概念，让大家更理解Netty。
+
+**Channel**
+
+数据传输流，与channel相关的概念有以下四个，上一张图让你了解netty里面的Channel。
+
+![x](./Resources/java-netty03.png)
+
+Channel，表示一个连接，可以理解为每一个请求，就是一个Channel。 
+
+ChannelHandler，核心处理业务就在这里，用于处理业务请求。 
+
+ChannelHandlerContext，用于传输业务数据。 
+
+ChannelPipeline，用于保存处理过程需要用到的 ChannelHandler 和 ChannelHandlerContext。
+
+**ByteBuf**
+
+ByteBuf 是一个存储字节的容器，最大特点就是使用方便，它既有自己的读索引和写索引，方便你对整段字节缓存进行读写，也支持get/set，方便你对其中每一个字节进行读写，他的数据结构如下图所示：
+
+![x](./Resources/java-netty04.png)
+
+它有三种使用模式：
+
+1. Heap Buffer 堆缓冲区
+
+   堆缓冲区是 ByteBuf 最常用的模式，他将数据存储在堆空间。
+
+2. Direct Buffer 直接缓冲区
+
+   直接缓冲区是 ByteBuf 的另外一种常用模式，他的内存分配都不发生在堆，jdk1.4 引入的 nio 的 ByteBuffer 类允许 jvm 通过本地方法调用分配内存，这样做有两个好处：
+
+   - 通过免去中间交换的内存拷贝，提升 IO 处理速度；直接缓冲区的内容可以驻留在垃圾回收扫描的堆区以外。
+   - DirectBuffer 在 -XX:MaxDirectMemorySize=xxM 大小限制下，使用 Heap 之外的内存，GC 对此“无能为力”，也就意味着规避了在高负载下频繁的 GC 过程对应用线程的中断影响。
+
+3. Composite Buffer 复合缓冲区
+
+   复合缓冲区相当于多个不同 ByteBuf 的视图，这是 netty 提供的，jdk 不提供这样的功能。
+
+   除此之外，他还提供一大堆 api 方便你使用，在这里我就不一一列出了，具体参见[ByteBuf字节缓存](https://links.jianshu.com/go?to=https%3A%2F%2Fwaylau.gitbooks.io%2Fessential-netty-in-action%2Fcontent%2FCORE%20FUNCTIONS%2FBuffers.html)。
+
+**Codec**
+
+Netty 中的编码/解码器，通过它你能完成字节与 pojo、pojo 与 pojo 的相互转换，从而达到自定义协议的目的。
+在 Netty 里面最有名的就是 HttpRequestDecoder 和 HttpResponseEncoder 了。
+
+**Netty工作原理源码分析**
+
+1. 我们如何提高NIO的工作效率
+
+2. 一个NIO是不是只能有一个selector？
+
+   不是，一个系统可以有多个selector
+
+3. selector是不是只能注册一个ServerSocketChannel？
+
+   不是，可以注册多个
+
+**SocketIO：**
+
+![x](./Resources/java-netty05.png)
+
+**NIO：**
+
+![x](./Resources/java-netty06.png)
+
+**NettyIO：**
+
+![x](./Resources/java-netty07.png)
 
 
 
