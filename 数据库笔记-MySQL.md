@@ -9,8 +9,9 @@
      - [控制外键约束](#控制外键约束)
      - [控制安全模式](#控制安全模式)
    - [常用SQL语句](#常用SQL语句)
-     - [复制表结构或数据](#复制表结构或数据)
+     - [表结构相关](#表结构相关)
      - [字符串分割](#字符串分割)
+     - [索引相关](#索引相关)
    - [常见错误](#常见错误)
      - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
    - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
@@ -315,9 +316,64 @@ set sql_safe_updates=0; --安全模式关闭状态
 
 
 
-#### 复制表结构或数据
+#### 查看系统配置
 
 ```sql
+-- 安全模式
+show variables like 'sql_safe_updates';
+set sql_safe_updates=1; --安全模式打开状态
+set sql_safe_updates=0; --安全模式关闭状态
+```
+
+
+
+#### 查看结构描述
+
+```sql
+show databases;
+desc tableName; --查看表结构
+show tables from dbName;
+show columns from tableName; --查看表中的列
+show index from tableName; --查询索引
+show create proc[edure] procName; --查看创建存储过程信息
+show procedure status;
+show function status;
+show profiles
+```
+
+
+
+#### 数据库引擎相关
+
+```sql
+-- 改变数据表的类型（MyISAM、InnoDB）：
+ALTER TABLE tblname  ENGINE typename
+
+-- 如果 `MyISAM` 数据表包含全文索引或地理数据，转换不能成功（`InnoDB` 不支持这些功能）。
+-- 如果对大量数据表进行转换，unix/Linux下的 `mysql_convert_table_format` 脚本很值得选用：
+-- 如果tbname没有指定，会转换所有数据表
+-- mysql数据库中的表类型都是`MyISAM`，保存着内部管理信息，千万不能转换！
+mysql_convert_table_format [opt] –type=InnoDB dbname [tbname]
+```
+
+
+
+#### 表结构相关
+
+https://dev.mysql.com/doc/relnotes/connector-j/8.0/en/news-8-0-19.html
+
+MySQL Server 8.0.17 deprecated the display width for the TINYINT, SMALLINT, MEDIUMINT, INT, and BIGINT data types when the ZEROFILL modifier is not used, and MySQL Server 8.0.19 has removed the display width for those data types from results of SHOW CREATE TABLE, SHOW CREATE FUNCTION, and queries on INFORMATION_SCHEMA.COLUMNS, INFORMATION_SCHEMA.ROUTINES, and INFORMATION_SCHEMA.PARAMETERS (except for the display width for signed TINYINT(1)). This patch adjusts Connector/J to those recent changes of MySQL Server and, as a result, DatabaseMetaData, ParameterMetaData, and ResultSetMetaData now report identical results for all the above-mentioned integer types and also for the FLOAT and DOUBLE data types. (Bug #30477722)
+
+***从8.0.17版本开始，TINYINT, SMALLINT, MEDIUMINT, INT, and BIGINT类型的显示宽度将失效。***
+
+```sql
+-- 增加一个数据列：
+ALTER TABLE tblname ADD newcolumn coltype coloptions [FIRST|AFTER existingcolumn]
+-- 修改一个数据列：
+ALTER TABLE tblname CHANGE oldcolumn newcolumn coltype coloptions
+-- 删除一个数据列：
+ALTER TABLE tblname DROP column
+
 -- 1. 复制表结构及其数据：
 create table table_name_new as select * from table_name_old
 -- 2. 只复制表结构：
@@ -330,6 +386,8 @@ insert into table_name_new select * from table_name_old
 -- 如果两个表结构不一样：
 insert into table_name_new(column1,column2...) select column1,column2... from table_name_old
 ```
+
+
 
 #### 字符串分割
 
@@ -344,6 +402,45 @@ SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321|30001','|',help_topic_id+1),'|',-1
 FROM mysql.help_topic 
 WHERE help_topic_id < LENGTH('10321|30001')-LENGTH(REPLACE('10321|30001','|',''))+1;
 ```
+
+
+
+#### 索引相关
+
+```sql
+-- 查看现有索引：
+-- 命令行（报错？）
+SHOW INDEX FROM tablename
+-- 查看数据库所有索引
+SELECT * FROM mysql.`innodb_index_stats` a WHERE a.`database_name` = '数据库名';
+-- 查看某一表索引
+SELECT * FROM mysql.`innodb_index_stats` a WHERE a.`database_name` = '数据库名' and a.table_name like '%表名%';
+-- 删除索引：
+DROP INDEX indexname ON tablename
+-- 增加一个索引：
+-- ALTER TABLE可用于创建普通索引、UNIQUE索引和PRIMARY KEY等
+-- 索引名index_name可选，缺省时，MySQL将根据第一个索引列赋一个名称。
+-- 另外，ALTER TABLE允许在单个语句中更改多个表，因此可以同时创建多个索引。
+ALTER TABLE tblname ADD PRIMARY KEY (indexcols …)
+ALTER TABLE tblname ADD INDEX [indexname] (indexcols …)
+ALTER TABLE tblname ADD UNIQUE [indexname] (indexcols …)
+ALTER TABLE tblname ADD FULLTEXT [indexname] (indexcols …)
+-- 只对被索引字段的前16个字符进行索引：
+ALTER TABLE titles ADD INDEX idxtitle (title(16))
+-- CREATE INDEX可用于对表增加普通索引或UNIQUE索引，可用于建表时创建索引。
+CREATE INDEX index_name ON table_name (column_list)
+CREATE UNIQUE INDEX index_name ON table_name (column_list)
+-- table_name、index_name和column_list具有与ALTER TABLE语句中相同的含义，索引名不可选。
+-- 另外，不能用CREATE INDEX语句创建PRIMARY KEY索引。
+-- 删除一个索引：
+ALTER TABLE tblname  DROP PRIMARY KEY
+ALTER TABLE tblname  DROP INDEX indexname
+ALTER TABLE tblname  DROP FOREIGN KEY indexname
+```
+
+
+
+
 
 
 
@@ -1884,6 +1981,206 @@ url=jdbc:mysql://yourip/college?user=root&password=yourpassword&useunicode=true&
 
 
 ### 性能优化
+
+
+
+#### InnoDB引擎性能优化
+
+**1. 内存利用方面**
+
+**innodb_buffer_pool_size**
+
+这个是 Innodb 最重要的参数，和 MyISAM 的 key_buffer_size 有相似之处，但也是有差别的。这个参数主要缓存 innodb 表的索引，数据，插入数据时的缓冲。
+
+该参数分配内存的原则：这个参数默认分配只有8M，可以说是非常小的一个值。如果是一个专用DB服务器，那么他可以占到内存的70%-80%。这个参数不能动态更改，所以分配需多考虑。分配过大，会使 Swap 占用过多，致使 Mysql 的查询特慢。如果你的数据比较小，那么可分配是你的 数据大小+10% 左右做为这个参数的值。
+
+例如：数据大小为50M，那么给这个值分配 innodb_buffer_pool_size＝64M
+
+设置方法，在my.cnf文件里：innodb_buffer_pool_size=4G
+
+> 注意：
+>
+> 在 Mysql5.7 版本之前，调整 innodb_buffer_pool_size 大小必须在 my.cnf 配置里修改，然后重启 mysql 进程才可以生效。
+> 如今到了 Mysql5.7 版本，就可以直接动态调整这个参数，方便了很多。
+>
+> 尤其是在服务器内存增加之后，运维人员不能粗心大意，要记得调大 Innodb_Buffer_Pool_size 这个参数。数据库配置后，要注意检查 Innodb_Buffer_Pool_size 这个参数的设置是否合理
+>
+> 需要注意的地方：
+>
+> 在调整 innodb_buffer_pool_size 期间，用户的请求将会阻塞，直到调整完毕，所以请勿在白天调整，在凌晨3-4点低峰期调整。
+> 调整时，内部把数据页移动到一个新的位置，单位是块。如果想增加移动的速度，需要调整 innodb_buffer_pool_chunk_size 参数的大小，默认是128M。
+
+**innodb_additional_mem_pool_size**
+
+用来存放 Innodb 的内部目录，这个值不用分配太大，系统可以自动调。通常设置 16Ｍ 够用了，如果表比较多，可以适当的增大。
+
+设置方法，在 my.cnf 文件里：`innodb_additional_mem_pool_size = 16M`
+
+**2. 关于日志方面**
+
+**innodb_log_file_size**
+
+作用：指定在一个日志组中，每个log的大小。结合 innodb_buffer_pool_size 设置其大小，25%-100%。避免不需要的刷新。
+
+> 注意：这个值分配的大小和数据库的写入速度，事务大小，异常重启后的恢复有很大的关系。一般取256M可以兼顾性能和recovery的速度。
+
+分配原则：几个日值成员大小加起来差不多和你的 innodb_buffer_pool_size 相等。上限为每个日值上限大小为4G。一般控制在几个Log文件相加大小在2G以内为佳。具体情况还需要看你的事务大小，数据大小为依据。
+
+说明：这个值分配的大小和数据库的写入速度，事务大小，异常重启后的恢复有很大的关系。
+
+设置方法：在my.cnf文件里：`innodb_log_file_size = 256M`
+
+**innodb_log_files_in_group**
+
+作用：指定你有几个日值组。
+
+分配原则：一般我们可以用2-3个日值组。默认为两个。
+
+设置方法：在my.cnf文件里：
+innodb_log_files_in_group=3
+
+innodb_log_buffer_size：
+作用：事务在内存中的缓冲，也就是日志缓冲区的大小， 默认设置即可，具有大量事务的可以考虑设置为16M。
+如果这个值增长过快，可以适当的增加innodb_log_buffer_size
+另外如果你需要处理大理的TEXT，或是BLOB字段，可以考虑增加这个参数的值。
+设置方法：在my.cnf文件里：
+innodb_log_buffer_size=3M
+
+innodb_flush_logs_at_trx_commit
+作用：控制事务的提交方式,也就是控制log的刷新到磁盘的方式。
+分配原则：这个参数只有3个值（0，1，2）.默认为1，性能更高的可以设置为0或是2，这样可以适当的减少磁盘IO（但会丢失一秒钟的事务。），游戏库的MySQL建议设置为0。主库请不要更改了。
+其中：
+0：log buffer中的数据将以每秒一次的频率写入到log file中，且同时会进行文件系统到磁盘的同步操作，但是每个事务的commit并不会触发任何log buffer 到log file的刷新或者文件系统到磁盘的刷新操作；
+1：（默认为1）在每次事务提交的时候将logbuffer 中的数据都会写入到log file，同时也会触发文件系统到磁盘的同步；
+2：事务提交会触发log buffer 到log file的刷新，但并不会触发磁盘文件系统到磁盘的同步。此外，每秒会有一次文件系统到磁盘同步操作。
+说明：
+这个参数的设置对Ｉｎｎｏｄｂ的性能有很大的影响，所以在这里给多说明一下。
+当这个值为1时：innodb 的事务LOG在每次提交后写入日值文件，并对日值做刷新到磁盘。这个可以做到不丢任何一个事务。
+当这个值为2时：在每个提交，日志缓冲被写到文件，但不对日志文件做到磁盘操作的刷新,在对日志文件的刷新在值为2的情况也每秒发生一次。但需要注意的是，由于进程调用方面的问题，并不能保证每秒１００％的发生。从而在性能上是最快的。但操作系统崩溃或掉电才会删除最后一秒的事务。
+当这个值为0时：日志缓冲每秒一次地被写到日志文件，并且对日志文件做到磁盘操作的刷新，但是在一个事务提交不做任何操作。mysqld进程的崩溃会删除崩溃前最后一秒的事务。
+从以上分析，当这个值不为１时，可以取得较好的性能，但遇到异常会有损失，所以需要根据自已的情况去衡量。
+设置方法：在my.cnf文件里：
+innodb_flush_logs_at_trx_commit=1
+
+3）文件IO分配，空间占用方面
+innodb_file_per_table
+作用：使每个Innodb的表，有自已独立的表空间。如删除文件后可以回收那部分空间。默认是关闭的，建议打开（innodb_file_per_table=1）
+分配原则：只有使用不使用。但DB还需要有一个公共的表空间。
+设置方法：在my.cnf文件里：
+innodb_file_per_table=1
+
+innodb_file_io_threads
+作用：文件读写IO数，这个参数只在Windows上起作用。在Linux上只会等于4，默认即可！
+设置方法：在my.cnf文件里：
+innodb_file_io_threads=4
+
+innodb_open_files
+作用：限制Innodb能打开的表的数据。
+分配原则：这个值默认是300。如果库里的表特别多的情况，可以适当增大为1000。innodb_open_files的大小对InnoDB效率的影响比较小。但是在InnoDBcrash的情况下，innodb_open_files设置过小会影响recovery的效率。所以用InnoDB的时候还是把innodb_open_files放大一些比较合适。
+设置方法：在my.cnf文件里：
+innodb_open_files=800
+
+innodb_data_file_path
+指定表数据和索引存储的空间，可以是一个或者多个文件。最后一个数据文件必须是自动扩充的，也只有最后一个文件允许自动扩充。这样，当空间用完后，自动扩充数据文件就会自动增长（以8MB为单位）以容纳额外的数据。
+例如： innodb_data_file_path=/disk1/ibdata1:900M;/disk2/ibdata2:50M:autoextend 两个数据文件放在不同的磁盘上。数据首先放在ibdata1 中，当达到900M以后，数据就放在ibdata2中。
+设置方法，在my.cnf文件里：
+innodb_data_file_path =ibdata1:1G;ibdata2:1G;ibdata3:1G;ibdata4:1G;ibdata5:1G;ibdata6:1G:autoextend
+
+innodb_data_home_dir
+放置表空间数据的目录，默认在mysql的数据目录，设置到和MySQL安装文件不同的分区可以提高性能。
+设置方法，在my.cnf文件里：（比如mysql的数据目录是/data/mysql/data，这里可以设置到不通的分区/home/mysql下）
+innodb_data_home_dir = /home/mysql
+
+4）其它相关参数（适当的增加table_cache）
+这里说明一个比较重要的参数：
+innodb_flush_method
+作用：Innodb和系统打交道的一个IO模型
+分配原则：
+Windows不用设置。
+linux可以选择：O_DIRECT
+直接写入磁盘，禁止系统Cache了
+设置方法：在my.cnf文件里：
+innodb_flush_method=O_DIRECT
+
+innodb_max_dirty_pages_pct
+作用：在buffer pool缓冲中，允许Innodb的脏页的百分比，值在范围1-100,默认为90，建议保持默认。
+这个参数的另一个用处：当Innodb的内存分配过大，致使Swap占用严重时，可以适当的减小调整这个值，使达到Swap空间释放出来。建义：这个值最大在90%，最小在15%。太大，缓存中每次更新需要致换数据页太多，太小，放的数据页太小，更新操作太慢。
+设置方法：在my.cnf文件里：
+innodb_max_dirty_pages_pct＝90
+动态更改需要有管理员权限：
+set global innodb_max_dirty_pages_pct=50;
+
+innodb_thread_concurrency
+同时在Innodb内核中处理的线程数量。建议默认值。
+设置方法，在my.cnf文件里：
+innodb_thread_concurrency = 16
+
+5）公共参数调优
+skip-external-locking
+MyISAM存储引擎也同样会使用这个参数，MySQL4.0之后，这个值默认是开启的。
+作用是避免MySQL的外部锁定(老版本的MySQL此参数叫做skip-locking)，减少出错几率增强稳定性。建议默认值。
+设置方法，在my.cnf文件里：
+skip-external-locking
+
+skip-name-resolve
+禁止MySQL对外部连接进行DNS解析（默认是关闭此项设置的，即默认解析DNS），使用这一选项可以消除MySQL进行DNS解析的时间。
+但需要注意，如果开启该选项，则所有远程主机连接授权都要使用IP地址方式，否则MySQL将无法正常处理连接请求！如果需要，可以设置此项。
+设置方法，在my.cnf文件里：（我这线上mysql数据库中打开了这一设置）
+skip-name-resolve
+
+max_connections
+设置最大连接（用户）数，每个连接MySQL的用户均算作一个连接，max_connections的默认值为100。此值需要根据具体的连接数峰值设定。
+设置方法，在my.cnf文件里：
+max_connections = 3000
+
+query_cache_size
+查询缓存大小，如果表的改动非常频繁，或者每次查询都不同，查询缓存的结果会减慢系统性能。可以设置为0。
+设置方法，在my.cnf文件里：
+query_cache_size = 512M
+
+sort_buffer_size
+connection级的参数，排序缓存大小。一般设置为2-4MB即可。
+设置方法，在my.cnf文件里：
+sort_buffer_size = 1024M
+
+read_buffer_size
+connection级的参数。一般设置为2-4MB即可。
+设置方法，在my.cnf文件里：
+read_buffer_size = 1024M
+
+max_allowed_packet
+网络包的大小，为避免出现较大的网络包错误，建议设置为16M
+设置方法，在my.cnf文件里：
+max_allowed_packet = 16M
+
+table_open_cache
+当某一连接访问一个表时，MySQL会检查当前已缓存表的数量。如果该表已经在缓存中打开，则会直接访问缓存中的表，以加快查询速度；如果该表未被缓存，则会将当前的表添加进缓存并进行查询。
+通过检查峰值时间的状态值Open_tables和Opened_tables，可以决定是否需要增加table_open_cache的值。
+如果发现open_tables等于table_open_cache，并且opened_tables在不断增长，那么就需要增加table_open_cache的值;设置为512即可满足需求。
+设置方法，在my.cnf文件里：
+table_open_cache = 512
+
+myisam_sort_buffer_size
+实际上这个myisam_sort_buffer_size参数意义不大，这是个字面上蒙人的参数，它用于ALTER TABLE, OPTIMIZE TABLE, REPAIR TABLE 等命令时需要的内存。默认值即可。
+设置方法，在my.cnf文件里：
+myisam_sort_buffer_size = 8M
+
+thread_cache_size
+线程缓存，如果一个客户端断开连接，这个线程就会被放到thread_cache_size中（缓冲池未满），SHOW STATUS LIKE 'threads%';如果 Threads_created 不断增大，那么当前值设置要改大，改到 Threads_connected 值左右。（通常情况下，这个值改善性能不大），默认8即可
+设置方法，在my.cnf文件里：
+thread_cache_size = 8
+
+innodb_thread_concurrency
+线程并发数，建议设置为CPU内核数*2
+设置方法，在my.cnf文件里：
+innodb_thread_concurrency = 8
+
+key_buffer_size
+仅作用于 MyISAM存储引擎，用来设置用于缓存 MyISAM存储引擎中索引文件的内存区域大小。如果我们有足够的内存，这个缓存区域最好是能够存放下我们所有的 MyISAM 引擎表的所有索引，以尽可能提高性能。不要设置超过可用内存的30%。即使不用MyISAM表，也要设置该值8-64M，用于临时表。
+设置方法，在my.cnf文件里：
+key_buffer_size = 8M
+
+
 
 参考：[MYSQL性能优化的最佳20+条经验](https://www.cnblogs.com/zhouyusheng/p/8038224.html)
 

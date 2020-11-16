@@ -9,28 +9,33 @@
    - [网络模式](#网络模式)
    - [挂载点](#挂载点)
    - [仓库](#仓库)
+   - [底层原理](#底层原理)
+   
 2. 实战
 
    - [安装](#安装)
    - [MySQL示例](#MySQL示例)
    - [wordpress示例](#wordpress示例)
-   - [常用命令](#常用命令)
-     - [镜像命令](#镜像命令)
-     - [容器命令](#容器命令)
-   
+   - [用Docker建立一个公用GPU服务器](#用Docker建立一个公用GPU服务器)
    - [编写Dockerfile](#编写Dockerfile)
-   
    - [Portainer管理集群部署](#Portainer管理集群部署)
    - [docker-compose](#docker-compose)
    - [docker-swarm](#docker-swarm)
    - [docker-machine](#docker-machine)
    - [搭建私有镜像仓库](#搭建私有镜像仓库)
+
 3. 总结
+
+   - [常用命令](#常用命令)
+     - [镜像命令](#镜像命令)
+     - [容器命令](#容器命令)
+
    - [常见问题](#常见问题)
    - [Windows容器](#Windows容器)
    - [基于Docker的DevOps方案](#基于Docker的DevOps方案)
    - [容器云平台的构建实践](#容器云平台的构建实践)
    - [参考](#参考)
+
 4. 升华
 
 
@@ -1425,6 +1430,109 @@ docker run -d –name registry_ui -p 8080:8080 -e REG1=http://172.17.0.2:5000/v1
 
 
 
+### 底层原理
+
+本文主要简单讲解 Docker 底层原理，包括控制组，命名空间和分层存储。
+
+**Docker 究竟做了什么？**
+
+为了理解 Docker 帮助我们做了什么，我们先来看看 Linux 内核做了什么。简单来说，Linux 内核做了下面几件事：
+
+- 对来自硬件的消息作出响应；
+- 启动和规划程序的运行；
+- 控制和组织存储；
+- 在程序之间传递消息；
+- 分配资源——内存，CPU，网络等；
+
+Docker 做的也是这些事情。
+
+Docker 是一个 Go 语言开发的程序，它利用了 Linux 内核的一些特性，比如控制组，命名空间等技术来为容器提供隔离，让容器看起来就是一个独立的系统。这些技术并不是 Docker 的原创，在 Docker 之前这些技术就已经存在了，不过除非你是 Linux 专家，否则很难完美地使用这些特性。Docker 的出现让这一切变得优雅又简单，你可以很方便地在自己的电脑使用 Docker 部署容器！
+
+本文接下来的内容会比较详细地介绍一下这些 Docker 背后的技术，了解一下原理有助于大家对 Docker 有一个更加深刻的认识。让我们开始吧！
+
+**Docker 的 C/S 模型**
+
+Docker 采用了 C/S 架构，包括客户端（Client）和服务端（Server），服务端通过 socket 接受来自客户端的请求，这些请求可以是创建镜像，运行容器，终止容器等等。
+
+![x](./Resources/docker36.png)
+
+服务端既可以运行在本地主机，也可以运行在远程服务器或者云端，只要你可以访问 Docker 的服务端，你甚至可以在容器里运行容器。现在，我们来看看在 Docker 容器里运行 Docker 容器的例子：
+
+![x](./Resources/docker37.png)
+
+Docker 官方有一个名为"docker"的镜像，使用这个镜像运行容器的话，就可以在容器里运行 Docker 命令。现在，我们让客户端运行在这个容器里面，服务端运行在宿主主机，所以需要把宿主主机的"/var/run/docker.sock"挂载到容器里的"/var/run/docker.sock"：
+
+```sh
+docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock docker sh
+```
+
+然后，我们可以在这个容器里运行 Docker 命令：
+
+```sh
+docker run -ti --rm net:v1.0 bash
+```
+
+你可以看到，"net:v1.0"本是我们自定义的镜像，存储在宿主主机里，之所以我们在容器里可以从这个镜像运行容器，是因为我们可以访问宿主主机的 Docker 服务端。所以只要我们可以访问宿主主机的 Docker 服务端，我们就可以从服务端存在的镜像运行容器。
+
+总之，只要理解：**Docker是C/S架构**就可以了！
+
+在深入讲解 Docker 网络原理之前，不得不简单提一下网络有关的知识：
+
+- Ethernet（以太网）：通过有线或者无线传递“帧”(frame)
+- IP Layer：在局域网内传递数据包
+- Routing（路由）：在不同网络之间传递数据包
+- Ports（端口）：寻址一台主机的特定程序，这里指的是某些程序监听某些端口
+
+其实在之前学习 Docker 网络操作部分的时候，我们已经介绍过 Docker 网络的一些原理了。Docker 并不是像变魔术一样直接在容器之间传递包，而是运行的时候会自动在宿主主机上创建一个名为 docker0 的虚拟网桥，它就像软件交换机一样，在挂载到它的网口之间进行消息转发。运行一个 Docker 容器时，会创建 veth 对(Virtual Ethernet Pair)接口，这对接口一端在容器内，另一端挂载到 Docker 的网桥（默认 docker0，或者使用-- net 参数指定网络）。veth 总是成对出现，并且从一端进入的数据会从另一端流出，这样就可以实现挂载到同一网桥的容器间通信。
+
+![x](./Resources/docker38.png)
+
+之前在学习 Docker 端口映射的时候，使用 -p 参数将宿主主机的端口映射到容器内部，这个过程用到了 Linux 的防火墙命令 iptable，iptable 会创建映射规则。现在，我们的主机上没有运行任何容器，让我们看看目前的端口映射规则：
+
+```sh
+iptables -n -L -t nat
+```
+
+![x](./Resources/docker39.png)
+
+现在，运行一个容器，映射宿主机的8080端口：
+
+```sh
+docker run --rm -p 8080:8080 -ti net:v1.0 bash
+```
+
+现在，再来看看端口映射情况：
+
+![x](./Resources/docker40.png)
+
+可以从最后一行看到我们的映射规则 `tcp dpt:8080 to 172.17.0.2:8080`。
+
+**进程和控制组**
+
+先来简单描述一下 Linux 进程有关知识。
+
+Linux 的进程都是来自一个父进程，所以进程之间是父子关系。当一个子进程结束的时候，会返回一个退出代码给父进程。在众多进程中，有一个进程是特殊的，它就是初始化进程(init)，进程号为0，这个进程负责启动所有其它进程。
+
+使用 Docker 运行容器时，容器启动的时候也有一个初始化进程，当这个进程终止的时候，对应的容器也就终止了。下面以一个具体例子加深理解：
+
+首先，运行一个容器：
+
+```sh
+docker run --name process --rm -ti ubuntu:16.04 bash
+```
+
+然后，查看容器进程号：
+
+```sh
+docker inspect --format '{{.State.Pid}}' process
+```
+
+然后使用 `kill <Pid>` 命令，发现容器退出。
+
+并且，Docker 使用 Linux 控制组（cgroup, control group 来对容器进程进行隔离。cgroup 是 Linux 内核的特性之一，它保证所有在一个控制组内的进程组成一个私密的、隔离的空间。控制组内的进程有自己的进程号，并且无法访问所在控制组之外的进程。所以控制组可以把你的系统中的进程划分为若干相互隔离的区域，并且控制组内的父进程衍生的子进程依旧在这个控制组内。Docker 正是利用这个特性实现容器间进程隔离。同时，控制组还提供了资源限制，资源审计等功能，这些在 Docker 里都有所体现。
+
+**分层存储**
+
 
 
 ## 实战
@@ -1628,575 +1736,180 @@ docker-compose up -d
 
 
 
-### 常用命令
+### 用Docker建立一个公用GPU服务器
 
+首先声明一下，Docker 本来被设计用来部署应用（一次配置，到处部署），但是在这篇文章里面，我们是把 Docker 当做一个虚拟机来用的，虽然这稍微有悖于 Docker 的使用哲学，但是，作为一个入门教程的结课项目，我们通过这个例子复习之前学到的 Docker 指令还是很好的。
 
+本文我们主要使用容器搭建一个可以供小型团队（10人以下）使用的 GPU 服务器，用来进行 Deep Learning 的开发和学习。如果读者不是深度学习研究方向的也不要担心，本文的内容依旧是讲解 Docker 的使用，不过提供了一个应用场景。另外，本文会涉及到一些之前没有提到过的 Linux 指令，为了方便 Linux 初学者，会提供详细解释或者参考资料。
 
-```sh
-# 启动docker服务
-service docker start
-# 查看帮助信息
-docker COMMAND --help
-```
+本文参考了以下资料的解决思路，将 LXC 容器替换成 Docker 容器，并针对实际情况作了改动：https://abcdabcd987.com/setup-shared-gpu-server-for-labs/
 
-分类|命令
---|--
-Docker环境信息|info、version
-镜像仓库命令|login、logout、pull、push、search
-镜像管理|build、images、import、load、rmi、save、tag、commit
-容器生命周期管理|Create、exec、kill、pause、restart、rm、run、start、stop、unpause
-容器运维操作|attach、export、inspect、port、ps、rename、stats、top、wait、cp、diff、update
-容器资源管理|volume、network
-系统日志信息| events、history、logs
+**为什么要使用 Docker 来建立服务器？**
 
+深度学习目前火出天际（2017年），我所在的实验室也有相关研究。但是，深度学习模型的训练需要强悍的显卡，由于目前显卡的价格还是比较高的，所以不可能给每个同学都配备几块显卡。因此，公用服务器就成了唯一的选择。但是，公用服务器有一个问题：如果大家都直接操作宿主主机，直接在宿主主机上配置自己的开发环境的话肯定会发生冲突。
 
+实验室一开始就是直接在宿主机配置账号，也允许每个人配置自己需要的开发环境，结果就是慢慢地大家的环境开始发生各种冲突，导致谁都没有办法安安静静地做研究。于是，我决定使用 Docker 把服务器容器化，每个人都直接登录自己的容器，所有开发都在自己的容器内完成，这样就避免了冲突。并且，Docker 容器的额外开销小得可以忽略不计，所以也不会影响服务器性能。
 
-#### 镜像命令
+**服务器配置思路**
 
-Docker系统有两个程序：docker服务端 和 docker客户端。其中 docker服务端 是一个服务进程，管理着所有的容器。docker客户端 则扮演着 docker服务端 的远程控制器，可以用来控制 docker 的服务端进程。大部分情况下，服务端 和 客户端 运行在一台机器上。
+服务器的配置需要满足一些条件：
 
-```sh
-# 检查docker的版本，这样可以用来确认docker服务在运行并可通过客户端链接
-docker version
-```
+- 用户可以方便地登录
+- 用户可以自由安装软件
+- 普通用户无法操作宿主主机
+- 用户可以使用 GPU 资源
+- 用户之间互不干扰
 
-镜像是包含创建容器所需的所有依赖项和信息的包。映像包括所有依赖项（例如框架）以及容器运行时使用的部署和执行配置。通常情况下，映像派生自多个基础映像，这些基础映像是堆叠在一起形成容器文件系统的层。创建后，映像不可变。
+我的解决思路是，在服务器安装显卡驱动后，使用 **nvidia-docker** 镜像运行容器。
 
-镜像是一个静态的概念，可以从一个镜像创建多个容器，每个容器互不影响！所谓“仓库”，简单来说就是集中存放镜像的地方。
+为什么使用 nvidia-docker 呢？因为 Docker 是平台无关的（也就是说，无论镜像的内容是什么，只要主机安装了 Docker，就可以从镜像运行容器），这带来的问题就是——当需要使用一些专用硬件的时候就会无法运行。
 
-Docker registry 是存储容器镜像的仓库，用户可以通过 Docker c1ient 与 Docker registry 进行通信，以此来完成镜像的搜索、下载和上传等相关操作。DockerHub 是由 Docker 公司在互联网上提供的一个镜像仓库，提供镜像的公有与私有存储服务，它是用户最主要的镜像来源。除了 DockerHub 外，用户还可以自行搭建私有服务器来实现镜像仓库的功能。
+因此，Docker 本身是不支持容器内访问 NVIDIA GPU 资源的。早期解决这个问题的办法是在容器内安装 NVIDIA 显卡驱动，然后映射与 NVIDIA 显卡相关的设备到容器（Linux 哲学：硬件即文件，所以很容易映射）。这种解决办法很脆弱，因为这样做之后就要求容器内的显卡驱动与主机显卡硬件型号完全吻合，否则即使把显卡资源映射到容器也无法使用！所以，使用这种方法，容器显然无法再做到平台无关了。
 
-Docker 官方维护着一个公共仓库 [Docker store](https://store.docker.com/)，你可以方便的在 Docker store 寻找自己想要的镜像。当然，你也可以在终端里面登录：docker login 输入你的用户名和密码就可以登陆了。然后，可以使用 sudo docker search ubuntu 来搜索 Ubuntu 镜像
+为了解决这些问题，nvidia-docker 应运而生。nvidia-docker 是专门为需要访问显卡资源的容器量身定制的，它对原始的 Docker 命令作了封装，只要使用 `nvidia-docker run` 命令运行容器，容器就可以访问主机显卡设备（只要主机安装了显卡驱动）。nvidia-docker 的使用规则和 Docker 是一致的，只需要把命令里的"docker"替换为"nvidia-docker"就可以了。
 
-**查找镜像**
+然后，为了方便大家使用，为每个容器做一些合适的端口映射，为了方便开发，我还配置了图形界面显示功能！
 
-```sh
-# 使用 docker search 命令可以搜索远端仓库中共享的镜像，默认搜索 Docker hub 官方仓库中的镜像。
-# 示例：搜索 tomcat 镜像
-docker search tomcat
-```
+最后，为了实时监控服务器的资源使用情况，使用 WeaveScope 平台监控容器运行状况（当然，这部分内容和 Docker 入门使用关系不大，大家随意看一下就好了）。
 
-**获取镜像**
+如果你没有 GPU 服务器，并且自己的电脑显卡也比较差，你可以不用 nvidia-docker，仅仅使用普通的 Docker 就好了。当然，你可能需要根据自己的实际情况对后文提供的 Dockerfile 进行修改。
+
+**宿主主机配置**
+
+首先，服务器主机需要安装显卡驱动，你可以使用 NVIDIA 官网提供的 ".run" 文件安装，也可以图方便使用 apt 安装：
 
 ```sh
-# 使用 docker pull 从仓库获取所需要的镜像
-# 实际上相当于  docker pull registry.hub.docker.com/<name>:<tag> 命令，即从注册服务器 registry.hub.docker.com 中的 <name> 仓库下载标记为 <tag> 的镜像。
-# 有时候官方仓库注册服务器下载较慢，可以从其他仓库下载。从其它仓库下载时需要指定完整的仓库注册服务器地址。
-# name：镜像名称
-# tag：可以应用于映像的标记或标签，以便可以识别同一映像的不同映像或版本（具体取决于版本号或目标环境）。
-docker pull centos:7
+apt install nvidia-387 nvidia-387-dev
 ```
 
-**查看镜像列表**
+接下来，我们安装 [nvidia-docker](#quick-start)：
 
 ```sh
-# 列出所有顶层（top-level）镜像
-docker images
-------------------------------------------------
-REPOSITORY|TAG|IMAGE ID|CREATED|SIZE
--|-|-|-|-
-centos|centos6|6a77ab6655b9|8 weeks ago|194.6 MB
-ubuntu|latest|2fa927b5cdd3|9 weeks ago|122 MB
+# Add the package repositories
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey |
+sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/ubuntu16.04/amd64/nvidia-docker.list |
+sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt-get update
+
+# Install nvidia-docker2 and reload the Docker daemon configuration
+sudo apt-get install -y nvidia-docker2
 ```
 
-实际上，在这里我们没有办法区分一个镜像和一个只读层，所以我们提出了 top-level 镜像。只有创建容器时使用的镜像或者是直接 pull 下来的镜像能被称为顶层(top-level)镜像，并且每一个顶层镜像下面都隐藏了多个镜像层。
-
-在列出信息中，可以看到几个字段信息
-
-- 来自于哪个仓库，比如 ubuntu
-- 镜像的标记，比如 14.04
-- 它的 ID 号（唯一）
-- 创建时间
-- 镜像大小
-
-**创建镜像**
+我们以 "tensorflow/tensorflow:latest-gpu" 为基础镜像定制自己的镜像，所以先 pull 这个镜像：
 
 ```sh
-docker commit
+docker pull tensorflow/tensorflow:latest-gpu
 ```
 
-参数说明：
+**使用 Dockerfile 定制镜像**
 
-- -a, –author: 作者信息
-- -m, –meassage: 提交消息
-- -p, –pause=true: 提交时暂停容器运行
-
-说明：基于已有的镜像的容器的创建。
+这部分内容参考了[这个项目](https://github.com/fcwu/docker-ubuntu-vnc-desktop)。配置可以在浏览器显示的远程桌面：
 
 ```sh
-# 以ubuntu为例子创建
-docker pull ubuntu
-# 运行ubuntu，-ti把容器内标准绑定到终端并运行bash，这样开跟传统的linux操作系统没什么两样
-docker run -ti ubuntu bash
-```
+FROM tensorflow/tensorflow:latest-gpu
+MAINTAINER Shichao ZHANG <@gmail>
 
-现在我们直接在容器内运行。这个内部系统是极简的，只保留一些系统运行参数，里面很多命令（vi）可能都是没有的。
+ENV DEBIAN_FRONTEND noninteractive
+RUN sed -i 's#http://archive.ubuntu.com/#http://tw.archive.ubuntu.com/#' /etc/apt/sources.list
 
-```sh
-# 退出容器
-exit
-# 容器创建成镜像的方法：docker commit
-# 通过某个容器 <id> 创建对应的镜像，有点类似git
-docker commit -a 'Colin Chen' -m 'This is a demo' d1d6706627f1 Colin/test
-# 通过 docker images 发现里面多了一个镜像 Colin/test
-```
+# built-in packages
+RUN apt-get update 
+    && apt-get install -y --no-install-recommends software-properties-common curl
+    && sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
+    && curl -SL http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key | apt-key add -
+    && add-apt-repository ppa:fcwu-tw/ppa 
+    && apt-get update 
+    && apt-get install -y --no-install-recommends --allow-unauthenticated
+    supervisor 
+    openssh-server openssh-client pwgen sudo vim-tiny
+    net-tools
+    lxde x11vnc xvfb
+    gtk2-engines-murrine ttf-ubuntu-font-family
+    libreoffice firefox
+    fonts-wqy-microhei 
+    language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
+    nginx
+    python-pip python-dev build-essential
+    mesa-utils libgl1-mesa-dri
+    gnome-themes-standard gtk2-engines-pixbuf gtk2-engines-murrine pinta arc-theme
+    dbus-x11 x11-utils
+    && rm -rf /var/lib/apt/lists/
+    
+RUN echo 'root:root' |chpasswd\****
 
-**上传镜像**
+# tini for subreap
+ENV TINI_VERSION v0.9.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
+RUN chmod +x /bin/tini
+ADD image /
+RUN pip install setuptools wheel && pip install -r /usr/lib/web/requirements.txt
 
-```sh
-# 用户可以通过 docker push 命令，把自己创建的镜像上传到仓库中来共享
-# 例如，用户在 Docker Hub 上完成注册后，可以推送自己的镜像到仓库中。
-docker push hainiu/httpd:1.0
-```
-
-**删除镜像**
-
-```sh
-# 删除构成镜像的一个只读层
-docker rmi <image-id>
-```
-
-你只能够使用 `docker rmi` 来移除最顶层（top level layer）（也可以说是镜像），你也可以使用 `-f` 参数来强制删除中间的只读层
-
->注意：当同一个镜像拥有多个标签，`docker rmi` 只是删除该镜像多个标签中的指定标签而已，而不影响镜像文件。如果一个镜像只有一个tag的话，删除tag就删除了镜像的本身。
-
-```sh
-# 为一个镜像做一个tag
-docker tag c9d990395902 Colin/ubuntu:test  
-# 执行删除tag操作
-docker rmi Colin/ubuntu:test
-# 删除镜像操作
-docker rmi ubuntu
-```
-
-如果镜像里面有容器正在运行，删除镜像的话，会提示error，系统默认是不允许删除的，如果强制删除需要加入 `-f` 操作，但是docker是不建议这么操作的，因为你删除了镜像其实容器并未删除，直接导致容器找不到镜像，这样会比较混乱。
-
-```sh
-# 运行一个镜像里面的容器
-docker run ubuntu echo 'Hello World'
-# 查看运行中的容器
-docker ps -a
-# 删除镜像，报错误error，有一个容器正在这个镜像内运行
-docker rmi ubuntu  
-# 强制删除
-docker rmi -f ubuntu  
-# 再次查看运行中的容器，已经找不到镜像（删除镜像未删除容器的后果）
-```
-
-**查看镜像操作记录**
-
-```sh
-docker history [name]
-```
-
-**给镜像设置一个新的仓库：版本对**
-
-```sh
-docker tag my_image:v1.0 my:v0.1
-```
-
-运行了上面的指令我们就得到了一个新的，和原来的镜像一模一样的镜像。
-
-**镜像保存**
-
-```sh
-# 创建一个镜像的压缩文件，这个文件能够在另外一个主机的 Docker 上使用。
-docker save <image-id>
-```
-
-和 export 命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
-
-使用示例：
-
-```sh
-# 保存 centos 镜像到 centos_images.tar 文件
-docker save -o centos_images.tar centos:centos6
-# 或者直接重定向
-docker save -o centos_images.tar centos:centos6 > centos_images.tar
-```
-
-**载入镜像**
-
-```sh
-# 使用 docker load 命令可以载入镜像，其中 image 可以为标签或ID。这将导入镜像及相关的元数据信息（包括标签等），可以使用 docker images 命令进行查看。我们先删除原有的 Colin/test 镜像，执行查看镜像，然后在导入镜像
-docker load --input test.jar
-# 可能这个镜像的名字不符合 docker 的要求，重新命名一下
-docker tag <ImageId> <ImageName>
-```
-
-**查看镜像详细信息**
-
-```sh
-# inspect命令会提取出容器或者镜像最顶层的元数据，默认会列出全部信息
-docker inspect <container-id> or <image-id>
-# 查看镜像的某一个详细信息
-docker inspect -f {{.os}} c9d990395902
-```
-
-说明：docker inspect 命令返回的是一个 JSON 的格式消息，如果我们只要其中的一项内容时，可以通过 -f 参数来指定。Image_id 通常可以使用该镜像ID的前若干个字符组成的可区分字符串来替代完成的ID。
-
-**生成镜像**
-
-**Dockerfile**：包含有关如何生成 Docker 映像的说明的文本文件。与批处理脚本相似，首先第一行将介绍基础映像，然后是关于安装所需程序、复制文件等操作的说明，直至获取所需的工作环境。
-
-**生成**：基于其 Dockerfile 提供的信息和上下文生成容器映像的操作，以及生成映像的文件夹中的其他文件。可以使用 `docker build` 命令生成映像 。
-
-**多阶段生成**：Docker 17.05 或更高版本的一个功能，可帮助减小最终映像的大小。概括来说，借助多阶段生成，可以使用一个包含 SDK 的大型基础映像（以此为例）编译和发布应用程序，然后使用发布文件夹和一个小型仅运行时基础映像生成一个更小的最终映像。
-
-**多体系结构映像**：多体系结构是一项功能，根据运行 Docker 的平台简化相应映像选择。例如，Dockerfile 从注册表请求基础映像 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 时，实际上它会获得 2.2-nanoserver-1709、2.2-nanoserver-1803、2.2-nanoserver-1809 或 2.2-stretch，具体取决于操作系统和运行 Docker 的版本 。
-
-**docker build：**
-
-使用 docker commit 来扩展一个镜像比较简单，但是不方便在一个团队中分享。我们可以使用 docker build 来创建一个新的镜像。为此，首先需要创建一个 Dockerfile，包含一些如何创建镜像的指令。新建一个目录和一个 Dockerfile。
-
-```sh
-mkdir hainiu
-cd hainiu
-touch Dockerfile
-```
-
-Dockerfile 中每一条指令都创建镜像的一层，例如：
-
-```Dockerfile
-FROM centos:centos6
-LABEL maintainer="chenxiao8516@163.com"
-# move all configuration files into container
-RUN yum install -y httpd
 EXPOSE 80
-CMD ["sh","-c","service httpd start;bash"]
+
+WORKDIR /root
+
+ENV HOME=/home/ubuntu
+SHELL=/bin/bash
+
+ENTRYPOINT ["/startup.sh"]  
 ```
 
-Dockerfile基本的语法是：
-
-- 使用#来注释
-- FROM指令告诉Docker使用哪个镜像作为基础
-- 接着是维护者的信息
-- RUN开头的指令会在创建中运行，比如安装一个软件包，在这里使用yum来安装了一些软件
-- 更详细的语法说明请参考[Dockerfile](https://docs.docker.com/engine/reference/builder/)
-
-编写完成 Dockerfile 后可以使用 docker build 来生成镜像。
+然后，由此 Dockerfile 构建镜像：
 
 ```sh
-docker build -t hainiu/httpd:1.0 .
+docker build -t gpu:v0.1 .
 ```
 
-其中 -t 标记添加tag，指定新的镜像的用户信息。"." 是 Dockerfile 所在的路径（当前目录），也可以替换为一个具体的 Dockerfile 的路径。注意一个镜像不能超过127层。用 docker images 查看镜像列表
+等待镜像构建完成。现在，从这个镜像运行一个容器：
 
 ```sh
-docker images
+nvidia-docker run -d -ti --rm --name gputest -p 9999:80 -e VNC_PASSWORD=1234 gpu:v0.1
 ```
 
-| REPOSITORY   | TAG     | IMAGE ID     | CREATED       | SIZE     |
-| ------------ | ------- | ------------ | ------------- | -------- |
-| hainiu/httpd | 1.0     | 5f9aa91b0c9e | 3 minutes ago | 292.4 MB |
-| centos       | centos6 | 6a77ab6655b9 | 8 weeks ago   | 194.6 MB |
-| ubuntu       | latest  | 2fa927b5cdd3 | 9 weeks ago   | 122 MB   |
+说明：-e VNC_PASSWORD 设置登录密码。
 
-细心的朋友可以看到最后一层的 ID(5f9aa91b0c9e) 和 image id 是一样的
+我的服务器网址是"223.3.43.127"，端口是我们指定的9999，会要求我们输入密码，输入你设置的密码，即可进入桌面环境。
 
-示例1：
+好了，这样的话团队成员就可以方便地使用 GPU 服务器了！
 
-```dockerfile
-# Use an official Python runtime as a parent image
-FROM python:2.7-slim
-# Set the working directory to /app
-WORKDIR /app
-# Copy the current directory contents into the container at /app
-COPY . /app
-# Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
-# Make port 80 available to the world outside this container
-EXPOSE 80
-# Define environment variable
-ENV NAME World
-# Run app.py when the container launches
-CMD ["python", "app.py"]
-```
+**简易服务器监控网站**
 
-示例2：
+我们使用一个开源项目来监控容器的运行——[Weave Scope](https://www.weave.works/docs/scope/latest/introducing/)。首先，在宿主主机执行以下命令来安装和启动 Weave Scope：
 
 ```sh
-# 后台模式运行：获得应用程序的长容器ID，然后被踢回终端
-docker run -d -p 4000:80 friendlyhello
-
-# 查看运行容器：
-docker container ls
-# List all containers, even those not running
-docker container ls -a
-# 结束运行：
-docker container stop <containId>
-# Force shutdown of the specified container
-docker container kill <hash>
-# Remove specified container from this machine
-docker container rm <hash>
-# Remove all containers
-docker container rm $(docker container ls -a -q)
-
- # Create image using this directory's Dockerfile
-docker build -t friendlyhello .
-# Run image from a registry
-docker run username/repository:tag
-# Run "friendlyhello" mapping port 4000 to 80
-docker run -p 4000:80 friendlyhello
-# 查看新标记的图像：
-docker image ls
-# List all images on this machine
-docker image ls -a
-# Remove specified image from this machine
-docker image rm <image id>
-# Remove all images from this machine
-docker image rm $(docker image ls -a -q)
-# 登录公共镜像库：
-docker login
-# Tag <image> for upload to registry
-docker tag <image> username/repository:tag
-# 标记镜像：
-docker tag friendlyhello wolfkings/get-started:part2
-# Upload tagged image to registry
-docker push username/repository:tag
-# 发布镜像：
-docker push wolfkings/get-started:part2
-
-# 从公共存储库中拉出并运行映像：
-docker run -d -p 4000:80 wolfkings/get-started:part2
+sudo curl -L git.io/scope -o /usr/local/bin/scope
+sudo chmod a+x /usr/local/bin/scope
+scope launch
 ```
 
-#### 容器命令
+然后浏览器打开服务器 IP 地址，端口号4040，就可以实时监控了：
 
-Docker 映像的实例。容器表示单个应用程序、进程或服务的执行。它由 Docker 映像的内容、执行环境和一组标准指令组成。在缩放服务时，可以从相同的映像创建多个容器实例。 或者，批处理作业可以从同一个映像创建多个容器，向每个实例传递不同的参数。
+点击对应的容器即可查看容器信息，包括 CPU 占用率，内存占用，端口映射表，开机时间，IP 地址，进程列表，环境变量等等。并且，通过这个监控网站，可以对容器做一些简单操作：停止，重启，attach，exec 等。
 
-**生命周期**
+这是一个很简单的 Docker 容器监控方案，使用者可以通过这个监控网站直接操作容器，所以无需登录宿主主机来进行相关操作，完美实现资源隔离。
 
-![x](./Resources/Docker容器生命周期.png)
+但是，这个方案也有一些缺点，比如每个用户都可以看到其它用户的密码，甚至可以直接进入其他用户的容器！不过，由于我们的使用背景是“实验室或者小团队的私密使用”，作为关系紧密的内部小团体，建立在大家相互信任的基础上，相信这也不是什么大问题。
 
-```sh
-# 查看容器详细信息：
-sudo docker inspect [nameOfContainer]
-# 查看容器最近一个进程：
-sudo docker top [nameOfContainer]
-# 停止一个正在运行的容器：
-sudo docker stop [nameOfContainer]
-# 继续运行一个被停止的容器：
-sudo docker restart [nameOfContainer]
-# 暂停一个容器进程：
-sudo docker pause [nameOfContainer]
-# 取消暂停：
-sudo docker unpause [nameOfContainer]
-# 终止一个容器：
-sudo docker kill [nameOfContainer]
-```
+**服务器管理方案小结**
 
-**创建容器**
+现在总结一下我们的 GPU 服务器容器化的全部工作：
 
-docker create <image-id>
+- 宿主主机配置 Docker 和 nvidia-docker，安装显卡驱动；
 
-docker create 命令为指定的镜像（image）添加了一个可读写层，构成了一个新的容器。注意，这个容器并没有运行。
+- 使用 Dockerfile 定制镜像；
 
-docker create 命令提供了许多参数选项可以指定名字，硬件资源，网络配置等等。
+- 为每个用户运行一个容器，注意需要挂载需要的数据卷；
 
-运行示例：创建一个centos的容器，可以使用仓库＋标签的名字确定image，也可以使用image－id指定image。返回容器id
+  ```sh
+  nvidia-docker run -ti -d --name ZhangShichao -v /home/berry/dockerhub/zsc/:/root/zsc -v /media/zhangzhe/data1:/root/sharedData -p 6012:22 -p 6018:80 -p 6010:6000 -p 6011:6001 -p 6019:8888 -e VNC_PASSWORD=ZhangShichao  gpu:v0.1
+  ```
 
-```sh
-# 查看本地images列表
-docker images
+- 使用 WeaveScope 监控容器的运行情况；
 
-# 用仓库＋标签
-docker create -it --name centos6_container centos:centos6
+在此之后，如果团队成员需要启动新的容器，管理员可以通过宿主主机为用户运行需要的容器。普通用户无法操作宿主主机，完美实现隔离！
 
-# 使用image -id
-docker create -it --name centos6_container 6a77ab6655b9 bash
-b3cd0b47fe3db0115037c5e9cf776914bd46944d1ac63c0b753a9df6944c7a67
 
-#可以使用 docker ps查看一件存在的容器列表，不加参数默认只显示当前运行的容器
-docker ps -a
-
-# 可以使用 -v 参数将本地目录挂载到容器中。
-docker create -it --name centos6_container -v /src/webapp:/opt/webapp centos:centos6
-
-# 这个功能在进行测试的时候十分方便，比如用户可以放置一些程序到本地目录中，来查看容器是否正常工作。本地目录的路径必须是绝对路径，如果目录不存在 Docker 会自动为你创建它。
-```
-
-**启动容器**
-
-docker start <container-id>
-
-Docker start命令为容器文件系统创建了一个进程隔离空间。注意，每一个容器只能够有一个进程隔离空间。
-
-运行实例：
-
-```sh
-# 通过名字启动
-docker start -i centos6_container
-
-# 通过容器ID启动
-docker start -i b3cd0b47fe3d
-```
-
-**进入容器**
-
-进入容器一般有三种方法：
-
-1. ssh 登录
-2. attach 和 exec
-3. nesenter
-
-attach 和 exec 方法是 Docker 自带的命令，使用起来比较方便；而无论是 ssh 还是 nesenter 的使用都需要一些额外的配置。
-
-attach 实际就是进入容器的主进程，所以无论你同时 attach 多少，其实都是进入了主进程。比如，我使用两次 attach 进入同一个容器，然后我在一个 attach 里面运行的指令也会在另一个 attach 里面同步输出，因为它们两个 attach 进入的根本就是一个进程！
-
-在 attach 进入的容器（前提是你退出了 exec）使用“ps -ef”指令可以看出，我们的容器只有一个 bash 进程和 ps 命令本身
-
-而 exec 就不一样了，exec 的过程其实是给容器新开了一个进程，比如我们使用 exec 进入容器后，使用 ps -ef 命令查看进程，你会发现，我们除了 ps 命令本身，还有两个 bash 进程，究其原因，就是因为我们 exec 进入容器的时候实际是在容器里面新开了一个进程。
-
-这就涉及到了另一个问题，如果你在 exec 里面执行 exit 命令，你只是关掉了 exec 命令新开的进程，而主进程依旧在运行，所以容器并不会停止；而在 attach 里面运行 exit 命令，你实际是终止了主进程，所以容器也就随之被停止了。总结一下，**attach 的使用不会在容器开辟新的进程；exec 主要用在需要给容器开辟新进程的情况下**。
-
-现在来介绍一下如何终止一个运行的容器。我们的容器在后台运行，现在我们觉得这个容器已经完成了任务，可以把它终止了，怎么办呢？一种办法是 attach 进入容器之后运行"exit"结束容器主进程，这样容器也就随之被终止了。另一种比较推荐的方法是运行：`sudo kill nameOfContainer`
-
-```sh
-# 在当前容器中执行新命令
-docker exec <container-id>
-# 如果增加 -it参数运行 bash 就和登录到容器效果一样的。
-docker exec -it centos6_container bash
-# attach命令可以连接到正在运行的容器，观察该容器的运行情况，或与容器的主进程进行交互。
-docker attach [OPTIONS] CONTAINER
-```
-
-**停止容器**
-
-```sh
-docker stop <container-id>
-```
-
-**删除容器**
-
-```sh
-docker rm <container-id>
-```
-
-如果删除正在运行的容器，需要停止容器再进行删除
-
-```sh
-docker stop <name>
-docker rm <name>
-```
-
-不管容器是否运行，可以使用 `docker rm –f` 命令进行删除。
-
-**运行容器**
-
-docker run <image-id>
-
-docker run 就是 docker create 和 docker start 两个命令的组合，支持参数也是一致的，如果指定容器名字时，容器已经存在会报错，可以增加 --rm 参数实现容器退出时自动删除。
-
-运行示例：`docker run -it --rm --name hello hello-world:latest bash`
-
-命令解释：
-
-- Docker run 是从一个镜像运行一个容器的指令。
-- -ti 参数的含义是：terminal interactive，这个参数可以让我们进入容器的交互式终端。
-- --name 指定容器的名字，后面的 hello 就是我们给这个容器起的名字。
-- hello-world:latest是指明从哪个镜像运行容器，hello-world是仓库名，latest是标签。如在选取镜像启动容器时，用户未指定具体tag，Docker将默认选取tag为latest的镜像。
-- bash 指明我们使用 bash 终端。
-
-具体来说，当你运行 "Docker run" 的时候：
-
-- 检查本地是否存在指定的镜像，不存在就从公共仓库下载；
-- 利用镜像创建并启动一个容器；
-- 给容器包含一个主进程（Docker 原则之一：一个容器一个进程，只要这个进程还存在，容器就会继续运行）；
-- 为容器分配文件系统，IP，从宿主主机配置的网桥接口中桥接一个虚拟接口等（会在之后的教程讲解）。
-
-守护态运行
-
-所谓“守护态运行”其实就是后台运行(background running)，有时候，需要让 Docker 在后台运行而不是直接把执行的结果输出到当前的宿主主机下，这个时候需要在运行 "docker run" 命令的时候加上 "-d" 参数(-d means detach)。
-
->注意：这里说的后台运行和容器长久运行不是一回事，后台运行只是说不会在宿主主机的终端打印输出，但是你给定的指令执行完成后，容器就会自动退出，所以，长久运行与否是与你给定的需要容器运行的命令有关，与"-d"参数没有关系。
-
-**查看容器列表**
-
-docker ps 命令会列出所有运行中的容器。这隐藏了非运行态容器的存在，如果想要找出这些容器，增加 -a 参数。
-
-**提交容器**
-
-```sh
-docker commit <container-id>  # 将容器的可读写层转换为一个只读层，这样就把一个容器转换成了不可变的镜像。
-```
-
-**容器导出**
-
-docker export <container-id>  --创建一个tar文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容。export后的容器再import到Docker中，只有一个容器当前状态的镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像。
-
-接下来，根据我们学过的内容，列出一点使用容器的建议，更多的建议会随着阅读的深入进一步提出。
-
-1. 要在容器里面保存重要文件，因为容器应该只是一个进程，数据需要使用数据卷保存，关于数据卷的内容在下一篇文章介绍；
-2. 尽量坚持 **一个容器，一个进程** 的使用理念，当然，在调试阶段，可以使用exec命令为容器开启新进程。
-
-**容器导入**
-
-导出的文件又可以使用 docker import 命令导入，成为镜像。示例：
-
-```sh
-cat export.tar | docker import – Colin/testimport:latest
-docker images
-```
-
-导入容器生成镜像，通过镜像生成容器。
-
-**限制容器资源**
-
-资源限制主要包含两个方面的内容——内存限制和 CPU 限制。
-
-**内存限制**：执行 Docker run 命令时可以使用的和内存限制有关的参数如下：
-
-- -m, --memory 内存限制，格式：数字+单位，单位可以是 b、k、m、g，最小 4M  
-- -- -memory-swap 内存和交换空间总大小限制，注意：必须比 -m 参数大
-
-**CPU限制**：Docker run 命令执行的时候可以使用的限制 CPU 的参数如下：
-
-- -- -cpuset-cpus="" 允许使用的 CPU 集
-- -c,--cpu-shares=0 CPU共享权值
-- -- -cpu-quota=0 限制 CPU CFS 配额，必须不小于 1ms，即 >=1000
-- cpu-period=0 限制 CPU CFS 调度周期，范围是 100ms~1s，即 [1000，1000000]
-
-现在详细介绍一下 CPU 限制的这几个参数。
-
-1. 可以设置在哪些 CPU 核上运行，比如下面的指令指定容器进程可以在 CPU1 和 CPU3 上运行：
-
-   ```sh
-   sudo docker run -ti --cpuset-cpus="1,3" --name cpuset ubuntu:16.04 bash
-   ```
-
-2. CPU 共享权值——CPU 资源相对限制
-
-   默认情况下，所有容器都得到同样比例的 CPU 周期，这个比例叫做 CPU 共享权值，通过"-c"或者"- -cpu-shares"设置。Docker 为每个容器设置的默认权值都是1024，不设置或者设置为0都会使用这个默认的共享权值。
-
-   比如你有2个同时运行的容器，第一个容器的 CPU 共享权值为3，第2个容器的 CPU 共享权值为1，那么第一个容器将得到75%的 CPU 时间，而第二个容器只能得到25%的 CPU 时间，如果这时你再添加一个 CPU 共享权值为4的容器，那么第三个容器将得到50%的 CPU 时间，原来的第一个和第二个容器分别得到37.5%和12.5的 CPU 时间。
-
-   但是需要注意，这个比例只有在 CPU 密集型任务执行的是有才有用，否则容器根本不会占用这么多 CPU 时间。
-
-3. CPU 资源绝对限制
-
-   Linux 通过 CFS 来调度各个进程对 CPU 的使用，CFS 的默认调度周期是 100ms。在使用 Docker 的时候我们可以通过"- -cpu-period"参数设置容器进程的调度周期，以及通过"- -cpu-quota"参数设置每个调度周期内容器能使用的 CPU 时间。一般这两个参数是配合使用的。但是，需要注意的是这里的“绝对”指的是一个上限，并不是说容器一定会使用这么多 CPU 时间，如果容器的任务不是很繁重，可能使用的 CPU 时间不会达到这个上限。
-
-**查看日志**
-
-如果你在后台运行一个容器，可是你把 `echo` 错误输入成了 `eceo`：
-
-```sh
-docker run -d --name logtest ubuntu:16.04 bash -c "eceo hello"
-```
-
-后来，你意识到你的容器没有正常运行，你可以使用 `docker logs` 指令查看哪里出了问题。
-
-```sh
-docker logs logtest
-```
-
-
-
-
-
-## 实战
 
 ### 搭建私有镜像仓库
 
@@ -2709,9 +2422,7 @@ docker run --name sshtest --rm -d -p 6666:22 net:v1.2
 
 这里的 --rm 参数的作用是容器终止后立刻删除。
 
-然后使用 `docker inspect sshtest` 查看容器网址为172.17.0.3，现在使用 ssh 登录（密码：root）：
-
-![image-20201112153752540](C:\Users\23907\AppData\Roaming\Typora\typora-user-images\image-20201112153752540.png)
+然后使用 `docker inspect sshtest` 查看容器网址为172.17.0.3，现在使用 ssh 登录（密码：root）
 
 在 ssh 的时候你可能会遇到如下问题：
 
@@ -2745,6 +2456,198 @@ RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 EXPOSE 22
 
 CMD ["/usr/sbin/sshd", "-D"]
+```
+
+ 再次构建：
+
+```sh
+docker build -t net:v1.1 .
+```
+
+这次我们构建的镜像只有303M，比 commit得到的镜像少了33MB。你可能对这种程度的减少并不满意，因为镜像体积的减小实在有限。其实这是因为我们的这个镜像本来就是为了安装这些软件，所以只能删掉一些sourlist的缓存信息。如果你构建一个镜像是为了编译某个程序，那么在你编译完之后可以使用 **apt-get purge -y --auto-remove XXX** 把一些编译环境和无用的软件删除掉，这样的话我们的镜像就会变得更精简。
+
+读到这里，读者应该对如何使用 Dockerfile 构建镜像有了一定的了解。我们使用 docker build 命令构建镜像：**docker built -t name <上下文路径>/URL/...**。现在，让我们详细谈谈这个构建命令，你应该已经注意到，docker build 命令的最后有一个 **.** 号，表示当前目录，并且 Dockerfile 也在这个目录。所以读者可能会以为命令里的“上下文路径”就是 Dockerfile 所在的目录。
+
+但不幸的是，这样理解并不对。为了解释“上下文路径”的意思，需要我们对 Docker 的架构有一点了解。Docker 使用典型的客户端-服务端（C/S）架构，通过远程API管理和创建容器。进行镜像构建的时候，Docker会将上下文路径下的命令打包传给服务端，在服务端构建镜像（当然，在我们的教程里，服务端也运行在本机，是以一个 Docker 后台服务端进程在运行）。所以有一些命令比如 COPY 需要使用相对路径复制本地文件到容器。但是，习惯上我们把 Dockerfile 放在一个空目录下，并把文件命名为 Dockerfile，因为如果不手动指定Dockerfile 的话，上下文目录下名字为 Dockerfile 的文件默认被当做构建镜像使用的 Dockerfile。同时，习惯上也把一些必须的文件复制到 Dockerfile 所在的目下。此时，Dockerfile 所在的目录就是上下文目录。
+
+**更多Dockerfile命令**
+
+在上一小节中，我们以一个实际的例子详细叙述了 Dockerfile 构建镜像的过程，由于例子很简单，所以只用到了4条指令，现在我们来一起看看更多的 Dockerfile 构建命令。本节把之前用到的命令也重新列了一次，可以作为编写 Dockerfile 的参阅手册。
+
+**FROM**
+
+FROM 指令指定基础镜像，我们定制的镜像是在基础镜像之上进行修改。FROM 指令必须是 dockerfile 文件的第一条指令。
+
+举例：**FROM ubuntu:16.04**
+
+**LABEL**
+
+LABEL指令添加元数据到一个镜像。LABEL 是**键值对**。还有一个指令 MAINTAINER 用来添加维护者信息，不过现在推荐使用 LABEL 而不是 MAINTAINER。
+
+举例：
+
+```sh
+LABEL "com.example.vendor"="ACME Incorporated"
+LABEL com.example.label-with-value="foo"
+LABEL version="1.0"
+LABEL description="This text illustrates \
+that label-values can span multiple lines."
+```
+
+**COPY 与 ADD**
+
+COPY 复制文件：**COPY <源路径> <目标路径> COPY ["<源路径>", ..., "<目标路径>"]**
+
+COPY 命令将上下文目录中的文件复制到镜像内的目标路径中，目标路径可以是绝对路径，也可以是由 WORKDIR 命令指定的相对路径（参见 WORKDIR 命令），目标路径无需事先创建，若不存在会自动创建。
+
+举例：
+
+```sh
+COPY hom /mydir/    
+COPY hom?.txt /mydir/   
+ADD 高级的文件复制
+```
+
+ADD 命令格式和 COPY 完全一样，但是 ADD 命令会在复制的同时做一些额外的工作，比如，如果源路径是 URL，ADD 命令会下载文件再放到目标路径；如果是压缩文件，会解压后放到目标路径。由于这个命令的附加属性，推荐尽量使用 COPY，仅仅在需要自动解压缩或者下载的场合使用 ADD。
+
+**RUN**
+
+RUN 是用来执行命令的，这条指令的格式有两种：
+
+Shell 格式是 **RUN <命令>**，我们的 Dockerfile 就是使用的 shell 格式； 
+
+exec 格式：**RUN [<"可执行文件">, <"参数1">, <"参数2">, ... ]**，和函数调用的格式很相似。
+
+举例：
+
+```sh
+RUN apt-get install vim
+RUN ["/bin/bash", "-c", "echo hello"]
+CMD 与 ENTRYPOINT
+```
+
+**CMD**
+
+CMD 是容器启动命令。和 RUN 命令类似，它也有2种格式：
+
+shell 格式： **CMD <命令>**
+
+exec 格式： **CMD [<"可执行文件">, <"参数1">, <"参数2">，... ]**,
+
+记得我们早就说过，容器不是虚拟机，容器的本质是进程。既然是进程，就需要指定进程运行的时候的参数和程序。CMD 就是为容器主进程启动命令而存在的。
+
+使用 CMD 命令的时候，初学者容易混淆**前台运行**和**后台运行**。再强调一遍，Docker 不是虚拟机，容器是进程，所以容器中的应用都应该以前台模式运行。
+
+** **ENTRYPOINT**
+
+ENTRYPOINT 命令和 CMD 一样有 shell 格式和 exec 格式，并且和 CMD 命令一样用来指定容器启动程序及参数。但是二者的适用场合有所不同。最重要的是，ENTRYPOINT 可以让我们把容器当成一条指令运行。下面，通过举例体会一下吧：
+
+首先，使用如下 Dockerfile 创建一个镜像 **docker build -t cmd .**
+
+```sh
+FROM ubuntu:16.04
+WORKDIR /
+CMD ["ls"]
+```
+
+然后再使用如下 Dockerfile 创建一个镜像 **docker build -t etp .**
+
+```sh
+FROM ubuntu:16.04
+WORKDIR /
+ENTRYPOINT ["ls"]
+```
+
+现在分别从这两个镜像运行容器：
+
+![x](./Resources/docker34.png)
+
+现在看起来没什么区别，接下来再从两个镜像分别运行容器，但是这次我们使用了 `ls` 命令的参数 `-l`：
+
+![x](./Resources/docker35.png)
+
+现在，相信读者已经可以明白 ***ENTRYPOINT可以把容器当命令运行*** 这句话的含义了。
+
+**ENV**
+
+ENV 命令用来 **设置环境变量**，其它指令可以使用这些环境变量。
+
+ENV key value
+
+ENV key1=value2 key2=value2
+
+举例：
+
+```sh
+ENV myName="John Doe" myDog=Rex\ The\ Dog
+myCat=fluffy
+
+ENV myName John Doe
+ENV myDog Rex The Dog
+ENV myCat fluffy
+```
+
+**ARG**
+
+```sh
+ARG <name>=<default value>
+```
+
+ARG命令也是用来设置环境变量的，但是由此构建的镜像所运行的容器却不能使用这些变量。具体来说，ARG指令定义了用户可以在编译时或者运行时传递的变量，如使用如下命令：`--build-arg <varname>=<value>`
+
+虽然容器无法看到 ARG 定义的变量，但是依旧不建议使用 ARG 参数传递密码，因为使用 `docker history` 命令依旧可以看到这些信息。
+
+**VOLUME**
+
+VOLUME 命令用来定义匿名卷。
+
+VOLUME ["<路径1>", "<路径2>"...]
+
+VOLUME <路径>
+
+我们已经知道，不应该向容器存储层写入数据，应该写到数据卷里面。为了防止用户在运行容器的时候忘记挂载数据卷，可以在 Dockerfile 里先定义匿名卷，这样即使忘记挂载数据卷，容器也不会向容器存储层写入大量数据。
+
+举例：`VOLUME /data`
+
+**EXPOSE**
+
+EXPOSE 用来暴露端口，格式为：`EXPOSE <端口1> [<端口2>……]`
+
+值得注意的是，EXPOSE 只是声明运行容器时提供的服务端口，这仅仅是一个声明，在运行容器的时候并不会因为这个声明就会开启端口服务，你依旧需要使用 -P 或者 -p 参数映射端口。在 Dockerfile 中写这样的端口声明有助于使用者理解这个镜像开放哪些服务端口，以便配置映射。并且，可以在 docker run 命令执行的时候使用 -P 参数随机映射宿主主机端口到 EXPOSE 的容器端口。
+
+举例：`EXPOSE 22`
+
+**WORKDIR**
+
+WORKDIR <工作目录路径>
+
+使用 WORKDIR 指定工作目录，以后各层的指令就会在这个指定的目录下运行。在这里，再提一下分层存储的概念，比方说你过你在 Dockerfile 里面这样写（假设你的 test.txt 文件在 /mydir 目录下）：
+
+```sh
+RUN cd /mydir
+RUN echo "Hello world." > test.txt
+```
+
+在 docker build 的时候会报错，提示找不到 test.txt 文件，因为在第一层的 cd 切换目录并不会影响第二层。此时，你就应该使用 WORKDIR 命令。
+
+举例：
+
+```sh
+WORKDIR /mydir
+RUN echo "Hello world." > test.txt
+```
+
+**USER**
+
+USER <用户名>
+
+指定用户。这个命令会影响其后的命令的执行身份。当然，前提是你先创建用户。
+
+举例：
+
+```sh
+RUN groupadd -r zsc && useradd -r -g zsc zsc
+USER zsc
 ```
 
 
@@ -3688,9 +3591,579 @@ Marathon
     7：mesos计算后，将jenkins发送的任务启动在slave3节点上，任务完成
 Jenkins Pipine：
 
-![x](./Resource/docker7.jpg)
+![x](./Resources/docker07.jpg)
+
+
 
 ## 总结
+
+
+
+### 常用命令
+
+
+
+```sh
+# 启动docker服务
+service docker start
+# 查看帮助信息
+docker COMMAND --help
+```
+
+| 分类             | 命令                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| Docker环境信息   | info、version                                                |
+| 镜像仓库命令     | login、logout、pull、push、search                            |
+| 镜像管理         | build、images、import、load、rmi、save、tag、commit          |
+| 容器生命周期管理 | Create、exec、kill、pause、restart、rm、run、start、stop、unpause |
+| 容器运维操作     | attach、export、inspect、port、ps、rename、stats、top、wait、cp、diff、update |
+| 容器资源管理     | volume、network                                              |
+| 系统日志信息     | events、history、logs                                        |
+
+
+
+#### 镜像命令
+
+Docker系统有两个程序：docker服务端 和 docker客户端。其中 docker服务端 是一个服务进程，管理着所有的容器。docker客户端 则扮演着 docker服务端 的远程控制器，可以用来控制 docker 的服务端进程。大部分情况下，服务端 和 客户端 运行在一台机器上。
+
+```sh
+# 检查docker的版本，这样可以用来确认docker服务在运行并可通过客户端链接
+docker version
+```
+
+镜像是包含创建容器所需的所有依赖项和信息的包。映像包括所有依赖项（例如框架）以及容器运行时使用的部署和执行配置。通常情况下，映像派生自多个基础映像，这些基础映像是堆叠在一起形成容器文件系统的层。创建后，映像不可变。
+
+镜像是一个静态的概念，可以从一个镜像创建多个容器，每个容器互不影响！所谓“仓库”，简单来说就是集中存放镜像的地方。
+
+Docker registry 是存储容器镜像的仓库，用户可以通过 Docker c1ient 与 Docker registry 进行通信，以此来完成镜像的搜索、下载和上传等相关操作。DockerHub 是由 Docker 公司在互联网上提供的一个镜像仓库，提供镜像的公有与私有存储服务，它是用户最主要的镜像来源。除了 DockerHub 外，用户还可以自行搭建私有服务器来实现镜像仓库的功能。
+
+Docker 官方维护着一个公共仓库 [Docker store](https://store.docker.com/)，你可以方便的在 Docker store 寻找自己想要的镜像。当然，你也可以在终端里面登录：docker login 输入你的用户名和密码就可以登陆了。然后，可以使用 sudo docker search ubuntu 来搜索 Ubuntu 镜像
+
+**查找镜像**
+
+```sh
+# 使用 docker search 命令可以搜索远端仓库中共享的镜像，默认搜索 Docker hub 官方仓库中的镜像。
+# 示例：搜索 tomcat 镜像
+docker search tomcat
+```
+
+**获取镜像**
+
+```sh
+# 使用 docker pull 从仓库获取所需要的镜像
+# 实际上相当于  docker pull registry.hub.docker.com/<name>:<tag> 命令，即从注册服务器 registry.hub.docker.com 中的 <name> 仓库下载标记为 <tag> 的镜像。
+# 有时候官方仓库注册服务器下载较慢，可以从其他仓库下载。从其它仓库下载时需要指定完整的仓库注册服务器地址。
+# name：镜像名称
+# tag：可以应用于映像的标记或标签，以便可以识别同一映像的不同映像或版本（具体取决于版本号或目标环境）。
+docker pull centos:7
+```
+
+**查看镜像列表**
+
+```sh
+# 列出所有顶层（top-level）镜像
+docker images
+------------------------------------------------
+REPOSITORY|TAG|IMAGE ID|CREATED|SIZE
+-|-|-|-|-
+centos|centos6|6a77ab6655b9|8 weeks ago|194.6 MB
+ubuntu|latest|2fa927b5cdd3|9 weeks ago|122 MB
+```
+
+实际上，在这里我们没有办法区分一个镜像和一个只读层，所以我们提出了 top-level 镜像。只有创建容器时使用的镜像或者是直接 pull 下来的镜像能被称为顶层(top-level)镜像，并且每一个顶层镜像下面都隐藏了多个镜像层。
+
+在列出信息中，可以看到几个字段信息
+
+- 来自于哪个仓库，比如 ubuntu
+- 镜像的标记，比如 14.04
+- 它的 ID 号（唯一）
+- 创建时间
+- 镜像大小
+
+**创建镜像**
+
+```sh
+docker commit
+```
+
+参数说明：
+
+- -a, –author: 作者信息
+- -m, –meassage: 提交消息
+- -p, –pause=true: 提交时暂停容器运行
+
+说明：基于已有的镜像的容器的创建。
+
+```sh
+# 以ubuntu为例子创建
+docker pull ubuntu
+# 运行ubuntu，-ti把容器内标准绑定到终端并运行bash，这样开跟传统的linux操作系统没什么两样
+docker run -ti ubuntu bash
+```
+
+现在我们直接在容器内运行。这个内部系统是极简的，只保留一些系统运行参数，里面很多命令（vi）可能都是没有的。
+
+```sh
+# 退出容器
+exit
+# 容器创建成镜像的方法：docker commit
+# 通过某个容器 <id> 创建对应的镜像，有点类似git
+docker commit -a 'Colin Chen' -m 'This is a demo' d1d6706627f1 Colin/test
+# 通过 docker images 发现里面多了一个镜像 Colin/test
+```
+
+**上传镜像**
+
+```sh
+# 用户可以通过 docker push 命令，把自己创建的镜像上传到仓库中来共享
+# 例如，用户在 Docker Hub 上完成注册后，可以推送自己的镜像到仓库中。
+docker push hainiu/httpd:1.0
+```
+
+**删除镜像**
+
+```sh
+# 删除构成镜像的一个只读层
+docker rmi <image-id>
+```
+
+你只能够使用 `docker rmi` 来移除最顶层（top level layer）（也可以说是镜像），你也可以使用 `-f` 参数来强制删除中间的只读层
+
+>注意：当同一个镜像拥有多个标签，`docker rmi` 只是删除该镜像多个标签中的指定标签而已，而不影响镜像文件。如果一个镜像只有一个tag的话，删除tag就删除了镜像的本身。
+
+```sh
+# 为一个镜像做一个tag
+docker tag c9d990395902 Colin/ubuntu:test  
+# 执行删除tag操作
+docker rmi Colin/ubuntu:test
+# 删除镜像操作
+docker rmi ubuntu
+```
+
+如果镜像里面有容器正在运行，删除镜像的话，会提示error，系统默认是不允许删除的，如果强制删除需要加入 `-f` 操作，但是docker是不建议这么操作的，因为你删除了镜像其实容器并未删除，直接导致容器找不到镜像，这样会比较混乱。
+
+```sh
+# 运行一个镜像里面的容器
+docker run ubuntu echo 'Hello World'
+# 查看运行中的容器
+docker ps -a
+# 删除镜像，报错误error，有一个容器正在这个镜像内运行
+docker rmi ubuntu  
+# 强制删除
+docker rmi -f ubuntu  
+# 再次查看运行中的容器，已经找不到镜像（删除镜像未删除容器的后果）
+```
+
+**查看镜像操作记录**
+
+```sh
+docker history [name]
+```
+
+**给镜像设置一个新的仓库：版本对**
+
+```sh
+docker tag my_image:v1.0 my:v0.1
+```
+
+运行了上面的指令我们就得到了一个新的，和原来的镜像一模一样的镜像。
+
+**镜像保存**
+
+```sh
+# 创建一个镜像的压缩文件，这个文件能够在另外一个主机的 Docker 上使用。
+docker save <image-id>
+```
+
+和 export 命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
+
+使用示例：
+
+```sh
+# 保存 centos 镜像到 centos_images.tar 文件
+docker save -o centos_images.tar centos:centos6
+# 或者直接重定向
+docker save -o centos_images.tar centos:centos6 > centos_images.tar
+```
+
+**载入镜像**
+
+```sh
+# 使用 docker load 命令可以载入镜像，其中 image 可以为标签或ID。这将导入镜像及相关的元数据信息（包括标签等），可以使用 docker images 命令进行查看。我们先删除原有的 Colin/test 镜像，执行查看镜像，然后在导入镜像
+docker load --input test.jar
+# 可能这个镜像的名字不符合 docker 的要求，重新命名一下
+docker tag <ImageId> <ImageName>
+```
+
+**查看镜像详细信息**
+
+```sh
+# inspect命令会提取出容器或者镜像最顶层的元数据，默认会列出全部信息
+docker inspect <container-id> or <image-id>
+# 查看镜像的某一个详细信息
+docker inspect -f {{.os}} c9d990395902
+```
+
+说明：docker inspect 命令返回的是一个 JSON 的格式消息，如果我们只要其中的一项内容时，可以通过 -f 参数来指定。Image_id 通常可以使用该镜像ID的前若干个字符组成的可区分字符串来替代完成的ID。
+
+**生成镜像**
+
+**Dockerfile**：包含有关如何生成 Docker 映像的说明的文本文件。与批处理脚本相似，首先第一行将介绍基础映像，然后是关于安装所需程序、复制文件等操作的说明，直至获取所需的工作环境。
+
+**生成**：基于其 Dockerfile 提供的信息和上下文生成容器映像的操作，以及生成映像的文件夹中的其他文件。可以使用 `docker build` 命令生成映像 。
+
+**多阶段生成**：Docker 17.05 或更高版本的一个功能，可帮助减小最终映像的大小。概括来说，借助多阶段生成，可以使用一个包含 SDK 的大型基础映像（以此为例）编译和发布应用程序，然后使用发布文件夹和一个小型仅运行时基础映像生成一个更小的最终映像。
+
+**多体系结构映像**：多体系结构是一项功能，根据运行 Docker 的平台简化相应映像选择。例如，Dockerfile 从注册表请求基础映像 
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 时，实际上它会获得 2.2-nanoserver-1709、2.2-nanoserver-1803、2.2-nanoserver-1809 或 2.2-stretch，具体取决于操作系统和运行 Docker 的版本 。
+
+**docker build：**
+
+使用 docker commit 来扩展一个镜像比较简单，但是不方便在一个团队中分享。我们可以使用 docker build 来创建一个新的镜像。为此，首先需要创建一个 Dockerfile，包含一些如何创建镜像的指令。新建一个目录和一个 Dockerfile。
+
+```sh
+mkdir hainiu
+cd hainiu
+touch Dockerfile
+```
+
+Dockerfile 中每一条指令都创建镜像的一层，例如：
+
+```Dockerfile
+FROM centos:centos6
+LABEL maintainer="chenxiao8516@163.com"
+# move all configuration files into container
+RUN yum install -y httpd
+EXPOSE 80
+CMD ["sh","-c","service httpd start;bash"]
+```
+
+Dockerfile基本的语法是：
+
+- 使用#来注释
+- FROM指令告诉Docker使用哪个镜像作为基础
+- 接着是维护者的信息
+- RUN开头的指令会在创建中运行，比如安装一个软件包，在这里使用yum来安装了一些软件
+- 更详细的语法说明请参考[Dockerfile](https://docs.docker.com/engine/reference/builder/)
+
+编写完成 Dockerfile 后可以使用 docker build 来生成镜像。
+
+```sh
+docker build -t hainiu/httpd:1.0 .
+```
+
+其中 -t 标记添加tag，指定新的镜像的用户信息。"." 是 Dockerfile 所在的路径（当前目录），也可以替换为一个具体的 Dockerfile 的路径。注意一个镜像不能超过127层。用 docker images 查看镜像列表
+
+```sh
+docker images
+```
+
+| REPOSITORY   | TAG     | IMAGE ID     | CREATED       | SIZE     |
+| ------------ | ------- | ------------ | ------------- | -------- |
+| hainiu/httpd | 1.0     | 5f9aa91b0c9e | 3 minutes ago | 292.4 MB |
+| centos       | centos6 | 6a77ab6655b9 | 8 weeks ago   | 194.6 MB |
+| ubuntu       | latest  | 2fa927b5cdd3 | 9 weeks ago   | 122 MB   |
+
+细心的朋友可以看到最后一层的 ID(5f9aa91b0c9e) 和 image id 是一样的
+
+示例1：
+
+```dockerfile
+# Use an official Python runtime as a parent image
+FROM python:2.7-slim
+# Set the working directory to /app
+WORKDIR /app
+# Copy the current directory contents into the container at /app
+COPY . /app
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+# Make port 80 available to the world outside this container
+EXPOSE 80
+# Define environment variable
+ENV NAME World
+# Run app.py when the container launches
+CMD ["python", "app.py"]
+```
+
+示例2：
+
+```sh
+# 后台模式运行：获得应用程序的长容器ID，然后被踢回终端
+docker run -d -p 4000:80 friendlyhello
+
+# 查看运行容器：
+docker container ls
+# List all containers, even those not running
+docker container ls -a
+# 结束运行：
+docker container stop <containId>
+# Force shutdown of the specified container
+docker container kill <hash>
+# Remove specified container from this machine
+docker container rm <hash>
+# Remove all containers
+docker container rm $(docker container ls -a -q)
+
+ # Create image using this directory's Dockerfile
+docker build -t friendlyhello .
+# Run image from a registry
+docker run username/repository:tag
+# Run "friendlyhello" mapping port 4000 to 80
+docker run -p 4000:80 friendlyhello
+# 查看新标记的图像：
+docker image ls
+# List all images on this machine
+docker image ls -a
+# Remove specified image from this machine
+docker image rm <image id>
+# Remove all images from this machine
+docker image rm $(docker image ls -a -q)
+# 登录公共镜像库：
+docker login
+# Tag <image> for upload to registry
+docker tag <image> username/repository:tag
+# 标记镜像：
+docker tag friendlyhello wolfkings/get-started:part2
+# Upload tagged image to registry
+docker push username/repository:tag
+# 发布镜像：
+docker push wolfkings/get-started:part2
+
+# 从公共存储库中拉出并运行映像：
+docker run -d -p 4000:80 wolfkings/get-started:part2
+```
+
+#### 容器命令
+
+Docker 映像的实例。容器表示单个应用程序、进程或服务的执行。它由 Docker 映像的内容、执行环境和一组标准指令组成。在缩放服务时，可以从相同的映像创建多个容器实例。 或者，批处理作业可以从同一个映像创建多个容器，向每个实例传递不同的参数。
+
+**生命周期**
+
+![x](./Resources/Docker容器生命周期.png)
+
+```sh
+# 查看容器详细信息：
+sudo docker inspect [nameOfContainer]
+# 查看容器最近一个进程：
+sudo docker top [nameOfContainer]
+# 停止一个正在运行的容器：
+sudo docker stop [nameOfContainer]
+# 继续运行一个被停止的容器：
+sudo docker restart [nameOfContainer]
+# 暂停一个容器进程：
+sudo docker pause [nameOfContainer]
+# 取消暂停：
+sudo docker unpause [nameOfContainer]
+# 终止一个容器：
+sudo docker kill [nameOfContainer]
+```
+
+**创建容器**
+
+docker create <image-id>
+
+docker create 命令为指定的镜像（image）添加了一个可读写层，构成了一个新的容器。注意，这个容器并没有运行。
+
+docker create 命令提供了许多参数选项可以指定名字，硬件资源，网络配置等等。
+
+运行示例：创建一个centos的容器，可以使用仓库＋标签的名字确定image，也可以使用image－id指定image。返回容器id
+
+```sh
+# 查看本地images列表
+docker images
+
+# 用仓库＋标签
+docker create -it --name centos6_container centos:centos6
+
+# 使用image -id
+docker create -it --name centos6_container 6a77ab6655b9 bash
+b3cd0b47fe3db0115037c5e9cf776914bd46944d1ac63c0b753a9df6944c7a67
+
+#可以使用 docker ps查看一件存在的容器列表，不加参数默认只显示当前运行的容器
+docker ps -a
+
+# 可以使用 -v 参数将本地目录挂载到容器中。
+docker create -it --name centos6_container -v /src/webapp:/opt/webapp centos:centos6
+
+# 这个功能在进行测试的时候十分方便，比如用户可以放置一些程序到本地目录中，来查看容器是否正常工作。本地目录的路径必须是绝对路径，如果目录不存在 Docker 会自动为你创建它。
+```
+
+**启动容器**
+
+docker start <container-id>
+
+Docker start命令为容器文件系统创建了一个进程隔离空间。注意，每一个容器只能够有一个进程隔离空间。
+
+运行实例：
+
+```sh
+# 通过名字启动
+docker start -i centos6_container
+
+# 通过容器ID启动
+docker start -i b3cd0b47fe3d
+```
+
+**进入容器**
+
+进入容器一般有三种方法：
+
+1. ssh 登录
+2. attach 和 exec
+3. nesenter
+
+attach 和 exec 方法是 Docker 自带的命令，使用起来比较方便；而无论是 ssh 还是 nesenter 的使用都需要一些额外的配置。
+
+attach 实际就是进入容器的主进程，所以无论你同时 attach 多少，其实都是进入了主进程。比如，我使用两次 attach 进入同一个容器，然后我在一个 attach 里面运行的指令也会在另一个 attach 里面同步输出，因为它们两个 attach 进入的根本就是一个进程！
+
+在 attach 进入的容器（前提是你退出了 exec）使用“ps -ef”指令可以看出，我们的容器只有一个 bash 进程和 ps 命令本身
+
+而 exec 就不一样了，exec 的过程其实是给容器新开了一个进程，比如我们使用 exec 进入容器后，使用 ps -ef 命令查看进程，你会发现，我们除了 ps 命令本身，还有两个 bash 进程，究其原因，就是因为我们 exec 进入容器的时候实际是在容器里面新开了一个进程。
+
+这就涉及到了另一个问题，如果你在 exec 里面执行 exit 命令，你只是关掉了 exec 命令新开的进程，而主进程依旧在运行，所以容器并不会停止；而在 attach 里面运行 exit 命令，你实际是终止了主进程，所以容器也就随之被停止了。总结一下，**attach 的使用不会在容器开辟新的进程；exec 主要用在需要给容器开辟新进程的情况下**。
+
+现在来介绍一下如何终止一个运行的容器。我们的容器在后台运行，现在我们觉得这个容器已经完成了任务，可以把它终止了，怎么办呢？一种办法是 attach 进入容器之后运行"exit"结束容器主进程，这样容器也就随之被终止了。另一种比较推荐的方法是运行：`sudo kill nameOfContainer`
+
+```sh
+# 在当前容器中执行新命令
+docker exec <container-id>
+# 如果增加 -it参数运行 bash 就和登录到容器效果一样的。
+docker exec -it centos6_container bash
+# attach命令可以连接到正在运行的容器，观察该容器的运行情况，或与容器的主进程进行交互。
+docker attach [OPTIONS] CONTAINER
+```
+
+**停止容器**
+
+```sh
+docker stop <container-id>
+```
+
+**删除容器**
+
+```sh
+docker rm <container-id>
+```
+
+如果删除正在运行的容器，需要停止容器再进行删除
+
+```sh
+docker stop <name>
+docker rm <name>
+```
+
+不管容器是否运行，可以使用 `docker rm –f` 命令进行删除。
+
+**运行容器**
+
+docker run <image-id>
+
+docker run 就是 docker create 和 docker start 两个命令的组合，支持参数也是一致的，如果指定容器名字时，容器已经存在会报错，可以增加 --rm 参数实现容器退出时自动删除。
+
+运行示例：`docker run -it --rm --name hello hello-world:latest bash`
+
+命令解释：
+
+- Docker run 是从一个镜像运行一个容器的指令。
+- -ti 参数的含义是：terminal interactive，这个参数可以让我们进入容器的交互式终端。
+- --name 指定容器的名字，后面的 hello 就是我们给这个容器起的名字。
+- hello-world:latest是指明从哪个镜像运行容器，hello-world是仓库名，latest是标签。如在选取镜像启动容器时，用户未指定具体tag，Docker将默认选取tag为latest的镜像。
+- bash 指明我们使用 bash 终端。
+
+具体来说，当你运行 "Docker run" 的时候：
+
+- 检查本地是否存在指定的镜像，不存在就从公共仓库下载；
+- 利用镜像创建并启动一个容器；
+- 给容器包含一个主进程（Docker 原则之一：一个容器一个进程，只要这个进程还存在，容器就会继续运行）；
+- 为容器分配文件系统，IP，从宿主主机配置的网桥接口中桥接一个虚拟接口等（会在之后的教程讲解）。
+
+守护态运行
+
+所谓“守护态运行”其实就是后台运行(background running)，有时候，需要让 Docker 在后台运行而不是直接把执行的结果输出到当前的宿主主机下，这个时候需要在运行 "docker run" 命令的时候加上 "-d" 参数(-d means detach)。
+
+>注意：这里说的后台运行和容器长久运行不是一回事，后台运行只是说不会在宿主主机的终端打印输出，但是你给定的指令执行完成后，容器就会自动退出，所以，长久运行与否是与你给定的需要容器运行的命令有关，与"-d"参数没有关系。
+
+**查看容器列表**
+
+docker ps 命令会列出所有运行中的容器。这隐藏了非运行态容器的存在，如果想要找出这些容器，增加 -a 参数。
+
+**提交容器**
+
+```sh
+docker commit <container-id>  # 将容器的可读写层转换为一个只读层，这样就把一个容器转换成了不可变的镜像。
+```
+
+**容器导出**
+
+docker export <container-id>  --创建一个tar文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容。export后的容器再import到Docker中，只有一个容器当前状态的镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像。
+
+接下来，根据我们学过的内容，列出一点使用容器的建议，更多的建议会随着阅读的深入进一步提出。
+
+1. 要在容器里面保存重要文件，因为容器应该只是一个进程，数据需要使用数据卷保存，关于数据卷的内容在下一篇文章介绍；
+2. 尽量坚持 **一个容器，一个进程** 的使用理念，当然，在调试阶段，可以使用exec命令为容器开启新进程。
+
+**容器导入**
+
+导出的文件又可以使用 docker import 命令导入，成为镜像。示例：
+
+```sh
+cat export.tar | docker import – Colin/testimport:latest
+docker images
+```
+
+导入容器生成镜像，通过镜像生成容器。
+
+**限制容器资源**
+
+资源限制主要包含两个方面的内容——内存限制和 CPU 限制。
+
+**内存限制**：执行 Docker run 命令时可以使用的和内存限制有关的参数如下：
+
+- -m, --memory 内存限制，格式：数字+单位，单位可以是 b、k、m、g，最小 4M  
+- -- -memory-swap 内存和交换空间总大小限制，注意：必须比 -m 参数大
+
+**CPU限制**：Docker run 命令执行的时候可以使用的限制 CPU 的参数如下：
+
+- -- -cpuset-cpus="" 允许使用的 CPU 集
+- -c,--cpu-shares=0 CPU共享权值
+- -- -cpu-quota=0 限制 CPU CFS 配额，必须不小于 1ms，即 >=1000
+- cpu-period=0 限制 CPU CFS 调度周期，范围是 100ms~1s，即 [1000，1000000]
+
+现在详细介绍一下 CPU 限制的这几个参数。
+
+1. 可以设置在哪些 CPU 核上运行，比如下面的指令指定容器进程可以在 CPU1 和 CPU3 上运行：
+
+   ```sh
+   sudo docker run -ti --cpuset-cpus="1,3" --name cpuset ubuntu:16.04 bash
+   ```
+
+2. CPU 共享权值——CPU 资源相对限制
+
+   默认情况下，所有容器都得到同样比例的 CPU 周期，这个比例叫做 CPU 共享权值，通过"-c"或者"- -cpu-shares"设置。Docker 为每个容器设置的默认权值都是1024，不设置或者设置为0都会使用这个默认的共享权值。
+
+   比如你有2个同时运行的容器，第一个容器的 CPU 共享权值为3，第2个容器的 CPU 共享权值为1，那么第一个容器将得到75%的 CPU 时间，而第二个容器只能得到25%的 CPU 时间，如果这时你再添加一个 CPU 共享权值为4的容器，那么第三个容器将得到50%的 CPU 时间，原来的第一个和第二个容器分别得到37.5%和12.5的 CPU 时间。
+
+   但是需要注意，这个比例只有在 CPU 密集型任务执行的是有才有用，否则容器根本不会占用这么多 CPU 时间。
+
+3. CPU 资源绝对限制
+
+   Linux 通过 CFS 来调度各个进程对 CPU 的使用，CFS 的默认调度周期是 100ms。在使用 Docker 的时候我们可以通过"- -cpu-period"参数设置容器进程的调度周期，以及通过"- -cpu-quota"参数设置每个调度周期内容器能使用的 CPU 时间。一般这两个参数是配合使用的。但是，需要注意的是这里的“绝对”指的是一个上限，并不是说容器一定会使用这么多 CPU 时间，如果容器的任务不是很繁重，可能使用的 CPU 时间不会达到这个上限。
+
+**查看日志**
+
+如果你在后台运行一个容器，可是你把 `echo` 错误输入成了 `eceo`：
+
+```sh
+docker run -d --name logtest ubuntu:16.04 bash -c "eceo hello"
+```
+
+后来，你意识到你的容器没有正常运行，你可以使用 `docker logs` 指令查看哪里出了问题。
+
+```sh
+docker logs logtest
+```
+
+
 
 ### 常见问题
 
