@@ -2,11 +2,11 @@
 
 1. 理论
 
-   - 为什么需要并行？
-   - 同步、异步、并发、并行概念 
-   - 有关并行的2个重要定律
-   - 从头开始——并行基础
-   - 内存模型和线程安全
+   - [为什么需要并行？](#为什么需要并行？)
+   - [同步、异步、并发、并行概念 ](#同步、异步、并发、并行概念 )
+   - [有关并行的2个重要定律](#有关并行的2个重要定律)
+   - [并行基础](#并行基础)
+   - [内存模型和线程安全](#内存模型和线程安全)
    - 无锁
 
 2. 实战
@@ -19,9 +19,14 @@
 
 4. 升华
 
-   
 
-## 为什么需要并行?
+
+
+## 理论
+
+
+
+### 为什么需要并行?
 
 1. 业务要求
 2. 性能
@@ -52,7 +57,9 @@
 
 并行计算还出于 **业务模型** 的需要。并不是为了提高系统性能，而是确实在业务上需要多个执行单元。比如HTTP服务器，为每一个 Socket 连接新建一个处理线程，让不同线程承担不同的业务工作，简化任务调度！
 
-## 同步、异步、并发、并行概念 
+
+
+### 同步、异步、并发、并行概念 
 
 1、同步(synchronous)和异步(asynchronous)
 
@@ -99,23 +106,27 @@ while (!atomicVar.compareAndSet(localVar, localVar+1)) {
 
 - 无等待(Wait-Free)：无锁的，要求所有的线程都必须在有限步内完成，无饥饿的
 
-## 有关并行的2个重要定律
 
-### Amdahl定律（阿姆达尔定律）
+
+### 有关并行的2个重要定律
+
+**Amdahl定律（阿姆达尔定律）**
 
 ![x](http://hyw6485860001.my3w.com/public/images/Amdahl.jpg)
 
-### Gustafson定律（古斯塔夫森）
+**Gustafson定律（古斯塔夫森）**
 
 ![x](http://hyw6485860001.my3w.com/public/images/Gustafson.jpg)
 
-## 从头开始——并行基础
 
-### 什么是线程
+
+### 并行基础
+
+**什么是线程**
 
 线程是进程内的执行单元
 
-### 线程内的基本操作
+**线程内的基本操作**
 
 
 
@@ -174,9 +185,7 @@ while (isAlive()) {
 
 不要在 Thread 实例上使用 `wait()` 和 `notify()` 方法
 
-
-
-### 守护线程
+**守护线程**
 
 - 在后台默默完成一些系统性服务，比如垃圾回收、JIT
 - 当一个java应用内只有守护线程时，java虚拟机会自然退出
@@ -187,9 +196,7 @@ t.setDaemon(true);
 t.start();
 ```
 
-
-
-### 线程优先级
+**线程优先级**
 
 ```java
 public final static int MIN_PRIORITY = 1;
@@ -198,30 +205,30 @@ public final static int MAX_PRIORITY = 10;
 
 Thread high = new HighPriority();
 LowPriority low = new LowPriority();
-high.setPriority(Thread.MAX_PRIORITY);
+high.setPriority(Thread.MAX_PRIORITY); // 高优先级的线程更容易在竞争中获胜
 low.setPriority(Thread.MIN_PRIORITY);
 low.start();
 high.start();
 ```
 
-高优先级的线程更容易在竞争中获胜
+**基本的线程同步操作**
 
-### 基本的线程同步操作
+- synchronized：锁定类、锁定实例
+- `Object.wait()` ：当前线程必须拥有object监视器才可以等待，释放所有权，让其它线程获取所有权
+- `Object.notify()`：当前线程必须拥有object监视器才可以通知，唤醒一个在object监视器上的线程（唤醒后该线程不是马上执行，必须等当前线程释放锁）
+- `Object.notifyAll()`：唤醒所有线程，谁抢到object Monitor谁先执行。 
 
-- synchronized
-- `Object.wait()` 和 `Object.notify()`
 
 
+### 内存模型和线程安全
 
-## 内存模型和线程安全
-
-### 原子性
+**原子性**
 
 原子性是指一个操作是不可中断的。即使是在多个线程一起执行的时候，一个操作一旦开始，就不会被其它线程干扰。
 
 i++是原子操作吗？
 
-### 有序性
+**有序性**
 
 在并发时，程序的执行可能就会出现乱序！
 
@@ -235,9 +242,7 @@ i++是原子操作吗？
 
 指令重排可以使流水线更加顺畅
 
-
-
-### 可见性
+**可见性**
 
 可见性是指当一个线程修改了某一个共享变量的值，其他线程是否能够立即知道这个修改
 
@@ -246,9 +251,7 @@ i++是原子操作吗？
 
 Java虚拟机层面的可见性：http://hushi55.github.io/2015/01/05/volatile-assembly
 
-
-
-### Happen-Before
+**Happen-Before**
 
 - 程序顺序原则：一个线程内保证语义的串行性
 - volatile规则：volatile变量的写，先发生于读，这保证了volatile变量的可见性
@@ -264,6 +267,8 @@ Java虚拟机层面的可见性：http://hushi55.github.io/2015/01/05/volatile-a
 ### 线程安全的概念
 
 指某个函数、函数库在多线程环境中被调用时，能够正确地处理各个线程的局部变量，使程序功能正确完成。
+
+
 
 ## 无锁
 
