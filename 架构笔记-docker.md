@@ -29,11 +29,12 @@
    - [常用命令](#常用命令)
      - [镜像命令](#镜像命令)
      - [容器命令](#容器命令)
-
    - [常见问题](#常见问题)
    - [Windows容器](#Windows容器)
    - [基于Docker的DevOps方案](#基于Docker的DevOps方案)
    - [容器云平台的构建实践](#容器云平台的构建实践)
+   - [Docker生态](#Docker生态)
+   - [监控工具](#监控工具)
    - [参考](#参考)
 
 4. 升华
@@ -404,6 +405,249 @@ func setNamespaces(daemon *Daemon, s *specs.Spec, c *container.Container) error 
 daemon.containerd.Create(context.Background(), container.ID, spec, createOptions)
 
 所有与命名空间的相关的设置都是在上述的两个函数中完成的，Docker 通过命名空间成功完成了与宿主机进程和网络的隔离。
+
+#### chroot
+
+在这里不得不简单介绍一下 chroot（change root），在 Linux 系统中，系统默认的目录就都是以 / 也就是根目录开头的，chroot 的使用能够改变当前的系统根目录结构，通过改变当前系统的根目录，我们能够限制用户的权利，在新的根目录下并不能够访问旧系统根目录的结构个文件，也就建立了一个与原系统完全隔离的目录结构。
+
+与 chroot 的相关内容部分来自** [**理解 chroot**](https://www.ibm.com/developerworks/cn/linux/l-cn-chroot/index.html) **一文，各位读者可以阅读这篇文章获得更详细的信息。
+
+#### CGroups
+
+我们通过Linux的命名空间为新创建的进程隔离了文件系统、网络并与宿主机器之间的进程相互隔离，但是命名空间并不能够为我们提供物理资源上的隔离，比如CPU或者内存，如果在同一台机器上运行了多个对彼此以及宿主机器一无所知的『容器』，这些容器却共同占用了宿主机器的物理资源。
+
+![x](./Resources/docker52.png)
+
+如果其中的某一个容器正在执行 CPU 密集型的任务，那么就会影响其他容器中任务的性能与执行效率，导致多个容器相互影响并且抢占资源。如何对多个容器的资源使用进行限制就成了解决进程虚拟资源隔离之后的主要问题，而 Control Groups（简称 CGroups）就是能够隔离宿主机器上的物理资源，例如 CPU、内存、磁盘 I/O 和网络带宽。
+
+每一个 CGroup 都是一组被相同的标准和参数限制的进程，不同的 CGroup 之间是有层级关系的，也就是说它们之间可以从父类继承一些用于限制资源使用的标准和参数。
+
+![x](./Resources/docker53.png)
+
+Linux 的 CGroup 能够为一组进程分配资源，也就是我们在上面提到的 CPU、内存、网络带宽等资源，通过对资源的分配，CGroup 能够提供以下的几种功能：
+
+![x](./Resources/docker54.png)
+
+在 CGroup 中，所有的任务就是一个系统的一个进程，而 CGroup 就是一组按照某种标准划分的进程，在 CGroup 这种机制中，所有的资源控制都是以 CGroup 作为单位实现的，每一个进程都可以随时加入一个 CGroup 也可以随时退出一个 CGroup。
+
+参考：[CGroup 介绍、应用实例及原理描述](https://www.ibm.com/developerworks/cn/linux/1506_cgroup/index.html)
+
+Linux 使用文件系统来实现 CGroup，我们可以直接使用下面的命令查看当前的 CGroup 中有哪些子系统：
+
+```sh
+lssubsys -m
+# ----------------------------------------
+cpuset /sys/fs/cgroup/cpuset
+cpu /sys/fs/cgroup/cpu
+cpuacct /sys/fs/cgroup/cpuacct
+memory /sys/fs/cgroup/memory
+devices /sys/fs/cgroup/devices
+freezer /sys/fs/cgroup/freezer
+blkio /sys/fs/cgroup/blkio
+perf_event /sys/fs/cgroup/perf_event
+hugetlb /sys/fs/cgroup/hugetlb
+```
+
+大多数 Linux 的发行版都有着非常相似的子系统，而之所以将上面的 cpuset、cpu 等东西称作子系统，是因为它们能够为对应的控制组分配资源并限制资源的使用。
+
+如果我们想要创建一个新的 cgroup 只需要在想要分配或者限制资源的子系统下面创建一个新的文件夹，然后这个文件夹下就会自动出现很多的内容，如果你在 Linux 上安装了 Docker，你就会发现所有子系统的目录下都有一个名为 docker 的文件夹：
+
+```sh
+ls cpu
+# -----------------------------------------
+cgroup.clone_children  
+...
+cpu.stat  
+docker  
+notify_on_release 
+release_agent 
+tasks
+
+ls cpu/docker/
+# -----------------------------------------
+9c3057f1291b53fd54a3d12023d2644efe6a7db6ddf330436ae73ac92d401cf1 
+cgroup.clone_children  
+...
+cpu.stat  
+notify_on_release 
+release_agent 
+tasks
+```
+
+9c3057xxx 其实就是我们运行的一个 Docker 容器，启动这个容器时，Docker 会为这个容器创建一个与容器标识符相同的 CGroup，在当前的主机上 CGroup 就会有以下的层级关系：
+
+![x](./Resources/docker55.png)
+
+每一个 CGroup 下面都有一个 tasks 文件，其中存储着属于当前控制组的所有进程的 pid，作为负责 cpu 的子系统，cpu.cfs_quota_us 文件中的内容能够对 CPU 的使用作出限制，如果当前文件的内容为 50000，那么当前控制组中的全部进程的 CPU 占用率不能超过 50%。
+
+如果系统管理员想要控制 Docker 某个容器的资源使用率就可以在 docker 这个父控制组下面找到对应的子控制组并且改变它们对应文件的内容，当然我们也可以直接在程序运行时就使用参数，让 Docker 进程去改变相应文件中的内容。
+
+```sh
+docker run -it -d --cpu-quota=50000 busybox
+# -----------------------------------------
+53861305258ecdd7f5d2a3240af694aec9adb91cd4c7e210b757f71153cdd274
+
+cd 53861305258ecdd7f5d2a3240af694aec9adb91cd4c7e210b757f71153cdd274/
+
+ls
+# -----------------------------------------
+cgroup.clone_children  cgroup.event_control  cgroup.procs  cpu.cfs_period_us  cpu.cfs_quota_us  cpu.shares  cpu.stat  notify_on_release  tasks
+
+cat cpu.cfs_quota_us
+# -----------------------------------------
+50000
+```
+
+当我们使用 Docker 关闭掉正在运行的容器时，Docker 的子控制组对应的文件夹也会被 Docker 进程移除，Docker 在使用 CGroup 时其实也只是做了一些创建文件夹改变文件内容的文件操作，不过 CGroup 的使用也确实解决了我们限制子容器资源占用的问题，系统管理员能够为多个容器合理的分配资源并且不会出现多个容器互相抢占资源的问题。
+
+#### UnionFS
+
+Linux 的命名空间和控制组分别解决了不同资源隔离的问题，前者解决了进程、网络以及文件系统的隔离，后者实现了 CPU、内存等资源的隔离，但是在 Docker 中还有另一个非常重要的问题需要解决 - 也就是镜像。
+
+镜像到底是什么，它又是如何组成和组织的是作者使用 Docker 以来的一段时间内一直比较让作者感到困惑的问题，我们可以使用 `docker run` 非常轻松地从远程下载 Docker 的镜像并在本地运行。
+
+Docker 镜像其实本质就是一个压缩包，我们可以使用下面的命令将一个 Docker 镜像中的文件导出：
+
+```sh
+docker export $(docker create busybox) | tar -C rootfs -xvf -
+
+ls
+# -----------------------------------------
+bin  dev  etc  home proc root sys  tmp  usr  var
+```
+
+你可以看到这个 busybox 镜像中的目录结构与 Linux 操作系统的根目录中的内容并没有太多的区别，可以说 Docker 镜像就是一个文件。
+
+#### 存储驱动
+
+Docker 使用了一系列不同的存储驱动管理镜像内的文件系统并运行容器，这些存储驱动与 Docker 卷(volume)有些不同，存储引擎管理着能够在多个容器之间共享的存储。
+
+想要理解 Docker 使用的存储驱动，我们首先需要理解 Docker 是如何构建并且存储镜像的，也需要明白 Docker 的镜像是如何被每一个容器所使用的；Docker 中的每一个镜像都是由一系列只读的层组成的，Dockerfile 中的每一个命令都会在已有的只读层上创建一个新的层：
+
+```dockerfile
+FROM ubuntu:15.04
+COPY . /app
+RUN make /app
+CMD python /app/app.py
+```
+
+容器中的每一层都只对当前容器进行了非常小的修改，上述的 Dockerfile 文件会构建一个拥有四层 layer 的镜像：
+
+![x](./Resources/docker56.png)
+
+当镜像被 `docker run` 命令创建时就会在镜像的最上层添加一个可写的层，也就是容器层，所有对于运行时容器的修改其实都是对这个容器读写层的修改。
+
+容器和镜像的区别就在于，所有的镜像都是只读的，而每一个容器其实等于镜像加上一个可读写的层，也就是同一个镜像可以对应多个容器。
+
+![x](./Resources/docker57.png)
+
+#### AUFS
+
+UnionFS 其实是一种为 Linux 操作系统设计的用于把多个文件系统『联合』到同一个挂载点的文件系统服务。而 AUFS 即 Advanced UnionFS 其实就是 UnionFS 的升级版，它能够提供更优秀的性能和效率。
+
+AUFS 作为联合文件系统，它能够将不同文件夹中的层联合(Union)到同一个文件夹中，这些文件夹在 AUFS 中称作分支，整个『联合』的过程被称为**联合挂载(Union Mount)**：
+
+![x](./Resources/docker58.png)
+
+每一个镜像层或者容器层都是 /var/lib/docker/ 目录下的一个子文件夹；在 Docker 中，所有镜像层和容器层的内容都存储在 /var/lib/docker/aufs/diff/ 目录中：
+
+```sh
+ls /var/lib/docker/aufs/diff/00adcccc1a55a36a610a6ebb3e07cc35577f2f5a3b671be3dbc0e74db9ca691c    93604f232a831b22aeb372d5b11af8c8779feb96590a6dc36a80140e38e764d8
+
+00adcccc1a55a36a610a6ebb3e07cc35577f2f5a3b671be3dbc0e74db9ca691c-init  93604f232a831b22aeb372d5b11af8c8779feb96590a6dc36a80140e38e764d8-init
+
+019a8283e2ff6fca8d0a07884c78b41662979f848190f0658813bb6a9a464a90    93b06191602b7934fafc984fbacae02911b579769d0debd89cf2a032e7f35cfa
+
+...
+```
+
+而 /var/lib/docker/aufs/layers/ 中存储着镜像层的元数据，每一个文件都保存着镜像层的元数据，最后的 /var/lib/docker/aufs/mnt/ 包含镜像或者容器层的挂载点，最终会被 Docker 通过联合的方式进行组装。
+
+![x](./Resources/docker59.png)
+
+上面的这张图片非常好的展示了组装的过程，每一个镜像层都是建立在另一个镜像层之上的，同时所有的镜像层都是只读的，只有每个容器最顶层的容器层才可以被用户直接读写，所有的容器都建立在一些底层服务(Kernel)上，包括命名空间、控制组、rootfs 等等，这种容器的组装方式提供了非常大的灵活性，只读的镜像层通过共享也能够减少磁盘的占用。
+
+#### 其他存储驱动
+
+AUFS 只是 Docker 使用的存储驱动的一种，除了 AUFS 之外，Docker 还支持了不同的存储驱动，包括 aufs、devicemapper、overlay2、zfs 和 vfs 等等，在最新的 Docker 中，overlay2 取代了 aufs 成为了推荐的存储驱动，但是在没有 overlay2 驱动的机器上仍然会使用 aufs 作为 Docker 的默认驱动。
+
+![x](./Resources/docker60.png)
+
+不同的存储驱动在存储镜像和容器文件时也有着完全不同的实现，有兴趣的读者可以在 Docker 的官方文档 [Select a storage driver](https://docs.docker.com/engine/userguide/storagedriver/selectadriver/) 中找到相应的内容。
+
+想要查看当前系统的 Docker 上使用了哪种存储驱动只需要使用以下的命令就能得到相对应的信息：
+
+```sh
+docker info | grep Storage
+# -----------------------------------------
+Storage Driver: aufs
+```
+
+作者的这台 Ubuntu 上由于没有 overlay2 存储驱动，所以使用 aufs 作为 Docker 的默认存储驱动。
+
+#### Reference
+
+- [Chapter 4. Docker Fundamentals · Using Docker by Adrian Mount](https://www.safaribooksonline.com/library/view/using-docker/9781491915752/ch04.html)
+
+- [TECHNIQUES BEHIND DOCKER](https://washraf.gitbooks.io/the-docker-ecosystem/content/Chapter 1/Section 3/techniques_behind_docker.html)
+
+- [Docker overview](#the-underlying-technology)
+
+- [Unifying filesystems with union mounts](https://lwn.net/Articles/312641/)
+
+- [DOCKER 基础技术：AUFS](https://coolshell.cn/articles/17061.html)
+
+- [RESOURCE MANAGEMENT GUIDE](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/)
+
+- [Kernel Korner - Unionfs: Bringing Filesystems Together](http://www.linuxjournal.com/article/7714)
+
+- [Union file systems: Implementations, part I](https://lwn.net/Articles/325369/)
+
+- [IMPROVING DOCKER WITH UNIKERNELS: INTRODUCING HYPERKIT, VPNKIT AND DATAKIT](https://blog.docker.com/2016/05/docker-unikernels-open-source/)
+
+- [Separation Anxiety: A Tutorial for Isolating Your System with Linux Namespaces](https://www.toptal.com/linux/separation-anxiety-isolating-your-system-with-linux-namespaces)
+
+- [理解 chroot](https://www.ibm.com/developerworks/cn/linux/l-cn-chroot/index.html)
+
+- [Linux Init Process / PC Boot Procedure](http://www.yolinux.com/TUTORIALS/LinuxTutorialInitProcess.html)
+
+- [Docker 网络详解及 pipework 源码解读与实践](http://www.infoq.com/cn/articles/docker-network-and-pipework-open-source-explanation-practice)
+
+- [Understand container communication](#communication-between-containers)
+
+- [Docker Bridge Network Driver Architecture](https://github.com/docker/labs/blob/master/networking/concepts/05-bridge-networks.md)
+
+- [Linux Firewall Tutorial: IPTables Tables, Chains, Rules Fundamentals](http://www.thegeekstuff.com/2011/01/iptables-fundamentals/)
+
+- [Traversing of tables and chains](http://www.iptables.info/en/structure-of-iptables.html)
+
+- [Docker 网络部分执行流分析（Libnetwork 源码解读）](http://dockone.io/article/1255)
+
+- [Libnetwork Design](https://github.com/docker/libnetwork/blob/master/docs/design.md)
+
+- [剖析 Docker 文件系统：Aufs与Devicemapper](http://www.infoq.com/cn/articles/analysis-of-docker-file-system-aufs-and-devicemapper)
+
+- [Linux - understanding the mount namespace & clone CLONE_NEWNS flag](https://stackoverflow.com/questions/22889241/linux-understanding-the-mount-namespace-clone-clone-newns-flag)
+
+- [Docker 背后的内核知识 —— Namespace 资源隔离](http://www.infoq.com/cn/articles/docker-kernel-knowledge-namespace-resource-isolation)
+
+- [Infrastructure for container projects](https://linuxcontainers.org/)
+
+- [Spec · libcontainer](https://github.com/opencontainers/runc/blob/master/libcontainer/SPEC.md)
+
+- [DOCKER 基础技术：LINUX NAMESPACE（上）](https://coolshell.cn/articles/17010.html)
+
+- [DOCKER 基础技术：LINUX CGROUP](https://coolshell.cn/articles/17049.html)
+
+- [《自己动手写Docker》书摘之三： Linux UnionFS](https://yq.aliyun.com/articles/65034)
+
+- [Introduction to Docker](http://www.programering.com/a/MDMzAjMwATk.html)
+
+- [Understand images, containers, and storage drivers](https://docs.docker.com/v1.9/engine/userguide/storagedriver/imagesandcontainers/)
+
+- [Use the AUFS storage driver](#configure-docker-with-the-aufs-storage-driver)
+
+本文图片使用 Sketch 进行绘制。
 
 
 
@@ -4344,6 +4588,118 @@ iperf Done.
 ![x](./Resource/46.png)
 
 综上所述，云平台的构建实践不是一蹴而就的。需要结合业务场景在方方面面给予规划并分而治之。技术栈的不断迭代，让云计算开始有了很多新内容可以学习和实践。但是，很多历史遗留的应用的容器化工作还是非常棘手的。附加上流程变革的时间进度，我们还是需要在很多方面折中并给出一些冗余的方案来适配传统业务体系的需求。所有，通过以上功能性和非功能性的需求参考，相信可以加快企业构建云平台的步伐并给予一些必要的指导参考。
+
+
+
+### Docker生态
+
+#### 三个著名的官方项目
+
+1. **Docker Compose**
+
+![x](./Resources/docker41.png)
+
+
+
+[参考链接 点击进入](https://docs.docker.com/compose/overview/)
+
+Compose 是 Docker 的一个官方开源项目，主要用来实现 Docker 容器集群的快速编排。之前我们介绍过 Dockerfile，使用 Dockerfile 用户可以方便快捷地定制镜像。然而有时候，一个应用是由几个容器配合完成的，比如 Web 需要前端、后端和数据库容器，可能还需要负载均衡。使用 Compose，你可以使用一个 yaml 文件来配置一个容器集合，然后使用一条指令启动集合内所有的容器服务。
+
+Compose 的使用主要包括以下3个步骤：
+
+- 编写需要的 Dockerfile
+
+- 编写 docker-compose.yml
+
+- 运行 `docker-compose up`
+
+  
+
+2. **Docker Machine**
+
+![x](./Resources/docker42.png)
+
+[参考链接 点击进入](https://docs.docker.com/machine/overview/)
+
+Docker machine 是 Docker 官方编排项目之一，主要用来在多平台快速安装 Docker，它可以帮助我们在远程的机器上安装 Docker，或者在虚拟机 host 上直接安装虚拟机并在虚拟机中安装 Docker。我们还可以通过 docker-machine 命令来管理这些虚拟机和 Docker。你可以这样理解，Docker Machine 是一个简化 Docker 安装的命令行工具，通过一个简单的命令行即可在相应的平台上安装 Docker。上面的图片形象地说明了这一点！
+
+3. **Docker Swarm**
+
+![x](./Resources/docker43.png)
+
+[参考链接 点击进入](https://docs.docker.com/swarm/overview/)
+
+Docker swarm 设计的初衷是方便地使用 Docker 命令来管理多台服务器之间的容器调度。Swarm 本来是一个独立项目，在 Docker1.12 之后被集成到 Docker engine 里面，成为 Docker 的一个子命令。Swarm 100%支持标准 Docker API，作为容器的集群管理器，它通过把多个 Docker Engine 聚集在一起，形成一个大的 docker-engine，对外提供容器的集群服务。同时这个集群对外提供 Swarm API，用户可以像使用 Docker Engine 一样使用 Docker 集群。
+
+
+
+#### 容器与云计算
+
+目前，越来越多的公有云平台支持 Docker。下面，挑选一些主要的公司进行介绍。
+
+1. **Amazon**
+
+![x](./Resources/docker49.png)
+
+亚马逊 Web 服务，即 AWS(Amazon Web Service)，是亚马逊公司推出的云服务。近年，亚马逊推出了 EC2 容器服务，让 Docker 容器更加简单。你可以通过 AWS 官网注册并使用 AWS 服务，EC2 服务允许你弹性配置云服务器。不过亚马逊云的价格对于国内用户来说并不是很友好，并且需要 Visa 或者 Master 信用卡才能注册，虽然 AWS 的网络延时应该是我见过的最小的，但是国内用户并不推荐。更多信息参见[官网](https://aws.amazon.com/getting-started/projects/?sc_channel=PS&sc_campaign=acquisition_AU&sc_publisher=google&sc_medium=ec2_b_rlsa&sc_content=ec2_e&sc_detail=amazon.ec2&sc_category=ec2&sc_segment=198244869287&sc_matchtype=e&sc_country=AU&s_kwcid=AL!4422!3!198244869287!e!!g!!amazon.ec2&ef_id=WW77lgAAAGqhSntv:20171118111659:s)。
+
+2. **阿里云**
+
+![x](./Resources/docker50.png)
+
+2009年，阿里公司创建阿里云，是中国起步较早的云服务平台。阿里云提供高性能、可伸缩的容器云服务，容器服务简化用户容器管理集群的搭建，十分方便。并且，学生用户不定期有优惠！更多信息参见[官网](https://cn.aliyun.com/?utm_medium=text&utm_source=bdbrand&utm_campaign=bdbrand&utm_content=se_32492)。
+
+3. **腾讯云**
+
+![x](./Resources/docker51.png)
+
+腾讯公司多年来积累了大量互联网服务经验，涵盖游戏、社交、网购等多个领域。腾讯云具体包括云服务器、云存储、云数据库和弹性Web引擎等基础云服务；腾讯云分析(MTA)、腾讯云推送等腾讯整体大数据能力以及 QQ 互联、QQ 空间、微云等云端链接社交体系。
+
+腾讯云容器服务是高度可扩展的高性能容器管理服务，用户可以在托管的云服务器实例集群上轻松运行应用程序，只需进行简单的 API 调用，便可操作容器。更多信息参见[官网](https://cloud.tencent.com/?fromSource=gwzcw.234976.234976.234976&lang=en)。
+
+
+
+### 监控工具
+
+本小节主要介绍一些容器监控工具（[参考资料链接](http://rancher.com/comparing-monitoring-options-for-docker-deployments/)）
+
+1. Docker stats 命令
+
+   作为 Docker 集成的命令，使用 stats 命令的好处是简单方便，无需另外安装其它软件即可使用。这条命令可以查看容器 CPU 利用率，内存占用等。但是这条指令功能确实比较简陋，无法提供高级服务。
+
+2. CAdvisor
+
+   ![x](./Resources/docker44.png)
+
+   CAdvisor 可以让用户在图形界面中查看 docker stats 得到的信息，作为一个易于设置并且很有用的工具，可以在网页查看资源占用信息而无需 ssh 登录到宿主主机，并且 CAdvisor 还可以生成可视化图表。
+
+   Cadvisor 开源免费，但是缺点是只能监控一个主机。更多资料参见 https://github.com/google/cadvisor。
+
+3. Scout
+
+   Scout 解决了 ADvisor 的局限性，它可以在多个主机和容器中获得监测数据，并可以根据检测数据生成图表和警报，但是它是收费的。另外，Scout 支持大量的插件，除了 Docker 的监控，还可以监控各种其它信息，这些特性使得 Scout 成为一个一站式监控系统，它的缺点是无法显示每个容器的详细信息。更多资料参见官网 https://scoutapp.com/。
+
+   ![x](./Resources/docker45.png)
+
+4. Data Dog
+
+   ![x](./Resources/docker46.png)
+
+   DaTA Dog 解决了 ADvisor 和 Scout 存在的一些问题，易于部署，可以提供详细的监控信息以及监控非 Docker 资源的能力，可以方便地生成任何容器的任何指标的图表，虽然它很优秀，但是收费也会更加高昂。更多资料参考官网 https://www.datadoghq.com/。
+
+5. Sensu
+
+   Scout 和 Datadog 提供集中监控和报警系统，然而它们都是被托管的服务，大规模部署的话成本会很突出。如果你需要一个自托管、集中指标的服务，可以考虑 Sensu。你可以使用插件配置使 Seusu 支持 Docker 容器指标。Sensu 几乎支持我们需要的所有评价标准，你可以获得足够多的监控细节，但是美中不足的是 Sensu 的警报能力有限，另外，Sensual 虽然免费，但是部署难度较大。更多资料参见官网 https://sensuapp.org/。
+
+   ![x](./Resources/docker47.png)
+
+6. Weave Scope
+
+   ![x](./Resources/docker48.png)
+
+   哈哈，最终还是要提一下我们在上一篇文章使用的 Weave Scope 监控系统，开源免费，界面友好，易于安装，并且支持和 Docker 容器交互，是我目前最喜欢的！更多资料参考 github https://github.com/weaveworks/scope。
+
+
 
 # Docker
 
