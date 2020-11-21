@@ -2,7 +2,10 @@
 
 1. 理论
    
+   - [基础类型](#基础类型)
+   
    - [索引](#索引)
+   
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
    - [常用命令语句](#常用命令语句)
@@ -12,14 +15,16 @@
      - [表结构相关](#表结构相关)
      - [字符串分割](#字符串分割)
      - [索引相关](#索引相关)
-   - [常见错误](#常见错误)
-     - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
-   - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
-     
    - [Handler](#Handler)
    - [事件调度器](#事件调度器)
+
 3. [总结](#总结)
-   
+
+   - [常见错误](#常见错误)
+     - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
+     - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
+     - [3、int型字段插入空值](#3、int型字段插入空值)
+
    - [性能优化](#性能优化)
    - [编码设置](#编码设置)
 - [压缩](#压缩)
@@ -66,6 +71,65 @@ data/ibdata1,-2,-3:  表空间和撤销日志
 data/ib_logfile0,-1,-2: InnoDB日志数据
 data/dbname/tablename.TRG: 触发器
 ```
+
+
+
+### 基础类型
+
+1. **整数类型：**tinyint, smallint, mediumint, int, bigint
+
+2. **浮点类型：**float, double
+
+   > decimal 能够存储精确值的原因在于其内部按照字符串存储。
+
+3. **日期类型：**date, time, datetime, timestamp, year
+
+4. **字符串类型：**char, varchar
+
+   > **char**
+   >
+   > **优点：**简单粗暴，不管你是多长的数据，我就按照规定的长度来存，用空格补全，取数据的时候整个整个的取，简单粗暴速度快
+   >
+   > **缺点：**貌似浪费空间，并且我们将来存储的数据的长度可能会参差不齐
+   >
+   > 
+   >
+   > **varchar：**不定长存储数据，更为精简和节省空间
+   >
+   > 在存数据的时候，会在每个数据前面加上一个头，这个头是1-2个bytes的数据，这个数据指的是后面跟着的这个数据的长度，1bytes能表示 2^8^=256，两个bytes表示 2^16^=65536，能表示0-65535的数字，所以varchar在存储的时候是这样的：1bytes+xxx+1bytes+xxx+1bytes+xxx，所以存的时候会比较麻烦，导致效率比char慢，取的时候也慢，先拿长度，再取数据。
+   >
+   > **优点：**节省了一些硬盘空间，一个acsii码的字符用一个bytes长度就能表示，但是也并不一定比char省，看一下官网给出的一个表格对比数据，当你存的数据正好是你规定的字段长度的时候，varchar反而占用的空间比char要多。
+   >
+   > **缺点：**存取速度都慢
+   >
+   > 
+   >
+   > 对于InnoDB数据表，内部的行存储格式没有区分固定长度和可变长度列（所有数据行都使用指向数据列值的头指针），因此在本质上，使用固定长度的CHAR列不一定比使用可变长度VARCHAR列性能要好。因而，主要的性能因素是数据行使用的存储总量。由于CHAR平均占用的空间多于VARCHAR，因此使用VARCHAR来最小化需要处理的数据行的存储总量和磁盘I/O是比较好的。
+   >
+   > 适合使用char：身份证号、手机号码、QQ号、username、password、银行卡号
+   > 适合使用varchar：评论、朋友圈、微博
+   
+5. **枚举和集合类型**
+
+   - **enum：**单选行为------枚举类型。只允许从值集合中选取单个值，而不能一次取多个值
+   - **set：**多选行为。可以允许值集合中任意选择1或多个元素进行组合。对超出范围的内容将不允许注入，而对重复的值将进行自动去重。
+
+   ```sql
+   -- 1.创建表
+   create table t8(id int, name char(18),gender enum('male','female'));
+   -- 2.写入数据
+   insert into t8 values(1,'alex','不详'); ---------不详无法写入
+   insert into t8 values(1,'alex','male');-------------male可以写入
+   insert into t8 values(1,'alex','female');------------female可以写入
+   
+   -- 1.创建表
+   create table t9(id int,name char(18),hobby set('抽烟','喝酒','洗脚','按摩','烫头'));
+   -- 2.写入数据
+   insert into t9 values(1,'太白','烫头,抽烟,喝酒,按摩');
+   insert into t9 values(1,'大壮','洗脚,洗脚,洗脚,按摩,按摩,打游戏');
+   ```
+
+
 
 ### 索引
 
@@ -1695,6 +1759,8 @@ set global log_bin_trust_function_creators = TRUE;
 
 其中在 function 里面，只有 DETERMINISTIC, NO SQL 和 READS SQL DATA 被支持。如果我们开启了 bin-log, 我们就必须为我们的 function 指定一个参数。
 
+
+
 #### 2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...
 
 ```sql
@@ -1704,6 +1770,20 @@ CONVERT('xxx' USING utf8) COLLATE utf8_unicode_ci
 存储过程中给字符串变量设置了超出长度的值，也有可能报此异常
 
 
+
+#### 3、int型字段插入空值
+
+问题：Incorrect integer value: '' for column 'id' at row 1
+
+解决：my.ini中查找sql-mode，默认为
+
+sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+
+将其修改为
+
+sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+
+重启mysql后即可 
 
 
 

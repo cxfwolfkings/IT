@@ -1,81 +1,33 @@
-# 目录
+# 武器库
+
+> 工欲善其事，必先利其器
+
+
 
 1. 开发工具
+   - [代码生成器](#代码生成器)
+   - [EditPlus](#EditPlus)
+   - [UltraEdit](#UltraEdit)
+   - [Notepad++](#Notepad++)
+   - [VSCode](#VSCode)
+   - [VSStudio](#VSStudio)
+
    - [JetBrain](#JetBrain)
-     - [快捷键](#JetBrain快捷键)
-     - [激活](#JetBrain激活)
-     - [修改Maven镜像](#修改Maven镜像)
+
+   - [Make](#make)
+   - [Cygwin & MinGW](#Cygwin&MinGW)
 2. 运维工具
+
+   - [vmware](#vmware)
+
    - [Sunny-Ngrok](#Sunny-Ngrok)
    - [Vagrant](#Vagrant)
-
-
-
-# 常用工具
-
->工欲善其事，必先利其器
-
-## 第一部分 开发工具
-
-### 第1天：[EditPlus](./1.1_EditPlus.md)
-
-- 环境搭建
-- 帮助手册
-- 调试工具
-- 函数自动完成
-
-### 第2天：[UltraEdit](./1.2_UltraEdit.md)
-
-- 环境搭建
-
-### 第3天：[Notepad++](./1.3_Notepad++.md)
-
-- 环境搭建
-
-### 第4天：[VSCode](./1.4_VSCode.md)
-
-- 调试 C# 控制台应用
-- 调试 .NET Core WebApi
-- git的配置
-- 快捷键
-- 配置项
-- 问题
-
-### 第5天：[VSStudio](./1.5_VSStudio.md)
-
-- 问题
-  - vs2019使用.NETCore3.0
-
-### 第6天：[Make](./1.6_make.md)
-
-### 第7天：[Cygwin & MinGW](./1.7_Cygwin&MinGW.md)
-
-### 第8天：[JetBrain](./1.8_JetBrain.md)
-
-## 第二部分 管理工具
-
-### 第1天：[vmware虚拟机](./2.1_vmware虚拟机.md)
-
-### 第2天：[git](./2.2_git.md)
-
-- [什么是Git](#什么是Git)
-- [常见问题](#常见问题)
-- [Git&nbsp;hook配置](#Git&nbsp;hook配置)
-- [客户端工具](#客户端工具)
-- [下载速度](#下载速度)
-
-### 第3天：[svn](./2.3_svn.md)
-
-## 第三部分 [运维工具](./3_运维工具.md)
-
-## 第四部分 [设计工具](./4_设计工具.md)
-
-- XMind
-- Markdown
-
-## 第五部分 [测试工具](./5_测试工具.md)
-
-## 第六部分 [在线工具](./6_在线工具.md)
+3. 管理工具
+   - [git](#git)
+   - [svn](#svn)
+4. 文档工具
+   - [XMind](#XMind)
+   - [Markdown](#Markdown)
 
 
 
@@ -83,11 +35,384 @@
 
 
 
-# VSCode
+### 代码生成器
 
-## 环境搭建
+> 项目负责人要有意识的提高团队的开发效率！
 
-### 调试C#控制台应用
+老的代码生成器的地址：https://www.cnblogs.com/skyme/archive/2011/12/22/2297592.html
+
+#### 懒猴子CG
+
+懒猴子CG支持在线搭建dubbo、springboot、springcloud等框架，支持在线生成swagger实体类等，支持自定义模版，支持多种语言的代码生成。这款生成器是国人研发的，站长迭代速度快，社区活跃，文档齐全。是一款及其灵活的生成器！推荐使用！
+
+官方网址：http://cg.lazy-monkey.com/ 免费
+
+#### IT猿网
+
+在线代码生成器，好处就是方便。重点是连验证码都能在线调试好生成java代码直接使用。
+
+官方网址：https://tool.ityuan.com/captcha 免费
+
+#### listcode
+
+一个超级强大的代码生成器网站，这个代码生成器非常完善， java，php，python，nodejs都支持，前后端分离，翻页，联合查询都做了，当之无愧的代码生成器中的战斗机。
+
+官网地址：https://www.listcode.cn/ 收费
+
+#### magicalcoder
+
+机械的增删改查基础代码和界面功能，自由拖拽定制，面向零基础，拖拽式编程，赋能企业，前后端代码一键生成，能够有效的提升效率。先不讲东西好不好，但他们的理念很贴心：把简单的重复劳动交给我们，把高大上的智力输出交给您，最终提高个人和团队的整体开发效率；我们希望您省下来的时间能多陪陪家人。
+
+官网：http://bbs.magicalcoder.com/ 免费
+
+#### MyBatis-Plus
+
+官网：[MyBatis-Plus](https://baomidou.com/)
+
+#### code-generation
+
+一个小型的业务项目，通常不需要很复杂的架构，一般就是通过单个或两个项目来实现。我们先来看下最基础的开发流程：
+
+1. 了解需求（项目负责人）
+2. 设计表结构（项目负责人）
+3. 创建基础框架（项目负责人）
+4. 制定开发计划，按模块分配任务（项目负责人）
+5. 进行模块开发（程序员A、B、C）
+6. 测试、上线
+
+程序员进行模块开发的方式有以下几种：
+
+1. 根据表结构设计，手工创建model，然后copy UserDao改名为CompanyDao，copy UserServiceImpl改名为CompanyServiceImpl，并修改引用的UserDao为CompanyDao等；
+2. 根据表结构设计，使用工具生成model，后续步骤同1。
+
+如果不细心，总是要修改个两三遍才能让一个模块有一个架子，然后再开始进行真正关心的业务开发，而这时候时间可能已经过去了一个小时，或许更久。
+
+程序员在开发时应该“懒”一点，如果类似的代码多次出现，不要在copy了，提取为公共的方法；如果类似的copy、修改的操作重复的出现的一个项目、不同的项目里，那就写个代码生成器吧，一键完成你手工几十步的操作。
+
+代码生成器是用来生成有规律的代码的，就如controller、service、serviceImpl、dao、daoImpl、model、jsp的结构，用户、角色、权限等等模块都有类似的结构，代码生成器可以代替我们的copy操作，自动生成这些不同业务对象的模板代码。
+
+**代码生成器怎么实现？**
+
+代码生成器的实现由很多种，我们以从mysql数据库表结构生成对应代码为例来说明如何实现一个代码生成器。有以下几个重点：
+
+1. 提前搭建好项目基础框架，因为生成的就是基础框架的模板代码
+2. 获取某个数据库内的表及表结构信息，用于生成model及其他代码
+3. 使用freemarker进行模板生成
+
+**1、提取基础框架**
+
+如公司项目都是前后端分离的，那我就提取了一个[rest-base](https://link.jianshu.com?t=https://github.com/q7322068/rest-base)项目作为基础框架，该框架满足绝大部分公司项目开发所需的基础功能
+
+**2、获取数据库表结构**
+
+```sql
+-- 获取所有库
+select DISTINCT(TABLE_SCHEMA) from information_schema.`TABLES`;
+-- 获取所有表
+SELECT TABLE_NAME as tableName,TABLE_COMMENT as tableComment 
+from information_schema.`TABLES` 
+where TABLE_SCHEMA='test';
+-- 获取某个表的结构
+select COLUMN_NAME as columnName,COLUMN_TYPE as columnType,COLUMN_DEFAULT as columnDefault
+    ,COLUMN_COMMENT as columnComment,CHARACTER_MAXIMUM_LENGTH as columnCharacterMaximumLength 
+from information_schema.columns 
+where table_schema = 'test' 
+  and table_name = 'rule'; 
+```
+
+通过查询information_schema库内的TABLES、columns表，可以获取数据内的表、表字段属性等。然后就可以以此来确定model的内容，如表user_role对应的实体就是UserRole，表字段和实体属性可以根据类型和规则进行映射。
+
+**freemarker生成模板代码**
+
+先大致讲下思路：
+
+1. 根据表名，按规则获取实体名称，从而也确认了dao、service等的类名；
+2. 将表字段转为map结构，作为参数传入model对于的模板内，从而生成对应的model类；
+3. 依次传入参数，通过模板生成dao、service等代码
+
+需要会一点freemarker的语法，基本上看个一小时就达到了写简单模板的程度了。
+
+**接口：**
+
+```java
+public interface GeneratorHelperService {
+
+    /**
+     * 设置公共参数，如
+     * projectPath 要生成代码的项目的路径：  D:/workspace/code-generator
+     * packagePath 要生成代码的项目的包的根路径：/src/main/java/com/hexun/bdc/generator
+     * templetePath 本项目内代码模板路径： /src/main/resources/code-templete
+     */
+    boolean setProperty(Map<String, String> map);
+
+    /**
+     * 生成某个库内所有表对应的代码
+     * @author yangwenkui
+     * @time 2017年10月29日 下午8:22:35
+     * @param dbname 数据库名称
+     * @return
+     */
+    boolean allTables(String dbname);
+
+    /**
+     * 生成某个库内某个表对应的代码
+     * @author yangwenkui
+     * @time 2017年10月29日 下午8:22:35
+     * @param dbname 数据库名称
+     * @param tableName 表名称
+     * @return
+     */
+    boolean oneTable(String dbname, String tableName);
+
+}
+```
+
+**实现：**
+
+```java
+@Service("generatorHelperService")
+public class GeneratorHelperServiceImpl implements GeneratorHelperService {
+
+    private static Logger logger = LoggerFactory.getLogger(GeneratorHelperServiceImpl.class);
+
+    private static Map<String, String> propertyMap = Maps.newConcurrentMap();
+
+    @Autowired
+    GeneratorHelperDao generatorHelperDao;
+    
+    @Value("${generator.project.path}")
+    private String localProjectPath;
+
+    @Override
+    public boolean setProperty(Map<String, String> map) {
+        propertyMap.putAll(map);
+        return true;
+    }
+
+    @Override
+    public boolean allTables(String dbname) {
+        List<Object> tables = generatorHelperDao.listAllTable(dbname);
+        for (Object item : tables) {
+            Object[] arr = (Object[]) item;
+            TableInfo tableInfo = new TableInfo(arr);
+            boolean success = generateCode(dbname, tableInfo);
+            if (!success) {
+                logger.error("generator code table=[{}] fail", item.toString());
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean oneTable(String dbname, String tableName) {
+        Object entity = generatorHelperDao.findTableInfo(dbname, tableName);
+        Object[] arr = (Object[]) entity;
+        TableInfo tableInfo = new TableInfo(arr);
+        return generateCode(dbname, tableInfo);
+    }
+
+    private boolean generateCode(String dbname, TableInfo item) {
+        List<Object> list = generatorHelperDao.listColumInfos(dbname, item.getTabelName());
+        List<ColumnInfo> columnInfos = new ArrayList<ColumnInfo>(list.size());
+        String idType = "String";
+        for (Object obj : list) {
+            Object[] arr = (Object[]) obj;
+            ColumnInfo columnInfo = new ColumnInfo(arr);
+            columnInfos.add(columnInfo);
+            if("id".equals(arr[0])){
+                if("int".equals(columnInfo.getModelType())){
+                    idType = "Integer";
+                } else if("long".equals(columnInfo.getModelType())){
+                    idType = "Long";
+                }
+            }
+        }
+        item.setIdType(idType);
+        createModel(item, columnInfos);
+        createOther(item,"dao");
+        createOther(item,"service");
+        createOther(item,"serviceImpl");
+        createOther(item,"controller");
+        return true;
+    }
+
+    
+    private void createModel(TableInfo item, List<ColumnInfo> columnInfos) {
+        String path = getUpPath();
+        String dir = String.format("%s/domain",path);
+        File file = new File(dir);
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        String templetePath = String.format("%s%s", localProjectPath,propertyMap.get("templetePath"));
+        String filePath = String.format("%s/%s.java", dir,item.getModleName());
+        
+        Map<String, Object> data = Maps.newHashMap();
+        data.put("proList", columnInfos);
+        data.put("modelParam", String.format("%s%s",item.getModleName().substring(0, 1).toLowerCase(),item.getModleName().substring(1)));
+        data.put("modellower", item.getModleName().toLowerCase());
+        data.put("tableInfo", item);
+        data.put("packagePath", Joiner.on(".").join(propertyMap.get("packagePath").split("/")).substring(15));
+        createTempleteFile(filePath,templetePath,"domain.flt",data);
+        
+    }
+
+    private void createTempleteFile(String filename, String templetePath,String templeteName,
+            Map<String, Object> data) {
+        try {
+            Configuration cfg = new Configuration();  
+            cfg.setDirectoryForTemplateLoading(new File(templetePath)); 
+            cfg.setObjectWrapper(new DefaultObjectWrapper());  
+              
+            //设置字符集  
+            cfg.setDefaultEncoding("UTF-8");  
+              
+            //设置尖括号语法和方括号语法,默认是自动检测语法  
+            //  自动 AUTO_DETECT_TAG_SYNTAX  
+            //  尖括号 ANGLE_BRACKET_TAG_SYNTAX  
+            //  方括号 SQUARE_BRACKET_TAG_SYNTAX  
+            cfg.setTagSyntax(Configuration.AUTO_DETECT_TAG_SYNTAX);  
+  
+            Writer out = new OutputStreamWriter(new FileOutputStream(filename),"UTF-8");  
+            Template temp = cfg.getTemplate(templeteName);  
+            temp.process(data, out); 
+            out.flush();
+            out.close();
+        }catch (Exception e) {
+            logger.error("process due to erro",e);
+        }  
+    }
+
+
+    private String getUpPath() {
+        return String.format("%s/%s", propertyMap.get("projectPath"),
+                propertyMap.get("packagePath"));
+    }
+
+    private void createOther(TableInfo item,String type) {
+        String path = getUpPath();
+        String lastDir = type;
+        if("serviceImpl".equals(type)){
+            lastDir = "service/impl";
+        }
+        
+        String dir = String.format("%s/%s",path,lastDir);
+        File file = new File(dir);
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        String templetePath = String.format("%s%s", localProjectPath,propertyMap.get("templetePath"));
+        String filePath = String.format("%s/%s.java", dir,item.getModleName()+type.substring(0,1).toUpperCase()+type.substring(1));
+        
+        Map<String, Object> data = Maps.newHashMap();
+        data.put("modelParam", String.format("%s%s",item.getModleName().substring(0, 1).toLowerCase(),item.getModleName().substring(1)));
+        data.put("modellower", item.getModleName().toLowerCase());
+        data.put("item", item);
+        data.put("packagePath", Joiner.on(".").join(propertyMap.get("packagePath").split("/")).substring(15));
+        
+        createTempleteFile(filePath,templetePath,String.format("%s.flt", type),data);
+    }
+
+}
+```
+
+**model模板(domain.flt)：**
+
+```java
+package ${packagePath}.domain;
+
+import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.sql.Timestamp;
+
+/**
+ * ${tableInfo.tableComment}
+ */
+@Entity
+@Table(name = "${tableInfo.tabelName}")
+public class  ${tableInfo.modleName} {
+    
+<#list proList as item>
+<#if item.modelName == "id">
+
+    @ApiModelProperty(value="主键")
+    @Id
+    <#if item.modelType == "int">
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
+    
+    </#if>
+    <#if item.modelType == "long">
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    
+    </#if>
+    <#if item.modelType == "String">
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid",strategy="uuid")
+    @Column(length=${item.modelCharacterMaximumLength})
+    private String id;//主键
+    
+    </#if>
+<#else>
+    @ApiModelProperty(value="${item.modelComment}") 
+    @Column(name="${item.columnName}"<#if (item.modelCharacterMaximumLength?exists && item.modelType == "String" && item.modelCharacterMaximumLength?number<=255)>,length=${item.modelCharacterMaximumLength}</#if><#if item.modelDefault?exists && item.modelDefault != "">,columnDefinition="${item.modelDefault}"</#if>)
+    private ${item.modelType} ${item.modelName};
+    
+</#if>
+</#list>
+<#list proList as item>
+    public ${item.modelType} get${item.modelNameFirstUpper}() {
+        return ${item.modelName};
+    }
+
+    public void set${item.modelNameFirstUpper}(${item.modelType} ${item.modelName}) {
+        this.${item.modelName} = ${item.modelName};
+    }
+    
+</#list>
+
+    @Override
+    public String toString() {
+        return String.format("${tableInfo.modleName} [<#list proList as item>, ${item.modelName}=%s</#list>]"
+                      <#list proList as item>, ${item.modelName}</#list>);
+    }
+
+}
+```
+
+**dao模板(dao.flt)：**
+
+```java
+package ${packagePath}.dao;
+
+import com.hexun.bdc.base.component.common.BaseDao;
+import ${packagePath}.domain.${item.modleName};
+
+public interface ${item.modleName}Dao extends BaseDao<${item.modleName}, ${item.idType}>{
+
+}
+```
+
+代码逻辑不复杂，service提供了三个接口，setProperty用于设置要生成的代码的路径及包名等，allTables用于初次生成，一次生成一个库内所有表对应的代码；oneTable用于生成指定表对应的代码，注意代码开发一段时间后，不要在上传至svn之前给覆盖了。
+完整代码在[code-generation](https://link.jianshu.com?t=https://github.com/q7322068/code-generation)，在此基础上，你可以很快修改出适合你公司的代码生成器！
+
+**参考：**
+
+- [开源中国](https://www.oschina.net/project/tag/407/code-generator)
+
+
+
+### VSCode
+
+#### 环境搭建
+
+**调试C#控制台应用**
 
 - A-[环境安装](https://www.microsoft.com/net/download)
 
