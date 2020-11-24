@@ -3,8 +3,8 @@
 1. 理论
    
    - [基础类型](#基础类型)
-   
    - [索引](#索引)
+   - [Explain详解](#Explain详解)
    
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
@@ -19,58 +19,55 @@
    - [事件调度器](#事件调度器)
 
 3. [总结](#总结)
-
-   - [常见错误](#常见错误)
+- [常见错误](#常见错误)
      - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
      - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
      - [3、int型字段插入空值](#3、int型字段插入空值)
-
-   - [性能优化](#性能优化)
+   
+- [性能优化](#性能优化)
    - [编码设置](#编码设置)
 - [压缩](#压缩)
 4. 升华
 
-## 理论
 
-1、一款开源、免费的数据库软件。MySql官网: [https://www.mysql.com/](https://www.mysql.com/)
 
-2、MySQL不足：
+一款开源、免费的数据库软件。MySql官网: [https://www.mysql.com/](https://www.mysql.com/)
 
-- MyISAM格式的数据表只有数据表锁定，没有数据行锁定，可以使用InnoDB格式数据表绕过这个问题
-- MyISAM数据表不能热备份，即无需锁定数据表就可以在对数据表进行处理时同时对其进行备份。InnoDB可以，但是收费
-- 不支持自定义类型
-- 不能直接处理XML数据
-- 没有OLAP功能。支持OLAP的数据库系统通常称为数据仓库(data warehouse)
-- 从5.0版本开始支持的存储过程和触发器并不成熟
-- 从4.1版本开始支持的GIS也不成熟
-
-3、MySQL版本：
+**MySQL版本：**
 
 - Alpha：开发
+
 - Beta：基本完成
+
 - Gamma：更加稳定
+
 - Production 或 Generally Available(GA)：足够成熟和稳定
 
-4、MySQL许可证：GPL(GNU Public License)
+**MySQL许可证：**
 
-5、SQL兼容性：MySQL 支持 SQL，SQL 有许多种“方言”，可以通过调整 MySQL 服务器的配置开关 sql-mode 使它在行为上与 IBM DB2 和 Oracle 等多种数据库系统保持最大限度的兼容
+GPL(GNU Public License) 
 
-6、MySQL数据文件：
+**SQL兼容性：**
 
-- Linux: /var/lib/mysql
-- Windows: %MySQL%/data
+MySQL 支持 SQL，SQL 有许多种“方言”，可以通过调整 MySQL 服务器的配置开关 sql-mode 使它在行为上与 IBM DB2 和 Oracle 等多种数据库系统保持最大限度的兼容
 
-```txt
-data/dbname/tablename.frm: 数据表结构定义
-data/dbname/db.opt: 整个数据库的结构定义和设置
-data/dbname/tablename.MYD: MyISAM数据表数据
-data/dbname/tablename.MYI: MyISAM数据表索引
-innodb_file_per_table: InnoDB存储方式（各自一个文件，统一的表空间）
-data/dbname/tablename.idb: InnoDB数据表数据、索引默认存储
-data/ibdata1,-2,-3:  表空间和撤销日志
-data/ib_logfile0,-1,-2: InnoDB日志数据
-data/dbname/tablename.TRG: 触发器
-```
+**MySQL数据文件：**
+
+Linux: `/var/lib/mysql`，Windows: `%MySQL%/data`
+
+- data/dbname/tablename.frm: 数据表结构定义
+- data/dbname/db.opt: 整个数据库的结构定义和设置
+- data/dbname/tablename.MYD: MyISAM数据表数据
+- data/dbname/tablename.MYI: MyISAM数据表索引
+- innodb_file_per_table: InnoDB存储方式（各自一个文件，统一的表空间）
+- data/dbname/tablename.idb: InnoDB数据表数据、索引默认存储
+- data/ibdata1,-2,-3: 表空间和撤销日志
+- data/ib_logfile0,-1,-2: InnoDB日志数据
+- data/dbname/tablename.TRG: 触发器
+
+
+
+## 理论
 
 
 
@@ -224,22 +221,123 @@ InnoDB 的所有辅助索引都引用主键作为 data 域。InnoDB 表是基于
 >InnoDB 索引和 MyISAM 索引的区别：
 
 - 一是主索引的区别，InnoDB 的数据文件本身就是索引文件。而 MyISAM 的索引和数据是分开的。
-
 - 二是辅助索引的区别：InnoDB 的辅助索引 data 域存储相应记录主键的值而不是地址。而 MyISAM 的辅助索引和主索引没有多大区别。
+
+
+
+### Explain详解
+
+expain出来的信息有10列：
+
+- **id**：选择标识符
+
+  SQL执行的顺序的标识。id相同时，执行顺序由上至下；id值越大，优先级越高，越先执行
+
+- **select_type**：表示查询的类型
+
+  1. **SIMPLE**（简单SELECT，不使用UNION或子查询等）
+  2. **PRIMARY**（子查询中最外层查询，查询中若包含任何复杂的子部分，最外层的select被标记为PRIMARY）
+  3. **UNION**（UNION中的第二个或后面的SELECT语句）
+  4. **DEPENDENT UNION**（UNION中的第二个或后面的SELECT语句，取决于外面的查询）
+  5. **UNION RESULT**（UNION的结果，union语句中第二个select开始后面所有select）
+  6. **SUBQUERY**（子查询中的第一个SELECT，结果不依赖于外部查询）
+  7. **DEPENDENT SUBQUERY**（子查询中的第一个SELECT，依赖于外部查询）
+  8. **DERIVED**（派生表的SELECT, FROM子句的子查询）
+  9. **UNCACHEABLE SUBQUERY**（一个子查询的结果不能被缓存，必须重新评估外链接的第一行）
+
+- **table**：输出结果集的表
+
+  显示这一步所访问数据库中表名称（显示这一行的数据是关于哪张表的），有时不是真实的表名字，可能是简称，也可能是第几步执行的结果的简称。
+
+- **partitions**：匹配的分区
+
+- **type**：表示表的连接类型
+
+  对表访问方式，表示MySQL在表中找到所需行的方式，又称**访问类型**。
+
+  常用的类型有：ALL、index、range、 ref、eq_ref、const、system、NULL（从左到右，性能从差到好）
+
+  - **ALL**：Full Table Scan，MySQL将遍历全表以找到匹配的行
+
+  - **index**：Full Index Scan，index与ALL区别为index类型只遍历索引树
+
+  - **range**：只检索给定范围的行，使用一个索引来选择行
+
+  - **ref**：表示上述表的连接匹配条件，即哪些列或常量被用于查找索引列上的值
+
+  - **eq_ref**：类似ref，区别在于使用的索引是唯一索引，对于每个索引键值，表中只有一条记录匹配，简单来说，就是多表连接中使用 primary key 或者 unique key 作为关联条件
+
+  - **const、system**：当MySQL对查询某部分进行优化，并转换为一个常量时，使用这些类型访问。如将主键置于where列表中，MySQL就能将该查询转换为一个常量，system是const类型的特例，当查询的表只有一行的情况下，使用system
+
+  - **NULL**：MySQL在优化过程中分解语句，执行时甚至不用访问表或索引，例如从一个索引列里选取最小值可以通过单独索引查找完成。
+
+- **possible_keys**：表示查询时，可能使用的索引
+
+  指出 MySQL 能使用哪个索引在表中找到记录，查询涉及到的字段上若存在索引，则该索引将被列出，但不一定被查询使用（该查询可以利用的索引，如果没有任何索引显示 null）
+
+  该列完全独立于EXPLAIN输出所示的表的次序。这意味着在possible_keys中的某些键实际上不能按生成的表次序使用。
+
+  如果该列是NULL，则没有相关的索引。在这种情况下，可以通过检查WHERE子句看是否它引用某些列或适合索引的列来提高你的查询性能。如果是这样，创造一个适当的索引并且再次用EXPLAIN检查查询
+
+- **key**：表示实际使用的索引
+
+  key列显示MySQL实际决定使用的键（索引），必然包含在possible_keys中
+
+  如果没有选择索引，键是NULL。要想强制MySQL使用或忽视possible_keys列中的索引，在查询中使用FORCE INDEX、USE INDEX或者IGNORE INDEX。
+
+- **key_len**：索引字段的长度
+
+  表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度（key_len显示的值为索引字段的最大可能长度，并非实际使用长度，即key_len是根据表定义计算而得，不是通过表内检索出的）。不损失精确性的情况下，长度越短越好 
+
+- **ref**：列与索引的比较
+
+  列与索引的比较，表示上述表的连接匹配条件，即哪些列或常量被用于查找索引列上的值
+
+- **rows**：扫描出的行数（估算的行数）
+
+  估算出结果集行数，表示MySQL根据表统计信息及索引选用情况，估算的找到所需的记录所需要读取的行数
+
+- **filtered**：按表条件过滤的行百分比
+
+- **Extra**：执行情况的描述和说明
+
+  该列包含MySQL解决查询的详细信息,有以下几种情况：
+
+  - Using where：不用读取表中所有信息，仅通过索引就可以获取所需数据，这发生在对表的全部的请求列都是同一个索引的部分的时候，表示mysql服务器将在存储引擎检索行后再进行过滤
+  - Using temporary：表示MySQL需要使用临时表来存储结果集，常见于排序和分组查询，常见 group by ; order by
+  - Using filesort：当Query中包含 order by 操作，而且无法利用索引完成的排序操作称为**文件排序**
+  - Using join buffer：该值强调了在获取连接条件时没有使用索引，并且需要连接缓冲区来存储中间结果。如果出现了这个值，那应该注意，根据查询的具体情况可能需要添加索引来改进能。
+  - Impossible where：这个值强调了where语句会导致没有符合条件的行（通过收集统计信息不可能存在结果）。
+  - Select tables optimized away：这个值意味着仅通过使用索引，优化器可能仅从聚合函数结果中返回一行
+  - No tables used：Query语句中使用from dual 或不含任何from子句
+
+**总结：**
+
+- EXPLAIN不会告诉你关于触发器、存储过程的信息或用户自定义函数对查询的影响情况
+- EXPLAIN不考虑各种Cache
+- EXPLAIN不能显示MySQL在执行查询时所作的优化工作
+- 部分统计信息是估算的，并非精确值
+- EXPALIN只能解释SELECT操作，其他操作要重写为SELECT后查看执行计划。
+
+通过收集统计信息不可能存在结果
+
+参考：[杰克思勒](http://www.cnblogs.com/tufujie/)
+
+
 
 ## 实战
 
+
+
 ### 安装与配置
 
->windows环境：
+#### windows环境
 
-**压缩包版**
-
-1、设置环境变量  
+**1、设置环境变量**  
 
 配置 `MYSQL_HOME` 为MySQL的解压路径，并设置path：`;%MYSQL_HOME%\bin`
 
-2、在MySQL解压路径下，新建 `my.ini` 配置初始化参数：
+**2、在MySQL解压路径下，新建 `my.ini` 配置初始化参数：**
 
 ```ini
 [mysql]
@@ -270,7 +368,7 @@ default-character-set=utf8
 
 >my.ini 文件格式必须是 `ANSI` 格式，否则会报错：`Found option without preceding group in config file`
 
-3、初始化数据库
+**3、初始化数据库**
 
 以 **管理员** 的身份打开cmd命令窗口，输入 `mysqld --initialize --console` 命令初始化 mysql 的 data 数据目录，初始化完毕后，会在解压目录下生成一个data文件夹，cmd窗口中会有随机生成的密码：
 
@@ -278,13 +376,13 @@ default-character-set=utf8
 
 生成密码：XkJ-VegEY3cY
 
-4、安装服务  
+**4、安装服务** 
 
 - 注册服务：`mysqld --install mysql-master --defaults-file="D:\Arms\mysql-8.0.19-winx64\my.ini"`
 - 启动服务：`net start mysql-master`
 - 登录：`mysql -u root -p`
 
-5、更改密码
+**5、更改密码**
 
 ```sql
 set password for root@localhost='123456';
@@ -292,35 +390,35 @@ set password for root@localhost='123456';
 ALTER USER USER() IDENTIFIED BY '新密码';
 ```
 
-6、问题解决：
+**6、问题解决：**
 
-- 6.1 服务名无效  
+**6.1 服务名无效**  
 
-  原因：没有注册 mysql 到服务中。  
+原因：没有注册 mysql 到服务中。  
 
-  解决：在命令行中输入`mysqld --install`，出现 `Service successfully install` 代表安装成功
+解决：在命令行中输入`mysqld --install`，出现 `Service successfully install` 代表安装成功
 
-- 6.2 cmd中能登录，Navicat中不能登录  
+**6.2 cmd中能登录，Navicat中不能登录**  
 
-   错误提示：
+错误提示：
 
-   ```sh
-   1251 - Client does not support authentication protocol requested by server; consider upgrading MySQL client
-   # 或者
-   Authentication plugin 'caching_sha2_password' cannot be loaded
-   # 或者
-   Access denied for user 'root'@'localhost'
-   ```
+```sh
+1251 - Client does not support authentication protocol requested by server; consider upgrading MySQL client
+# 或者
+Authentication plugin 'caching_sha2_password' cannot be loaded
+# 或者
+Access denied for user 'root'@'localhost'
+```
 
-   原因：
+原因：
 
-   1. 没有开启远程登录
-   2. mysql8 之前的版本中加密规则是 `mysql_native_password`，而在 mysql8 之后，加密规则是 `caching_sha2_password`。
+1. 没有开启远程登录
+2. mysql8 之前的版本中加密规则是 `mysql_native_password`，而在 mysql8 之后，加密规则是 `caching_sha2_password`。
 
-   解决：
+解决：
 
-   1. 开启远程登录
-   2. 把 mysql 用户登录密码加密规则还原成 `mysql_native_password`，或者升级 Navicat 驱动。  
+1. 开启远程登录
+2. 把 mysql 用户登录密码加密规则还原成 `mysql_native_password`，或者升级 Navicat 驱动。  
 
 ```sh
 # 登录系统
@@ -349,7 +447,9 @@ mysql> flush privileges;
 mysql> exit;
 ```
 
->安装包版，根据向导安装即可！
+
+
+
 
 ### 常用命令语句
 
