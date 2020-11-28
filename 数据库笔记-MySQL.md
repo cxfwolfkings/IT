@@ -19,14 +19,22 @@
    - [事件调度器](#事件调度器)
 
 3. [总结](#总结)
-- [常见错误](#常见错误)
+
+   - [常见错误](#常见错误)
+
      - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
+
      - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
+
      - [3、int型字段插入空值](#3、int型字段插入空值)
-   
-- [性能优化](#性能优化)
+
+   - [性能优化](#性能优化)
+
    - [编码设置](#编码设置)
-- [压缩](#压缩)
+
+   - [压缩](#压缩)
+   - [死锁](#死锁)
+
 4. 升华
 
 
@@ -2532,6 +2540,19 @@ PHP手册：[mysql_pconnect()](http://php.net/manual/en/function.mysql-pconnect.
 ### 压缩
 
 参考：[https://www.jb51.net/article/116140.htm](#https://www.jb51.net/article/116140.htm)
+
+
+
+### 死锁
+
+解决思路：
+
+1. 使用临时表保存全部待操作记录（增删改）
+2. 给业务表加表级锁
+3. 将临时表数据同步到业务表
+4. 释放表级锁
+
+问题：业务表在大量并发操作下，会发生什么？
 
 
 
