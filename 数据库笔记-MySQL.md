@@ -2556,6 +2556,100 @@ PHP手册：[mysql_pconnect()](http://php.net/manual/en/function.mysql-pconnect.
 
 
 
+### 备份
+
+备份：
+
+```bash
+:: 设置MySql数据库的IP
+set ipaddress=10.30.100.106
+set port=3306
+
+:: 要备份MySql数据库名
+set db_name1=lead_pm
+set db_name2=lead_basic
+set db_name3=lead_pm_1.6
+set db_name4=lead_basic_1.6
+set db_name5=lead_perf
+
+set db_name6=lead_attence
+set db_name7=lead_general
+
+:: 获取当前月份 yyyymm 202006
+:: 获取备份时的时间戳 yyyymmddHHmiss 20200622164535
+set backup_month=%date:~0,4%%date:~5,2%
+set backup_date=%date:~0,4%%date:~5,2%%date:~8,2%
+:: set backup_time=%date:~0,4%%date:~5,2%%date:~8,2%%time:~0,2%%time:~3,2%%time:~6,2%
+
+:: 备份目录(如果没有则创建)
+SET floder=C:\Database\backup\%backup_month%
+if not exist %floder% md "%floder%" 
+
+:: 设置mysqldump 备份的参数
+set pm_db=-uroot -p123 -h %ipaddress% -P %port% %db_name1%
+set basic_db=-uroot -p123 -h %ipaddress% -P %port% %db_name2%
+set pm_db_1_6=-uroot -p123 -h %ipaddress% -P %port% %db_name3%
+set basic_db_1_6=-uroot -p123 -h %ipaddress% -P %port% %db_name4%
+set perf_db=-uroot -p123 -h %ipaddress% -P %port% %db_name5%
+
+set attence_db=-uroot -p123 -h %ipaddress% -P %port% %db_name6%
+set general_db=-uroot -p123 -h %ipaddress% -P %port% %db_name7%
+
+:: 使用mysqldump对指定的MySql进行备份
+C:\mysql_test\bin\mysqldump --single-transaction %pm_db% --opt -R -E >Product_Full_%db_name1%_%backup_date%.sql
+C:\mysql_test\bin\mysqldump --single-transaction %basic_db% --opt -R -E >Product_Full_%db_name2%_%backup_date%.sql
+C:\mysql_test\bin\mysqldump --single-transaction %pm_db_1_6% --opt -R -E >Product_Full_%db_name3%_%backup_date%.sql
+C:\mysql_test\bin\mysqldump --single-transaction %basic_db_1_6% --opt -R -E >Product_Full_%db_name4%_%backup_date%.sql
+C:\mysql_test\bin\mysqldump --single-transaction %perf_db% --opt -R -E >Product_Full_%db_name5%_%backup_date%.sql
+
+C:\mysql_test\bin\mysqldump --single-transaction %attence_db% --opt -R -E >Product_Full_%db_name6%_%backup_date%.sql
+C:\mysql_test\bin\mysqldump --single-transaction %general_db% --opt -R -E >Product_Full_%db_name7%_%backup_date%.sql
+
+:: 用7-zip对备份出的sql文件进行压缩，此处使用7zip进行压缩，也可以换成其它的压缩命令
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name1%_%backup_date%.zip"  Product_Full_%db_name1%_%backup_date%.sql
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name2%_%backup_date%.zip"  Product_Full_%db_name2%_%backup_date%.sql
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name3%_%backup_date%.zip"  Product_Full_%db_name3%_%backup_date%.sql
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name4%_%backup_date%.zip"  Product_Full_%db_name4%_%backup_date%.sql
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name5%_%backup_date%.zip"  Product_Full_%db_name5%_%backup_date%.sql
+
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name6%_%backup_date%.zip"  Product_Full_%db_name6%_%backup_date%.sql
+"C:\Program Files\7-Zip\7z.exe" a "%floder%\Product_Full_%db_name7%_%backup_date%.zip"  Product_Full_%db_name7%_%backup_date%.sql
+
+::  删除已压缩的备份文件
+del Product_Full_*.sql
+
+:: 生成ftp的参数文件，把压缩后的zip文件上传到FTP服务器
+echo open 10.30.100.105 8080>>temp.txt    
+echo user administrator>>temp.txt
+echo Qwerty654>>temp.txt
+echo cd BackUp\Test>>temp.txt
+echo put "%floder%\Product_Full_%db_name1%_%backup_date%.zip">>temp.txt
+echo put "%floder%\Product_Full_%db_name2%_%backup_date%.zip">>temp.txt
+echo put "%floder%\Product_Full_%db_name3%_%backup_date%.zip">>temp.txt
+echo put "%floder%\Product_Full_%db_name4%_%backup_date%.zip">>temp.txt
+echo put "%floder%\Product_Full_%db_name5%_%backup_date%.zip">>temp.txt
+
+echo put "%floder%\Product_Full_%db_name6%_%backup_date%.zip">>temp.txt
+echo put "%floder%\Product_Full_%db_name7%_%backup_date%.zip">>temp.txt
+echo bye>>temp.txt
+
+:: 执行上传命令
+ftp -i -n -s:temp.txt  
+
+:: 删除ftp的临时参数文件
+del temp.txt
+:: 删除两天前备份的压缩文件
+:: del MYSQL_100_%del_zip_file%.zip 
+```
+
+恢复：
+
+```bash
+
+```
+
+
+
 ## 升华
 
 
