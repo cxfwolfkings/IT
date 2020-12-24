@@ -19,9 +19,9 @@
 2. 运维工具
 
    - [vmware](#vmware)
-
-   - [Sunny-Ngrok](#Sunny-Ngrok)
+- [Sunny-Ngrok](#Sunny-Ngrok)
    - [Vagrant](#Vagrant)
+   - [Log查看器](#Log查看器)
 3. 管理工具
    - [git](#git)
    - [svn](#svn)
@@ -1506,6 +1506,28 @@ end
     对于本入门指南的其余部分，我们将仅使用之前添加的"hashicorp/precise64"框。但是在完成这个入门指南后不久，你可能会遇到的第一个问题是“我在哪里可以找到更多的盒子？”
     找到更多盒子的最佳位置是HashiCorp的Vagrant Cloud box目录。HashiCorp的Vagrant Cloud有一个提供免费的可以运行各种平台和技术的box的公共目录。HashiCorp的Vagrant Cloud还有一个很棒的搜索功能，可以让你找到你关心的box。
     除了寻找免费box外，如果您打算为自己的组织创建box，HashiCorp的Vagrant Cloud可让您托管自己的box以及私人box。
+
+
+
+### Log查看器
+
+**超大****log****文件查看工具**
+
+l PilotEdit（主要是针对文本文件）
+
+l glogg（windows和linux都可以用）
+
+l WINHEX（主要针对二进制文件）
+
+l EmEditor（打开速度快，对中文支持好）
+
+**参考**
+
+https://coderxing.gitbooks.io/architecture-evolution/
+
+
+
+
 
 # 汇总
 
