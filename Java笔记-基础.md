@@ -1,10 +1,20 @@
-# 目录
 
-- 入门
-  - 诞生历史
-  - 环境搭建
-  - 基本语法
-  - 开发工具
+
+
+
+## 目录
+
+1. 理论
+   - 诞生历史
+   - 环境搭建
+   - 基本语法
+   - 开发工具
+2. 实战
+3. 总结
+4. 升华
+
+
+
 - 面向对象 - 封装 / 继承 / 多态
 - 附录
   - [JDK历史版本](https://www.oracle.com/technetwork/java/javase/archive-139210.html)
@@ -12,11 +22,11 @@
 
 
 
-## 入门
+## 理论
 
-![x](http://viyitech.cn/public/images/java.jpg)
+![x](./Resources/java.jpg)
 
-![x](http://viyitech.cn/public/images/goslin.jpg)
+![x](./Resources/goslin.jpg)
 
 ### 诞生历史
 
