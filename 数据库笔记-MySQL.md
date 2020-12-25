@@ -18,7 +18,7 @@
    - [Handler](#Handler)
    - [触发器](#触发器)
 - [事件调度器](#事件调度器)
-   
+  
 3. [总结](#总结)
 
    - [常见错误](#常见错误)
@@ -28,14 +28,12 @@
      - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
 
      - [3、int型字段插入空值](#3、int型字段插入空值)
-
-   - [性能优化](#性能优化)
-
-   - [编码设置](#编码设置)
-
+- [性能优化](#性能优化)
+   - [查询效率](#查询效率)
+- [编码设置](#编码设置)
    - [压缩](#压缩)
-   - [死锁](#死锁)
-
+- [死锁](#死锁)
+   
 4. 升华
 
 
@@ -2193,6 +2191,20 @@ https://www.cnblogs.com/ctaixw/p/5660531.html
 
 ### 编码设置
 
+> 前言：在创建数据库的时候，会有这样一个选项->排序规则，平时在创建数据库的时候并没有注意，只是选择了默认，也没感觉有什么问题，今天看到这个突然好奇起来，所以看了一些资料做了以下的一些总结，若有错误之处请斧正。
+
+这个排序规则的作用是什么？可以避免一些在数据库导入时出现的一些错误。很多时候在导入数据库的时候会出现字符乱码的问题，但是如果定制编码的话，就会更容易的发现问题。在mysql中我们经常使用的是utf8_unicode_ci和utf8_general_ci,两者还是有一些区别的，当前，utf8_unicode_ci校对规则仅部分支持Unicode校对规则算法。一些字符还是不能支持。并且，不能完全支持组合的记号。这主要影响越南和俄罗斯的一些少数民族语言，如：Udmurt 、Tatar、Bashkir和Mari。
+
+utf8_general_ci是一个遗留的 校对规则，不支持扩展。它仅能够在字符之间进行逐个比较。这意味着utf8_general_ci校对规则进行的比较速度很快，但是与使用utf8_unicode_ci的 校对规则相比，比较正确性较差）。
+
+例如，使用utf8_general_ci和utf8_unicode_ci两种 校对规则下面的比较相等： Ä = A Ö = O Ü = U 两种校对规则之间的区别是，对于utf8_general_ci下面的等式成立： ß = s 但是，对于utf8_unicode_ci下面等式成立： ß = ss 对于一种语言仅当使用utf8_unicode_ci排序做的不好时，才执行与具体语言相关的utf8字符集 校对规则。例如，对于德　　语和法语，utf8_unicode_ci工作的很好，因此不再需要为这两种语言创建特殊的utf8校对规则。 utf8_general_ci也适用与德语和法语，除了‘ß'等于‘s'，而不是‘ss'之外。　　如果你的应用能够接受这些，那么应该使用utf8_general_ci，因为它速度快。否则，使用utf8_unicode_ci，因为它比较准确。
+
+上面我们讲到utf8_xxxx_ci，但是对于上面的编码格式后面的ci还是有些不解，当然不只是ci，还有ki，wi什么的，他们代表的是什么尼？
+
+排序规则名称由两部份构成，前半部份是指本排序规则所支持的字符集。如：Chinese_PRC_CS_AI_WS，前半部份：指UNICODE字符集，Chinese_PRC指针对大陆简体字UNICODE的排序规则。排序规则的后半部份即后缀含义：BIN 二进制排序、CI(CS) 是否区分大小写（CI不区分，CS区分）、AI(AS) 是否区分重音（AI不区分，AS区分）、KI(KS) 是否区分假名类型（KI不区分，KS区分）、WI(WS) 是否区分宽度（WI不区分，WS）。
+
+现在对排序规则有一定的了解之后就明白自己需要那种编码格式了，平时我都是使用utf8_general_ci，最好是做到编码统一，就会减少数据库乱码这种情况的发生。
+
 ```sql
 -- gbk: create database `test2` default character set gbk collate gbk_chinese_ci;
 -- utf8: create database `test2` default character set utf8 collate utf8_general_ci;
@@ -2431,7 +2443,7 @@ key_buffer_size = 8M
 
 
 
-参考：[MYSQL性能优化的最佳20+条经验](https://www.cnblogs.com/zhouyusheng/p/8038224.html)
+#### 查询效率
 
 **1、为查询缓存优化你的查询**
 
@@ -2450,7 +2462,9 @@ $r = mysql_query("SELECT username FROM user WHERE signup_date >= '$today'");
 
 上面两条 SQL 语句的差别就是 CURDATE() ，MySQL 的查询缓存对这个函数不起作用。所以，像 NOW() 和 RAND() 或是其它的诸如此类的 SQL 函数都不会开启查询缓存，因为这些函数的返回是不定的。所以，你所需要的就是用一个变量来代替 MySQL 的函数，从而开启缓存。
 
-**2、EXPLAIN 你的 SELECT 查询**
+**2、SQL语句中IN包含的值不应过多**
+
+MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：select id from t where num in(1,2,3) 对于连续的数值，能用between就不要用in了；再或者使用连接来替换。
 
 **3、当只要一行数据时使用 LIMIT 1**
 
@@ -2470,17 +2484,13 @@ $r = mysql_query("SELECT username FROM user WHERE signup_date >= '$today'");
 
 **6、千万不要 ORDER BY RAND()**
 
-想打乱返回的数据行，下面方法会更好：
-
-```php
-$r = mysql_query("SELECT count(*) FROM user");
-$d = mysql_fetch_row($r);
-$rand = mt_rand(0, $d[0] - 1);
-
-$r = mysql_query("SELECT username FROM user LIMIT $rand, 1");
+```sql
+select id from `dynamic` order by rand() limit 1000;
+-- 上面的SQL语句，可优化为：
+select id from `dynamic` t1 join (select rand() * (select max(id) from `dynamic`) as nid) t2 on t1.id > t2.nid limit 1000;
 ```
 
-**7、避免 SELECT ***
+**7、避免 SELECT *，如果排序字段没有用到索引，就尽量少排序**
 
 **8、永远为每张表设置一个ID**
 
@@ -2597,6 +2607,16 @@ PHP手册：[mysql_pconnect()](http://php.net/manual/en/function.mysql-pconnect.
 在理论上来说，这听起来非常的不错。但是从个人经验上来说，这个功能制造出来的麻烦事更多。因为，你只有有限的链接数，内存问题，文件句柄数，等等。
 
 而且，Apache 运行在极端并行的环境中，会创建很多很多的子进程。这就是为什么这种“永久链接”的机制工作不好的原因。在你决定要使用“永久链接”之前，你需要好好地考虑一下你的整个系统的架构。
+
+**22、如果限制条件中其他字段没有索引，尽量少用or**
+
+or两边的字段中，如果有一个不是索引字段，而其他条件也不是索引字段，会造成该查询不走索引的情况。很多时候使用union all或者是union（必要的时候）的方式来代替“or”会得到更好的效果。
+
+**23、尽量用union all代替union**
+
+union和union all的差异主要是前者需要将结果集合并后再进行唯一性过滤操作，这就会涉及到排序，增加大量的CPU运算，加大资源消耗及延迟。当然，union all的前提条件是两个结果集没有重复数据。
+
+
 
 ### 压缩
 
