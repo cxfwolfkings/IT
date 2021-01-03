@@ -4,7 +4,11 @@
    
    - [基础类型](#基础类型)
    - [索引](#索引)
+   - [临时表](#临时表)
+   - [缓存池](#缓存池)
    - [Explain详解](#Explain详解)
+   - [table瘦身](#table瘦身)
+   - [SQL&nbsp;Joins、统计、随机查询](#SQL&nbsp;Joins、统计、随机查询)
    
 2. [实战](#实战)
    - [安装与配置](#安装与配置)
@@ -23,16 +27,22 @@
 
    - [常见错误](#常见错误)
 
-     - [1、This function has none of DETERMINISTIC, NOSQL, ...](#1、This function has none of DETERMINISTIC, NOSQL, ...)
-
-     - [2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
-
-     - [3、int型字段插入空值](#3、int型字段插入空值)
-- [性能优化](#性能优化)
-   - [查询效率](#查询效率)
-- [编码设置](#编码设置)
+     - [1. This function has none of DETERMINISTIC, NOSQL, ...](#1. This function has none of DETERMINISTIC, NOSQL, ...)
+- [2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
+     - [3. 非空字段插入空值](#3. 非空字段插入空值)
+- [4. MySQL Connector/NET Exception: Reading from the stream has failed](#4. MySQL Connector/NET Exception: Reading from the stream has failed)
+   
+   - [性能优化](#性能优化)
+   
+     - [引擎优化](#引擎优化)
+   
+     - [SQL优化](#SQL优化)
+   
+   - [编码设置](#编码设置)
+   
    - [压缩](#压缩)
-- [死锁](#死锁)
+   
+   - [死锁](#死锁)
    
 4. 升华
 
@@ -232,6 +242,159 @@ InnoDB 的所有辅助索引都引用主键作为 data 域。InnoDB 表是基于
 
 
 
+### 临时表
+
+一般来说，分为两类：
+
+**1. MySQL 临时表引擎，名字叫做 Memory**。比如
+
+```
+create table tmp1(id int, str1 varchar(100) ) engine = memory;
+```
+
+由参数 max_heap_table_size 来控制，超过报错。
+
+**2. 非临时表的引擎**，这里又分为两类：
+
+1）用户自定义的临时表，比如:
+
+```
+create temporary table (id int, str1 varchar(100) );
+```
+
+2）SQL执行过程中产生的内部临时表，比如：UNION , 聚合类ORDER BY，派生表，大对象字段的查询，子查询或者半连接的固化等等场景。
+
+那么这两种临时表的计数器通常用 `show global status like '%tmp_%tables%'` 来查看。以上结果分别代表，只创建磁盘上的临时表计数以及临时表的总计数。这两个计数器由参数 tmp_table_size 和 max_heap_table_size 两个取最小值来控制。
+
+那在 MySQL 5.7 之前，这个 SQL 运行中产生的临时表是 MYISAM，而且只能是 MYISAM。那 MySQL 从 5.7 开始提供了参数 Internal_tmp_mem_storage_engine 来定义内部的临时表引擎，可选值为 MYISAM 和 INNODB 。当然这里我们选择 INNODB 。并且把内部的临时表默认保存在临时表空间 ibtmp1（可以用参数 innodb_temp_data_file_path 设置大小以及步长等）下。当然这里我们得控制下 ibtmp1 的大小，要不然一个烂SQL就把磁盘整爆了。
+
+但是MySQL 5.7 之前都没有解决如下问题:
+
+- VARCHAR的变长存储。那就是如果临时表的字段定义是 VARCHAR(200)，那么映射到内存里处理的字段变为CHAR(200)。假设 VARCHAR(200) 就存里一个字符 "Y", 那岂不是很大的浪费。
+- 大对象的默认磁盘存储，比如 TEXT，BLOB， JSON等，不管里面存放了啥，直接转化为磁盘存储。
+
+MySQL 8.0 开始，专门实现了一个临时表的引擎 TempTable , 解决了 VARCHAR 字段的变长存储以及大对象的内存存储。由变量 interal_tmp_mem_storage_engine 来控制，可选值为 TempTable（默认）和 Memory；新引擎的大小由参数 temp_table_max_ram 来控制，默认为1G。超过了则存储在磁盘上（ibtmp1）。并且计数器由性能字典的表 memory_summary_global_by_event_name 来存储。
+
+```sql
+SELECT * FROM performance_schema. memory_summary_global_by_event_name WHERE event_name like '%temptable%';
+
+*************************** 1. row ***************************
+EVENT_NAME: **memory/temptable/physical_disk**
+COUNT_ALLOC: 0
+COUNT_FREE: 0
+SUM_NUMBER_OF_BYTES_ALLOC: 0
+SUM_NUMBER_OF_BYTES_FREE: 0
+LOW_COUNT_USED: 0
+CURRENT_COUNT_USED: 0
+HIGH_COUNT_USED: 0
+LOW_NUMBER_OF_BYTES_USED: 0
+CURRENT_NUMBER_OF_BYTES_USED: 0
+HIGH_NUMBER_OF_BYTES_USED: 0
+*************************** 2. row ***************************
+EVENT_NAME: **memory/temptable/physical_ram**
+COUNT_ALLOC: 1
+COUNT_FREE: 0
+SUM_NUMBER_OF_BYTES_ALLOC: 1048576
+SUM_NUMBER_OF_BYTES_FREE: 0
+LOW_COUNT_USED: 0
+CURRENT_COUNT_USED: 1
+HIGH_COUNT_USED: 1
+LOW_NUMBER_OF_BYTES_USED: 0
+CURRENT_NUMBER_OF_BYTES_USED: 1048576
+HIGH_NUMBER_OF_BYTES_USED: 1048576
+
+2 rows in set (0.03 sec)
+```
+
+以上 memory/temptable/physical_disk 代表放入磁盘上的临时表计数情况。memory/temptable/physical_ram 代表放入内存的临时表计数情况。
+
+**那总结下MySQL 8.0 引入的 TempTable 引擎：**
+
+- 默认内部临时表引擎。
+- 支持变长字符类型的实际存储。
+- 设置变量 temp_table_max_ram 来控制实际存储内存区域大小。
+
+**[tmp_table_size参数](https://www.cnblogs.com/uphold/p/11378109.html)**
+
+1、参数查看
+
+方法一：mysql> show variables like 'tmp_table_size';
+方法二：直接查看my.cnf文件tmp_table_size参数值
+
+2、参数配置
+
+方法一：mysql> set global tmp_table_size=16*1024*1024; 重启后会丢失使用my.cnf参数
+方法二：直接修改my.cnf文件tmp_table_size参数值，但需要重启实例生效
+
+3、参数值意义
+
+tmp_table_size参数配置内部内存临时表的大小。 此参数不适用用户创建的MEMORY表，用户创建的MEMORY表用max_heap_table_size参数配置。
+
+实际限制由tmp_table_size和max_heap_table_size的值中较小的一个确定，如果内存中的临时表超出限制，MySQL自动将其转换为磁盘上的MyISAM表。如果要执行许多 GROUP BY查询，可以增加tmp_table_size的值（或如有必要，也可以使用max_heap_table_size）。
+
+执行计划中Extra字段包含有“Using temporary” 时会产生临时表。
+
+4、外料
+
+MySQL中临时表主要有两类，包括外部临时表和内部临时表。外部临时表是通过语句create temporary table...创建的临时表，临时表只在本会话有效，会话断开后，临时表数据会自动清理。内部临时表主要有两类，一类是information_schema中临时表，另一类是会话执行查询时，如果执行计划中包含有“Using temporary”时，会产生临时表。内部临时表与外部临时表的一个区别在于，我们看不到内部临时表的表结构定义文件frm。而外部临时表的表定义文件frm，一般是以 `#sql{进程id}{线程id}` 序列号组成，因此不同会话可以创建同名的临时表。
+
+临时表与普通表的主要区别在于是否在实例，会话，或语句结束后，自动清理数据。比如，内部临时表，我们在一个查询中，如果要存储中间结果集，而查询结束后，临时表就会自动回收，不会影响用户表结构和数据。另外就是，不同会话的临时表可以重名，所有多个会话执行查询时，如果要使用临时表，不会有重名的担忧。5.7引入了临时表空间后，所有临时表都存储在临时表空间（非压缩）中，临时表空间的数据可以复用。临时表并非只支持Innodb引擎，还支持myisam引擎，memory引擎等。因此，临时表我们看不到实体（idb文件），但其实不一定是内存表，也可能存储在临时表空间中。
+
+临时表既可以是innodb引擎表，也可以是memory引擎表。这里所谓的内存表，是说memory引擎表，通过建表语句create table ...engine=memory，数据全部在内存，表结构通过frm管理，同样的内部的memory引擎表，也是看不到frm文件中，甚至看不到information_schema在磁盘上的目录。在MySQL内部，information_schema里面的临时表就包含两类：innodb引擎的临时表和memory引擎的临时表。比如 TABLES 表属于 memory 临时表，而 columns, processlist 属于 innodb 引擎临时表。内存表所有数据都在内存中，在内存中数据结构是一个数组（堆表），所有数据操作都在内存中完成，对于小数据量场景，速度比较快（不涉及物理IO操作）。但内存毕竟是有限的资源，因此，如果数据量比较大，则不适合用内存表，而是选择用磁盘临时表（innodb引擎），这种临时表采用B+树存储结构（innodb引擎），innodb的bufferpool资源是共享的，临时表的数据可能会对bufferpool的热数据有一定的影响，另外，操作可能涉及到物理IO。memory引擎表实际上也是可以创建索引的，包括Btree索引和Hash索引，所以查询速度很快，主要缺陷是内存资源有限。
+
+5、官网信息
+
+| Property            | Value                |
+| ------------------- | -------------------- |
+| Command-Line Format | --tmp-table-size=#   |
+| System Variable     | tmp_table_size       |
+| Scope               | Global, Session      |
+| Dynamic             | Yes                  |
+| Type                | integer              |
+| Default Value       | 16777216             |
+| Minimum Value       | 1024                 |
+| Maximum Value       | 18446744073709551615 |
+
+The maximum size of internal in-memory temporary tables. This variable does not apply to user-created MEMORY tables.
+
+The actual limit is determined from whichever of the values of tmp_table_size and max_heap_table_size is smaller. If an in-memory temporary table exceeds the limit, MySQL automatically converts it to an on-disk MyISAM table. Increase the value of tmp_table_size (and max_heap_table_size if necessary) if you do many advanced GROUP BY queries and you have lots of memory.
+
+You can compare the number of internal on-disk temporary tables created to the total number of internal temporary tables created by comparing the values of the Created_tmp_disk_tables and Created_tmp_tables variables.
+
+ 6、针对报错信息：Table '/mysql/data3001/tmp/#sql_ca3c_0' is marked as crashed and should be repaired
+
+
+
+### 缓存池
+
+![x](E:/WorkingDir/Office/Resources/tbms0029.png)
+
+应用系统分层架构，为了加速数据访问，会把最常访问的数据，放在缓存(cache)里，避免每次都去访问数据库。操作系统，会有缓冲池(buffer pool)机制，避免每次访问磁盘，以加速数据的访问。MySQL作为一个存储系统，同样具有缓冲池(buffer pool)机制，以避免每次查询数据都进行磁盘IO，主要作用：
+
+> 1、存在的意义是加速查询 
+>
+> 2、缓冲池(buffer pool) 是一种常见的**降低磁盘访问** 的机制；
+>
+> 3、缓冲池通常以页(page **16K**)为单位缓存数据；
+>
+> 4、缓冲池的常见管理算法是**LRU**，memcache，OS，InnoDB都使用了这种算法；
+>
+> 5、InnoDB对普通LRU进行了优化：将缓冲池分为`老生代`和`新生代`，入缓冲池的页，优先进入老生代，该页被访问，才进入新生代，以解决预读失效的问题页被访问。且在老生代**停留时间超过配置阈值**的，才进入新生代，以解决批量数据访问，大量热数据淘汰的问题
+
+**预读失效**：
+
+> 由于预读(Read-Ahead)，提前把页放入了缓冲池，但最终MySQL并没有从页中读取数据，称为预读失效
+
+![x](E:/WorkingDir/Office/Resources/tbms0030.png)
+
+**缓冲池污染**：
+
+> 当某一个SQL语句，要批量扫描大量数据时，可能导致把缓冲池的所有页都替换出去，导致大量热数据被换出，MySQL性能急剧下降，这种情况叫缓冲池污染。解决办法：加入`老生代停留时间窗口`策略后，短时间内被大量加载的页，并不会立刻插入新生代头部，而是优先淘汰那些，短期内仅仅访问了一次的页。
+
+
+
+
+
 ### Explain详解
 
 expain出来的信息有10列：
@@ -329,6 +492,74 @@ expain出来的信息有10列：
 通过收集统计信息不可能存在结果
 
 参考：[杰克思勒](http://www.cnblogs.com/tufujie/)
+
+
+
+### table瘦身
+
+**空洞**：
+
+> MySQL执行`delete`命令其实只是把记录的位置，或者数据页标记为了`可复用`，但磁盘文件的大小是不会变的。通过delete命令是不能回收表空间的。这些可以复用，而没有被使用的空间，看起来就像是`空洞`。插入时候引发分裂同样会产生空洞。
+
+**重建表思路**：
+
+> 1、新建一个跟A表结构相同的表B 
+>
+> 2、按照主键ID将A数据一行行读取同步到表B 
+>
+> 3、用表B替换表A实现效果上的瘦身。
+
+**重建表指令**：
+
+> 1、alter table A engine=InnoDB，慎重用，牛逼的DBA都用下面的开源工具。
+>
+> 2、推荐Github：gh-ost
+
+
+
+### SQL&nbsp;Joins、统计、随机查询
+
+7种join具体如下：
+
+![x](./Resources/db003.jpg)
+
+**统计**：
+
+> 1、MyISAM模式下把一个表的总行数存在了磁盘上，直接拿来用即可 
+>
+> 2、InnoDB引擎由于 MVCC 的原因，需要把数据读出来然后累计求和 
+>
+> 3、性能来说 由好到坏：count(字段) < count(主键id) < count(1) ≈ count(*)，`尽量用count(*)。`
+
+**随机查询**：
+
+```
+mysql> select word from words order by rand() limit 3;
+```
+
+直接使用`order by rand()`，[explain](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488546&idx=1&sn=732ca84abf572196ddf76597fe096969&scene=21#wechat_redirect) 这个语句发现需要 `Using temporary`和 `Using filesort`，查询的执行代价往往是比较大的。所以在设计的时要避开这种写法。
+
+```
+mysql> select count(*) into @C from t;
+set @Y1 = floor(@C * rand());
+set @Y2 = floor(@C * rand());
+set @Y3 = floor(@C * rand());
+select * from t limit @Y1,1; 
+select * from t limit @Y2,1;
+select * from t limit @Y3,1;
+```
+
+这样可以避免临时表跟排序的产生，最终查询行数 = C + (Y1+1) + (Y2+1) + (Y3+1)
+
+**exist 和 in 对比**：
+
+> 1、in查询时首先查询子查询的表，然后将内表和外表做一个`笛卡尔积`，然后按照条件进行筛选。
+>
+> 2、子查询使用 exists，会先进行主查询，将查询到的每行数据`循环带入`子查询校验是否存在，过滤出整体的返回数据。
+>
+> 3、两表大小相当，in 和 exists 差别不大。`内表大，用 exists 效率较高；内表小，用 in 效率较高`。
+>
+> 4、查询用not in 那么内外表都进行全表扫描，没有用到索引；而not extsts 的子查询依然能用到表上的索引。`not exists都比not in要快`。
 
 
 
@@ -1850,7 +2081,7 @@ END
 
 
 
-#### 1、This function has none of DETERMINISTIC, NOSQL, ...
+#### 1. This function has none of DETERMINISTIC, NOSQL, ...
 
 ```sql
 set global log_bin_trust_function_creators = TRUE;
@@ -1868,7 +2099,7 @@ set global log_bin_trust_function_creators = TRUE;
 
 
 
-#### 2、Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...
+#### 2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...
 
 ```sql
 CONVERT('xxx' USING utf8) COLLATE utf8_unicode_ci
@@ -1878,7 +2109,7 @@ CONVERT('xxx' USING utf8) COLLATE utf8_unicode_ci
 
 
 
-#### 3、int型字段插入空值
+#### 3. 非空字段插入空值
 
 问题：Incorrect integer value: '' for column 'id' at row 1
 
@@ -1886,11 +2117,17 @@ CONVERT('xxx' USING utf8) COLLATE utf8_unicode_ci
 
 sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 
-将其修改为
-
-sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+删除`STRICT_TRANS_TABLES`, `NO_AUTO_CREATE_USER`
 
 重启mysql后即可 
+
+
+
+#### 4. MySQL Connector/NET Exception: Reading from the stream has failed
+
+参考：https://blog.csdn.net/fancyf/article/details/78295964
+
+连接字符串：**SslMode=None**
 
 
 
@@ -2245,7 +2482,7 @@ url=jdbc:mysql://yourip/college?user=root&password=yourpassword&useunicode=true&
 
 
 
-#### InnoDB引擎性能优化
+#### 引擎优化
 
 **1. 内存利用方面**
 
@@ -2443,7 +2680,121 @@ key_buffer_size = 8M
 
 
 
-#### 查询效率
+SQL优化主要分4个方向：`SQL语句跟索引`、`表结构`、`系统配置`、`硬件`。
+
+总优化思路就是**最大化利用索引**、**尽可能避免全表扫描**、**减少无效数据的查询**：
+
+> 1、减少数据访问：设置`合理的字段类型`，启用压缩，通过索引访问等减少磁盘 IO。
+>
+> 2、返回更少的数据：只`返回需要`的字段和数据分页处理，减少磁盘 IO 及网络 IO。
+>
+> 3、减少交互次数：`批量` DML 操作，函数存储等减少数据连接次数。
+>
+> 4、减少服务器 CPU 开销：**尽量减少数据库排序操作以及全表查询**，减少 CPU 内存占用 。
+>
+> 5、分表分区：使用`表分区`，可以增加并行操作，更大限度利用 CPU 资源。
+
+**SQL语句优化大致举例**：
+
+> 1、合理建立覆盖索引：可以有效减少回表。
+>
+> 2、union，or，in都能命中索引，建议使用in 
+>
+> 3、负向条件(!=、<>、not in、not exists、not like 等) 索引不会使用索引，建议用in。
+>
+> 4、在列上进行运算或使用函数会使索引失效，从而进行全表扫描 
+>
+> 5、小心隐式类型转换，原字符串用整型会触发`CAST`函数导致索引失效。原int用字符串则会走索引。
+>
+> 6、不建议使用%前缀模糊查询。
+>
+> 7、多表关联查询时，小表在前，大表在后。在 MySQL 中，执行 from 后的表关联查询是从左往右执行的（Oracle 相反），第一张表会涉及到全表扫描。
+>
+> 8、调整 Where 字句中的连接顺序，MySQL 采用从左往右，自上而下的顺序解析 where 子句。根据这个原理，应将过滤数据多的条件往前放，最快速度缩小结果集。
+
+**SQL调优大致思路**：
+
+1、先用慢查询日志定位具体需要优化的sql 
+
+2、使用 [explain](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488546&idx=1&sn=732ca84abf572196ddf76597fe096969&scene=21#wechat_redirect) 执行计划查看索引使用情况 
+
+3、重点关注（一般情况下根据这4列就能找到索引问题）：
+
+> 1、key（查看有没有使用索引） 
+>
+> 2、key_len（查看索引使用是否充分）
+>
+> 3、type（查看索引类型） 
+>
+> 4、Extra（查看附加信息：排序、临时表、where条件为false等）
+
+4、根据上1步找出的索引问题优化sql 5、再回到第2步
+
+![x](./Resources/db004.PNG)
+
+**表结构优化**：
+
+> 1、尽量使用TINYINT、SMALLINT、MEDIUM_INT作为整数类型而非INT，如果非负则加上UNSIGNED 。
+>
+> 2、VARCHAR的长度只分配真正需要的空间 。
+>
+> 3、尽量使用TIMESTAMP而非DATETIME 。
+>
+> 4、单表不要有太多字段，建议在20以内。
+>
+> 5、避免使用NULL字段，很难查询优化且占用额外索引空间。字符串默认为''。
+
+**读写分离**：
+
+> 只在主服务器上写，只在从服务器上读。对应到数据库集群一般都是一主一从、一主多从。业务服务器把需要写的操作都写到主数据库中，读的操作都去从库查询。主库会同步数据到从库保证数据的一致性。一般 [读写分离](https://mp.weixin.qq.com/s?__biz=MzA5NDIzNzY1OQ==&mid=2735617707&idx=2&sn=6fd038b3385c1175a6efd4ef00543e35&scene=21#wechat_redirect) 的实现方式有两种：`代码封装`跟`数据库中间件`。
+
+**分库分表**：[分库分表](https://mp.weixin.qq.com/s?__biz=MzkzNTEwOTAxMA==&mid=2247484479&idx=1&sn=97358231f0f7086f0056fc5bb4e8afff&scene=21#wechat_redirect)分为垂直和水平两个方式，一般是`先垂直后水平`。
+
+> 1、`垂直分库`：将应用分为若干模块，比如订单模块、用户模块、商品模块、支付模块等等。其实就是微服务的理念。
+>
+> 2、`垂直分表`：一般将不常用字段跟数据较大的字段做拆分。
+>
+> 3、`水平分表`：根据场景选择什么字段作分表字段，比如淘宝日订单1000万，用userId作分表字段，数据查询支持到最近6个月的订单，超过6个月的做归档处理，那么6个月的数据量就是18亿，分1024张表，每个表存200W数据，hash(userId)%100找到对应表格。
+>
+> 4、`ID生成器`：[分布式ID](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247485459&idx=1&sn=9baf434bdeebe98be60bcde7df702f22&scene=21#wechat_redirect) 需要跨库全局唯一方便查询存储-检索数据，确保唯一性跟数字递增性。
+
+目前主要流行的分库分表工具 就是`Mycat`和`sharding-sphere`。
+
+**TiDB**：开源`分布式`数据库，结合了传统的 RDBMS 和NoSQL 的最佳特性。TiDB 兼容 MySQL，`支持无限的水平扩展`，具备强一致性和高可用性。TiDB 的目标是为 OLTP(Online Transactional Processing) 和 OLAP (Online Analytical Processing) 场景提供一站式的解决方案。TiDB 具备如下核心特点
+
+> 1、支持 MySQL 协议（开发接入成本低）。
+>
+> 2、100% 支持事务（数据一致性实现简单、可靠）。
+>
+> 3、无限水平拓展（不必考虑分库分表），不停服务。
+>
+> 4、TiDB 支持和 MySQL 的互备。
+>
+> 5、遵循jdbc原则，学习成本低，强关系型，强一致性，不用担心主从配置，不用考虑分库分表，还可以无缝动态扩展。
+
+适合：
+
+> 1、原业务的 MySQL 的业务遇到单机容量或者性能瓶颈时，可以考虑使用 TiDB 无缝替换 MySQL。
+>
+> 2、大数据量下，MySQL 复杂查询很慢。
+>
+> 3、大数据量下，数据增长很快，接近单机处理的极限，不想分库分表或者使用数据库中间件等对业务侵入性较大、对业务有约束的 Sharding 方案。
+>
+> 4、大数据量下，有高并发实时写入、实时查询、实时统计分析的需求。
+>
+> 5、有分布式事务、多数据中心的数据 100% 强一致性、auto-failover 的高可用的需求。
+
+不适合：
+
+> 1、单机 MySQL 能满足的场景也用不到 TiDB。
+>
+> 2、数据条数少于 5000w 的场景下通常用不到 TiDB，TiDB 是为大规模的数据场景设计的。
+>
+> 3、如果你的应用数据量小（所有数据千万级别行以下），且没有高可用、强一致性或者多数据中心复制等要求，那么就不适合使用 TiDB。
+
+
+
+
 
 **1、为查询缓存优化你的查询**
 
@@ -4024,3 +4375,12 @@ n 建议使用内存队列产品而不使用memcache 来进行缓存异步更新
 - 最后，分享一句话，学会把问题简单化，正如Caoz 常说的，你如果认为这个问题很复杂，你一定想错了。
 - 感谢您的阅读，如对您有帮助，请在百度文库给本文五分好评，并推荐给您的朋友，多谢。
 
+
+
+### 参考
+
+1. SQL基础：https://juejin.im/post/6844903790571700231
+
+2. SQL面试：https://sowhat.blog.csdn.net/article/details/71158104
+
+3. MySQL拷问：https://www.jianshu.com/nb/22933318
