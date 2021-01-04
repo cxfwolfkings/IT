@@ -22,11 +22,11 @@
 
 命令|说明
 -|-
-`rpm -i example.rpm`|安装 example.rpm 包；
-`rpm -iv example.rpm`|安装 example.rpm 包并在安装过程中显示正在安装的文件信息；
-`rpm -ivh example.rpm`|安装 example.rpm 包并在安装过程中显示正在安装的文件信息及安装进度；
-`rpm -qa | grep gitlab`|查看安装完成的软件
-`rpm -e --nodeps`|要卸载的软件包
+rpm -i example.rpm|安装 example.rpm 包；
+rpm -iv example.rpm|安装 example.rpm 包并在安装过程中显示正在安装的文件信息；
+rpm -ivh example.rpm|安装 example.rpm 包并在安装过程中显示正在安装的文件信息及安装进度；
+rpm -qa \| grep gitlab|查看安装完成的软件
+rpm -e --nodeps|要卸载的软件包
 
 配置、编译、安装、卸载源码发布的软件包。
 
