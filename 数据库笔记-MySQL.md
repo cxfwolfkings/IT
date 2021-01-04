@@ -21,29 +21,35 @@
      - [索引相关](#索引相关)
    - [Handler](#Handler)
    - [触发器](#触发器)
-- [事件调度器](#事件调度器)
-  
+   
+   - [事件调度器](#事件调度器)
+   - [MySQL监控](#MySQL监控)
+   
 3. [总结](#总结)
 
    - [常见错误](#常见错误)
 
      - [1. This function has none of DETERMINISTIC, NOSQL, ...](#1. This function has none of DETERMINISTIC, NOSQL, ...)
-- [2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
+     
+     - [2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
+     
      - [3. 非空字段插入空值](#3. 非空字段插入空值)
-- [4. MySQL Connector/NET Exception: Reading from the stream has failed](#4. MySQL Connector/NET Exception: Reading from the stream has failed)
-   
+     
+     - [4. MySQL Connector/NET Exception: Reading from the stream has failed](#4. MySQL Connector/NET Exception: Reading from the stream has failed)
+     - [5. mysql 卡死 大部分线程长时间处于sending data的状态](#5. mysql 卡死 大部分线程长时间处于sending data的状态)
+
    - [性能优化](#性能优化)
-   
+
      - [引擎优化](#引擎优化)
-   
+
      - [SQL优化](#SQL优化)
-   
+
    - [编码设置](#编码设置)
-   
+
    - [压缩](#压缩)
-   
+
    - [死锁](#死锁)
-   
+
 4. 升华
 
 
@@ -2131,6 +2137,30 @@ sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 
 
 
+#### 5. mysql 卡死 大部分线程长时间处于sending data的状态
+
+sending data状态表示两种情况，一种是mysql已经查询了数据，正在发给客户端；另一种情况是，mysql已经知道某些数据需要去什么地方读取，正在从数据文件中读取。
+
+临时表、存储库引擎、缓存池设置的容量是否足够？
+
+默认情况下，临时表空间文件是自动扩展的，在正常关闭或初始化中止时，将删除临时表空间，并在每次启动服务器时重新创建。
+
+对临时表空间的大小进行限制，允许自动增长，但最大容量有上限：
+
+```ini
+[mysqld]
+innodb_temp_data_file_path=ibtmp1:12M:autoextend:max:500M
+```
+
+设置了上限的大小，当数据文件达到最大大小时，查询将失败，并显示一条错误消息，表明表已满，查询不能往下执行，避免 ibtmp1 过大。
+
+8.0 的临时表空间分为会话临时表空间和全局临时表空间，会话临时表空间存储用户创建的临时表和当 InnoDB 配置为磁盘内部临时表的存储引擎时由优化器创建的内部临时表，当会话断开连接时，其临时表空间将被截断并释放回池中；也就是说，在 8.0 中有一个专门的会话临时表空间，当会话被杀掉后，可以回收磁盘空间；而原来的 ibtmp1 是现在的全局临时表空间，存放的是对用户创建的临时表进行更改的回滚段，在 5.7 中 ibtmp1 存放的是用户创建的临时表和磁盘内部临时表；
+也就是在 8.0 和 5.7 中 ibtmp1 的用途发生了变化，5.7 版本临时表的数据存放在 ibtmp1 中，在 8.0 版本中临时表的数据存放在会话临时表空间，如果临时表发生更改，更改的 undo 数据存放在 ibtmp1 中；
+
+总结：在 mysql5.7 时，杀掉会话，临时表会释放，但是仅仅是在 ibtmp 文件里标记一下，空间是不会释放回操作系统的。如果要释放空间，需要重启数据库；在 mysql8.0 中可以通过杀掉会话来释放临时表空间。
+
+
+
 ### Handler
 
 ```sql
@@ -2416,6 +2446,138 @@ load data语句是将文件的内容插入到表中，相当于是insert语句�
 ### 事件调度器
 
 https://www.cnblogs.com/ctaixw/p/5660531.html
+
+
+
+### MySQL监控
+
+一、监控采集依据：主要基于show global status对数据进行采集
+
+二、对用户进行授权，然后使用show global status进行采集分析
+
+mysql -uroot -p”xxxx” -e "show global status" ###查看所有的值
+
+监控项注释：
+
+Aborted_clients ##客户端不能正常连接，失败的连接数量。
+
+Aborted_connects ##客户端中断数量，可能有恶意连接。
+
+\###吞吐量
+
+Bytes_received ##从所有客户端接收到的字节数。
+
+Bytes_sent ##发送给所有客户端的字节数。
+
+\###com admin 语句执行数量
+
+Com_commit ##统计提交语句次数
+
+com_delete ##统计删除语句
+
+com_delete_multi ##最小
+
+com_insert ##统计插入语句
+
+com_rollback ##事务回滚
+
+Connections ##不管是否成功连接到mysql的个数
+
+\###临时表数量
+
+Created_tmp_disk_tables ##服务器创建的临时表数量
+
+Created_tmp_files ##已经创建的临时文件数量
+
+Created_tmp_tables ##服务器执行语句时自动创建的内存中的临时表的数量。如果Created_tmp_disk_tables较大，你可能要增加tmp_table_size值使临时表基于内存而不基于硬盘。
+
+\##后台预读线程读取到Innodb缓冲池的页的数量
+
+Innodb_buffer_pool_reads ##不能满足InnoDB必须单页读取的缓冲池中的逻辑读数量。
+
+Innodb_buffer_pool_read_ahead ##预读的次数
+
+Innodb_buffer_pool_read_requests ##从缓冲池中读取的页的次数
+
+*缓冲池的命中率=
+
+innodb_buffer_pool_read_requests/(innodb_buffer_pool_read_requests+innodb_buffer_pool_read_ahead+innodb_buffer_pool_reads)
+
+innodb_data_read 总共读入的字节数；
+
+innodb_data_reads 发起读取请求的次数，每次读取可能需要读取多个页。
+
+*平均每次读取的字节数=innodb_data_read/innodb_data_reads
+
+Innodb_rows_deleted ##执行deleted操作的次数
+
+Innodb_rows_inserted ##执行insert操作的次数
+
+Innodb_rows_read ##执行select操作的次数
+
+Innodb_rows_updated ##执行update操作的次数
+
+\###针对MyISAM引擎：
+
+key_buffer_size ##缓冲池大小
+
+Key_blocks_unused ##未使用的缓存簇(blocks)数
+
+Key_blocks_used ##表示曾经用到的最大的blocks数
+
+\* 这台服务器，所有的缓存都用到了，要么增加key_buffer_size，要么就是过渡索引了，把缓存占满了，理想设置：
+
+Key_blocks_used / (Key_blocks_unused + Key_blocks_used) * 100% ≈ 80%
+
+Key_reads ##在内存中没有找到直接从硬盘读取索引
+
+Key_read_requests ##一共索引请求
+
+\* 计算索引未名字概率：
+
+key_cache_miss_rate = Key_reads / Key_read_requests * 100%
+
+\###Qcache查询缓冲区：
+
+Qcache_free_blocks ##Query Cache 中目前还有多少剩余的blocks
+
+Qcache_free_memory ##Query Cache 剩余的内存大小
+
+Qcache_hits ##多少次命中
+
+Qcache_inserts ##多少次未命中的插入： Qcache_hits / ( Qcache_hits + Qcache_inserts )
+
+Qcache_lowmem_prunes ##多少条Query 因为内存不足而被清除出Query Cache
+
+Qcache_not_cached ##因为query_cache_type 的设置或者不能被cache 的Query 的数量；
+
+Qcache_queries_in_cache ##当前Query Cache中的cache 的Query数量
+
+Slow_queries ##慢查询
+
+Sort_range ##通过range scan 完成的排序总次数
+
+Sort_rows ##排序总行数
+
+Sort_scan ##通过扫描完成的排序总次数
+
+Table_locks_immediate ##可以立即获取锁的查询次数。
+
+Table_locks_waited ##不能立即获取锁的查询次数。
+
+Uptime ##mysql 运行时长
+
+**三、****zabbix agnet****自定义key：**
+
+UserParameter=mysql[*],mysql -uroot -pxxx -e "show global status"|grep "$1" | cut -f2
+
+Mysql[Uptime]
+
+Grep uptime | cut -f2
+
+Myslq[Table_locks_waited]
+
+注释：通过key传回的值，$1筛选出我们要的值。
 
 
 
