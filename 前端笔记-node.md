@@ -1,7 +1,5 @@
 # node
 
-## 目录
-
 1. 简介
    - [安装](#安装)
    - [常用命令](#常用命令)
@@ -19,7 +17,10 @@
      - [__dirname](#__dirname)
      - [process](#process)
    - [常用工具](#常用工具)
+   
 2. [参考](#参考)
+
+   
 
 - 简单的说 Node.js 就是运行在服务端的 JavaScript。
 - Node.js 是一个基于Chrome JavaScript 运行时建立的一个平台。
@@ -1434,7 +1435,7 @@ fs.stat('input.txt', function (err, stats) {
    }
    console.log(stats);
    console.log("读取文件信息成功！");
-   
+
    // 检测文件类型
    console.log("是否为文件(isFile) ? " + stats.isFile());
    console.log("是否为目录(isDirectory) ? " + stats.isDirectory());    
@@ -1571,7 +1572,7 @@ fs.open('input.txt', 'r+', function(err, fd) {
       if(bytes > 0){
          console.log(buf.slice(0, bytes).toString());
       }
-
+    
       // 关闭文件
       fs.close(fd, function(err){
          if (err){
@@ -1610,7 +1611,7 @@ fs.open('input.txt', 'r+', function(err, fd) {
    }
    console.log("文件打开成功！");
    console.log("截取10字节后的文件内容。");
-   
+
    // 截取文件
    fs.ftruncate(fd, 10, function(err){
       if (err){
@@ -1627,7 +1628,7 @@ fs.open('input.txt', 'r+', function(err, fd) {
          if(bytes > 0){
             console.log(buf.slice(0, bytes).toString());
          }
-
+    
          // 关闭文件
          fs.close(fd, function(err){
             if (err){
@@ -1841,11 +1842,11 @@ S异步 mkdir(2).回调函数没有参数，但可能抛出异常。 mode defaul
 42	fs.openSync(path, flags[, mode])
 同步 version of fs.open().
 43	fs.utimes(path, atime, mtime, callback)
- 
+
 44	fs.utimesSync(path, atime, mtime)
 修改文件时间戳，文件通过指定的文件路径。
 45	fs.futimes(fd, atime, mtime, callback)
- 
+
 46	fs.futimesSync(fd, atime, mtime)
 修改文件时间戳，通过文件描述符指定。
 47	fs.fsync(fd, callback)
@@ -1906,7 +1907,7 @@ node.js 中 url 模块中的 parse 函数提供了这个功能。
 var http = require('http');
 var url = require('url');
 var util = require('util');
- 
+
 http.createServer(function(req, res){
     res.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
     res.end(util.inspect(url.parse(req.url, true)));
@@ -1921,17 +1922,17 @@ http.createServer(function(req, res){
 var http = require('http');
 var url = require('url');
 var util = require('util');
- 
+
 http.createServer(function(req, res){
     res.writeHead(200, {'Content-Type': 'text/plain'});
- 
+
     // 解析 url 参数
     var params = url.parse(req.url, true).query;
     res.write("网站名：" + params.name);
     res.write("\n");
     res.write("网站 URL：" + params.url);
     res.end();
- 
+
 }).listen(3000);
 获取 POST 请求内容
 POST 请求的内容全部的都在请求体中，http.ServerRequest 并没有一个属性内容为请求体，原因是等待请求体传输可能是一件耗时的工作。
@@ -1939,16 +1940,16 @@ POST 请求的内容全部的都在请求体中，http.ServerRequest 并没有�
 基本语法结构说明
 var http = require('http');
 var querystring = require('querystring');
- 
+
 http.createServer(function(req, res){
     // 定义了一个post变量，用于暂存请求体的信息
     var post = '';     
- 
+
     // 通过req的data事件监听函数，每当接受到请求体的数据，就累加到post变量中
     req.on('data', function(chunk){    
         post += chunk;
     });
- 
+     
     // 在end事件触发后，通过querystring.parse将post解析为真正的POST请求格式，然后向客户端返回。
     req.on('end', function(){    
         post = querystring.parse(post);
@@ -1958,7 +1959,7 @@ http.createServer(function(req, res){
 以下实例表单通过 POST 提交并输出数据：
 var http = require('http');
 var querystring = require('querystring');
- 
+
 var postHTML = 
   '<html><head><meta charset="utf-8"><title>菜鸟教程 Node.js 实例</title></head>' +
   '<body>' +
@@ -1968,7 +1969,7 @@ var postHTML =
   '<input type="submit">' +
   '</form>' +
   '</body></html>';
- 
+
 http.createServer(function (req, res) {
   var body = "";
   req.on('data', function (chunk) {
@@ -1979,7 +1980,7 @@ http.createServer(function (req, res) {
     body = querystring.parse(body);
     // 设置响应头部信息及编码
     res.writeHead(200, {'Content-Type': 'text/html; charset=utf8'});
- 
+
     if(body.name && body.url) { // 输出提交的数据
         res.write("网站名：" + body.name);
         res.write("<br>");
@@ -2430,16 +2431,16 @@ var http = require('http');
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
- 
- 
+
+
 // 创建服务器
 http.createServer( function (request, response) {  
    // 解析请求，包括文件名
    var pathname = url.parse(request.url).pathname;
-   
+
    // 输出请求的文件名
    console.log("Request for " + pathname + " received.");
-   
+
    // 从文件系统中读取请求的文件内容
    fs.readFile(pathname.substr(1), function (err, data) {
       if (err) {
@@ -2459,7 +2460,7 @@ http.createServer( function (request, response) {
       response.end();
    });   
 }).listen(8080);
- 
+
 // 控制台会输出以下信息
 console.log('Server running at http://127.0.0.1:8080/');
 接下来我们在该目录下创建一个 index.html 文件，代码如下：
@@ -2488,14 +2489,14 @@ Request for /index.html received.     #  客户端请求信息
 使用 Node 创建 Web 客户端
 Node 创建 Web 客户端需要引入 http 模块，创建 client.js 文件，代码如下所示：
 var http = require('http');
- 
+
 // 用于请求的选项
 var options = {
    host: 'localhost',
    port: '8080',
    path: '/index.html'  
 };
- 
+
 // 处理响应的回调函数
 var callback = function(response){
    // 不断更新数据
@@ -2503,7 +2504,7 @@ var callback = function(response){
    response.on('data', function(data) {
       body += data;
    });
-   
+
    response.on('end', function() {
       // 数据接收完成
       console.log(body);
@@ -2555,18 +2556,18 @@ $ cnpm list express
 //express_demo.js 文件
 var express = require('express');
 var app = express();
- 
+
 app.get('/', function (req, res) {
    res.send('Hello World');
 })
- 
+
 var server = app.listen(8081, function () {
- 
+
   var host = server.address().address
   var port = server.address().port
- 
+
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
- 
+
 })
 执行以上代码：
 $ node express_demo.js 
@@ -2620,46 +2621,46 @@ Response 对象 - response 对象表示 HTTP 响应，即在接收到请求时�
 创建 express_demo2.js 文件，代码如下所示：
 var express = require('express');
 var app = express();
- 
+
 //  主页输出 "Hello World"
 app.get('/', function (req, res) {
    console.log("主页 GET 请求");
    res.send('Hello GET');
 })
- 
- 
+
+
 //  POST 请求
 app.post('/', function (req, res) {
    console.log("主页 POST 请求");
    res.send('Hello POST');
 })
- 
+
 //  /del_user 页面响应
 app.get('/del_user', function (req, res) {
    console.log("/del_user 响应 DELETE 请求");
    res.send('删除页面');
 })
- 
+
 //  /list_user 页面 GET 请求
 app.get('/list_user', function (req, res) {
    console.log("/list_user GET 请求");
    res.send('用户列表页面');
 })
- 
+
 // 对页面 abcd, abxcd, ab123cd, 等响应 GET 请求
 app.get('/ab*cd', function(req, res) {   
    console.log("/ab*cd GET 请求");
    res.send('正则匹配');
 })
- 
- 
+
+
 var server = app.listen(8081, function () {
- 
+
   var host = server.address().address
   var port = server.address().port
- 
+
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
- 
+
 })
 执行以上代码：
 $ node express_demo2.js 
@@ -2679,20 +2680,20 @@ public/images/logo.png
 创建 express_demo3.js 文件，代码如下所示：
 var express = require('express');
 var app = express();
- 
+
 app.use(express.static('public'));
- 
+
 app.get('/', function (req, res) {
    res.send('Hello World');
 })
- 
+
 var server = app.listen(8081, function () {
- 
+
   var host = server.address().address
   var port = server.address().port
- 
+
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
- 
+
 })
 执行以上代码：
 $ node express_demo3.js 
@@ -2706,7 +2707,7 @@ index.htm 文件代码：
 <body>
 <form action="http://127.0.0.1:8081/process_get" method="GET">
 First Name: <input type="text" name="first_name">  <br>
- 
+
 Last Name: <input type="text" name="last_name">
 <input type="submit" value="Submit">
 </form>
@@ -2715,15 +2716,15 @@ Last Name: <input type="text" name="last_name">
 server.js 文件代码：
 var express = require('express');
 var app = express();
- 
+
 app.use(express.static('public'));
- 
+
 app.get('/index.htm', function (req, res) {
    res.sendFile( __dirname + "/" + "index.htm" );
 })
- 
+
 app.get('/process_get', function (req, res) {
- 
+
    // 输出 JSON 格式
    var response = {
        "first_name":req.query.first_name,
@@ -2732,14 +2733,14 @@ app.get('/process_get', function (req, res) {
    console.log(response);
    res.end(JSON.stringify(response));
 })
- 
+
 var server = app.listen(8081, function () {
- 
+
   var host = server.address().address
   var port = server.address().port
- 
+
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
- 
+
 })
 执行以上代码：
 node server.js 
@@ -2752,7 +2753,7 @@ index.htm 文件代码：
 <body>
 <form action="http://127.0.0.1:8081/process_post" method="POST">
 First Name: <input type="text" name="first_name">  <br>
- 
+
 Last Name: <input type="text" name="last_name">
 <input type="submit" value="Submit">
 </form>
@@ -2762,18 +2763,18 @@ server.js 文件代码：
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
- 
+
 // 创建 application/x-www-form-urlencoded 编码解析
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
- 
+
 app.use(express.static('public'));
- 
+
 app.get('/index.htm', function (req, res) {
    res.sendFile( __dirname + "/" + "index.htm" );
 })
- 
+
 app.post('/process_post', urlencodedParser, function (req, res) {
- 
+
    // 输出 JSON 格式
    var response = {
        "first_name":req.body.first_name,
@@ -2782,14 +2783,14 @@ app.post('/process_post', urlencodedParser, function (req, res) {
    console.log(response);
    res.end(JSON.stringify(response));
 })
- 
+
 var server = app.listen(8081, function () {
- 
+
   var host = server.address().address
   var port = server.address().port
- 
+
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
- 
+
 })
 执行以上代码：
 $ node server.js
@@ -2816,22 +2817,22 @@ server.js 文件代码：
 var express = require('express');
 var app = express();
 var fs = require("fs");
- 
+
 var bodyParser = require('body-parser');
 var multer  = require('multer');
- 
+
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ dest: '/tmp/'}).array('image'));
- 
+
 app.get('/index.htm', function (req, res) {
    res.sendFile( __dirname + "/" + "index.htm" );
 })
- 
+
 app.post('/file_upload', function (req, res) {
- 
+
    console.log(req.files[0]);  // 上传的文件信息
- 
+
    var des_file = __dirname + "/" + req.files[0].originalname;
    fs.readFile( req.files[0].path, function (err, data) {
         fs.writeFile(des_file, data, function (err) {
@@ -2848,14 +2849,14 @@ app.post('/file_upload', function (req, res) {
        });
    });
 })
- 
+
 var server = app.listen(8081, function () {
- 
+
   var host = server.address().address
   var port = server.address().port
- 
+
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
- 
+
 })
 执行以上代码：
 $ node server.js 
@@ -2867,14 +2868,14 @@ express_cookie.js 文件代码：
 // express_cookie.js 文件
 var express      = require('express')
 var cookieParser = require('cookie-parser')
- 
+
 var app = express()
 app.use(cookieParser())
- 
+
 app.get('/', function(req, res) {
   console.log("Cookies: ", req.cookies)
 })
- 
+
 app.listen(8081)
 执行以上代码：
 $ node express_cookie.js 
@@ -3190,7 +3191,7 @@ console.log("进程 " + process.argv[2] + " 执行。" );
 master.js 文件代码：
 const fs = require('fs');
 const child_process = require('child_process');
- 
+
 for(var i=0; i<3; i++) {
    var workerProcess = child_process.spawn('node', ['support.js', i]);
 
@@ -3239,7 +3240,7 @@ console.log("进程 " + process.argv[2] + " 执行。" );
 master.js 文件代码：
 const fs = require('fs');
 const child_process = require('child_process');
- 
+
 for(var i=0; i<3; i++) {
    var worker_process = child_process.fork("support.js", [i]);    
 
@@ -3304,9 +3305,9 @@ var connection = mysql.createConnection({
   password : '123456',
   database : 'test'
 });
- 
+
 connection.connect();
- 
+
 connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
   if (error) throw error;
   console.log('The solution is: ', results[0].solution);
@@ -3343,7 +3344,7 @@ host	主机地址 （默认：localhost）
 查询数据
 将上面我们提供的 SQL 文件导入数据库后，执行以下代码即可查询出数据：
 var mysql  = require('mysql');  
- 
+
 var connection = mysql.createConnection({     
   host     : 'localhost',       
   user     : 'root',              
@@ -3351,9 +3352,9 @@ var connection = mysql.createConnection({
   port: '3306',                   
   database: 'test', 
 }); 
- 
+
 connection.connect();
- 
+
 var  sql = 'SELECT * FROM websites';
 //查
 connection.query(sql,function (err, result) {
@@ -3361,12 +3362,12 @@ connection.query(sql,function (err, result) {
           console.log('[SELECT ERROR] - ',err.message);
           return;
         }
- 
+
        console.log('--------------------------SELECT----------------------------');
        console.log(result);
        console.log('------------------------------------------------------------\n\n');  
 });
- 
+
 connection.end();
 执行以下命令输出就结果为：
 $ node test.js
@@ -3405,7 +3406,7 @@ $ node test.js
 插入数据
 我们可以向数据表 websties 插入数据：
 var mysql  = require('mysql');  
- 
+
 var connection = mysql.createConnection({     
   host     : 'localhost',       
   user     : 'root',              
@@ -3413,9 +3414,9 @@ var connection = mysql.createConnection({
   port: '3306',                   
   database: 'test', 
 }); 
- 
+
 connection.connect();
- 
+
 var  addSql = 'INSERT INTO websites(Id,name,url,alexa,country) VALUES(0,?,?,?,?)';
 var  addSqlParams = ['菜鸟工具', 'https://c.runoob.com','23453', 'CN'];
 //增
@@ -3424,13 +3425,13 @@ connection.query(addSql,addSqlParams,function (err, result) {
          console.log('[INSERT ERROR] - ',err.message);
          return;
         }        
- 
+
        console.log('--------------------------INSERT----------------------------');
        //console.log('INSERT ID:',result.insertId);        
        console.log('INSERT ID:',result);        
        console.log('-----------------------------------------------------------------\n\n');  
 });
- 
+
 connection.end();
 执行以下命令输出就结果为：
 $ node test.js
@@ -3450,7 +3451,7 @@ INSERT ID: OkPacket {
 更新数据
 我们也可以对数据库的数据进行修改：
 var mysql  = require('mysql');  
- 
+
 var connection = mysql.createConnection({     
   host     : 'localhost',       
   user     : 'root',              
@@ -3458,9 +3459,9 @@ var connection = mysql.createConnection({
   port: '3306',                   
   database: 'test', 
 }); 
- 
+
 connection.connect();
- 
+
 var modSql = 'UPDATE websites SET name = ?,url = ? WHERE Id = ?';
 var modSqlParams = ['菜鸟移动站', 'https://m.runoob.com',6];
 //改
@@ -3473,18 +3474,18 @@ connection.query(modSql,modSqlParams,function (err, result) {
   console.log('UPDATE affectedRows',result.affectedRows);
   console.log('-----------------------------------------------------------------\n\n');
 });
- 
+
 connection.end();
 执行以下命令输出就结果为：
 --------------------------UPDATE----------------------------
 UPDATE affectedRows 1
 -----------------------------------------------------------------
 执行成功后，查看数据表，即可以看到更新的数据：
- 
+
 删除数据
 我们可以使用以下代码来删除 id 为 6 的数据:
 var mysql  = require('mysql');  
- 
+
 var connection = mysql.createConnection({     
   host     : 'localhost',       
   user     : 'root',              
@@ -3492,9 +3493,9 @@ var connection = mysql.createConnection({
   port: '3306',                   
   database: 'test', 
 }); 
- 
+
 connection.connect();
- 
+
 var delSql = 'DELETE FROM websites where id=6';
 //删
 connection.query(delSql,function (err, result) {
@@ -3502,19 +3503,19 @@ connection.query(delSql,function (err, result) {
           console.log('[DELETE ERROR] - ',err.message);
           return;
         }        
- 
+
        console.log('--------------------------DELETE----------------------------');
        console.log('DELETE affectedRows',result.affectedRows);
        console.log('-----------------------------------------------------------------\n\n');  
 });
- 
+
 connection.end();
 执行以下命令输出就结果为：
 --------------------------DELETE----------------------------
 DELETE affectedRows 1
 -----------------------------------------------------------------
 执行成功后，查看数据表，即可以看到 id=6 的数据已被删除：
- 
+
 连接 MongoDB
 MongoDB是一种文档导向数据库管理系统，由C++撰写而成。
 本章节我们将为大家介绍如何使用 Node.js 来连接 MongoDB，并对数据库进行操作。
@@ -3526,7 +3527,7 @@ MongoDB是一种文档导向数据库管理系统，由C++撰写而成。
 要在 MongoDB 中创建一个数据库，首先我们需要创建一个 MongoClient 对象，然后配置好指定的 URL 和 端口号。 如果数据库不存在，MongoDB 将创建数据库并建立连接。
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/mydb";
- 
+
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
   console.log("数据库已创建!");
@@ -3552,7 +3553,7 @@ MongoClient.connect(url, function (err, db) {
 以下实例我们连接数据库 runoob 的 site 表，并插入两条数据：
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/runoob'; # 数据库为 runoob
- 
+
 var insertData = function(db, callback) {  
     //连接到表 site
     var collection = db.collection('site');
@@ -3567,7 +3568,7 @@ var insertData = function(db, callback) {
         callback(result);
     });
 }
- 
+
 MongoClient.connect(DB_CONN_STR, function(err, db) {
     console.log("连接成功！");
     insertData(db, function(result) {
@@ -3604,7 +3605,7 @@ site                     # 自动创建了 site 集合（数据表）
 以下实例检索 name 为 "菜鸟教程" 的实例：
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/runoob';    
- 
+
 var selectData = function(db, callback) {  
   //连接到表  
   var collection = db.collection('site');
@@ -3619,7 +3620,7 @@ var selectData = function(db, callback) {
     callback(result);
   });
 }
- 
+
 MongoClient.connect(DB_CONN_STR, function(err, db) {
   console.log("连接成功！");
   selectData(db, function(result) {
@@ -3636,7 +3637,7 @@ MongoClient.connect(DB_CONN_STR, function(err, db) {
 我们也可以对数据库的数据进行修改，以下实例将 name 为 "菜鸟教程" 的 url 改为 https://www.runoob.com：
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/runoob';    
- 
+
 var updateData = function(db, callback) {  
     //连接到表  
     var collection = db.collection('site');
@@ -3652,7 +3653,7 @@ var updateData = function(db, callback) {
         callback(result);
     });
 }
- 
+
 MongoClient.connect(DB_CONN_STR, function(err, db) {
     console.log("连接成功！");
     updateData(db, function(result) {
@@ -3668,7 +3669,7 @@ MongoClient.connect(DB_CONN_STR, function(err, db) {
 以下实例将 name 为 "菜鸟工具" 的数据删除 :
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/runoob';    
- 
+
 var delData = function(db, callback) {  
   //连接到表  
   var collection = db.collection('site');
@@ -3683,7 +3684,7 @@ var delData = function(db, callback) {
     callback(result);
   });
 }
- 
+
 MongoClient.connect(DB_CONN_STR, function(err, db) {
   console.log("连接成功！");
   delData(db, function(result) {

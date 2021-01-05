@@ -1,7 +1,5 @@
 # Gitlab
 
-## 目录
-
 1. 简介
    - [生命周期](#生命周期)
    - [CI/CD（持续集成/持续部署）](#CI/CD（持续集成/持续部署）)
@@ -13,9 +11,11 @@
      - [安装GitLab Runner](#安装GitLab&nbsp;Runner)
    - [配置](#配置)
    - [常用命令](#常用命令)
+   - [CI/CD脚本](#CI/CD脚本)
    - [创建SpringBoot项目测试CI/CD](#创建SpringBoot项目测试CI/CD)
-3. [总结](#总结)
 4. [参考](#参考)
+
+
 
 ## 简介
 
@@ -53,7 +53,11 @@ github 和 docker hub 都是一种公共服务，都是收费的。jenkins 文�
 
 PS：本人的目标 CI/CD 的整个流程，可以自己搭建一套小公司内部的流程，方便开发人员和测试使用。
 
+
+
 ## 实战
+
+
 
 ### 安装
 
@@ -177,14 +181,19 @@ sudo EXTERNAL_URL="http://gitlab.example.com" rpm -i gitlab-ee-9.5.2-ee.0.el7.x8
 
 示例：`sudo EXTERNAL_URL="http://gitlab.colin.com" rpm -i gitlab-ce-11.9.1-ce.0.el7.x86_64.rpm`
 
+
+
 #### 安装GitLab&nbsp;Runner
+
+参考：https://docs.gitlab.com/runner/install/
+
+**Linux：**
 
 1、添加GitLab的官方存储库
 
 ```sh
 # For Debian/Ubuntu/Mint
 curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
-
 # For RHEL/CentOS/Fedora
 curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | sudo bash
 ```
@@ -194,7 +203,6 @@ curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/sc
 ```sh
 # For Debian/Ubuntu/Mint
 sudo apt-get install gitlab-runner
-
 # For RHEL/CentOS/Fedora
 sudo yum install gitlab-runner
 ```
@@ -205,11 +213,21 @@ sudo yum install gitlab-runner
 # for DEB based systems
 apt-cache madison gitlab-runner
 sudo apt-get install gitlab-runner=10.0.0
-
 # for RPM based systems
 yum list gitlab-runner --showduplicates | sort -r
 sudo yum install gitlab-runner-10.0.0-1
 ```
+
+**Windows：**
+
+1. 下载后，解压任意目录内，并可以重命名任意名称，本文以 `runner.exe` 为例
+2. 使用 cmd 或 PowerShell 打开，`cd` 打开所在目录，执行 `runner.exe`
+3. 注册 `runner.exe`至你的 gitlab 网站，以 [官方文档](https://docs.gitlab.com/runner/register/index.html) 为准，很详细, 不再复述
+4. 将 `runer.exe` 注册至windows系统服务，保持开机启动，以 [官方文档](https://docs.gitlab.com/runner/install/windows.html) 为准, 不再复述
+
+**注意：**gitlab 12 开始，runner.exe shell 采用 PowerShell 执行方式，CI 代码注意使用 PowerShell 脚本语言
+
+
 
 ### 配置
 
@@ -263,6 +281,72 @@ gitlab-rake gitlab:backup:restore BACKUP=1393513186
 # 启动Gitlab
 sudo gitlab-ctl start
 ```
+
+
+
+### CI/CD脚本
+
+**dotnet core**
+
+Dockerfile
+
+```dockerfile
+FROM  mcr.microsoft.com/dotnet/core/sdk:2.2 as build-env
+# code目录
+WORKDIR /code
+
+# 项目拷贝至code
+COPY *.csproj ./ 
+RUN dotnet restore
+ 
+# 代码拷贝至code
+COPY  . ./
+# 发布文件在code/out文件夹
+RUN dotnet publish -c Release -o out
+# 找到runtime 
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+# 新建一个目录app
+WORKDIR /app
+# code目录发布的代码文件放到app
+COPY --from=build-env /code/out ./
+# 输出到80端口
+EXPOSE 80
+ENTRYPOINT [ "dotnet","tonywebsite.dll" ]
+```
+
+docker-compose.yml
+
+```yml
+version: '3'
+services:
+  web: 
+    build: .
+    container_name: 'aspnetcore'
+    ports:
+      - '8003:80'
+```
+
+.gitlab.ci.yml
+
+```yml
+build-master:
+  image: docker:19.03.2
+  stage: build              
+ 
+  script:
+    - docker --version
+  
+  image:
+    name: docker/compose:1.24.1         # 添加docker-compose，使用docker-compose编排镜像
+    entrypoint: ["/bin/sh", "-c"]
+ 
+  rtest:
+    script:
+      - docker-compose --version
+      - docker-compose up -d --build --force-recreate
+```
+
+
 
 ### 创建SpringBoot项目测试CI/CD
 
@@ -332,8 +416,6 @@ run:
 3、将项目提交到 `Gitlab` 仓库即可
 
 提交到仓库的 master 分支后，会自动执行 CI/CD，第一次会比较慢，因为要拉取一些镜像和下载目前本地库没有的 jar 包。
-
-## 总结
 
 ## 参考
 

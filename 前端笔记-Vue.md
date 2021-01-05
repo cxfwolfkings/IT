@@ -1,6 +1,4 @@
-# 前端笔记6：Vue
-
-## 目录
+# Vue
 
 1. 简介
    - [安装](#安装)
@@ -32,6 +30,11 @@
    - [mint-ui](#mint-ui)
    - [构建](#构建)
 3. 总结
+   - [常见错误](#常见错误)
+     - NavigationDuplicated
+     - watch不触发、不生效
+
+
 
 ## 简介
 
@@ -532,6 +535,8 @@ new Vue({
   </div>
 </div>
 ```
+
+
 
 ### 样式绑定
 
@@ -3011,11 +3016,13 @@ computed: {
 
 饿了么出品，element-ui 在PC端使用，移动端版本 mint-ui：`https://mint-ui.github.io/#!/zh-cn`
 
+
+
 ### 构建
 
 如果要发布在子网站下，需要做如下配置：
 
-**1、build/utils.js**
+**1. build/utils.js**
 
 ```js
 // ...
@@ -3033,7 +3040,7 @@ if (options.extract) {
 // ...
 ```
 
-**2、config/index.js**
+**2. config/index.js**
 
 ```js
 // ...
@@ -3054,7 +3061,7 @@ build: {
 // ...
 ```
 
-**3、index.html**
+**3. index.html**
 
 ```html
 <!DOCTYPE html>
@@ -3074,4 +3081,48 @@ build: {
 </html>
 ```
 
+
+
 ## 总结
+
+
+
+### 常见错误
+
+**1. [NavigationDuplicated {_name: "NavigationDuplicated", name: "NavigationDuplicated"}](https://www.cnblogs.com/dianzan/p/11399745.html)**
+
+1）安装 3.1.1 以上的 vue-router 版本
+
+2）通用处理：在main.js中加入
+
+```js
+import Router from 'vue-router'
+
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+```
+
+
+
+**2. [watch不触发、不生效](https://blog.csdn.net/weixin_40755688/article/details/86719530)**
+
+问题：深层props过程中，props的数据传到了目标文件，但却没有触发数据更新及页面更新
+
+解决：
+
+```js
+watch: {
+  'obj.attr1.attr1_1': {
+    handler (newVal) {
+      if (this.uploadConfig.moreList && this.uploadConfig.moreList.length > 0) {
+	      this.moreList = newVal.moreList
+	    }
+	  },
+	  deep: true,  // 监听深层
+	  immediate: true  // 立即触发
+	}
+}
+```
+
