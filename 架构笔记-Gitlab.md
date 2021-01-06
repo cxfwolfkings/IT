@@ -10,6 +10,8 @@
      - [手动下载和安装GitLab包](#手动下载和安装GitLab包)
      - [安装GitLab Runner](#安装GitLab&nbsp;Runner)
    - [配置](#配置)
+     - [外部URL](#外部URL)
+     - [注册GitLab&nbsp;Runner](#注册GitLab&nbsp;Runner)
    - [常用命令](#常用命令)
    - [CI/CD脚本](#CI/CD脚本)
    - [创建SpringBoot项目测试CI/CD](#创建SpringBoot项目测试CI/CD)
@@ -231,31 +233,59 @@ sudo yum install gitlab-runner-10.0.0-1
 
 ### 配置
 
-1. 外部URL
 
-   添加或编辑以下行 vi /etc/gitlab/gitlab.rb：
 
-   ```sh
-   external_url "http://gitlab.colin.com"
-   ```
+#### 外部URL
 
-   运行 `sudo gitlab-ctl reconfigure` 以使更改生效。
+添加或编辑以下行 vi /etc/gitlab/gitlab.rb：
 
-2. SSH密钥
+```sh
+external_url "http://gitlab.colin.com"
+```
 
-   参考：[http://192.168.235.128/help/ssh/README#locating-an-existing-ssh-key-pair](http://192.168.235.128/help/ssh/README#locating-an-existing-ssh-key-pair)
+运行 `sudo gitlab-ctl reconfigure` 以使更改生效。
 
-   在Git Bash中生成新key(RSA)：`ssh-keygen -o -t rsa -b 4096 -C "colin.chen@softtek.com"`
 
-   添加或更改密码：`ssh-keygen -p -o -f <keyname>`
 
-   接下来将SSH密钥添加到GitLab帐户
+#### SSH密钥
 
-   在Git Bash中查看密钥(RSA)：`cat ~/.ssh/id_rsa.pub | clip`
+参考：[http://192.168.235.128/help/ssh/README#locating-an-existing-ssh-key-pair](http://192.168.235.128/help/ssh/README#locating-an-existing-ssh-key-pair)
 
-   在gitlab中设置密钥：[http://192.168.235.128/profile/keys](http://192.168.235.128/profile/keys)
+在Git Bash中生成新key(RSA)：`ssh-keygen -o -t rsa -b 4096 -C "colin.chen@softtek.com"`
 
-   测试：`ssh -T git@192.168.235.128`
+添加或更改密码：`ssh-keygen -p -o -f <keyname>`
+
+接下来将SSH密钥添加到GitLab帐户
+
+在Git Bash中查看密钥(RSA)：`cat ~/.ssh/id_rsa.pub | clip`
+
+在gitlab中设置密钥：[http://192.168.235.128/profile/keys](http://192.168.235.128/profile/keys)
+
+测试：`ssh -T git@192.168.235.128`
+
+
+
+#### 注册GitLab&nbsp;Runner
+
+参考：https://docs.gitlab.com/runner/register/index.html
+
+**Windows:**
+
+```sh
+# 1. 执行注册命令
+./gitlab-runner.exe register
+# 2. 输入GitLab instance URL：http://10.30.100.104/
+# 3. 输入token：KbB5sogCtG-dL9vMg9Px
+# 4. 输入runner描述
+# 5. 输入tag，逗号分隔
+# 6. 提供runner执行者，一般输入：docker
+# 7. docker executor时，输入默认镜像（.gitlab-ci.yml未指定镜像时使用）
+# 同一台机器使用多个runner时，重复该操作。
+```
+
+runner executor选择：https://docs.gitlab.com/runner/executors/README.html
+
+
 
 ### 常用命令
 

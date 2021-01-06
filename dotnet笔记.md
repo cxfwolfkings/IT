@@ -1456,7 +1456,7 @@ namespace Demo
             key2.SetValue("NullFile", "");
             key1.Close();
             key2.Close();
-
+    
             key1 = Registry.ClassesRoot.CreateSubKey("cs");
             key1.SetValue("", "csharpfile");
             key2 = key1.CreateSubKey("DefaultIcon");
@@ -1678,7 +1678,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         searchInfo = new SearchInfo();
         this.DataContext = searchInfo;
-
+    
         BindingOperations.EnableCollectionSynchronization(searchInfo.List, lockList);
 }
 
@@ -2235,7 +2235,7 @@ namespace CodeFirstDemo
                 }
             }
         }
-
+    
         private static void CreateObjects()
         {
             using (var data = new MenuContext())
@@ -2243,21 +2243,21 @@ namespace CodeFirstDemo
                 MenuCard card = data.MenuCards.Create();
                 card.Text = "Soups";
                 data.MenuCards.Add(card);
-
+    
                 Menu m = data.Menus.Create();
                 m.Text = "Baked Potato Soup";
                 m.Price = 4.80M;
                 m.Day = new DateTime(2012, 9, 20);
                 m.MenuCard = card;
                 data.Menus.Add(m);
-
+    
                 Menu m2 = data.Menus.Create();
                 m2.Text = "Cheddar Broccoli Soup";
                 m2.Price = 4.50M;
                 m2.Day = new DateTime(2012, 9, 21);
                 m2.MenuCard = card;
                 data.Menus.Add(m2);
-
+    
                 try
                 {
                     data.SaveChanges();
@@ -2477,9 +2477,9 @@ public partial class Book : EntityObject
         book.Publisher = publisher;
         return book;
     }
-
+    
     #endregion
-
+    
     #region Simple Properties
     
     /// <summary>
@@ -2580,9 +2580,9 @@ public partial class Book : EntityObject
         private global::System.String _Isbn;
         partial void OnIsbnChanging(global::System.String value);
         partial void OnIsbnChanged();
-
+    
         #endregion
-
+    
         #region Navigation Properties
     
         /// <summary>
@@ -2606,9 +2606,9 @@ public partial class Book : EntityObject
                 }
             }
         }
-
+    
         #endregion
-
+    
     }
 这个Book类派生自基类EntityObject，并为其数据定义属性Title。属性的set访问器以两种不同的方式触发信息的改变:
 	一种方式是调用EntityObject基类的ReportPropertyChanging()和ReportPropertyChanged()方法。调用这些方法会使用INotifyProperty Changing 和INotifyProperty Changed接口，以通知每个客户端用这些接口的事件来注册。
@@ -2710,9 +2710,9 @@ namespace BooksDemo
             }
         }
         private ObjectSet<Book> _Books;
-
+    
         #endregion
-
+    
         #region AddTo Methods
     
         /// <summary>
@@ -2730,9 +2730,9 @@ namespace BooksDemo
         {
             base.AddObject("Books", book);
         }
-
+    
         #endregion
-
+    
     }
 ObjectContext类给调用者提供了几个服务:
 	跟踪已经检索到的实体对象。如果再次查询该对象，就从对象上下文中提取它。
@@ -3126,7 +3126,7 @@ namespace POCODemo
         public string Title { get; set; }
         public string Publisher { get; set; }
         public string Isbn { get; set; }
-
+    
         public virtual ICollection<Author> Authors { get; set; }
     }
 }
@@ -3145,7 +3145,7 @@ namespace POCODemo
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-
+    
         public virtual ICollection<Book> Books { get; set; }
     }
 }
@@ -3223,17 +3223,17 @@ public class DbTracingListener : IDbTracingListener
 
     public void CommandExecuting(DbConnection connection, DbCommand command)
     {
-
+    
     }
-
+    
     public void CommandFailed(DbConnection connection, DbCommand command, Exception exception, TimeSpan duration)
     {
-
+    
     }
-
+    
     public void CommandFinished(DbConnection connection, DbCommand command, object result, TimeSpan duration)
     {
-
+    
     }
 }
 在方法内部通过 context.Command.CommandText 可以获得你的ef的sql命令的内容。
@@ -3337,7 +3337,7 @@ context.Users.Where(...).Delete();
 context.Users.Update(
     u => u.Name.Contans("J"), 
     u2 => new User {Salary = 999});
- 
+
 //第一个参数也可以传入已经有的IQuaryable的参数如下
 var users = context.Users.Where(u => u.FirstName == "firstname");
 context.Users.Update(users, u => new User {FirstName = "newfirstname"});
@@ -3351,7 +3351,7 @@ var q = db.Tasks.Where(t => t.Priority == 2);
 var q1 = q.FutureCount();
 // 获取分页的数据
 var q2 = q.Skip(pageIndex).Take(pageSize).Future();
- 
+
 // 这里会触发上面所有Future函数中的查询包装到一个连接中执行
 int total = q1.Value;
 // 因为已经得到结果了，这里不会再次查询
@@ -3420,10 +3420,10 @@ public static void LogException(Exception ex)
     if( context != null ) {
         // 能运行到这里，就肯定是在处理ASP.NET请求，我们可以放心地访问Request的所有数据
         sb.AppendLine("Url:" + context.Request.RawUrl);
-
+    
         // 还有记录什么数据，您自己来实现吧。
     }
-
+    
     System.IO.File.AppendAllText("日志文件路径", sb.ToString());
 }
 就是一个判断，解决了所有问题。
@@ -3504,12 +3504,12 @@ namespace CSCountry.App_Code
         /// 请参见下面的链接: http://go.microsoft.com/?linkid=8101007
         /// </summary>
         #region IHttpModule Members
-
+    
         public void Dispose()
         {
             //此处放置清除代码。
         }
-
+    
         public void Init(HttpApplication context)
         {
             // 下面是如何处理 LogRequest 事件并为其 
@@ -3518,9 +3518,9 @@ namespace CSCountry.App_Code
             context.BeginRequest += BeginRequest;
             context.PreRequestHandlerExecute += PreRequestHandlerExecute;
         }
-
+    
         #endregion
-
+    
         public void OnLogRequest(object source, EventArgs e)
         {
             //可以在此处放置自定义日志记录逻辑
@@ -3700,4 +3700,11 @@ var host = location.hostname; //结果：www.mystudy.cn
 调用的JS函数必须在<head>标签内才能读到
 ClientScript.RegisterStartupScript()
 
+
+
+## 参考
+
+1. [C# 中使用 OpenCV](https://mp.weixin.qq.com/s?__biz=MzAxMTMxMDQ3Mw==&mid=2660112118&idx=1&sn=126721cf6f3c4ddd9881dceb4e5629e1&chksm=8039b210b74e3b06c972d27dfe675a0405f19a79b716ea092194c675821000e0256a134e2064&scene=132#wechat_redirect)
+2. [如何在 ASP.NET Core 中 使用 功能开关](https://mp.weixin.qq.com/s?__biz=MzAwNTMxMzg1MA==&mid=2654082214&idx=2&sn=deac5283213d344c3a2cd0b3228b5c4e&chksm=80d830f3b7afb9e56b3a8fb49f81609ed63943aabc76030ac035b56d7862915677ed4897b764&scene=132#wechat_redirect)
+3. [GraphQL:DataLoader的神奇](#https://mp.weixin.qq.com/s?__biz=MzAwNTMxMzg1MA==&mid=2654082092&idx=2&sn=3883f739df8b757720f9b238cf2efca6&chksm=80d83079b7afb96f887fd333a175d8f0966114cfc0761dd715eb69fc29c77c34c0d9eaffe3ba&mpshare=1&scene=23&srcid=1225gWhzpv2fvmjaI5RGMNE0&sharer_sharetime=1608855346601&sharer_shareid=83c85f3c4ddf8afec618435580a94a3e#rd)
 

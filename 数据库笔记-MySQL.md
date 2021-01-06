@@ -2386,6 +2386,7 @@ declare exit handler for 'name' rollback;
 ### 触发器
 
 ```sql
+-- 创建触发器
 CREATE TRIGGER trigger_name trigger_time trigger_event ON tb_name FOR EACH ROW trigger_stmt
 -- trigger_name：触发器的名称
 -- tirgger_time：触发时机，为BEFORE或者AFTER
@@ -2395,6 +2396,12 @@ CREATE TRIGGER trigger_name trigger_time trigger_event ON tb_name FOR EACH ROW t
 -- 所以可以说MySQL创建以下六种触发器：
 BEFORE INSERT,BEFORE DELETE,BEFORE UPDATE
 AFTER INSERT,AFTER DELETE,AFTER UPDATE
+
+-- 查看触发器
+SHOW TRIGGERS [FROM schema_name];
+
+-- 删除触发器
+DROP TRIGGER [IF EXISTS] [schema_name.]trigger_name
 ```
 
 ![x](./Resources/db001.png)
@@ -2406,8 +2413,8 @@ load data语句是将文件的内容插入到表中，相当于是insert语句�
 **限制和注意事项：**
 
 1. 触发程序不能调用将数据返回客户端的存储程序，也不能使用采用CALL语句的动态SQL语句，但是允许存储程序通过参数将数据返回触发程序，也就是存储过程或者函数通过OUT或者INOUT类型的参数将数据返回触发器是可以的，但是不能调用直接返回数据的过程。
-
 2. 不能在触发器中使用以显示或隐式方式开始或结束事务的语句，如START TRANSACTION,COMMIT或ROLLBACK。
+3. OLD 是只读的，而 NEW 则可以在触发器中使用 SET 赋值，这样不会再次触发触发器，造成循环调用
 
 > 注意事项：MySQL的触发器是按照BEFORE触发器、行操作、AFTER触发器的顺序执行的，其中任何一步发生错误都不会继续执行剩下的操作，如果对事务表进行的操作，如果出现错误，那么将会被回滚，如果是对非事务表进行操作，那么就无法回滚了，数据可能会出错。
 
@@ -2440,6 +2447,39 @@ load data语句是将文件的内容插入到表中，相当于是insert语句�
 5. 同步实时地复制表中的数据。
 
 6. 自动计算数据值，如果数据的值达到了一定的要求，则进行特定的处理。例如，如果公司的帐号上的资金低于5万元则立即给财务人员发送警告数据。
+
+补充：在MySQL中，BEGIN … END 语句的语法为：
+
+```sql
+BEGIN
+  [statement_list]
+END
+```
+
+
+其中，statement_list 代表一个或多个语句的列表，列表内的每条语句都必须用分号（;）来结尾。而在MySQL中，分号是语句结束的标识符，遇到分号表示该段语句已经结束，MySQL可以开始执行了。因此，解释器遇到statement_list 中的分号后就开始执行，然后会报出错误，因为没有找到和 BEGIN 匹配的 END。
+
+这时就会用到 DELIMITER 命令（DELIMITER 是定界符，分隔符的意思），它是一条命令，不需要语句结束标识，语法为：`DELIMITER new_delemiter`，new_delemiter 可以设为1个或多个长度的符号，默认的是分号（;），我们可以把它修改为其他符号，如`DELIMITER $`，在这之后的语句，以分号结束，解释器不会有什么反应，只有遇到了$，才认为是语句结束。注意，使用完之后，应该把它给修改回来。
+
+示例：
+
+```sql
+DROP TRIGGER IF EXISTS T_BEFORE_ADD_ON_PROJ;
+DELIMITER $
+CREATE TRIGGER T_BEFORE_ADD_ON_PROJ BEFORE INSERT
+ON biz_project FOR EACH ROW
+BEGIN
+  IF IFNULL(NEW.ORG_STR, '') = '' THEN
+	  SET NEW.ORG_STR = lead_basic.FUNC_GET_ORG_BY_USER(NEW.PROJECT_RESPONSIBLE_USER);
+  END IF;
+	IF IFNULL(NEW.MACHINE_NO, '') = '' AND IFNULL(NEW.MACHINE_ID, 0) > 0 THEN
+	  SET NEW.MACHINE_NO = (SELECT MACHINE_NAME FROM lead_basic.bas_machine WHERE ID = NEW.MACHINE_ID LIMIT 1);
+  END IF;
+	IF IFNULL(NEW.CUSTOMER_NAME, '') = '' AND IFNULL(NEW.CUSTOMER_ID, 0) > 0 THEN
+	  SET NEW.CUSTOMER_NAME = (SELECT CONCAT(r.REGION_NAME, '-', c.CUSTOMER_NAME) FROM lead_basic.bas_customer c LEFT JOIN lead_basic.bas_region r ON r.ID = c.CUSTOMER_REGION WHERE c.ID = NEW.CUSTOMER_ID LIMIT 1);
+  END IF;
+END$
+```
 
 
 
@@ -2842,6 +2882,8 @@ key_buffer_size = 8M
 
 
 
+#### SQL优化
+
 SQL优化主要分4个方向：`SQL语句跟索引`、`表结构`、`系统配置`、`硬件`。
 
 总优化思路就是**最大化利用索引**、**尽可能避免全表扫描**、**减少无效数据的查询**：
@@ -3129,6 +3171,32 @@ or两边的字段中，如果有一个不是索引字段，而其他条件也不
 
 union和union all的差异主要是前者需要将结果集合并后再进行唯一性过滤操作，这就会涉及到排序，增加大量的CPU运算，加大资源消耗及延迟。当然，union all的前提条件是两个结果集没有重复数据。
 
+**24、巧用STRAIGHT_JOIN**
+
+inner join是由MySQL选择驱动表，但是有些特殊情况需要选择另个表作为驱动表，比如有group by、order by等「Using filesort」、「Using temporary」时。STRAIGHT_JOIN来强制连接顺序，在STRAIGHT_JOIN左边的表名就是驱动表，右边则是被驱动表。在使用STRAIGHT_JOIN有个前提条件是该查询是内连接，也就是inner join。其他链接不推荐使用STRAIGHT_JOIN，否则可能造成查询结果不准确。
+
+**25、关于JOIN优化**
+
+LEFT JOIN A表为驱动表，INNER JOIN MySQL会自动找出那个数据少的表作用驱动表，RIGHT JOIN B表为驱动表。
+
+**注意：**
+
+**1）MySQL中没有full join，可以用以下方式来解决：**
+
+```sql
+select * from A left join B on B.name = A.name where B.name is null union allselect * from B;
+```
+
+**2）尽量使用inner join，避免left join：**
+
+参与联合查询的表至少为2张表，一般都存在大小之分。如果连接方式是inner join，在没有其他过滤条件的情况下MySQL会自动选择小表作为驱动表，但是left join在驱动表的选择上遵循的是左边驱动右边的原则，即left join左边的表名为驱动表。
+
+**3）合理利用索引：**
+
+被驱动表的索引字段作为on的限制字段。
+
+**4）利用小表去驱动大表**
+
 
 
 ### 压缩
@@ -3138,6 +3206,57 @@ union和union all的差异主要是前者需要将结果集合并后再进行唯
 
 
 ### 死锁
+
+```sql
+-- 查看死锁
+show engine innodb status
+
+-- 查询是否锁表
+show OPEN TABLES where In_use > 0;
+
+-- 数据库版本查询
+select version();
+
+-- 引擎查询
+show create table {tableName};
+
+-- 事务隔离级别查询方法
+select @@tx_isolation;
+
+-- 事务隔离级别设置方法（只对当前Session生效）：
+set session transaction isolation level read committed;
+/**
+ * 注意：
+ *   1. 如果数据库是分库的，以上SQL语句需要在单库上执行，不能在逻辑库执行。
+ *   2. 全局生效，需要修改my.ini
+ */
+
+-- 方法1：利用 metadata_locks 视图
+-- 此方法仅适用于 MySQL 5.7 以上版本，该版本 performance_schema 新增了 metadata_locks，
+-- 如果上bai锁前启用了元数据锁的探针（默认是未启用的），可以比较容易的定位全局锁会话。
+-- 1：查看当前的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX;
+-- 2：查看当前锁定的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;
+-- 3：查看当前等锁的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;
+
+-- 方法2：利用 events_statements_history 视图
+-- 此方法适用于 MySQL 5.6 以上版本，启用 performance_schema.eventsstatements_history（5.6 默认未启用，5.7 默认启用），
+-- 该表会 SQL 历史记录执行，如果请求太多，会自动清理早期的信息，有可能将上锁会话的信息清理掉。
+
+-- 方法3：利用 gdb 工具
+-- 如果上述两种都用不了或者没来得及启用，可以尝试第三种方法。
+-- 利用 gdb 找到所有线程信息，查看每个线程中持有全局锁对象，输出对应的会话 ID。
+-- 也可以使用 gdb 交互模式，但 attach mysql 进程后 mysql 会完全 hang 住，读请求也会受到影响，不建议使用交互模式。
+
+-- 方法4：show processlist
+-- 如果备份程序使用的特定用户执行备份，如果是 root 用户备份，那 time 值越大的是持锁会话的概率越大，
+-- 如果业务也用 root 访问，重点是 state 和 info 为空的，这里有个小技巧可以快速筛选，筛选后尝试 kill 对应 ID，
+-- 再观察是否还有 wait global read lock 状态的会话。
+
+-- 方法5：重启！
+```
 
 解决思路：
 
