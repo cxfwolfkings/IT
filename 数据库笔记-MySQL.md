@@ -373,6 +373,13 @@ You can compare the number of internal on-disk temporary tables created to the t
 
 ### 缓存池
 
+参考：
+
+1. https://www.cnblogs.com/FengGeBlog/p/10144768.html
+2. https://www.cnblogs.com/chengyunblogs/p/11929040.html
+3. https://blog.csdn.net/n88lpo/article/details/86486263
+4. https://blog.csdn.net/weixin_33882452/article/details/94318658
+
 ![x](E:/WorkingDir/Office/Resources/tbms0029.png)
 
 应用系统分层架构，为了加速数据访问，会把最常访问的数据，放在缓存(cache)里，避免每次都去访问数据库。操作系统，会有缓冲池(buffer pool)机制，避免每次访问磁盘，以加速数据的访问。MySQL作为一个存储系统，同样具有缓冲池(buffer pool)机制，以避免每次查询数据都进行磁盘IO，主要作用：
@@ -4661,7 +4668,21 @@ n 建议使用内存队列产品而不使用memcache 来进行缓存异步更新
 ### 参考
 
 1. SQL基础：https://juejin.im/post/6844903790571700231
-
 2. SQL面试：https://sowhat.blog.csdn.net/article/details/71158104
-
 3. MySQL拷问：https://www.jianshu.com/nb/22933318
+4. https://www.cnblogs.com/assistants/p/11958998.html
+5. https://www.cnblogs.com/wy123/p/12724252.html
+6. https://www.cnblogs.com/hanwuxing/p/10367147.html
+7. https://www.cnblogs.com/zejin2008/p/5262751.html
+8. https://www.cnblogs.com/out8/p/4222166.html
+9. https://www.cnblogs.com/zhuyeshen/p/12084845.html
+10. https://www.cnblogs.com/mintsd/p/13062308.html
+11. https://blog.csdn.net/zdhsoft/article/details/89373364
+12. https://www.ddpool.cn/article/56666.html
+13. https://www.cnblogs.com/csj2018/p/9955405.html
+14. https://www.jb51.net/article/159737.htm
+15. https://www.cnblogs.com/wintersoft/p/10787474.html
+16. https://blog.csdn.net/qq_27607965/article/details/79925288
+17. https://www.cnblogs.com/cyun/p/4308960.html
+18. https://www.cnblogs.com/liaojie970/p/6824773.html
+

@@ -3450,3 +3450,4 @@ ng build --prod
 - [Angular 官方 blog 里面关于 Schematics 的解释，请点击这里查看](https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2)
 - [SASS 的 API 请参考官方网站](http://sass-lang.com/)
 - [学习 RxJS](https://rxjs-cn.github.io/learn-rxjs-operators/)
+- [Angualr6表单提交验证并跳转](https://www.cnblogs.com/yangchaojie/p/9686028.html)

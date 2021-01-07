@@ -6,9 +6,11 @@
      - [jwt和OAuth2](#jwt和OAuth2)
      - [IdentityServer4](#IdentityServer4)
    - [gRPC](#gRPC)
-2. 实战
+   - [nuget](#nuget)
+   
    - [jwt授权](#jwt授权)
 3. 总结
+   
    - [反编译](#反编译)
 4. 练习
 
@@ -846,6 +848,54 @@ OpenID Connect 和 OAuth 2.0 组合的优点在于，您可以使用单一协议
 gRPC 是一个由Google开源的，跨语言的，高性能的远程过程调用（RPC）框架。gRPC使客户端和服务端应用程序可以透明地进行通信，并简化了连接系统的构建。它使用HTTP/2作为通信协议，使用 Protocol Buffers 作为序列化协议。
 
 参考：[https://www.cnblogs.com/stulzq/p/11581967.html](https://www.cnblogs.com/stulzq/p/11581967.html)
+
+
+
+## nuget
+
+参考：https://www.cnblogs.com/xcsn/p/6259853.html
+
+```sh
+# 升级到最新版
+nuget update -self
+
+# 1.安装
+# 安装指定版本类库
+install-package <程序包名> -version <版本号>
+# 安装到指定的项目
+install-package <程序包名> -project XXXProjectName -version <版本号>
+
+# 2.更新
+Update-Package <程序包名>
+
+# 3.重新安装
+# 重新安装所有Nuget包(整个解决方案都会重新安装)
+update-package -reinstall
+# 重新安装指定项目所有Nuget包
+update-package -project <项目名称> -reinstall
+
+# 4.卸载
+# 正常卸载
+uninstall-package <程序包名>
+# 强制卸载
+Uninstall-Package <程序包名> -Force
+
+# 5.查询
+# 默认列出本地已经安装了的包。可以加参数 -remote -filter entityframework 来在包源中查找自己想要的包
+Get-Package
+```
+
+常见问题：
+
+1. nuget安装dll时提示“已拥有为system.diagnostics.tracesource定义的依赖项”，这是因为nuget版本比较低引起的。
+
+   解决方法:
+
+   打开VS -> 打开菜单“工具”-“扩展和更新” -> 选择“更新” -> 选择“Visual Studio库” -> 点击 nuget 进行更新；
+
+
+
+
 
 ## 实战
 
@@ -2012,7 +2062,7 @@ Person p = Person.Get(Person.Properties.Id == 10);
 作为一名编程人员，在ORM使用的观念上会有不同，具体取舍需根据具体的项目和场景
 
 ## SqlSugar
-  
+
 国内。可以运行在 `.NET 4.+` & `.NET CORE` 的高性能、轻量级 ORM 框架。开源、免费
 
 ## Dos.ORM

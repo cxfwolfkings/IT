@@ -2615,55 +2615,41 @@ beforeRouteEnter (to, from, next) {
 
 ### vue-router
 
+参考：https://www.imooc.com/article/43683
+
 Vue.js 路由允许我们通过不同的 URL 访问不同的内容，实现多视图的单页Web应用（single page web application，SPA）。
 
-Vue.js 路由需要载入[vue-router](https://github.com/vuejs/vue-router)库，中文文档地址：[vue-router文档](https://github.com/vuejs/vue-router)。
-
-npm 简单的路由[实例](https://github.com/chrisvfritz/vue-2.0-simple-routing-example)：
-
-下载完后，解压该目录并进入该目录，执行以下命令：
-
-```sh
-# 安装依赖，使用淘宝资源命令 cnpm
-cnpm install
-# 启动应用，地址为 localhost:8080
-cnpm run dev
-```
-
-如果你需要发布到正式环境可以执行以下命令：
-
-```sh
-cnpm run build
-```
-
-执行成功后，访问 `http://localhost:8080` 查看效果
+Vue.js 路由需要载入[vue-router](https://github.com/vuejs/vue-router)库，中文文档地址：[vue-router文档](https://github.com/vuejs/vue-router)。npm 简单的路由[实例](https://github.com/chrisvfritz/vue-2.0-simple-routing-example)。
 
 **总结：**
 
-- 有时候，同一个路径可以匹配多个路由，此时，匹配的优先级就按照路由的定义顺序：谁先定义的，谁的优先级就最高。
-- url的param之前要加"#/"才能访问定义的路由（hash模式）
-- vue-router的切换不同于传统的页面的切换。路由之间的切换，其实就是组件之间的切换，不是真正的页面切换。这也会导致一个问题，就是引用相同组件的时候，会导致该组件无法更新，也就是我们口中的页面无法更新的问题了。
+1）有时候，同一个路径可以匹配多个路由，此时，匹配的优先级就按照路由的定义顺序：谁先定义的，谁的优先级就最高。
 
-  >解决方法：[https://blog.csdn.net/w390058785/article/details/82813032](https://blog.csdn.net/w390058785/article/details/82813032)
+2）url的param之前要加"#/"才能访问定义的路由（hash模式）
 
-- 前端路由：核心就是锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据
-- ui-router：锚点值改变，如何获取模板？ajax？vue中，模板数据不是通过ajax请求来，而是调用函数获取到模板内容；核心：锚点值改变
-- 使用方式：
-  1. 下载 `npm i vue-router -S`
-  2. 在main.js中引入 `import VueRouter from 'vue-router';`
-  3. 安装插件 `Vue.use(VueRouter);`
-  4. 创建路由对象并配置路由规则  
-  
-     ```js
-     let router = new VueRouter({ routes:[ {path:'/home',component:Home} ]});
-     ```
+3）vue-router的切换不同于传统的页面的切换。路由之间的切换，其实就是组件之间的切换，不是真正的页面切换。这也会导致一个问题，就是引用相同组件的时候，会导致该组件无法更新，也就是我们口中的页面无法更新的问题了。
 
-  5. 将其路由对象传递给Vue的实例，options中加入 `router:router`
-  6. 在app.vue中留坑 `<router-view></router-view>`
+>解决方法：[https://blog.csdn.net/w390058785/article/details/82813032](https://blog.csdn.net/w390058785/article/details/82813032)
 
-- 在vue-router中，有两大对象被挂载到了实例this：`$route`（只读、具备信息的对象）、`$router`（具备功能函数）
+4）前端路由：核心就是锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。ui-router：锚点值改变，如何获取模板？ajax？vue中，模板数据不是通过ajax请求来，而是调用函数获取到模板内容；核心：锚点值改变
 
-**查询字符串：**
+5）使用方式：
+
+1. 下载 `npm i vue-router -S`
+2. 在main.js中引入 `import VueRouter from 'vue-router';`
+3. 安装插件 `Vue.use(VueRouter);`
+4. 创建路由对象并配置路由规则  
+
+   ```js
+   let router = new VueRouter({ routes:[ {path:'/home',component:Home} ]});
+   ```
+
+5. 将其路由对象传递给Vue的实例，options中加入 `router:router`
+6. 在app.vue中留坑 `<router-view></router-view>`
+
+6）在vue-router中，有两大对象被挂载到了实例this：`$route`（只读、具备信息的对象）、`$router`（具备功能函数）
+
+7）查询字符串
 
 ```html
 <router-link :to="{name:'detail',query:{id:1}} ">xxx</router-link>
@@ -2677,7 +2663,7 @@ cnpm run build
 
 使用`params`，参数不会拼接在路由后面，地址栏上看不到参数。由于动态路由也是传递params的，所以在 `this.$router.push()` 方法中 `path` 不能和 `params` 一起使用，否则 `params` 将无效，需要用 name 来指定页面及通过路由配置的 name 属性访问
 
-其它用法：
+8）其它用法：
 
 - `this.$router.go` 根据浏览器记录 前进1 后退-1
 - `this.$router.push`（直接跳转到某个页面显示）
@@ -2782,6 +2768,57 @@ beforeRouteLeave (to, from, next) {
   // 可以访问组件实例 `this`
 }
 ```
+
+路由权限管理：
+
+实现控制的方式分两种：
+
+1. 通过[vue-router addRoutes ](https://router.vuejs.org/zh-cn/api/router-instance.html#methods)方法注入路由实现控制
+2. 通过[vue-router beforeEach ](https://router.vuejs.org/zh-cn/api/router-instance.html#methods)钩子限制路由跳转
+
+addRoutes 方式：
+
+通过请求服务端获取当前用户路由配置，编码为 vue-router 所支持的基本格式（具体如何编码取决于前后端协商好的数据格式），通过调用 this.$router.addRoutes 方法将编码好的用户路由注入到现有的 vue-router 实例中去，以实现用户路由。
+
+beforeEach 方式
+
+通过请求服务端获取当前用户路由配置，通过注册 router.beforeEach 钩子对路由的每次跳转进行管理，每次跳转都进行检查，如果目标路由不存再于 基本路由 和 当前用户的 用户路由 中，取消跳转，转为跳转错误页。
+
+以上两种方式均需要在 vue-router 中配置错误页，以保证用户感知权限不足。
+
+两种方式的原理其实都是一样的，只不过 addRoutes 方式 通过注入路由配置告诉 vue-router ：“当前我们就只有这些路由，其它路由地址我们一概不认”，而 beforeEach 则更多的是依赖我们手动去帮 vue-router 辨别什么页面可以去，什么页面不可以去。说白了也就是 自动 与 手动 的差别。说到这，估计大家都会觉得既然是 自动 的，那肯定是 addRoutes 最方便快捷了，还能简化业务代码，但是！很多人都忽略了一点：
+
+addRoutes 方法仅仅是帮你注入新的路由，并没有帮你剔除其它路由！
+
+设想存在这么一种情况：用户在自己电脑上登录了管理员账号，这个时候会向路由中注入管理员的路由，然后再退出登录，保持页面不刷新，改用普通用户账号进行登录，这个时候又会向路由中注入普通用户的路由，那么，在路由中将存在两种用户类型的路由，即使用户不感知，通过改变 url，普通用户也可以访问管理员的页面！
+
+对于这个问题，也有一个解决办法：
+
+```js
+import Vue from 'vue'
+import Router from 'vue-router'
+Vue.use(Router)
+const createRouter = () => new Router({
+ mode: 'history',
+ routes: []
+})
+const router = createRouter()
+export function resetRouter () {
+ const newRouter = createRouter()
+ router.matcher = newRouter.matcher
+}
+export default router
+```
+
+通过新建一个全新的 Router，然后将新的 Router.matcher 赋给当前页面的管理 Router，以达到更新路由配置的目的。
+
+一个[小demo](https://github.com/MinFE/vue-router-premission-control-demo)，大家可以去[体验一下](https://minfe.github.io/vue-router-premission-control-demo/)。关于上述问题，在[vue-router ](https://github.com/vuejs/vue-router)的 github issues 下有过讨论，分别是：
+
+[Add option to Reset/Delete Routes #1436](https://github.com/vuejs/vue-router/issues/1436)
+
+[Feature request: replace routes dynamically #1234](https://github.com/vuejs/vue-router/issues/1234)
+
+
 
 ### i18n
 

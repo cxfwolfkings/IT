@@ -29,7 +29,7 @@
   ASP.NET Web API是一种通信技术，可用在任何使用HTTP协议的客户端，但是它的基础仍是：路由和控制器，只是这里不需要视图。
 
 ### 第一个为示例
-  
+
   Menu.cs
 
   ```C#
@@ -546,9 +546,9 @@ Swagger 可以干什么？
 ## 简介
 
 WCF 是 .NET 框架的一部分，由 .NET Framework 3.0 开始引入，与Windows Presentation Foundation 及 Windows Workflow Foundation 并行为新一代 Windows 操作系统以及 WinFX 的三个重大应用程序开发类库。
-  
+
 在 .NET Framework 2.0 以及前版本中，微软发展了 Web Service(SOAP with HTTP communication)，.NET Remoting (TCP/HTTP/Pipeline communication) 以及基础的 Winsock 等通信支持。
-  
+
 由于各个通信方法的设计方法不同，而且彼此之间也有相互的重叠性，对于开发人员来说，不同的选择会有不同的程序设计模型，而且必须要重新学习，让开发人员在使用中有许多不便。同时，面向服务架构(Service-Oriented Architecture) 也开始盛行于软件工业中，因此微软重新查看了这些通信方法，并设计了一个统一的程序开发模型，对于数据通信提供了最基本最有弹性的支持，这就是 **Windows Communication Foundation**。
 
 在 David Chappell 所撰的《Introducing Windows Communication Foundation》一文中，用了一个活鲜鲜的例子，来说明 WCF 的优势所在。假定我们要为一家汽车租赁公司开发一个新的应用程序，用于租车预约服务。该租车预约服务会被多种应用程序访问，包括呼叫中心(Call Center)，基于 J2EE 的租车预约服务以及合作伙伴的应用程序(Partner Application)
@@ -622,13 +622,13 @@ Web API：
 ### 自定义服务宿主
 
 使用 WCF 可以在任意宿主上运行服务。
-  
+
 对于服务主机，必须引用 RoomReservationService 库和 System.ServiceModel 程序集。
-  
+
 该服务从实例化和打开 ServiceHost 类型的对象开始。这个类在 System.ServiceModel 名称空间中定义。
-  
+
 实现该服务的 RoomReservationService 类在构造函数中定义。调用Open()方法会启动服务的监听器信道，该服务准备用于侦听请求。Close()方法会停止信道。
-  
+
 下面的示例代码还添加了 ServiceMetadataBehavior 类型的一个操作，添加该操作，就允许使用 WSDL 创建一个客户端应用程序。
 
   ```C#
@@ -687,9 +687,9 @@ Web API：
   ```
 
 对于 WCF 配置，需要把用服务库创建的应用程序配置文件复制到宿主应用程序中。
-  
+
 使用 WCF Service Configuration Editor 可以编辑这个配置文件。除了使用配置文件之外，还可以通过编程方式配置所有内容，并使用几个默认值。
-  
+
 宿主应用程序的示例代码不需要任何配置文件。使用自定义服务宿主，可以在 WCF 库的项目设置中取消用来启动 WCF 服务宿主的 WCF 选项。
 
 ### WCF客户端
@@ -1128,7 +1128,7 @@ Web API：
      当您在 Visual Studio 中添加服务引用或使用 SvcUtil.exe工具时，将会生成一个客户端配置文件。 在以前版本的 WCF 中，这些配置文件包含每个绑定属性的值，即使该值是默认值。 在 WCF 4.5 中，生成的配置文件仅包含那些设置为非默认值的绑定属性。
 
    - WCF 现在支持协定优先开发：
-  
+    
      Svcutil.exe 具有一个 /serviceContract 开关，这样即可从 WSDL 文档生成服务和数据协定。
 
    - 从可移植子集项目添加服务引用
@@ -1136,7 +1136,7 @@ Web API：
    - `ASP.NET` 兼容模式默认值已更改
 
      WCF 提供了 `ASP.NET` 兼容模式，以向开发人员授予编写 WCF 服务时对 `ASP.NET HTTP` 管道中的功能的完全访问权限。 若要使用此模式下，必须设置web.config `<serviceHostingEnvironment>`  节aspNetCompatibilityEnabled属性为 true 。此外，此 appDomain 中的任何服务都需要将 RequirementsMode property on its AspNetCompatibilityRequirementsAttribute 设置为 Allowed 或 Required。 默认情况下 AspNetCompatibilityRequirementsAttribute 现在将设置为Allowed。
-  
+    
    - 流改进
 
      向 WCF 添加了对异步流的新支持。 若要启用异步流，请将 DispatcherSynchronizationBehavior 终结点行为添加到服务主机，并将其 AsynchronousSendEnabled 属性设置为 true。 在服务将经过流处理的消息发送到多个正在缓慢读取的客户端时，这样做有益于可伸缩性。 WCF 不再阻止每个客户端的一个线程，并将释放该线程以便为另一个客户端提供服务。
@@ -1177,4 +1177,5 @@ Web API：
 ## 参考
 
 - [MSDN](https://docs.microsoft.com/zh-cn/dotnet/framework/wcf/)
+- [Dotnet Core多版本API共存的优雅实现](https://mp.weixin.qq.com/s?__biz=MzIxNjIwNzQ5Mw==&mid=2649758503&idx=2&sn=0309ca8c1c459b0e8ab860b73391203b&chksm=8f8822cdb8ffabdb5603a3d2df3c832bfa30243e0def5aadec6330863793484a39ee598cf04b&mpshare=1&scene=23&srcid=1225eSq4H8S1JDbNUlLS0iFe&sharer_sharetime=1608855058069&sharer_shareid=83c85f3c4ddf8afec618435580a94a3e#rd)
 
