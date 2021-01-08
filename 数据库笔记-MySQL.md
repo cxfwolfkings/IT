@@ -10,7 +10,7 @@
    - [table瘦身](#table瘦身)
    - [SQL&nbsp;Joins、统计、随机查询](#SQL&nbsp;Joins、统计、随机查询)
    
-2. [实战](#实战)
+2. 实战
    - [安装与配置](#安装与配置)
    - [常用命令语句](#常用命令语句)
      - [控制外键约束](#控制外键约束)
@@ -21,11 +21,11 @@
      - [索引相关](#索引相关)
    - [Handler](#Handler)
    - [触发器](#触发器)
-   
    - [事件调度器](#事件调度器)
    - [MySQL监控](#MySQL监控)
+   - [死锁](#死锁)
    
-3. [总结](#总结)
+3. 总结
 
    - [常见错误](#常见错误)
 
@@ -37,20 +37,15 @@
      
      - [4. MySQL Connector/NET Exception: Reading from the stream has failed](#4. MySQL Connector/NET Exception: Reading from the stream has failed)
      - [5. mysql 卡死 大部分线程长时间处于sending data的状态](#5. mysql 卡死 大部分线程长时间处于sending data的状态)
-
-   - [性能优化](#性能优化)
-
-     - [引擎优化](#引擎优化)
-
-     - [SQL优化](#SQL优化)
-
-   - [编码设置](#编码设置)
-
+- [性能优化](#性能优化)
+   - [引擎优化](#引擎优化)
+  
+   - [SQL优化](#SQL优化)
+- [编码设置](#编码设置)
    - [压缩](#压缩)
+- [死锁](#死锁)
+   - [参考](#参考)
 
-   - [死锁](#死锁)
-
-4. 升华
 
 
 
@@ -371,7 +366,7 @@ You can compare the number of internal on-disk temporary tables created to the t
 
 
 
-### 缓存池
+## 缓存池
 
 参考：
 
@@ -508,7 +503,7 @@ expain出来的信息有10列：
 
 
 
-### table瘦身
+## table瘦身
 
 **空洞**：
 
@@ -530,7 +525,7 @@ expain出来的信息有10列：
 
 
 
-### SQL&nbsp;Joins、统计、随机查询
+## SQL&nbsp;Joins、统计、随机查询
 
 7种join具体如下：
 
@@ -576,19 +571,15 @@ select * from t limit @Y3,1;
 
 
 
-## 实战
+## 安装与配置
 
+### windows环境
 
-
-### 安装与配置
-
-#### windows环境
-
-**1、设置环境变量**  
+**1. 设置环境变量**  
 
 配置 `MYSQL_HOME` 为MySQL的解压路径，并设置path：`;%MYSQL_HOME%\bin`
 
-**2、在MySQL解压路径下，新建 `my.ini` 配置初始化参数：**
+**2. 在MySQL解压路径下，新建 `my.ini` 配置初始化参数：**
 
 ```ini
 [mysql]
@@ -619,7 +610,7 @@ default-character-set=utf8
 
 >my.ini 文件格式必须是 `ANSI` 格式，否则会报错：`Found option without preceding group in config file`
 
-**3、初始化数据库**
+**3. 初始化数据库**
 
 以 **管理员** 的身份打开cmd命令窗口，输入 `mysqld --initialize --console` 命令初始化 mysql 的 data 数据目录，初始化完毕后，会在解压目录下生成一个data文件夹，cmd窗口中会有随机生成的密码：
 
@@ -627,13 +618,13 @@ default-character-set=utf8
 
 生成密码：XkJ-VegEY3cY
 
-**4、安装服务** 
+**4. 安装服务** 
 
 - 注册服务：`mysqld --install mysql-master --defaults-file="D:\Arms\mysql-8.0.19-winx64\my.ini"`
 - 启动服务：`net start mysql-master`
 - 登录：`mysql -u root -p`
 
-**5、更改密码**
+**5. 更改密码**
 
 ```sql
 set password for root@localhost='123456';
@@ -641,7 +632,7 @@ set password for root@localhost='123456';
 ALTER USER USER() IDENTIFIED BY '新密码';
 ```
 
-**6、问题解决：**
+**6. 问题解决**
 
 **6.1 服务名无效**  
 
@@ -855,7 +846,48 @@ ALTER TABLE tblname  DROP FOREIGN KEY indexname
 
 
 
+#### JSON函数
 
+```sql
+-- 创建json
+json_array([val[, val] ...])  -- 创建json数组 
+json_object([key, val[, key, val] ...])  -- 创建json对象
+json_quote  -- 将json转成json字符串类型
+
+-- 查询json 
+json_contains(json_doc, val[, path])  -- 判断是否包含某个json值
+json_contains_path(json_doc, 'one|all', path[, path] ...)  -- 判断某个路径下是否包json值
+
+-- 提取json值
+json_extract(json_doc, path[, path] ...)
+column->path    -- json_extract的简洁写法，MySQL 5.7.9开始支持
+column->>path   -- json_unquote(column -> path)的简洁写法
+json_keys(json_doc[, path])  -- 提取json中的键值为json数组
+json_search(json_doc, 'one|all', search_str[, escape_char[, path] ...])  -- 按给定字符串关键字搜索json，返回匹配的路径
+
+-- 修改json 
+json_append -- 废弃，MySQL 5.7.9开始改名为json_array_append
+json_array_append(json_doc, path, val[, path, val] ...) -- 末尾添加数组元素，如果原有值是数值或json对象，则转成数组后，再添加元素
+json_array_insert(json_doc, path, val[, path, val] ...) -- 插入数组元素
+json_insert(json_doc, path, val[, path, val] ...) -- 插入值（插入新值，但不替换已经存在的旧值）
+json_merge(json_doc, json_doc[, json_doc] ...) -- 合并json数组或对象
+json_remove(json_doc, path[, path] ...) -- 删除json数据
+json_replace(json_doc, path, val[, path, val] ...) -- 替换值（只替换已经存在的旧值）
+json_set(json_doc, path, val[, path, val] ...) -- 设置值（替换旧值，并插入不存在的新值）
+json_unquote -- 去除json字符串的引号，将值转成string类型
+
+-- 返回json属性 
+json_depth(json_doc) -- 返回json文档的最大深度
+json_length(json_doc[, path]) -- 返回json文档的长度
+json_type -- 返回json值得类型
+json_valid -- 判断是否为合法json文档
+
+-- 示例
+insert into t values(5,JSON_Object('key1',v1,'key2',v2));
+insert into t values(4,JSON_Array(v1,v2,v3));
+update t set js = json_set('{"a":1,"s":"abc"}','$.a',456,'$.b','bbb') where id = 1;
+-- 结果js={"a":456,"s":"abc","b":"bbb"}
+```
 
 
 
@@ -2628,6 +2660,95 @@ Myslq[Table_locks_waited]
 
 
 
+## 死锁
+
+死锁是指两个或两个以上的进程在执行过程中，因争夺资源而造成的一种互相等待的现象，可以认为如果一个资源被锁定，它总会在以后某个时间被释放。而死锁发生在当多个进程访问同一数据库时，其中每个进程拥有的锁都是其他进程所需的，由此造成每个进程都无法继续下去。
+
+InnoDB的并发写操作会触发死锁，InnoDB也提供了死锁检测机制，可以通过设置innodb_deadlock_detect
+
+参数可以打开或关闭死锁检测：
+
+```sql
+-- 打开死锁检测，数据库发生死锁时自动回滚（默认选项）
+innodb_deadlock_detect = on
+-- 关闭死锁检测，发生死锁的时候，用锁超时来处理，
+-- 通过设置锁超时参数innodb_lock_wait_timeout可以在超时发生时回滚被阻塞的事务
+innodb_deadlock_detect = off
+```
+
+还可以通过设置InnDB Monitors来进一步观察锁冲突详细信息。设置InnoDB Monitors方法：
+
+```sql
+create table innodb_monitor(a INT) engine=innodb;
+create table innodb_tablespace_monitor(a INT) engine=innodb;
+create table innodb_lock_monitor(a INT) engine=innodb;
+create table innodb_table_monitor(a INT) engine=innodb;
+```
+
+常用SQL语句：
+
+```sql
+-- 查看死锁
+show engine innodb status
+
+-- 查询是否锁表
+show OPEN TABLES where In_use > 0;
+
+-- 数据库版本查询
+select version();
+
+-- 引擎查询
+show create table {tableName};
+
+-- 事务隔离级别查询方法
+select @@tx_isolation;
+
+-- 事务隔离级别设置方法（只对当前Session生效）：
+set session transaction isolation level read committed;
+/**
+ * 注意：
+ *   1. 如果数据库是分库的，以上SQL语句需要在单库上执行，不能在逻辑库执行。
+ *   2. 全局生效，需要修改my.ini
+ */
+
+-- 方法1：利用 metadata_locks 视图
+-- 此方法仅适用于 MySQL 5.7 以上版本，该版本 performance_schema 新增了 metadata_locks，
+-- 如果上bai锁前启用了元数据锁的探针（默认是未启用的），可以比较容易的定位全局锁会话。
+-- 1：查看当前的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX;
+-- 2：查看当前锁定的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;
+-- 3：查看当前等锁的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;
+
+-- 方法2：利用 events_statements_history 视图
+-- 此方法适用于 MySQL 5.6 以上版本，启用 performance_schema.eventsstatements_history（5.6 默认未启用，5.7 默认启用），
+-- 该表会 SQL 历史记录执行，如果请求太多，会自动清理早期的信息，有可能将上锁会话的信息清理掉。
+
+-- 方法3：利用 gdb 工具
+-- 如果上述两种都用不了或者没来得及启用，可以尝试第三种方法。
+-- 利用 gdb 找到所有线程信息，查看每个线程中持有全局锁对象，输出对应的会话 ID。
+-- 也可以使用 gdb 交互模式，但 attach mysql 进程后 mysql 会完全 hang 住，读请求也会受到影响，不建议使用交互模式。
+
+-- 方法4：show processlist
+-- 如果备份程序使用的特定用户执行备份，如果是 root 用户备份，那 time 值越大的是持锁会话的概率越大，
+-- 如果业务也用 root 访问，重点是 state 和 info 为空的，这里有个小技巧可以快速筛选，筛选后尝试 kill 对应 ID，
+-- 再观察是否还有 wait global read lock 状态的会话。
+
+-- 方法5：重启！
+```
+
+**解决思路：**
+
+1. 使用临时表保存全部待操作记录（增删改）
+2. 给业务表加表级锁
+3. 将临时表数据同步到业务表
+4. 释放表级锁
+
+**问题：**业务表在大量并发操作下，会发生什么？
+
+
+
 ## 总结
 
 1. 在1个SQL语句中临时表只能查询一次！连接断开后，自动删除
@@ -2687,11 +2808,11 @@ url=jdbc:mysql://yourip/college?user=root&password=yourpassword&useunicode=true&
 
 
 
-### 性能优化
+## 性能优化
 
 
 
-#### 引擎优化
+### 引擎优化
 
 **1. 内存利用方面**
 
@@ -2889,7 +3010,7 @@ key_buffer_size = 8M
 
 
 
-#### SQL优化
+### SQL优化
 
 SQL优化主要分4个方向：`SQL语句跟索引`、`表结构`、`系统配置`、`硬件`。
 
@@ -3209,70 +3330,6 @@ select * from A left join B on B.name = A.name where B.name is null union allsel
 ### 压缩
 
 参考：[https://www.jb51.net/article/116140.htm](#https://www.jb51.net/article/116140.htm)
-
-
-
-### 死锁
-
-```sql
--- 查看死锁
-show engine innodb status
-
--- 查询是否锁表
-show OPEN TABLES where In_use > 0;
-
--- 数据库版本查询
-select version();
-
--- 引擎查询
-show create table {tableName};
-
--- 事务隔离级别查询方法
-select @@tx_isolation;
-
--- 事务隔离级别设置方法（只对当前Session生效）：
-set session transaction isolation level read committed;
-/**
- * 注意：
- *   1. 如果数据库是分库的，以上SQL语句需要在单库上执行，不能在逻辑库执行。
- *   2. 全局生效，需要修改my.ini
- */
-
--- 方法1：利用 metadata_locks 视图
--- 此方法仅适用于 MySQL 5.7 以上版本，该版本 performance_schema 新增了 metadata_locks，
--- 如果上bai锁前启用了元数据锁的探针（默认是未启用的），可以比较容易的定位全局锁会话。
--- 1：查看当前的事务
-SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX;
--- 2：查看当前锁定的事务
-SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;
--- 3：查看当前等锁的事务
-SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;
-
--- 方法2：利用 events_statements_history 视图
--- 此方法适用于 MySQL 5.6 以上版本，启用 performance_schema.eventsstatements_history（5.6 默认未启用，5.7 默认启用），
--- 该表会 SQL 历史记录执行，如果请求太多，会自动清理早期的信息，有可能将上锁会话的信息清理掉。
-
--- 方法3：利用 gdb 工具
--- 如果上述两种都用不了或者没来得及启用，可以尝试第三种方法。
--- 利用 gdb 找到所有线程信息，查看每个线程中持有全局锁对象，输出对应的会话 ID。
--- 也可以使用 gdb 交互模式，但 attach mysql 进程后 mysql 会完全 hang 住，读请求也会受到影响，不建议使用交互模式。
-
--- 方法4：show processlist
--- 如果备份程序使用的特定用户执行备份，如果是 root 用户备份，那 time 值越大的是持锁会话的概率越大，
--- 如果业务也用 root 访问，重点是 state 和 info 为空的，这里有个小技巧可以快速筛选，筛选后尝试 kill 对应 ID，
--- 再观察是否还有 wait global read lock 状态的会话。
-
--- 方法5：重启！
-```
-
-解决思路：
-
-1. 使用临时表保存全部待操作记录（增删改）
-2. 给业务表加表级锁
-3. 将临时表数据同步到业务表
-4. 释放表级锁
-
-问题：业务表在大量并发操作下，会发生什么？
 
 
 
@@ -4670,19 +4727,21 @@ n 建议使用内存队列产品而不使用memcache 来进行缓存异步更新
 1. SQL基础：https://juejin.im/post/6844903790571700231
 2. SQL面试：https://sowhat.blog.csdn.net/article/details/71158104
 3. MySQL拷问：https://www.jianshu.com/nb/22933318
-4. https://www.cnblogs.com/assistants/p/11958998.html
-5. https://www.cnblogs.com/wy123/p/12724252.html
-6. https://www.cnblogs.com/hanwuxing/p/10367147.html
-7. https://www.cnblogs.com/zejin2008/p/5262751.html
-8. https://www.cnblogs.com/out8/p/4222166.html
-9. https://www.cnblogs.com/zhuyeshen/p/12084845.html
-10. https://www.cnblogs.com/mintsd/p/13062308.html
-11. https://blog.csdn.net/zdhsoft/article/details/89373364
-12. https://www.ddpool.cn/article/56666.html
-13. https://www.cnblogs.com/csj2018/p/9955405.html
-14. https://www.jb51.net/article/159737.htm
-15. https://www.cnblogs.com/wintersoft/p/10787474.html
-16. https://blog.csdn.net/qq_27607965/article/details/79925288
-17. https://www.cnblogs.com/cyun/p/4308960.html
-18. https://www.cnblogs.com/liaojie970/p/6824773.html
+4. [顺丰面试：MySQL十连击](https://mp.weixin.qq.com/s/ZoCZLG3o3AZBDSO1y3nbmw)
+5. https://www.cnblogs.com/assistants/p/11958998.html
+6. https://www.cnblogs.com/wy123/p/12724252.html
+7. https://www.cnblogs.com/hanwuxing/p/10367147.html
+8. https://www.cnblogs.com/zejin2008/p/5262751.html
+9. https://www.cnblogs.com/out8/p/4222166.html
+10. https://www.cnblogs.com/zhuyeshen/p/12084845.html
+11. https://www.cnblogs.com/mintsd/p/13062308.html
+12. https://blog.csdn.net/zdhsoft/article/details/89373364
+13. https://www.ddpool.cn/article/56666.html
+14. https://www.cnblogs.com/csj2018/p/9955405.html
+15. https://www.jb51.net/article/159737.htm
+16. https://www.cnblogs.com/wintersoft/p/10787474.html
+17. https://blog.csdn.net/qq_27607965/article/details/79925288
+18. https://www.cnblogs.com/cyun/p/4308960.html
+19. https://www.cnblogs.com/liaojie970/p/6824773.html
+20. [MySQL 8.0能彻底解决困扰运维的复制延迟问题！](http://blog.itpub.net/31547898/viewspace-2200045/)
 

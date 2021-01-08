@@ -7,10 +7,10 @@
 1. 理论
 
    - [数据类型](#数据类型)
-
-   - [数据持久化](#数据持久化)
-
+- [数据持久化](#数据持久化)
    - [过期删除](#过期删除)
+- [分布式锁](#分布式锁)
+   - [Redis限流](#Redis限流)
 
 2. 实战
 
@@ -20,19 +20,7 @@
    - [操作命令](#操作命令)
    - [内存管理](#内存管理)
 
-   - [淘汰策略](#淘汰策略)
-
    - [集群部署](#集群部署)
-
-   - [主从复制](#主从复制)
-
-   - [Redis&nbsp;Cluster](#rediscluster)
-
-   - [ShardedJedis](#shardedjedis)
-
-   - [Codis](#codis)
-
-   - [集群方案对比](#集群方案对比)
 
    - [事务管理](#事务管理)
 
@@ -52,19 +40,11 @@
 
    - [使用场景](#使用场景)
 
-   - [分布式锁](#分布式锁)
-
    - [消息队列](#消息队列)
 
 3. 总结
 
-   - [高可用解决方案](#高可用解决方案)
-
-     - [方案1：Redis Cluster](#方案1redis-cluster)
-
-     - [方案2：Twemproxy](#方案2twemproxy)
-
-     - [方案3：Codis](#方案3codis)
+   - [常见知识点](#常见知识点)
 
    - [问题](#问题)
 
@@ -120,7 +100,11 @@ Redis 特点
 - 性能极高：Redis能读的速度是110000次/s，写的速度是81000次/s，此外，Key 和 Value 的大小限制均为 512M，这阈值相当可观。
 - 丰富的特性：Redis 还支持 publish/subscribe，通知，key 过期等等特性。
 
+
+
 ### 数据类型
+
+参考：https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488832&idx=1&sn=5999893d7fe773f54f7d097ac1c2074d&chksm=ebdef478dca97d6e2433abdeecf600669ffbb1b68eb2b744e7ed72aac4cd5c4cabf19b0d8f19&scene=132#wechat_redirect
 
 数据类型|可以存储的值|操作
 -|-|-
@@ -153,9 +137,35 @@ TYPE key | 返回 key 所储存的值的类型
 
 更多命令请参考：[https://redis.io/commands](https://redis.io/commands)
 
-**String：**
+#### String
 
 [https://www.runoob.com/redis/redis-strings.html](https://www.runoob.com/redis/redis-strings.html)
+
+**用途**：适用于简单key-value存储、setnx key value实现分布式锁、计数器（原子性）、分布式全局唯一ID。
+
+**底层**：C语言中String用char[]数组表示，源码中用`SDS`(simple dynamic string)封装char[]，这是Redis存储的`最小单元`，一个SDS最大可以存储512M信息。
+
+```c
+struct sdshdr{
+  unsigned int len; // 标记char[]的长度
+  unsigned int free; // 标记char[]中未使用的元素个数
+  char buf[]; // 存放元素的坑
+}
+```
+
+Redis对SDS再次封装生成了RedisObject，核心有两个作用：
+
+1. 说明是5种类型哪一种。
+2. 里面有指针用来指向 SDS。
+
+当你执行`set name sowhat`的时候，其实Redis会创建两个RedisObject对象，键的RedisObject 和 值的RedisOjbect 其中它们type = REDIS_STRING，而SDS分别存储的就是 name 跟 sowhat 字符串咯。
+
+并且Redis底层对SDS有如下优化：
+
+1. SDS修改后大小 > 1M时 系统会多分配空间来进行`空间预分配`。
+2. SDS是`惰性释放空间`的，你free了空间，可是系统把数据记录下来下次想用时候可直接使用。不用新申请空间。
+
+示例：
 
 ```sh
 # key: hello; value: world
@@ -169,7 +179,23 @@ OK
 (nil)
 ```
 
-**List：**
+#### List
+
+![x](./Resources/st031.png)
+
+查看源码底层 `adlist.h` 会发现底层就是个 **双端链表**，该链表最大长度为2^32-1。常用就这几个组合。
+
+- lpush + lpop = stack 先进后出的栈 
+
+- lpush + rpop = queue 先进先出的队列 
+
+- lpush + ltrim = capped collection 有限集合
+
+- lpush + brpop = message queue 消息队列
+
+一般可以用来做简单的消息队列，并且当数据量小的时候可能用到独有的压缩列表来提升性能。当然专业点还是要 [RabbitMQ](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488121&idx=1&sn=1ca9adc665b9ba0fc68c2d647b967d7c&scene=21#wechat_redirect)、ActiveMQ等。
+
+示例：
 
 ```sh
 # 创建集合，list-key是集合名称
@@ -196,7 +222,23 @@ OK
 2) "item"
 ```
 
-**Set：**
+#### Set
+
+如果你明白Java中HashSet是[HashMap](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247485513&idx=1&sn=340e879f3197ae9e3d8789a1ad55a76e&scene=21#wechat_redirect)的简化版那么这个Set应该也理解了。都是一样的套路而已。这里你可以认为是没有Value的Dict。看源码 `t.set.c` 就可以了解本质了。
+
+```c
+int setTypeAdd(robj *subject, robj *value) {
+    long long llval;
+    if (subject->encoding == REDIS_ENCODING_HT) {
+         // 看到底层调用的还是dictAdd，只不过第三个参数= NULL
+         if (dictAdd(subject->ptr,value,NULL) == DICT_OK) {
+            incrRefCount(value);
+            return 1;
+        }
+        ....
+```
+
+示例：
 
 ```sh
 # 创建散列表（元素不重复），set-key是表名
@@ -229,7 +271,60 @@ OK
 2) "item3"
 ```
 
-**Hash：**
+#### Hash
+
+散列非常适用于将一些相关的数据存储在一起，比如用户的购物车。该类型在日常用途还是挺多的。
+
+这里需要明确一点：Redis中只有一个K，一个V。其中 K 绝对是字符串对象，而 V 可以是String、List、Hash、Set、ZSet任意一种。
+
+hash的底层主要是采用字典dict的结构，整体呈现层层封装。从小到大如下：
+
+**dictEntry**
+
+真正的数据节点，包括key、value 和 next 节点。
+
+**dictht**
+
+1. 数据 dictEntry 类型的数组，每个数组的item可能都指向一个链表。
+
+2. 数组长度 size。
+
+3. sizemask 等于 size - 1。
+
+4. 当前 dictEntry 数组中包含总共多少节点。
+
+**dict**
+
+1. dictType 类型，包括一些自定义函数，这些函数使得key和value能够存储
+2. rehashidx 其实是一个标志量，如果为`-1`说明当前没有扩容，如果`不为 -1` 则记录扩容位置。
+3. dictht数组，两个Hash表。
+4. iterators 记录了当前字典正在进行中的迭代器
+
+组合后结构就是如下：
+
+![x](./Resources/st032.png)
+
+**渐进式扩容**
+
+为什么 dictht ht[2]是两个呢？**目的是在扩容的同时不影响前端的CURD**，慢慢的把数据从ht[0]转移到ht[1]中，同时`rehashindex`来记录转移的情况，当全部转移完成，将ht[1]改成ht[0]使用。
+
+rehashidx = -1说明当前没有扩容，rehashidx != -1则表示扩容到数组中的第几个了。
+
+扩容之后的数组大小为大于used*2的**2的n次方**的最小值，跟 [HashMap](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247485513&idx=1&sn=340e879f3197ae9e3d8789a1ad55a76e&scene=21#wechat_redirect) 类似。然后挨个遍历数组同时调整rehashidx的值，对每个dictEntry[i] 再挨个遍历链表将数据 Hash 后重新映射到 dictht[1]里面。并且 **dictht[0].use** 跟 **dictht[1].use** 是动态变化的。
+
+![x](./Resources/st033.png)
+
+整个过程的重点在于`rehashidx`，其为第一个数组正在移动的下标位置，如果当前内存不够，或者操作系统繁忙，扩容的过程可以随时停止。
+
+停止之后如果对该对象进行操作，那是什么样子的呢？
+
+1. 如果是新增，则直接新增第二个数组，因为如果新增到第一个数组，以后还是要移过来，没必要浪费时间
+
+2. 如果是删除，更新，查询，则先查找第一个数组，如果没找到，则再查询第二个数组。
+
+![x](./Resources/st034.png)
+
+示例：
 
 ```sh
 > hset hash-key sub-key1 value1
@@ -258,7 +353,25 @@ OK
 2) "value1"
 ```
 
-**ZSet：**
+#### ZSet
+
+范围查找 的天敌就是 有序集合，看底层 `redis.h` 后就会发现 Zset用的就是可以跟二叉树媲美的`跳跃表`来实现有序。跳表就是多层**链表**的结合体，跳表分为许多层(level)，每一层都可以看作是数据的**索引**，**这些索引的意义就是加快跳表查找数据速度**。
+
+每一层的数据都是有序的，上一层数据是下一层数据的子集，并且第一层(level 1)包含了全部的数据；层次越高，跳跃性越大，包含的数据越少。并且随便插入一个数据该数据是否会是跳表索引完全随机的跟玩骰子一样。
+
+跳表包含一个表头，它查找数据时，是`从上往下，从左往右`进行查找。现在找出值为37的节点为例，来对比说明跳表和普遍的链表。
+
+1. 没有跳表查询 比如我查询数据37，如果没有上面的索引时候路线如下图：
+
+   ![x](./Resources/st035.png)
+
+2. 有跳表查询 有跳表查询37的时候路线如下图：
+
+   ![x](./Resources/st036.png)
+
+应用场景：
+
+> 积分排行榜、时间排序新闻、延时队列。
 
 ```sh
 > zadd zset-key 728 member1
@@ -288,11 +401,163 @@ OK
 2) "982"
 ```
 
+#### Redis Geo
+
+参考[Redis Geo核心原理解析](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247485957&idx=2&sn=a5a75f2f9053cfd40df2d0d7a16389ef&scene=21#wechat_redirect)。他的核心思想就是将地球近似为球体来看待，然后 GEO 利用 GeoHash 将二维的经纬度转换成字符串，来实现位置的划分跟指定距离的查询。
+
+#### HyperLogLog
+
+HyperLogLog ：是一种`概率`数据结构，它使用概率算法来统计集合的近似基数。而它算法的最本原则是`伯努利过程 + 分桶 + 调和平均数`。具体实现可看  HyperLogLog 讲解。
+
+**功能**：误差允许范围内做基数统计 (基数就是指一个集合中不同值的个数) 的时候非常有用，每个HyperLogLog的键可以计算接近**2^64**不同元素的基数，而大小只需要12KB。错误率大概在0.81%。所以如果用做 UV 统计很合适。
+
+HyperLogLog底层 一共分了 **2^14** 个桶，也就是 16384 个桶。每个(registers)桶中是一个 6 bit 的数组，这里有个骚操作就是一般人可能直接用一个字节当桶浪费2个bit空间，但是Redis底层只用6个然后通过前后拼接实现对内存用到了极致，最终就是 16384*6/8/1024 = 12KB。
+
+#### bitmap
+
+BitMap 原本的含义是用一个比特位来映射某个元素的状态。由于一个比特位只能表示 0 和 1 两种状态，所以 BitMap 能映射的状态有限，但是使用比特位的优势是能大量的节省内存空间。
+
+在 Redis 中BitMap 底层是基于字符串类型实现的，可以把 Bitmaps 想象成一个以比特位为单位的数组，数组的每个单元只能存储0和1，数组的下标在 Bitmaps 中叫做偏移量，BitMap 的 offset 值上限 **2^32 - 1**。
+
+![x](./Resources/st037.png)
+
+1. 用户签到
+
+   > key = 年份：用户id  offset = （今天是一年中的第几天） % （今年的天数）
+
+2. 统计活跃用户
+
+   > 使用日期作为 key，然后用户 id 为 offset 设置不同 offset 为 0 1 即可。
+
+**PS**：Redis 它的通讯协议是基于TCP的应用层协议 RESP(REdis Serialization Protocol)。
+
+#### Bloom Filter
+
+使用布隆过滤器得到的判断结果：`不存在的一定不存在，存在的不一定存在`。布隆过滤器原理：
+
+> 当一个元素被加入集合时，通过K个散列函数将这个元素映射成一个位数组中的K个点（有效降低冲突概率），把它们置为1。检索时，我们只要看看这些点是不是都是1就知道集合中有没有它了：如果这些点有任何一个为0，则被检元素一定不在；如果都是1，则被检元素很可能在。这就是布隆过滤器的基本思想。
+
+想玩的话可以用Google的`guava`包玩耍一番。
+
+![x](./Resources/st038.png)
+
+#### 发布订阅
+
+redis提供了`发布、订阅`模式的消息机制，其中消息订阅者与发布者不直接通信，发布者向指定的频道（channel）发布消息，订阅该频道的每个客户端都可以接收到消息。不过与专业的MQ(RabbitMQ RocketMQ ActiveMQ Kafka)相比不值一提，这个功能就算球了。
+
+![x](./Resources/st039.png)
+
+
+
 ### 数据持久化
+
+- [Redis持久化机制](./总结-面试1.md#Redis)
 
 
 
 ### 过期删除
+
+- [Redis过期策略和内存淘汰策略](./总结-面试1.md#Redis)
+
+
+
+### 分布式锁
+
+日常开发中我们可以用 [synchronized](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488320&idx=1&sn=6fd5cddf2a0ff68fe00ccc834e90521b&scene=21#wechat_redirect) 、[Lock](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488426&idx=1&sn=705cace6ce7fbc2d6f141e8b03623fff&scene=21#wechat_redirect) 实现并发编程。但是Java中的锁**只能保证在同一个JVM进程内中执行**。如果在分布式集群环境下用锁呢？日常一般有两种选择方案。
+
+#### Zookeeper实现分布式锁
+
+你需要知道一点基本`zookeeper`知识：
+
+> 1、持久节点：客户端断开连接zk不删除persistent类型节点 
+> 2、临时节点：客户端断开连接zk删除ephemeral类型节点 
+> 3、顺序节点：节点后面会自动生成类似0000001的数字表示顺序 
+> 4、节点变化的通知：客户端注册了监听节点变化的时候，会**调用回调方法**
+
+大致流程如下，其中注意每个节点`只`监控它前面那个节点状态，从而避免`羊群效应`。关于模板代码百度即可。
+
+![x](./Resources/st042.png)
+
+缺点：
+
+> 频繁的创建删除节点，加上注册watch事件，对于zookeeper集群的压力比较大，性能也比不上Redis实现的分布式锁。
+
+#### Redis实现分布式锁
+
+本身原理也比较简单，Redis 自身就是一个单线程处理器，具备互斥的特性，通过setNX，exist等命令就可以完成简单的分布式锁，处理好超时释放锁的逻辑即可。
+
+SETNX
+
+> SETNX 是SET if Not eXists的简写，日常指令是`SETNX key value`，如果 key 不存在则set成功返回 1，如果这个key已经存在了返回0。
+
+SETEX
+
+> SETEX key seconds value 表达的意思是 将值 value 关联到 key ，并将 key 的生存时间设为多少秒。如果 key 已经存在，setex命令将覆写旧值。并且 setex是一个`原子性`(atomic)操作。
+
+加锁：一般就是用一个标识唯一性的字符串比如UUID 配合 SETNX 实现加锁。
+
+解锁：这里用到了LUA脚本，LUA可以保证是**原子性**的，思路就是判断一下Key和入参是否相等，是的话就删除，返回成功1，0就是失败。
+
+缺点：这个锁是**无法重入的**，且自己实现的话各种边边角角都要考虑到，所以了解个大致思路流程即可，**工程化还是用开源工具包就行**。
+
+#### Redisson实现分布式锁
+
+**Redisson** 是在Redis基础上的一个服务，采用了基于NIO的Netty框架，不仅能作为Redis底层驱动**客户端**，还能将原生的RedisHash，List，Set，String，Geo，HyperLogLog等数据结构封装为Java里大家最熟悉的映射（Map），列表（List），集（Set），通用对象桶（Object Bucket），地理空间对象桶（Geospatial Bucket），基数估计算法（HyperLogLog）等结构。
+
+这里我们只是用到了关于分布式锁的几个指令，它的大致底层原理：
+
+![x](./Resources/st043.png)
+
+[Redisson加锁解锁](https://mp.weixin.qq.com/s?__biz=MzU0OTk3ODQ3Ng==&mid=2247483893&idx=1&sn=32e7051116ab60e41f72e6c6e29876d9&scene=21#wechat_redirect) 大致流程图如下：
+
+![x](./Resources/st044.png)
+
+
+
+## Redis限流
+
+在开发高并发系统时，有三把利器用来保护系统：`缓存`、`降级`和`限流`。
+
+那么何为限流呢？顾名思义，限流就是限制流量，就像你宽带包了1个G的流量，用完了就没了。通过限流，我们可以很好地控制系统的qps，从而达到保护系统的目的。
+
+### 1. 基于Redis的setnx、zset
+
+#### setnx
+
+比如我们需要在10秒内限定20个请求，那么我们在setnx的时候可以设置过期时间10，当请求的setnx数量达到20时候即达到了限流效果。
+
+**缺点**：比如当统计1-10秒的时候，无法统计2-11秒之内，如果需要统计N秒内的M个请求，那么我们的Redis中需要保持N个key等等问题。
+
+#### zset
+
+其实限流涉及的最主要的就是滑动窗口，上面也提到1-10怎么变成2-11。其实也就是起始值和末端值都各+1即可。我们可以将请求打造成一个**zset数组**，当每一次请求进来的时候，value保持唯一，可以用UUID生成，而score可以用当前时间戳表示，因为score我们可以用来计算当前时间戳之内有多少的请求数量。而zset数据结构也提供了**range**方法让我们可以很轻易的获取到2个时间戳内有多少请求，
+
+**缺点**：就是zset的数据结构会越来越大。
+
+### 2. 漏桶算法
+
+漏桶算法思路：把水比作是请求，漏桶比作是系统处理能力极限，水先进入到漏桶里，漏桶里的水**按一定速率流出**，当流出的速率小于流入的速率时，由于漏桶容量有限，后续进入的水直接溢出（拒绝请求），以此实现限流。
+
+![x](./Resources/st045.png)
+
+### 3. 令牌桶算法
+
+令牌桶算法的原理：可以理解成医院的挂号看病，只有拿到号以后才可以进行诊病。
+
+![x](./Resources/st046.png)
+
+细节流程大致：
+
+1. 所有的请求在处理之前都需要**拿到一个可用的令牌才会被处理**。
+2. 根据限流大小，设置按照一定的速率往桶里添加令牌。
+3. 设置桶最大可容纳值，当桶满时新添加的令牌就被丢弃或者拒绝。
+4. 请求达到后首先要获取令牌桶中的令牌，拿着令牌才可以进行其他的业务逻辑，处理完业务逻辑之后，将令牌直接删除。
+5. 令牌桶有最低限额，当桶中的令牌达到最低限额的时候，请求处理完之后将不会删除令牌，以此保证足够的限流。
+
+工程化：
+
+1. [自定义注解、aop、Redis + Lua](https://mp.weixin.qq.com/s?__biz=MzAxNTM4NzAyNg==&mid=2247484077&idx=1&sn=c873e011a3c921737c1b0bf24ddc6c68&scene=21#wechat_redirect) 实现限流。
+2. 推荐 **guava** 的 **RateLimiter** 实现。
 
 
 
@@ -952,8 +1217,6 @@ Redis 的内存模型比较复杂，内容也较多，感兴趣的读者可以�
 
 在 Redis 中，并不是所有数据都一直存储在内存中，可以将一些很久没用的 value 交换到磁盘，而 Memcached 的数据则会一直在内存中。
 
-### 淘汰策略
-
 
 
 ### 集群部署
@@ -1199,87 +1462,7 @@ OK
 
 Codis也支持HashTag，不过Codis已经解决了大多数命令的slot限制。
 
-#### 集群方案对比
 
-协议支持：
-
-命令|Redis Cluster|ShardedJedis|Codis
--|-|-|-
-mget/mset|仅限同一个slot|不支持|失去原子性
-keys|仅限同一个slot|不支持|不支持
-scan|仅限同一个slot|不支持|仅限同一个slot（SLOTSSCAN命令）
-rename|仅限同一个slot|不支持|不支持
-pipeline|不支持|不支持|支持
-事务|支持相同slot|不支持|不支持
-发布/订阅|支持|不支持|不支持
-eval|仅限同一slot|不支持|支持
-
-参考：[https://www.cnblogs.com/Finley/p/8595506.html](https://www.cnblogs.com/Finley/p/8595506.html)
-
-**哨兵机制**
-
-哨兵(Sentinel)是非存储节点，作为 Redis 配置中心可以监听一或多套集群中的存储节点。
-
-- 集群主服务器进入下线状态时，自动从从服务器中选举出新主服务器，实现自动故障转移。
-- 克服了传统主从复制需要手动执行故障转移、写能力和存储能力受限的问题。
-- 客户端遍历 Sentinel 集合，选取可用的 Sentinel 节点，并请求获取 Redis 信息，而不再关心具体的存储节点变化。
-
-**节点下线**
-
-多个 Sentinel 发现并确认 Master 问题：每组 Sentinel 可以监控一或多个 Redis 集群，其中
-
-- 主观下线：即 Sentinel 节点对 Redis 节点失败的偏见，超出超时时间认为 Master 已经宕机：sentinel down-after-milliseconds masterName 30000
-- 客观下线：所有 Sentinel 节点对 Redis 节点失败要达成共识，即超过 quorum 个统一。
-
-**领导者选举**
-
-选举出一个 Sentinel 作为 Leader：集群中至少有三个 Setinel 节点，但只有其中一个节点可完成故障转移。通过以下命令可以进行失败判定或领导者选举：
-
-```sh
-sentinel is-mastr-down-by-addr
-```
-
-具体流程：
-
-- 每个主观下线的 Sentinel 节点向其他 Sentinel 节点发送命令，要求设置它为领导者；
-- 收到命令的 Sentinel 节点如果没有同意通过其他 Sentinel 节点发送的命令，则同意该请求，否则拒绝；
-- 如果该 Sentinel 节点发现自己的票数已经超过 Sentinel 集合半数且超过 quorum，则它成为领导者；
-- 如果此过程有多个 Sentinel 节点成为领导者，则等待一段时间再重新进行选举。
-
-**故障转移**
-
-故障转移的流程：
-
-- Sentinel 选出一个合适的 Slave 作为新的 Master（slaveof no one 命令）；
-- 向其余 Slave 发出通知，让它们成为新 Master 的 Slave（parallel-syncs 参数）；
-- 等待旧 Master 复活，并使之称为新 Master 的 Slave；
-- 向客户端通知 Master 变化。
-
-从 Slave 中选择新 Master 节点的规则：
-
-- 选择 slave-priority 最高的节点；
-- 选择复制偏移量最大的节点（同步数据最多）；
-- 选择 runId 最小的节点。
-
-**高可用读写分离**
-
-从节点是主节点的副本，是高可用的基础，同时扩展了读数据的能力。
-
-当主节点宕机，Sentinel 可以选出新的 Master 解决问题，但同时也需要向客户端发出通知消息，使之基于三个消息做出调整：
-
-1. +switch-master：切换主节点（从 -> 主）；
-2. +convert-to-slave：切换从节点（旧主 -> 从）；
-3. +sdown：主观下线。
-
-![x](http://121.196.182.26:6100/public/images/redis-copy4.png)
-
-**定时任务**
-
-- 每 10s 每个 Sentinel 对 Master 和 Slave 执行 info，目的是发现 Slave 节点、确定主从关系；
-- 每 2s 每个 Sentinel 通过 Master 的 Channel 交换信息(pub-sub)：
-- 通过 `__sentinel__:hello` 频道交互；
-- 交互对节点的分析和自身信息；
-- 每 1s 每个 Sentinel 对其他 Sentinel 和 Redis 执行 ping，进行心跳检测。
 
 ## 事务管理
 
@@ -1587,17 +1770,7 @@ Redis 3.2 后提供计算地理位置信息的 API。
 
   当应用服务器不再存储用户的会话信息，也就不再具有状态，一个用户可以请求任意一个应用服务器，从而更容易实现高可用性以及可伸缩性。
 
-### 分布式锁
 
-在分布式场景下，无法使用单机环境下的锁来对多个节点上的进程进行同步。
-
-可以使用 Redis 自带的 SETNX 命令实现分布式锁，除此之外，还可以使用官方提供的 RedLock 分布式锁实现。
-
-查找表
-
-例如 DNS 记录就很适合使用 Redis 进行存储。
-
-查找表和缓存类似，也是利用了 Redis 快速的查找特性。但是查找表的内容不能失效，而缓存的内容可以失效，因为缓存不作为可靠的数据来源。
 
 ## 消息队列
 
@@ -1617,27 +1790,30 @@ Set 可以实现交集、并集等操作，从而实现共同好友等功能。
 
 ZSet 可以实现有序性操作，从而实现排行榜等功能。
 
-## 高可用解决方案
 
-Redis 有很多高可用的解决方案，下面简单介绍其中三种。
 
-### 方案1：Redis Cluster
+## 常见知识点
 
-从3.0版本开始，Redis 支持集群模式——Redis Cluster，可线性扩展到1000个节点。Redis-Cluster 采用无中心架构，每个节点都保存数据和整个集群状态，每个节点都和其它所有节点连接，客户端直连 Redis 服务，免去了 Proxy 代理的损耗。Redis Cluster 最小集群需要三个主节点，为了保障可用性，每个主节点至少挂一个从节点（当主节点故障后，对应的从节点可以代替它继续工作），三主三从的 Redis Cluster 架构如下图所示：
+1. 字符串模糊查询时用`Keys`可能导致线程阻塞，尽量用`scan`指令进行无阻塞的取出数据然后去重下即可。
 
-![x](./Resource/69.png)
+2. 多个操作的情况下记得用`pipeLine`把所有的命令一次发过去，避免频繁的发送、接收带来的网络开销，提升性能。
 
-### 方案2：Twemproxy
+3. bigkeys可以扫描redis中的大key，底层是使用scan命令去遍历所有的键，对每个键根据其类型执行STRLEN、LLEN、SCARD、HLEN、ZCARD这些命令获取其长度或者元素个数。缺陷是线上试用并且个数多不一定空间大。
 
-Twemproxy 是一个使用 C 语言编写、以代理的方式实现的、轻量级的 Redis 代理服务器。它通过引入一个代理层，将应用程序后端的多台 Redis 实例进行统一管理，使应用程序只需要在 Twemproxy 上进行操作，而不用关心后面具体有多少个真实的 Redis 实例，从而实现了基于 Redis 的集群服务。当某个节点宕掉时，Twemproxy 可以自动将它从集群中剔除，而当它恢复服务时，Twemproxy 也会自动连接。由于是代理，Twemproxy 会有微小的性能损失。
+4. 线上应用记得开启Redis慢查询日志哦，基本思路跟MySQL类似。
 
-Twemproxy 架构如下图所示：
+5. Redis中因为内存分配策略跟增删数据是会导致`内存碎片`，你可以重启服务也可以执行`activedefrag yes`进行内存重新整理来解决此问题。
+   $$
+   Memory Fragmentation Ratio = \frac{Used Memory RSS}{Used Memory}
+   $$
 
-![x](./Resource/70.png)
+   1. Ratio >1 表明有内存碎片，越大表明越多。
 
-### 方案3：Codis
+   2. Ratio < 1 表明正在使用虚拟内存，虚拟内存其实就是硬盘，性能比内存低得多，这是应该增强机器的内存以提高性能。
 
-Codis 是一个分布式 Redis 解决方案，对于上层的应用来说，连接到 Codis Proxy 和连接原生的 Redis Server 没有明显的区别（部分命令不支持），上层应用可以像使用单机的 Redis 一样使用，Codis 底层会处理请求的转发，不停机的数据迁移等工作。
+   3. 一般来说，mem_fragmentation_ratio的数值在1 ~ 1.5之间是比较健康的。
+
+
 
 ## 问题
 
@@ -1651,6 +1827,127 @@ Codis 是一个分布式 Redis 解决方案，对于上层的应用来说，连�
 >
 >原因3：Redis 服务器的 redis.conf 中没有配置 redis 访问密码。  
 >解决办法：取消 requirepass 前面的注释，然后在后面配置密码即可。
+
+
+
+### 缓存雪崩
+
+雪崩定义：
+
+> Redis中大批量key在同一时间同时失效导致所有请求都打到了MySQL。而MySQL扛不住导致大面积崩塌。
+
+雪崩解决方案：
+
+> 1、缓存数据的过期时间加上个随机值，防止同一时间大量数据过期现象发生。
+>
+> 2、如果缓存数据库是分布式部署，将热点数据均匀分布在不同搞得缓存数据库中。
+>
+> 3、设置热点数据永远不过期。
+
+
+
+### 缓存穿透
+
+穿透定义：
+
+> 缓存穿透 是 指缓存和数据库中`都没有`的数据，比如ID默认>0，黑客一直 请求ID= -12的数据那么就会导致数据库压力过大，严重会击垮数据库。
+
+穿透解决方案：
+
+> 1、后端接口层增加 用户**鉴权校验**，**参数做校验**等。
+>
+> 2、单个IP每秒访问次数超过阈值**直接拉黑IP**，关进小黑屋1天，在获取IP代理池的时候我就被拉黑过。
+>
+> 3、从缓存取不到的数据，在数据库中也没有取到，这时也可以将key-value对写为key-null 失效时间可以为15秒**防止恶意攻击**。
+>
+> 4、用Redis提供的  **Bloom Filter** 特性也OK。
+
+
+
+### 缓存击穿
+
+击穿定义：
+
+> 现象：大并发集中对这一个热点key进行访问，当这个Key在失效的瞬间，持续的大并发就穿破缓存，直接请求数据库。
+
+击穿解决：
+
+> 设置热点数据永远不过期 加上互斥锁也能搞定了
+
+
+
+### 双写一致性
+
+双写：`缓存`跟`数据库`均更新数据，如何保证数据一致性？
+
+1、先更新数据库，再更新缓存
+
+> 安全问题：线程A更新数据库->线程B更新数据库->线程B更新缓存->线程A更新缓存。`导致脏读`。
+>
+> 业务场景：读多写少场景，频繁更新数据库而缓存根本没用。更何况如果缓存是叠加计算后结果更`浪费性能`。
+
+2、先删缓存，再更新数据库
+
+> A 请求写来更新缓存。
+>
+> B 发现缓存不在去数据查询旧值后写入缓存。
+>
+> A 将数据写入数据库，此时缓存跟数据库**不一致**。
+
+因此 **FackBook** 提出了  [Cache Aside Pattern](https://mp.weixin.qq.com/s?__biz=MzI1NDQ3MjQxNA==&mid=2247486125&idx=1&sn=9a263b9bb7f1abdf249a0011e7996a5e&scene=21#wechat_redirect)
+
+> 失效：应用程序先从cache取数据，没有得到，则从数据库中取数据，成功后，放到缓存中。
+>
+> 命中：应用程序从cache中取数据，取到后返回。
+>
+> 更新：`先把数据存到数据库中，成功后，再让缓存失效`。
+
+
+
+### 脑裂
+
+脑裂是指因为网络原因，导致master节点、slave节点 和 sentinel 集群处于不同的网络分区，此时因为sentinel集群**无法感知**到master的存在，所以将slave节点提升为master节点。此时存在两个不同的master节点就像一个大脑分裂成了两个。其实在`Hadoop` 、`Spark`集群中都会出现这样的情况，只是解决方法不同而已（用ZK配合强制杀死）。
+
+集群脑裂问题中，如果客户端还在基于原来的master节点继续写入数据那么新的master节点将无法同步这些数据，当网络问题解决后sentinel集群将原先的master节点降为slave节点，此时再从新的master中同步数据将造成大量的数据丢失。
+
+Redis处理方案是redis的配置文件中存在的两个参数
+
+```yaml
+min-replicas-to-write 3  表示连接到master的最少slave数量
+min-replicas-max-lag 10  表示slave连接到master的最大延迟时间
+```
+
+如果连接到master的slave数量 < 第一个参数 且 ping的延迟时间 <= 第二个参数那么master就会拒绝写请求，配置了这两个参数后如果发生了集群脑裂则原先的master节点接收到客户端的写入请求会拒绝就可以减少数据同步之后的数据丢失。
+
+
+
+### 事务
+
+[MySQL](https://mp.weixin.qq.com/s?__biz=MzI4NjI1OTI4Nw==&mid=2247488721&idx=1&sn=eead82d2b7a0fdf993beacc4dfd60313&scene=21#wechat_redirect) 中的事务还是挺多道道的还要，而在Redis中的事务只要有如下三步：
+
+![x](./Resources/st041.png)
+
+关于事务具体结论：
+
+> 1、redis事务就是一次性、顺序性、排他性的执行一个队列中的**一系列命令**。　 
+>
+> 2、Redis事务**没有隔离级别**的概念：批量操作在发送 EXEC 命令前被放入队列缓存，并不会被实际执行，也就**不存在事务内的查询要看到事务里的更新，事务外查询不能看到**。
+>
+> 3、Redis**不保证原子性**：Redis中单条命令是原子性执行的，但事务不保证原子性。
+>
+> 4、Redis编译型错误事务中所有代码均不执行，指令使用错误。运行时异常是错误命令导致异常，其他命令可正常执行。
+>
+> 5、watch指令类似于**乐观锁**，在事务提交时，如果watch监控的多个KEY中任何KEY的值已经被其他客户端更改，则使用EXEC执行事务时，事务队列将不会被执行。
+
+
+
+### 正确开发步骤
+
+> `上线前`：Redis **高可用**，主从+哨兵，Redis cluster，避免全盘崩溃。
+>
+> `上线时`：本地 ehcache 缓存 + Hystrix 限流 + 降级，避免MySQL扛不住。`上线后`：Redis **持久化**采用 RDB + AOF 来保证断点后自动从磁盘上加载数据，快速恢复缓存数据。
+
+
 
 ## 参考
 
