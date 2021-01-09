@@ -1,4 +1,4 @@
-# 目录
+# MySQL
 
 1. 理论
    
@@ -39,7 +39,7 @@
      - [5. mysql 卡死 大部分线程长时间处于sending data的状态](#5. mysql 卡死 大部分线程长时间处于sending data的状态)
 - [性能优化](#性能优化)
    - [引擎优化](#引擎优化)
-  
+    
    - [SQL优化](#SQL优化)
 - [编码设置](#编码设置)
    - [压缩](#压缩)
@@ -2664,9 +2664,7 @@ Myslq[Table_locks_waited]
 
 死锁是指两个或两个以上的进程在执行过程中，因争夺资源而造成的一种互相等待的现象，可以认为如果一个资源被锁定，它总会在以后某个时间被释放。而死锁发生在当多个进程访问同一数据库时，其中每个进程拥有的锁都是其他进程所需的，由此造成每个进程都无法继续下去。
 
-InnoDB的并发写操作会触发死锁，InnoDB也提供了死锁检测机制，可以通过设置innodb_deadlock_detect
-
-参数可以打开或关闭死锁检测：
+InnoDB的并发写操作会触发死锁，InnoDB也提供了死锁检测机制，可以通过设置innodb_deadlock_detect参数打开或关闭死锁检测：
 
 ```sql
 -- 打开死锁检测，数据库发生死锁时自动回滚（默认选项）
@@ -2679,6 +2677,8 @@ innodb_deadlock_detect = off
 还可以通过设置InnDB Monitors来进一步观察锁冲突详细信息。设置InnoDB Monitors方法：
 
 ```sql
+create database test;
+use test
 create table innodb_monitor(a INT) engine=innodb;
 create table innodb_tablespace_monitor(a INT) engine=innodb;
 create table innodb_lock_monitor(a INT) engine=innodb;

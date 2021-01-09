@@ -1,4 +1,12 @@
-# 目录
+# 实战
+
+1. [.NET Core](#.NET Core)
+   
+   - [.NET Core使用缓存](#.NET Core使用缓存)
+   
+   - [.NET Core常见问题](#.NET Core常见问题)
+
+
 
 ## 第四部分 C/S开发
 
@@ -159,6 +167,67 @@
      - [关于IIS的IUSER和IWAM帐户](./Summary.md#关于IIS的IUSER和IWAM帐户)
 8. 项目
    - [实验室管理系统](./lab.md#实验室管理系统总结)
+
+
+
+## .NET Core
+
+
+
+### .NET Core使用缓存
+
+参考：
+
+1. [Redis官方网站](http://www.redis.io/)
+2. [StackExchange.Redis详细文档](https://github.com/StackExchange/StackExchange.Redis)
+3. [微软Azure Redis 缓存](https://azure.microsoft.com/zh-cn/services/cache/)
+
+
+
+### .NET Core常见问题
+
+
+
+**1. [.NET Core 项目指定SDK版本](https://www.cnblogs.com/stulzq/p/9503121.html)**
+
+**问题：**前几天 Visual Studio 2017 推送了 15.8 版本，此版本自带了 .NET Core 2.1.2 （SDK版本 2.1.400），由于公司的项目使用的 .NET Core 2.1.0 版本（SDK版本 2.1.300），在编译的时候直接报错了。这是**因为 .NET Core 项目默认使用最新版本的 .NET Core**，我们的Nuget包没有进行升级，所以报错了。
+
+**版本对照：**
+
+| .NET Core 版本 | SDK 版本 | Runtime 版本 |
+| -------------- | -------- | ------------ |
+| 2.1.2          | 2.1.400  | 2.1.2        |
+| 2.1.2          | 2.1.302  | 2.1.2        |
+| 2.1.1          | 2.1.301  | 2.1.1        |
+| 2.1.0          | 2.1.300  | 2.1.0        |
+
+以上数据来自官方：https://www.microsoft.com/net/download/dotnet-core/2.1
+
+最终我们采用了指定项目SDK版本来解决了。在**项目的根目录**打开cmd，执行命令即可：
+
+```sh
+dotnet new global.json --sdk-version <SDK版本号>
+```
+
+要注意的是**最后的参数是SDK版本**，不是.NET Core 版本，可参照上表。
+
+可在项目根目录执行命令来检查，看看是否与设置的SDK版本号一致：`dotnet --version`
+
+操作演示：
+
+![x](./Resources/dotnet001.gif)
+
+global.json 文件内容：
+
+```json
+{
+  "sdk": {
+    "version": "2.1.300"
+  }
+}
+```
+
+
 
 ## Microsoft技术栈
 
