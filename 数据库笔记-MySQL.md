@@ -39,7 +39,7 @@
      - [5. mysql 卡死 大部分线程长时间处于sending data的状态](#5. mysql 卡死 大部分线程长时间处于sending data的状态)
 - [性能优化](#性能优化)
    - [引擎优化](#引擎优化)
-    
+   
    - [SQL优化](#SQL优化)
 - [编码设置](#编码设置)
    - [压缩](#压缩)
@@ -693,7 +693,7 @@ mysql> exit;
 
 
 
-### 常用命令语句
+## 常用命令语句
 
 
 
@@ -718,7 +718,7 @@ set sql_safe_updates=0; --安全模式关闭状态
 
 
 
-### 常用SQL语句
+## 常用SQL语句
 
 
 
@@ -2672,6 +2672,8 @@ innodb_deadlock_detect = on
 -- 关闭死锁检测，发生死锁的时候，用锁超时来处理，
 -- 通过设置锁超时参数innodb_lock_wait_timeout可以在超时发生时回滚被阻塞的事务
 innodb_deadlock_detect = off
+-- 保存全部死锁日志（该选项默认关闭，打开时死锁日志存放到error_log配置的文件里面）
+set global innodb_print_all_deadlocks = on
 ```
 
 还可以通过设置InnDB Monitors来进一步观察锁冲突详细信息。设置InnoDB Monitors方法：
@@ -4728,20 +4730,21 @@ n 建议使用内存队列产品而不使用memcache 来进行缓存异步更新
 2. SQL面试：https://sowhat.blog.csdn.net/article/details/71158104
 3. MySQL拷问：https://www.jianshu.com/nb/22933318
 4. [顺丰面试：MySQL十连击](https://mp.weixin.qq.com/s/ZoCZLG3o3AZBDSO1y3nbmw)
-5. https://www.cnblogs.com/assistants/p/11958998.html
-6. https://www.cnblogs.com/wy123/p/12724252.html
-7. https://www.cnblogs.com/hanwuxing/p/10367147.html
-8. https://www.cnblogs.com/zejin2008/p/5262751.html
-9. https://www.cnblogs.com/out8/p/4222166.html
-10. https://www.cnblogs.com/zhuyeshen/p/12084845.html
-11. https://www.cnblogs.com/mintsd/p/13062308.html
-12. https://blog.csdn.net/zdhsoft/article/details/89373364
-13. https://www.ddpool.cn/article/56666.html
-14. https://www.cnblogs.com/csj2018/p/9955405.html
-15. https://www.jb51.net/article/159737.htm
-16. https://www.cnblogs.com/wintersoft/p/10787474.html
-17. https://blog.csdn.net/qq_27607965/article/details/79925288
-18. https://www.cnblogs.com/cyun/p/4308960.html
-19. https://www.cnblogs.com/liaojie970/p/6824773.html
-20. [MySQL 8.0能彻底解决困扰运维的复制延迟问题！](http://blog.itpub.net/31547898/viewspace-2200045/)
+5. [Innodb重要参数优化](https://www.cnblogs.com/chengyunblogs/p/11929040.html)
+6. https://www.cnblogs.com/assistants/p/11958998.html
+7. https://www.cnblogs.com/wy123/p/12724252.html
+8. https://www.cnblogs.com/hanwuxing/p/10367147.html
+9. https://www.cnblogs.com/zejin2008/p/5262751.html
+10. https://www.cnblogs.com/out8/p/4222166.html
+11. https://www.cnblogs.com/zhuyeshen/p/12084845.html
+12. https://www.cnblogs.com/mintsd/p/13062308.html
+13. https://blog.csdn.net/zdhsoft/article/details/89373364
+14. https://www.ddpool.cn/article/56666.html
+15. https://www.cnblogs.com/csj2018/p/9955405.html
+16. https://www.jb51.net/article/159737.htm
+17. https://www.cnblogs.com/wintersoft/p/10787474.html
+18. https://blog.csdn.net/qq_27607965/article/details/79925288
+19. https://www.cnblogs.com/cyun/p/4308960.html
+20. https://www.cnblogs.com/liaojie970/p/6824773.html
+21. [MySQL 8.0能彻底解决困扰运维的复制延迟问题！](http://blog.itpub.net/31547898/viewspace-2200045/)
 

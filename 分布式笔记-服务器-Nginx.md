@@ -1,34 +1,34 @@
-# 目录
+# Nginx
 
+简介：
 
-
-Nginx是一款轻量级的Web 服务器/反向代理服务器及电子邮件（IMAP/POP3）代理服务器，并在一个BSD-like 协议下发行。由俄罗斯的程序设计师Igor Sysoev所开发，其特点是占有内存少，并发能力强，事实上nginx的并发能力确实在同类型的网页服务器中表现较好，中国大陆使用 nginx 网站用户有：新浪、网易、腾讯等。
-
-Nginx简介：
-
-- Nginx("engine x") 是一个高性能的HTTP 和反向代理服务器，也是一个IMAP/POP3/SMTP 代理服务器。
+- Nginx("engine x") 是一个高性能的HTTP和反向代理服务器，也是一个IMAP/POP3/SMTP代理服务器。
 
 - 第一个公开版本0.1.0发布于2004年10月4日。
 
-- 其将源代码以类BSD许可证的形式发布，因它的稳定性、丰富的功能集、示例配置文件和低系统资源的消耗而闻
+- 其将源代码以类BSD许可证的形式发布，因它的稳定性、丰富的功能集、示例配置文件和低系统资源的消耗而闻名
 
-- 官方测试nginx能够支支撑5万并发链接，并且cpu、内存等资源消耗却非常低，运行非常稳定
+- 官方测试nginx能够支撑5万并发链接，并且cpu、内存等资源消耗却非常低，运行非常稳定
 - 2011年6月1日，nginx1.0.4发布。
+
+- 俄罗斯程序设计师Igor Sysoev开发，特点：占有内存少，并发能力强。
+
+  > 事实上nginx的并发能力确实在同类型的网页服务器中表现较好，中国大陆使用 nginx 网站用户有：新浪、网易、腾讯等。
 
 功能：
 
 - web服务器
 - web reverse proxy
-- smtp reverse proxy
+- smtp proxy
 
 Nginx 和 apache 的优缺点：
 
-1. nginx相对于apache的优点：轻量级，同样起 web 服务，比 apache 占用更少的内存及资源抗并发，nginx 处理请求是异步非阻塞的，而 apache 则是阻塞型的，在高并发下 nginx 能保持低资源低消耗高性能高度模块化的设计，编写模块相对简单，社区活跃，各种高性能模块出品迅速
-2. apache 相对于 nginx 的优点：rewrite，比 nginx 的 rewrite 模块强大超多，基本想到的都可以找到，少 bug ，nginx 的 bug 相对较多
-3. Nginx 配置简洁, Apache 复杂
-4. 最核心的区别在于 apache 是同步多进程模型，一个连接对应一个进程；nginx是异步的，多个连接（万级别）可以对应一个进程
+1. nginx相对于apache的优点：轻量级，同样起web服务，比apache占用更少的内存及资源，抗并发，nginx处理请求是异步非阻塞的，而apache则是阻塞型的，在高并发下nginx能保持低资源低消耗高性能高度模块化的设计，编写模块相对简单，社区活跃，各种高性能模块出品迅速
+2. apache相对于nginx的优点：rewrite，比nginx的rewrite模块强大超多，基本想到的都可以找到，少bug，nginx的bug相对较多
+3. Nginx配置简洁，Apache复杂
+4. 最核心的区别在于apache是同步多进程模型，一个连接对应一个进程；nginx是异步的，多个连接（万级别）可以对应一个进程
 
-Tengine 是 nginx 的加强版，封装版，淘宝开源
+Tengine是nginx的加强、封装版，淘宝开源
 
 - 官网 http://tengine.taobao.org/
 - [动态模块加载（DSO）](http://tengine.taobao.org/document_cn/dso_cn.html)支持。加入一个模块不再需要重新编译整个Tengine；
@@ -53,25 +53,17 @@ Tengine 是 nginx 的加强版，封装版，淘宝开源
 
 **如何解决高并发和负载均衡？**
 
-怎么解决高并发问题，解决单个服务器过载问题
+解决单个服务器过载问题
 
 前端和后端架构：
 
 Tomcat，一个 Servlet 和 JSP 容器；前端服务器处理静态页面
 
-
-
 什么是高可用？
 
-
-
-如何解决高可用问题
-
-
+如何解决高可用问题？
 
 负载均衡的session一致性问题
-
-
 
 **安装之前准备**
 
