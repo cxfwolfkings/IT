@@ -697,6 +697,17 @@ mysql> exit;
 
 
 
+```sh
+# 导出数据库
+mysqldump -uroot -pleadchina30045016747 --databases dbName --no-tablespaces --no-create-db --no-create-info --skip-triggers --skip-add-locks --flush-privileges > src.sql
+# 导入数据库
+mysql -uroot -p123 < master.sql
+```
+
+
+
+
+
 #### 控制外键约束
 
 ```sql
