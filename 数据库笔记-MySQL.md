@@ -19,6 +19,7 @@
      - [表结构相关](#表结构相关)
      - [字符串分割](#字符串分割)
      - [索引相关](#索引相关)
+     - [日期时间函数](#日期时间函数)
    - [Handler](#Handler)
    - [触发器](#触发器)
    - [事件调度器](#事件调度器)
@@ -764,8 +765,10 @@ show profiles
 
 ```sql
 -- 改变数据表的类型（MyISAM、InnoDB）：
-ALTER TABLE tblname  ENGINE typename
-
+ALTER TABLE tbName ENGINE = tpName;
+show engines;
+show table status from db_name where name='table_name';
+show create table table_name;
 -- 如果 `MyISAM` 数据表包含全文索引或地理数据，转换不能成功（`InnoDB` 不支持这些功能）。
 -- 如果对大量数据表进行转换，unix/Linux下的 `mysql_convert_table_format` 脚本很值得选用：
 -- 如果tbname没有指定，会转换所有数据表
@@ -806,22 +809,6 @@ insert into table_name_new(column1,column2...) select column1,column2... from ta
 
 
 
-#### 字符串分割
-
-```sql
--- ","分割
-SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321,30001',',',help_topic_id+1),',',-1) AS num 
-FROM mysql.help_topic 
-WHERE help_topic_id < LENGTH('10321,30001')-LENGTH(REPLACE('10321,30001',',',''))+1;
-
--- "|"分割
-SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321|30001','|',help_topic_id+1),'|',-1) AS num 
-FROM mysql.help_topic 
-WHERE help_topic_id < LENGTH('10321|30001')-LENGTH(REPLACE('10321|30001','|',''))+1;
-```
-
-
-
 #### 索引相关
 
 ```sql
@@ -853,6 +840,86 @@ CREATE UNIQUE INDEX index_name ON table_name (column_list)
 ALTER TABLE tblname  DROP PRIMARY KEY
 ALTER TABLE tblname  DROP INDEX indexname
 ALTER TABLE tblname  DROP FOREIGN KEY indexname
+```
+
+
+
+#### 字符串函数
+
+```sql
+-- ","分割
+SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321,30001',',',help_topic_id+1),',',-1) AS num 
+FROM mysql.help_topic 
+WHERE help_topic_id < LENGTH('10321,30001')-LENGTH(REPLACE('10321,30001',',',''))+1;
+
+-- "|"分割
+SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('10321|30001','|',help_topic_id+1),'|',-1) AS num 
+FROM mysql.help_topic 
+WHERE help_topic_id < LENGTH('10321|30001')-LENGTH(REPLACE('10321|30001','|',''))+1;
+```
+
+
+
+#### 日期时间函数
+
+```sql
+-- 1. 获得当前日期时间
+now(), sysdate()
+-- now() 在执行开始时值就得到了， sysdate() 在函数执行时动态得到值
+select now(), sleep(3), now();
+current_timestamp, current_timestamp()
+
+-- 2. 日期转换函数、时间转换函数
+select date_format('2008-08-08 22:23:01', '%Y%m%d%H%i%s');
+select time_format('22:23:01', '%H%i%s');
+select str_to_date('08/09/2008', '%m/%d/%Y'); -- 2008-08-09
+select str_to_date('08/09/08' , '%m/%d/%y'); -- 2008-08-09
+select str_to_date('08.09.2008', '%m.%d.%Y'); -- 2008-08-09
+select str_to_date('08:09:30', '%h:%i:%s'); -- 08:09:30
+select str_to_date('08.09.2008 08:09:30', '%m.%d.%Y %h:%i:%s'); -- 2008-08-09 08:09:30
+select to_days('0000-00-00'); -- 0
+select to_days('2008-08-08'); -- 733627
+SELECT FROM_DAYS(733627); -- 2008-08-08
+select time_to_sec('01:00:05'); -- 3605
+select sec_to_time(3605); -- '01:00:05'
+-- makdedate(year,dayofyear)
+select makedate(2001,31); -- '2001-01-31'
+select makedate(2001,32); -- '2001-02-01'
+-- maketime(hour,minute,second)
+select maketime(12,15,30); -- '12:15:30'
+select unix_timestamp(); -- 1218290027
+select unix_timestamp('2008-08-08'); -- 1218124800
+select unix_timestamp('2008-08-08 12:30:00'); -- 1218169800
+select from_unixtime(1218290027); -- '2008-08-09 21:53:47'
+select from_unixtime(1218124800); -- '2008-08-08 00:00:00'
+select from_unixtime(1218169800); -- '2008-08-08 12:30:00'
+select from_unixtime(1218169800, '%Y %D %M %h:%i:%s %x'); -- '2008 8th August 12:30:00 2008'
+
+-- 3. 日期时间计算函数
+select date_add(now(), interval 1 day); -- add 1 day
+select date_add(now(), interval 1 hour); -- add 1 hour
+select date_add(now(), interval 1 minute); -- ...
+select date_add(now(), interval 1 second);
+select date_add(now(), interval 1 microsecond);
+select date_add(now(), interval 1 week);
+select date_add(now(), interval 1 month);
+select date_add(now(), interval 1 quarter);
+select date_add(now(), interval 1 year);
+select date_add(now(), interval -1 day); -- sub 1 day
+select date_sub('1998-01-01 00:00:00', interval '1 1:1:1' day_second); -- 1997-12-30 22:58:59
+select datediff('2008-08-08', '2008-08-01'); -- 7
+select datediff('2008-08-01', '2008-08-08'); -- -7
+select timediff('2008-08-08 08:08:08', '2008-08-08 00:00:00'); -- 08:08:08
+select timediff('08:08:08', '00:00:00'); -- 08:08:08
+select timestamp('2008-08-08'); -- 2008-08-08 00:00:00
+select timestamp('2008-08-08 08:00:00', '01:01:01'); -- 2008-08-08 09:01:01
+select timestamp('2008-08-08 08:00:00', '10 01:01:01'); -- 2008-08-18 09:01:01
+select timestampadd(day, 1, '2008-08-08 08:00:00'); -- 2008-08-09 08:00:00
+select timestampdiff(year,'2002-05-01','2001-01-01'); -- -1
+select timestampdiff(day ,'2002-05-01','2001-01-01'); -- -485
+select timestampdiff(hour,'2008-08-08 12:00:00','2008-08-08 00:00:00'); -- -12
+-- 时区转换：convert_tz(dt,from_tz,to_tz)
+select convert_tz('2008-08-08 12:00:00', '+08:00', '+00:00'); -- 2008-08-08 04:00:00
 ```
 
 
