@@ -3800,3 +3800,5 @@ Express.js是基于Node.js中http模块和Connect组件的Web框架。这些组�
   - https://www.microsoft.com/en-us/sql-server/developer-get-started/
 - MySQL连接
   - http://www.runoob.com/nodejs/nodejs-mysql.html
+
+- [Mongoose基础入门](https://www.cnblogs.com/xiaohuochai/p/7215067.html)
