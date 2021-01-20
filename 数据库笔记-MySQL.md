@@ -28,14 +28,13 @@
    
 3. 总结
 
+   - 常见问题
+  - [忘记密码](#忘记密码)
+   
    - [常见错误](#常见错误)
-
-     - [1. This function has none of DETERMINISTIC, NOSQL, ...](#1. This function has none of DETERMINISTIC, NOSQL, ...)
-     
+   - [1. This function has none of DETERMINISTIC, NOSQL, ...](#1. This function has none of DETERMINISTIC, NOSQL, ...)
      - [2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...](#2. Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and ...)
-     
      - [3. 非空字段插入空值](#3. 非空字段插入空值)
-     
      - [4. MySQL Connector/NET Exception: Reading from the stream has failed](#4. MySQL Connector/NET Exception: Reading from the stream has failed)
      - [5. mysql 卡死 大部分线程长时间处于sending data的状态](#5. mysql 卡死 大部分线程长时间处于sending data的状态)
 - [性能优化](#性能优化)
@@ -665,7 +664,7 @@ Access denied for user 'root'@'localhost'
 
 ```sh
 # 登录系统
-mysql -u root -p 密码
+mysql -uroot -p密码
 # 切换数据库
 mysql> use mysql;
 # 更新，任意客户端可以使用root登录
@@ -673,13 +672,13 @@ mysql> update user set host = '%' where user = 'root';
 
 # 修改加密规则
 mysql> ALTER USER 'root'@'%' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER;
-# 更新用户密码
+# 更新用户密码（8.0以上）
 mysql> ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 
 # 刷新权限
 mysql> flush privileges;
 
-# 上面的命令不行，可以试试下面的
+# 上面的命令不行，可以试试下面的（5.7）
 mysql> grant all privileges on *.* to root@'%' identified by '密码';
 # 如果是固定ip就这么写  
 mysql> grant all privileges on *.* to 'root'@'192.168.0.49' identified by '密码' with grant option;
@@ -2197,6 +2196,70 @@ END
 可以看到Mysql的游标在处理大一点的数据量时还是比较乏力的，仅适合用于操作几百上千的小数据量。
 
 ```
+
+
+
+### 常见问题
+
+#### 忘记密码
+
+1、忘记root密码
+
+```sh
+# 停止服务
+net stop mysql
+# 跳过认证登录（8.0以上）
+mysqld --shared-memory --skip-grant-tables
+# 上面的窗口卡住，另起一个窗口
+mysql
+# 重置root密码为空
+update mysql.user set authentication_string='' where User = 'root';
+# 退出所有命令行，重新登陆数据库，（若显示服务未启动，需先启动MySQL服务，输入net start mysql）
+# root登录
+mysql -uroot
+# 修改root密码
+alter user 'root'@'localhost' identified by  '123';
+# 刷新权限
+flush privileges;
+```
+
+2、误删root用户
+
+```sh
+# 往user表中插入root用户:
+insert into user set user='root',ssl_cipher=''x509_issuer='',x509_subject='';
+# 给新建的root用户授权:
+update user set Host='localhost',select_priv='y',insert_priv='y',update_priv='y',
+Alter_priv='y',delete_priv='y',create_priv='y',drop_priv='y',reload_priv='y',shutdown_priv='y',Process_priv='y',file_priv='y',grant_priv='y',References_priv='y',index_priv='y',create_user_priv='y',show_db_priv='y',super_priv='y',create_tmp_table_priv='y',Lock_tables_priv='y',execute_priv='y',repl_slave_priv='y',repl_client_priv='y',create_view_priv='y',show_view_priv='y',create_routine_priv='y',alter_routine_priv='y',create_user_priv='y' where user='root';
+```
+
+3、修改其它用户密码
+
+1） 用`SET PASSWORD`命令
+
+```mysql
+set password for 用户名@localhost = password('新密码');
+set password for root@localhost = password('123');
+```
+
+2）用mysqladmin
+
+```sh
+mysqladmin -u用户名 -p旧密码 password 新密码
+mysqladmin -uroot -p123456 password 123
+```
+
+3）更新user表
+
+```sql
+use mysql;
+update user set password=password('123') where user='root' and host='localhost';
+flush privileges;
+```
+
+
+
+
 
 
 
