@@ -68,13 +68,13 @@ git pull origin <branch>:<branch>
 git branch feature1 # 或者
 git checkout -b feature1
 # 推送到远程新分支
-git push --set-upstream origin [feature1]
+git push --set-upstream origin <feature1>
 # 推送到远程仓库
 git push origin feature1
 # 切换分支
 git checkout feature1
 # 设置上游分支
-git branch --set-upstream-to=origin/feature1 [feature1]
+git branch --set-upstream-to=origin/<feature1> <feature1>
 # 查看上下游分支关系
 git branch -vv
 

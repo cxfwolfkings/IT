@@ -1,6 +1,4 @@
-入门
-
-## 目录
+Python
 
 1. 简介
    - [Python历史](#Python历史)
@@ -13,21 +11,18 @@
    - [进程和线程](#进程和线程)
    - [网络编程](#网络编程)
    - [图像和文档处理](#图像和文档处理)
-   - [异步任务和定时任务](#异步任务和定时任务)
+   - [并发编程](#并发编程)
+   - [定时任务](#定时任务)
+   - [数据结构和算法](#数据结构和算法)
 2. 实战
    - [搭建编程环境](#搭建编程环境)
    - [Python开发工具](#Python开发工具)
-   - [练习](#练习)
+   - [BS](#BS)
+     - [Django框架](#Django框架)
 3. 问题
 4. 总结
 
-## 
 
-1. 第一部分 python语言概述
-2. 第二部分 b/s开发
-3. 第三部分 爬虫开发
-4. 第四部分 数据处理和机器学习
-5. 第五部分 项目总结和附录
 
 ## 第一部分 python语言概述
 
@@ -1945,15 +1940,13 @@ if __name__ == '__main__':
 
 
 
-### 网络编程
+## 网络编程
 
-# 网络编程入门
-
-## 计算机网络基础
+### 计算机网络基础
 
 计算机网络是独立自主的计算机互联而成的系统的总称，组建计算机网络最主要的目的是实现多台计算机之间的通信和资源共享。今天计算机网络中的设备和计算机网络的用户已经多得不可计数，而计算机网络也可以称得上是一个“复杂巨系统”，对于这样的系统，我们不可能用一两篇文章把它讲清楚，有兴趣的读者可以自行阅读Andrew S.Tanenbaum老师的经典之作《计算机网络》或Kurose和Ross老师合著的《计算机网络:自顶向下方法》来了解计算机网络的相关知识。
 
-### 计算机网络发展史
+#### 计算机网络发展史
 
 1. 1960s - 美国国防部ARPANET项目问世，奠定了分组交换网络的基础。
 
@@ -1973,7 +1966,7 @@ if __name__ == '__main__':
 
    ![x](E:/WorkingDir/Office/python/Resource/after-browser.jpg)
 
-### TCP/IP模型
+#### TCP/IP模型
 
 实现网络通信的基础是网络通信协议，这些协议通常是由[互联网工程任务组(IETF)](https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E5%B7%A5%E7%A8%8B%E4%BB%BB%E5%8A%A1%E7%BB%84)制定的。所谓“协议”就是通信计算机双方必须共同遵从的一组约定，例如怎样建立连接、怎样互相识别等，网络协议的三要素是：语法、语义和时序。构成我们今天使用的Internet的基础的是TCP/IP协议族，所谓协议族就是一系列的协议及其构成的通信模型，我们通常也把这套东西称为TCP/IP模型。与国际标准化组织发布的OSI/RM这个七层模型不同，TCP/IP是一个四层模型，也就是说，该模型将我们使用的网络从逻辑上分解为四个层次，自底向上依次是：网络接口层、网络层、传输层和应用层，如下图所示。
 
@@ -1987,18 +1980,18 @@ TCP全称传输控制协议，它是基于IP提供的寻址和路由服务而建
 2. 流量控制（通过滑动窗口匹配数据发送者和接收者之间的传输速度）。
 3. 拥塞控制（通过RTT时间以及对滑动窗口的控制缓解网络拥堵）。
 
-### 网络应用模式
+#### 网络应用模式
 
 1. C/S模式和B/S模式。这里的C指的是Client（客户端），通常是一个需要安装到某个宿主操作系统上的应用程序；而B指的是Browser（浏览器），它几乎是所有图形化操作系统都默认安装了的一个应用软件；通过C或B都可以实现对S（服务器）的访问。关于二者的比较和讨论在网络上有一大堆的文章，在此我们就不再浪费笔墨了。
 2. 去中心化的网络应用模式。不管是B/S还是C/S都需要服务器的存在，服务器就是整个应用模式的中心，而去中心化的网络应用通常没有固定的服务器或者固定的客户端，所有应用的使用者既可以作为资源的提供者也可以作为资源的访问者。
 
-## 基于HTTP协议的网络资源访问
+### 基于HTTP协议的网络资源访问
 
-### HTTP（超文本传输协议）
+#### HTTP（超文本传输协议）
 
 HTTP是超文本传输协议（Hyper-Text Transfer Proctol）的简称，维基百科上对HTTP的解释是：超文本传输协议是一种用于分布式、协作式和超媒体信息系统的应用层协议，它是[万维网](https://zh.wikipedia.org/wiki/%E5%85%A8%E7%90%83%E8%B3%87%E8%A8%8A%E7%B6%B2)数据通信的基础，设计HTTP最初的目的是为了提供一种发布和接收[HTML](https://zh.wikipedia.org/wiki/HTML)页面的方法，通过HTTP或者[HTTPS](https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE)（超文本传输安全协议）请求的资源由[URI（统一资源标识符）](https://zh.wikipedia.org/wiki/%E7%B5%B1%E4%B8%80%E8%B3%87%E6%BA%90%E6%A8%99%E8%AD%98%E7%AC%A6)来标识。关于HTTP的更多内容，我们推荐阅读阮一峰老师的[《HTTP 协议入门》](http://www.ruanyifeng.com/blog/2016/08/http.html)，简单的说，通过HTTP我们可以获取网络上的（基于字符的）资源，开发中经常会用到的网络API（有的地方也称之为网络数据接口）就是基于HTTP来实现数据传输的。
 
-### JSON格式
+#### JSON格式
 
 JSON（JavaScript Object Notation）是一种轻量级的数据交换语言，该语言以易于让人阅读的文字（纯文本）为基础，用来传输由属性值或者序列性的值组成的数据对象。尽管JSON是最初只是Javascript中一种创建对象的字面量语法，但它在当下更是一种独立于语言的数据格式，很多编程语言都支持JSON格式数据的生成和解析，Python内置的json模块也提供了这方面的功能。由于JSON是纯文本，它和[XML](https://zh.wikipedia.org/wiki/XML)一样都适用于异构系统之间的数据交换，而相较于XML，JSON显得更加的轻便和优雅。下面是表达同样信息的XML和JSON，而JSON的优势是相当直观的。
 
@@ -2023,7 +2016,7 @@ JSON的例子：
 }
 ```
 
-### requests库
+#### requests库
 
 requests是一个基于HTTP协议来使用网络的第三库，其[官方网站](http://cn.python-requests.org/zh_CN/latest/)有这样的一句介绍它的话：“Requests是唯一的一个**非转基因**的Python HTTP库，人类可以安全享用。”简单的说，使用requests库可以非常方便的使用HTTP，避免安全缺陷、冗余代码以及“重复发明轮子”（行业黑话，通常用在软件工程领域表示重新创造一个已有的或是早已被优化過的基本方法）。前面的文章中我们已经使用过这个库，下面我们还是通过requests来实现一个访问网络数据接口并从中获取美女图片下载链接然后下载美女图片到本地的例子程序，程序中使用了[天行数据](https://www.tianapi.com/)提供的网络API。
 
@@ -2075,11 +2068,11 @@ if __name__ == '__main__':
     main()
 ```
 
-## 基于传输层协议的套接字编程
+### 基于传输层协议的套接字编程
 
 套接字这个词对很多不了解网络编程的人来说显得非常晦涩和陌生，其实说得通俗点，套接字就是一套用[C语言](https://zh.wikipedia.org/wiki/C%E8%AF%AD%E8%A8%80)写成的应用程序开发库，主要用于实现进程间通信和网络编程，在网络应用开发中被广泛使用。在Python中也可以基于套接字来使用传输层提供的传输服务，并基于此开发自己的网络应用。实际开发中使用的套接字可以分为三类：流套接字（TCP套接字）、数据报套接字和原始套接字。
 
-### TCP套接字
+#### TCP套接字
 
 所谓TCP套接字就是使用TCP协议提供的传输服务来实现网络通信的编程接口。在Python中可以通过创建socket对象并指定type属性为SOCK_STREAM来使用TCP套接字。由于一台主机可能拥有多个IP地址，而且很有可能会配置多个不同的服务，所以作为服务器端的程序，需要在创建套接字对象后将其绑定到指定的IP地址和端口上。这里的端口并不是物理设备而是对IP地址的扩展，用于区分不同的服务，例如我们通常将HTTP服务跟80端口绑定，而MySQL数据库服务默认绑定在3306端口，这样当服务器收到用户请求时就可以根据端口号来确定到底用户请求的是HTTP服务器还是数据库服务器提供的服务。端口的取值范围是0~65535，而1024以下的端口我们通常称之为“著名端口”（留给像FTP、HTTP、SMTP等“著名服务”使用的端口，有的地方也称之为“周知端口”），自定义的服务通常不使用这些端口，除非自定义的是HTTP或FTP这样的著名服务。
 
@@ -2240,13 +2233,13 @@ if __name__ == '__main__':
 
 >说明： 上面的代码主要为了讲解网络编程的相关内容因此并没有对异常状况进行处理，请读者自行添加异常处理代码来增强程序的健壮性。
 
-### UDP套接字
+#### UDP套接字
 
 传输层除了有可靠的传输协议TCP之外，还有一种非常轻便的传输协议叫做用户数据报协议，简称UDP。TCP和UDP都是提供端到端传输服务的协议，二者的差别就如同打电话和发短信的区别，后者不对传输的可靠性和可达性做出任何承诺从而避免了TCP中握手和重传的开销，所以在强调性能和而不是数据完整性的场景中（例如传输网络音视频数据），UDP可能是更好的选择。可能大家会注意到一个现象，就是在观看网络视频时，有时会出现卡顿，有时会出现花屏，这无非就是部分数据传丢或传错造成的。在Python中也可以使用UDP套接字来创建网络应用，对此我们不进行赘述，有兴趣的读者可以自行研究。
 
-## 网络应用开发
+### 网络应用开发
 
-### 发送电子邮件
+#### 发送电子邮件
 
 在即时通信软件如此发达的今天，电子邮件仍然是互联网上使用最为广泛的应用之一，公司向应聘者发出录用通知、网站向用户发送一个激活账号的链接、银行向客户推广它们的理财产品等几乎都是通过电子邮件来完成的，而这些任务应该都是由程序自动完成的。
 
@@ -2335,7 +2328,7 @@ if __name__ == '__main__':
     main()
 ```
 
-### 发送短信
+#### 发送短信
 
 发送短信也是项目中常见的功能，网站的注册码、验证码、营销信息基本上都是通过短信来发送给用户的。在下面的代码中我们使用了[互亿无线](http://www.ihuyi.com/)短信平台（该平台为注册用户提供了50条免费短信以及常用开发语言发送短信的demo，可以登录该网站并在用户自服务页面中对短信进行配置）提供的API接口实现了发送短信的服务，当然国内的短信平台很多，读者可以根据自己的需要进行选择（通常会考虑费用预算、短信达到率、使用的难易程度等指标），如果需要在商业项目中使用短信服务建议购买短信平台提供的套餐服务。
 
@@ -2367,13 +2360,11 @@ if __name__ == '__main__':
 
 
 
-### 图像和文档处理
+## 图像和文档处理
 
 # 
 
 用程序来处理图像和办公文档经常出现在实际开发中，Python的标准库中虽然没有直接支持这些操作的模块，但我们可以通过Python生态圈中的第三方模块来完成这些操作。
-
-## 操作图像
 
 ### 计算机图像相关知识
 
@@ -2479,29 +2470,29 @@ Pillow中最为重要的是Image类，读取和处理图像都要通过这个类
 
    ![x](E:/WorkingDir/Office/python/Resource/image-filter.png)
 
-## 处理Excel电子表格
+### 处理Excel电子表格
 
 Python的openpyxl模块让我们可以在Python程序中读取和修改Excel电子表格，当然实际工作中，我们可能会用LibreOffice Calc和OpenOffice Calc来处理Excel的电子表格文件，这就意味着openpyxl模块也能处理来自这些软件生成的电子表格。关于openpyxl的使用手册和使用文档可以查看它的[官方文档](https://openpyxl.readthedocs.io/en/stable/#)。
 
-## 处理Word文档
+### 处理Word文档
 
 利用python-docx模块，Pytho 可以创建和修改Word文档，当然这里的Word文档不仅仅是指通过微软的Office软件创建的扩展名为docx的文档，LibreOffice Writer和OpenOffice Writer都是免费的字处理软件。
 
-## 处理PDF文档
+### 处理PDF文档
 
 PDF是Portable Document Format的缩写，使用.pdf作为文件扩展名。接下来我们就研究一下如何通过Python实现从PDF读取文本内容和从已有的文档生成新的PDF文件。
 
 
 
-### 异步任务和定时任务
+## 并发编程
 
 
 
-## 实战
+## 定时任务
 
 
 
-### 搭建编程环境
+## 搭建编程环境
 
 想要开始 Python 编程之旅，首先得在自己使用的计算机上安装 Python 解释器环境，下面将以安装官方的 Python 解释器为例，讲解如何在不同的操作系统上安装 Python 环境。
 
@@ -2597,7 +2588,7 @@ python hello.py
 
  
 
-### Python开发工具
+## Python开发工具
 
  
 
@@ -2714,576 +2705,23 @@ turtle.mainloop()
 
 
 
-# 目录
-
-1. 理论
-   - [Web应用机制和术语](#Web应用机制和术语)
-2. 实战
-   - [Django快速上手](#Django快速上手)
-   - [Flask入门](#Flask入门)
-3. 总结
-4. 升华
-
-
-
-## 理论
-
-
-
-### Web应用机制和术语
-
-Web开发的早期阶段，开发者需要手动编写每个页面，例如一个新闻门户网站，每天都要修改它的HTML页面，随着网站规模和体量的增大，这种方式就变得极度糟糕。
-
-为了解决这个问题，开发人员想到了用外部程序来为Web服务器生成动态内容，也就是说HTML页面以及页面中的动态内容不再通过手动编写而是通过程序自动生成。
-
-最早的时候，这项技术被称为CGI（公共网关接口），当然随着时间的推移，CGI暴露出的问题也越来越多，例如大量重复的样板代码，总体性能较为低下等，因此在时代呼唤新英雄的背景下，PHP、ASP、JSP这类Web应用开发技术在上世纪90年代中后期如雨后春笋般涌现。
-
-通常我们说的Web应用是指通过浏览器来访问网络资源的应用程序，因为浏览器的普及性以及易用性，Web应用使用起来方便简单，免除了安装和更新应用程序带来的麻烦，而且也不用关心用户到底用的是什么操作系统，甚至不用区分是PC端还是移动端。
-
-下图向我们展示了Web应用的工作流程，其中涉及到的术语如下表所示。
-
-![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/web-application.png)
-
->说明：相信有经验的读者会发现，这张图中其实还少了很多东西，例如反向代理服务器、数据库服务器、防火墙等，而且图中的每个节点在实际项目部署时可能是一组节点组成的集群。当然，如果你对这些没有什么概念也不要紧，继续下去就行了，后面会给大家一一讲解的。
-
-| 术语      | 解释                                                         |
-| --------- | ------------------------------------------------------------ |
-| URL/URI   | 统一资源定位符/统一资源标识符，网络资源的唯一标识            |
-| 域名      | 与Web服务器地址对应的一个易于记忆的字符串名字                |
-| DNS       | 域名解析服务，可以将域名转换成对应的IP地址                   |
-| IP地址    | 网络上的主机的身份标识，通过IP地址可以区分不同的主机         |
-| HTTP      | 超文本传输协议，构建在TCP之上的应用级协议，万维网数据通信的基础 |
-| 反向代理  | 代理客户端向服务器发出请求，然后将服务器返回的资源返回给客户端 |
-| Web服务器 | 接受HTTP请求，然后返回HTML文件、纯文本文件、图像等资源给请求者 |
-| Nginx     | 高性能的Web服务器，也可以用作[反向代理](https://zh.wikipedia.org/wiki/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86)，[负载均衡](https://zh.wikipedia.org/wiki/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1) 和 [HTTP缓存](https://zh.wikipedia.org/wiki/HTTP%E7%BC%93%E5%AD%98) |
-
-**HTTP协议：**
-
-这里我们稍微费一些笔墨来谈谈上面提到的HTTP。HTTP（超文本传输协议）是构建于TCP（传输控制协议）之上应用级协议，它利用了TCP提供的可靠的传输服务实现了Web应用中的数据交换。按照维基百科上的介绍，设计HTTP最初的目的是为了提供一种发布和接收[HTML](https://zh.wikipedia.org/wiki/HTML)页面的方法，也就是说这个协议是浏览器和Web服务器之间传输的数据的载体。
-
-关于这个协议的详细信息以及目前的发展状况，大家可以阅读阮一峰老师的[《HTTP 协议入门》](http://www.ruanyifeng.com/blog/2016/08/http.html)、[《互联网协议入门》](http://www.ruanyifeng.com/blog/2012/05/internet_protocol_suite_part_i.html)系列以及[《图解HTTPS协议》](http://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html)进行了解。
-
-下图是我在四川省网络通信技术重点实验室学习和工作期间使用开源协议分析工具Ethereal（抓包工具WireShark的前身）截取的访问百度首页时的HTTP请求和响应的报文（协议数据），由于Ethereal截取的是经过网络适配器的数据，因此可以清晰的看到从物理链路层到应用层的协议数据。
-
-HTTP请求（请求行+请求头+空行+\[消息体]）：
-
-![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/http-request.png)
-
-HTTP响应（响应行+响应头+空行+消息体）：
-
->说明：这两张图是在2009年9月10日截取的，但愿这两张如同泛黄的照片般的截图能帮助你了解HTTP到底是什么样子的。
-
-## Django快速上手
+## BS
 
 Python 的 Web 框架有上百个，比它的关键字还要多。所谓 Web 框架，就是用于开发 Web 服务器端应用的基础设施（通常指封装好的模块和一系列的工具）。事实上，即便没有 Web 框架，我们仍然可以通过 socket 或 [CGI](https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E7%BD%91%E5%85%B3%E6%8E%A5%E5%8F%A3) 来开发 Web 服务器端应用，但是这样做的成本和代价在实际开发中通常是不能接受的。
 
 通过 Web 框架，我们可以化繁为简，同时降低创建、更新、扩展应用程序的工作量。Python 的 Web 框架中比较有名的有：Flask、Django、Tornado、Sanic、Pyramid、Bottle、Web2py、web.py 等。
 
+### Django框架
+
 在基于 Python 的 Web 框架中，Django 是所有重量级选手中最有代表性的一位，开发者可以基于 Django 快速的开发可靠的 Web 应用程序，因为它减少了 Web 开发中不必要的开销，对常用的设计和开发模式进行了封装，并对 MVC 架构提供了支持（MTV）。
 
 许多成功的网站和 App 都是基于 Django 框架构建的，国内比较有代表性的网站包括：知乎、豆瓣网、果壳网、搜狐闪电邮箱、101围棋网、海报时尚网、背书吧、堆糖、手机搜狐网、咕咚、爱福窝、果库等。
-
-![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/mvc.png)
 
 Django 诞生于2003年，它是一个在真正的应用中成长起来的项目，由劳伦斯出版集团旗下在线新闻网站的内容管理系统(CMS)研发团队编写（主要是Adrian Holovaty 和 Simon Willison），以比利时的吉普赛爵士吉他手 Django Reinhardt 来命名，在2005年夏天作为开源框架发布。
 
 使用 Django 能用很短的时间构建出功能完备的网站，因为它代替程序员完成了所有乏味和重复的劳动，剩下真正有意义的核心业务给程序员，这一点就是对 **DRY（Don't Repeat Yourself）** 理念的最好践行。
 
-**准备工作**
-
-1、检查 Python 环境：Django 1.11 需要 Python 2.7 或 Python 3.4 以上的版本；Django 2.0 需要 Python 3.4 以上的版本；Django 2.1 需要 Python 3.5 以上的版本。
-
->说明：我自己平时使用 macOS 做开发，macOS 和 Linux 平台使用的命令跟 Windows 平台有较大的区别，这一点在之前也有过类似的说明，如果使用 Windows 平台做开发，替换一下对应的命令即可。
-
-```sh
-python3 --version
-```
-
-```sh
-python3
->>> import sys
->>> sys.version
->>> sys.version_info
-```
-
-2、创建项目文件夹并切换到该目录，例如我们要实例一个OA（办公自动化）项目。
-
-```sh
-mkdir oa
-cd oa
-```
-
-3、创建并激活虚拟环境。
-
-```sh
-python3 -m venv venv
-# 激活虚拟环境 Linux
-source venv/bin/activate
-# 激活虚拟环境 Windows
-venv\Scripts\activate
-```
-
->说明：上面使用了 Python 自带的 venv 模块完成了虚拟环境的创建，当然也可以使用 virtualenv 或 pipenv 这样的工具。
-
-4、更新包管理工具pip。
-
-```sh
-(venv)$ pip install -U pip -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
-或
-
-```sh
-(venv)$ python -m pip install -U pip -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
->注意：请注意终端提示符发生的变化，前面的(venv)说明我们已经进入虚拟环境，而虚拟环境下的 python 和 pip 已经是 Python 3 的解释器和包管理工具了。
->
->一般 pip 等插件安装在类似 C:\Users\Administrator\AppData\Local\Programs\Python\Python37-32\Scripts 的目录中，需要将这个目录加入环境变量path，才能方便地使用 pip 命令。
-
-5、安装 Django。
-
-```sh
-(venv)$ pip install django -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
-或指定版本号来安装对应的Django的版本。
-
-```sh
-(venv)$ pip install django==2.1.8
-```
-
-6、检查 Django 的版本。
-
-```sh
-(venv)$ python -m django --version
-(venv)$ django-admin --version
-```
-
-或
-
-```sh
-(venv)$ python
->>> import django
->>> django.get_version()
-```
-
-当然，也可以通过 pip 来查看安装的依赖库及其版本，如：
-
-```sh
-(venv)$ pip freeze
-(venv)$ pip list
-```
-
-下图展示了 Django 版本和 Python 版本的对应关系，如果在安装时没有指定版本号，将自动选择最新的版本（在写作这段内容时，Django 最新的版本是2.2）。
-
-| Django版本 | Python版本              |
-| ---------- | ----------------------- |
-| 1.8        | 2.7、3.2、3.3、3.4、3.5 |
-| 1.9、1.10  | 2.7、3.4、3.5           |
-| 1.11       | 2.7、3.4、3.5、3.6、3.7 |
-| 2.0        | 3.4、3.5、3.6、3.7      |
-| 2.1、2.2   | 3.5、3.6、3.7           |
-
-7、使用django-admin创建项目，项目命名为oa。
-
-```sh
-(venv)$ django-admin startproject oa .
-```
-
->注意：上面的命令最后的那个点，它表示在当前路径下创建项目。
-
-执行上面的命令后看看生成的文件和文件夹，它们的作用如下所示：
-
-- `manage.py`： 一个让你可以管理Django项目的工具程序。
-- `oa/__init__.py`：一个空文件，告诉Python解释器这个目录应该被视为一个Python的包。
-- `oa/settings.py`：Django项目的配置文件。
-- `oa/urls.py`：Django项目的URL声明（URL映射），就像是你的网站的“目录”。
-- `oa/wsgi.py`：项目运行在WSGI兼容Web服务器上的接口文件。
-
->说明：WSGI全称是Web服务器网关接口，维基百科上给出的解释是“为Python语言定义的[Web服务器](https://zh.wikipedia.org/wiki/%E7%B6%B2%E9%A0%81%E4%BC%BA%E6%9C%8D%E5%99%A8)和[Web应用程序](https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F)或框架之间的一种简单而通用的接口”。
-
-8、启动服务器运行项目。
-
-```sh
-(venv)$ python manage.py runserver
-```
-
-在浏览器中输入 `http://127.0.0.1:8000` 访问我们的服务器
-
->说明1：刚刚启动的是Django自带的用于开发和测试的服务器，它是一个用纯Python编写的轻量级Web服务器，但它并不是真正意义上的生产级别的服务器，千万不要将这个服务器用于和生产环境相关的任何地方。
->
->说明2：用于开发的服务器在需要的情况下会对每一次的访问请求重新载入一遍Python代码。所以你不需要为了让修改的代码生效而频繁的重新启动服务器。然而，一些动作，比如添加新文件，将不会触发自动重新加载，这时你得自己手动重启服务器。
->
->说明3：可以通过 `python manage.py help` 命令查看可用命令列表；在启动服务器时，也可以通过 `python manage.py runserver 1.2.3.4:5678` 来指定将服务器运行于哪个IP地址和端口。
->
->说明4：可以通过 `Ctrl+C` 来终止服务器的运行。
-
-9、接下来我们修改项目的配置文件 settings.py，Django是一个支持国际化和本地化的框架，因此刚才我们看到的默认首页也是支持国际化的，我们将默认语言修改为中文，时区设置为东八区。
-
-```sh
-(venv)$ vim oa/settings.py
-```
-
-```py
-# 此处省略上面的内容
-
-# 设置语言代码
-LANGUAGE_CODE = 'zh-hans'
-# 设置时区
-TIME_ZONE = 'Asia/Chongqing'
-
-# 此处省略下面的内容
-```
-
-10、刷新刚才的页面。
-
-**动态页面**
-
-1、创建名为hrs（人力资源系统）的应用，一个Django项目可以包含一个或多个应用。
-
-```sh
-(venv)$ python manage.py startapp hrs
-```
-
-执行上面的命令会在当前路径下创建hrs目录，其目录结构如下所示：
-
-- `__init__.py`：一个空文件，告诉Python解释器这个目录应该被视为一个Python的包。
-- `admin.py`：可以用来注册模型，用于在Django的管理界面管理模型。
-- `apps.py`：当前应用的配置文件。
-- `migrations`：存放与模型有关的数据库迁移信息。
-- `__init__.py`：一个空文件，告诉Python解释器这个目录应该被视为一个Python的包。
-- `models.py`：存放应用的数据模型，即实体类及其之间的关系（MVC/MTV中的M）。
-- `tests.py`：包含测试应用各项功能的测试类和测试函数。
-- `views.py`：处理请求并返回响应的函数（MVC中的C，MTV中的V）。
-
-2、修改应用目录下的视图文件views.py。
-
-```sh
-(venv)$ vim hrs/views.py
-```
-
-```py
-from django.http import HttpResponse
-
-def index(request):
-  return HttpResponse('<h1>Hello, Django!</h1>')
-```
-
-3、在应用目录创建一个urls.py文件并映射URL。
-
-```sh
-(venv)$ touch hrs/urls.py
-(venv)$ vim hrs/urls.py
-```
-
-```py
-from django.urls import path
-from hrs import views
-
-urlpatterns = [
-  path('', views.index, name='index'),
-]
-```
-
->说明：上面使用的path函数是Django 2.x中新添加的函数，除此之外还可以使用支持正则表达式的URL映射函数re_path函数；Django 1.x中是用名为url函数来设定URL映射。
-
-4、修改项目目录下的urls.py文件，对应用中设定的URL进行合并。
-
-```sh
-(venv) $ vim oa/urls.py
-```
-
-```py
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-  path('admin/', admin.site.urls),
-  path('hrs/', include('hrs.urls')),
-]
-```
-
->说明：上面的代码通过include函数将hrs应用中配置URL的文件包含到项目的URL配置中，并映射到hrs/路径下。
-
-5、重新运行项目，并打开浏览器中访问 `http://localhost:8000/hrs` 。
-
-```sh
-(venv)$ python manage.py runserver
-```
-
-**使用视图模板**
-
-通过拼接 HTML 代码的方式生成动态视图的做法在实际开发中是不能接受的，这一点大家一定能够想到。
-
-为了解决这个问题，我们可以提前准备一个模板页，所谓模板页就是一个带占位符的 HTML 页面，当我们将程序中获得的数据替换掉页面中的占位符时，一个动态页面就产生了。
-
-我们可以用 Django 框架中 template 模块的 `Template` 类创建模板对象，通过模板对象的 `render` 方法实现对模板的渲染，在 Django 框架中还有一个名为 `render` 的便捷函数可以来完成渲染模板的操作。
-
-所谓的渲染就是用数据替换掉模板页中的占位符，当然这里的渲染称为后端渲染，即在服务器端完成页面的渲染再输出到浏览器中，这种做法的主要坏处是当并发访问量较大时，服务器会承受较大的负担，所以今天有很多的 Web 应用都使用了前端渲染，即服务器只提供所需的数据（通常是 JSON 格式），在浏览器中通过 JavaScript 获取这些数据并渲染到页面上，这个我们在后面的内容中会讲到。
-
-1、先回到 manage.py 文件所在的目录创建名为 templates 文件夹。
-
-```sh
-(venv)$ mkdir templates
-```
-
-2、创建模板页index.html。
-
-```sh
-(venv)$ touch templates/index.html
-(venv)$ vim templates/index.html
-```
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>首页</title>
-</head>
-<body>
-  <h1>部门信息</h1>
-  <hr>
-  <table>
-    <tr>
-      <th>部门编号</th>
-      <th>部门名称</th>
-      <th>所在地</th>
-    </tr>
-    {% for dept in depts_list %}
-    <tr>
-      <td>{{ dept.no }}</td>
-      <td>{{ dept.name }}</td>
-      <td>{{ dept.location }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</body>
-</html>
-```
-
->在上面的模板页中我们使用了 `{{ greeting }}` 这样的模板占位符语法，也使用了 `{% for %}` 这样的模板指令，这些都是 Django 模板语言(DTL)的一部分。
->
->如果对此不熟悉并不要紧，我们会在后续的内容中进一步的讲解，而且我们刚才也说到了，渲染页面还有更好的选择就是使用前端渲染，当然这是后话。
-
-3、回到应用目录，修改 views.py 文件。
-
-```sh
-(venv)$ vim hrs/views.py
-```
-
-```py
-from django.shortcuts import render
-
-depts_list = [
-  {'no': 10, 'name': '财务部', 'location': '北京'},
-  {'no': 20, 'name': '研发部', 'location': '成都'},
-  {'no': 30, 'name': '销售部', 'location': '上海'}
-]
-
-def index(request):
-  return render(request, 'index.html', {'depts_list': depts_list})
-```
-
-> 说明：Django 框架通过 shortcuts 模块的便捷函数 `render` 简化了渲染模板的操作，有了这个函数，就不用先创建 Template 对象再去调用 render 方法。
-
-到此为止，我们还没有办法让 views.py 中的 render 函数找到模板文件 index.html，为此我们需要修改 settings.py 文件，配置模板文件所在的路径。
-
-4、切换到项目目录修改 settings.py 文件。
-
-```sh
-(venv)$ vim oa/settings.py
-```
-
-```py
-# 此处省略上面的内容
-TEMPLATES = [{
-  'BACKEND': 'django.template.backends.django.DjangoTemplates',
-  'DIRS': [os.path.join(BASE_DIR, 'templates')],
-  'APP_DIRS': True,
-  'OPTIONS': {
-    'context_processors': [
-      'django.template.context_processors.debug',
-      'django.template.context_processors.request',
-      'django.contrib.auth.context_processors.auth',
-      'django.contrib.messages.context_processors.messages',
-    ]
-  }
-}]
-# 此处省略下面的内容
-```
-
-5、重新运行项目或直接刷新页面查看结果。
-
-```sh
-(venv)$ python manage.py runserver
-```
-
-![x](http://wxdhhg.cn/wordpress/wp-content/uploads/2020/04/show-depts.png)
-
-**总结：**
-
-至此，我们已经利用 Django 框架完成了一个非常小的 Web 应用，虽然它并没有任何的实际价值，但是可以通过这个项目对 Django 框架有一个感性的认识。
-
-当然，实际开发中我们可以用 PyCharm 来创建项目，如果使用专业版的 PyCharm，可以直接创建 Django 项目。
-
-使用 PyCharm 的好处在于编写代码时可以获得代码提示、错误修复、自动导入等功能，从而提升开发效率，但是专业版的 PyCharm 需要按年支付相应的费用，社区版的 PyCharm 中并未包含对 Django 框架直接的支持，但是我们仍然可以使用它来创建 Django 项目，只是在使用上没有专业版的方便。
-
-关于 PyCharm 的使用，可以参考[《玩转PyCharm》](https://github.com/jackfrued/Python-100-Days/blob/master/%E7%8E%A9%E8%BD%ACPyCharm.md)一文。此外，Django 最好的学习资料肯定是它的[官方文档](https://docs.djangoproject.com/zh-hans/2.0/)，当然图灵社区出版的[《Django基础教程》](http://www.ituring.com.cn/book/2630)也是非常适合初学者的入门级读物。
-
-**深入模型**
-
-MVC 架构追求的是“模型”和“视图”的解耦合。所谓“模型”说得更直白一些就是数据（的表示），所以通常也被称作“数据模型”。
-
-在实际的项目中，数据模型通常通过数据库实现持久化操作，而关系型数据库在过去和当下都是持久化的首选方案，下面我们以 MySQL 为例来说明如何使用关系型数据库来实现持久化操作。
-
-**配置关系型数据库MySQL**
-
-我们继续来完善 OA 项目，首先从配置项目使用的数据库开始。
-
-1、修改项目的 settings.py 文件，首先将我们之前创建的应用 hrs 添加已安装的项目中，然后配置 MySQL 作为持久化方案。
-
-```sh
-(venv)$ vim oa/settings.py
-```
-
-```py
-# 此处省略上面的代码
-INSTALLED_APPS = [
-  'django.contrib.admin',
-  'django.contrib.auth',
-  'django.contrib.contenttypes',
-  'django.contrib.sessions',
-  'django.contrib.messages',
-  'django.contrib.staticfiles',
-  'hrs'
-]
-
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'oa',
-    'HOST': '127.0.0.1',
-    'PORT': 3306,
-    'USER': 'root',
-    'PASSWORD': '123456',
-  }
-}
-# 此处省略下面的代码
-```
-
-在配置ENGINE属性时，常用的可选值包括：
-
-- django.db.backends.sqlite3'：SQLite嵌入式数据库。
-- django.db.backends.postgresql'：BSD许可证下发行的开源关系型数据库产品。
-- django.db.backends.mysql'：转手多次目前属于甲骨文公司的经济高效的数据库产品。
-- django.db.backends.oracle'：甲骨文公司的关系型数据库旗舰产品。
-
-其他的配置可以参考官方文档中[数据库配置](https://docs.djangoproject.com/zh-hans/2.0/ref/databases/#third-party-notes)的部分。
-
-`NAME` 属性代表数据库的名称，如果使用 SQLite 它对应着一个文件，在这种情况下 `NAME` 的属性值应该是一个绝对路径；使用其他关系型数据库，则要配置对应的 `HOST（主机）`、`PORT（端口）`、`USER（用户名）`、`PASSWORD（口令）`等属性。
-
-2、安装 Python 操作 MySQL 的依赖库，Python3 中通常使用 PyMySQL，Python2 中通常用 MySQLdb。
-
-```sh
-(venv)$ pip install pymysql -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
-如果使用 Python3 需要修改项目目录下的 `__init__.py` 文件并加入如下所示的代码，这段代码的作用是将 PyMySQL 视为 MySQLdb 来使用，从而避免 Django 找不到连接 MySQL 的客户端工具而询问你："Did you install mysqlclient?"（你安装了 mysqlclient 吗？）。
-
-```py
-import pymysql
-
-pymysql.install_as_MySQLdb()
-```
-
-3、如果之前没有为应用程序创建数据库，那么现在是时候创建名为 oa 的数据库了。在 MySQL 中创建数据库的 SQL 语句如下所示：
-
-```sql
-create database oa default charset utf8;
-```
-
-4、Django 框架本身有自带的数据模型，我们稍后会用到这些模型，为此我们先做一次迁移操作。所谓迁移，就是根据模型自动生成关系数据库中的二维表，命令如下所示：
-
-```sh
-(venv)$ python manage.py migrate
-Operations to perform:
-Apply all migrations: admin, auth, contenttypes, sessions
-Running migrations:
-  Applying contenttypes.0001_initial... OK
-  Applying auth.0001_initial... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying sessions.0001_initial... OK
-```
-
-5、接下来，我们为自己的应用创建数据模型。如果要在 hrs 应用中实现对部门和员工的管理，我们可以先创建部门和员工数据模型，代码如下所示。
-
-```sh
-(venv)$ vim hrs/models.py
-```
-
-```py
-from django.db import models
-
-class Dept(models.Model):
-  """部门类"""
-  no = models.IntegerField(primary_key=True, db_column='dno', verbose_name='部门编号')
-  name = models.CharField(max_length=20, db_column='dname', verbose_name='部门名称')
-  location = models.CharField(max_length=10, db_column='dloc', verbose_name='部门所在地')
-
-  class Meta:
-    db_table = 'tb_dept'
-
-
-class Emp(models.Model):
-  """员工类"""
-  no = models.IntegerField(primary_key=True, db_column='eno', verbose_name='员工编号')
-  name = models.CharField(max_length=20, db_column='ename', verbose_name='员工姓名')
-  job = models.CharField(max_length=10, verbose_name='职位')
-  # 多对一外键关联(自参照)
-  mgr = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='主管')
-  sal = models.DecimalField(max_digits=7, decimal_places=2, verbose_name='月薪')
-  comm = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, verbose_name='补贴')
-  # 多对一外键关联(参照部门模型)
-  dept = models.ForeignKey(Dept, db_column='dno', on_delete=models.PROTECT, verbose_name='所在部门')
-
-  class Meta:
-    db_table = 'tb_emp'
-```
-
->说明：上面定义模型时使用了字段类及其属性，其中 IntegerField 对应数据库中的 integer 类型，CharField 对应数据库的 varchar 类型，DecimalField 对应数据库的 decimal 类型，ForeignKey 用来建立多对一外键关联。
->
->字段属性 primary_key 用于设置主键，max_length 用来设置字段的最大长度，db_column 用来设置数据库中与字段对应的列，verbose_name 则设置了 Django 后台管理系统中该字段显示的名称。如果对这些东西感到很困惑也不要紧，文末提供了字段类、字段属性、元数据选项等设置的相关说明，不清楚的读者可以稍后查看对应的参考指南。
-
-6、再次执行迁移操作，先通过模型生成迁移文件，再执行迁移创建二维表。
-
-```sh
-(venv)$ python manage.py makemigrations hrs
-Migrations for 'hrs':
-  hrs/migrations/0001_initial.py
-    - Create model Dept
-    - Create model Emp
-(venv)$ python manage.py migrate
-Operations to perform:
-  Apply all migrations: admin, auth, contenttypes, hrs, sessions
-Running migrations:
-  Applying hrs.0001_initial... OK
-```
-
-
-
-## Flask入门
+### Flask框架
 
 **安装**
 
@@ -4055,386 +3493,32 @@ app.wsgi_app = LighttpdCGIRootFix(app.wsgi_app)
 - [Flask 官方文档](https://dormousehole.readthedocs.io/en/latest/)
 
 
-# Ajax和表单
 
-基于前面章节讲解的知识，我们已经可以使用Django框架来完成Web应用的开发了。接下来我们就尝试实现一个投票应用，具体的需求是用户进入应用首先查看到“学科介绍”页面，该页面显示了一个学校所开设的所有学科；通过点击某个学科，可以进入“老师介绍”页面，该页面展示了该学科所有老师的详细情况，可以在该页面上给老师点击“好评”或“差评”；如果用户没有登录，在投票时会先跳转到“登录页”要求用户登录，登录成功才能投票；对于未注册的用户，可以在“登录页”点击“新用户注册”进入“注册页”完成用户注册操作，注册成功后会跳转到“登录页”，注册失败会获得相应的提示信息。
 
-## 准备工作
 
-由于之前已经详细的讲解了如何创建Django项目以及项目的相关配置，因此我们略过这部分内容，唯一需要说明的是，从上面对投票应用需求的描述中我们可以分析出三个业务实体：学科、老师和用户。学科和老师之间通常是一对多关联关系（一个学科有多个老师，一个老师通常只属于一个学科），用户因为要给老师投票，所以跟老师之间是多对多关联关系（一个用户可以给多个老师投票，一个老师也可以收到多个用户的投票）。首先修改应用下的models.py文件来定义数据模型，先给出学科和老师的模型。
 
-```py
-from django.db import models
-
-
-class Subject(models.Model):
-    """学科"""
-    no = models.IntegerField(primary_key=True, verbose_name='编号')
-    name = models.CharField(max_length=20, verbose_name='名称')
-    intro = models.CharField(max_length=511, default='', verbose_name='介绍')
-    create_date = models.DateField(null=True, verbose_name='成立日期')
-    is_hot = models.BooleanField(default=False, verbose_name='是否热门')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'tb_subject'
-        verbose_name = '学科'
-        verbose_name_plural = '学科'
-
-
-class Teacher(models.Model):
-    """老师"""
-    no = models.AutoField(primary_key=True, verbose_name='编号')
-    name = models.CharField(max_length=20, verbose_name='姓名')
-    detail = models.CharField(max_length=1023, default='', blank=True, verbose_name='详情')
-    photo = models.CharField(max_length=1023, default='', verbose_name='照片')
-    good_count = models.IntegerField(default=0, verbose_name='好评数')
-    bad_count = models.IntegerField(default=0, verbose_name='差评数')
-    subject = models.ForeignKey(to=Subject, on_delete=models.PROTECT, db_column='sno', verbose_name='所属学科')
-
-    class Meta:
-        db_table = 'tb_teacher'
-        verbose_name = '老师'
-        verbose_name_plural = '老师'
-```
-
-模型定义完成后，可以通过“生成迁移”和“执行迁移”来完成关系型数据库中二维表的创建，当然这需要提前启动数据库服务器并创建好对应的数据库，同时我们在项目中已经安装了PyMySQL而且完成了相应的配置，这些内容此处不再赘述。
-
-```sh
-(venv)$ python manage.py makemigrations vote
-...
-(venv)$ python manage.py migrate
-...
-```
-
->注意：为了给vote应用生成迁移文件，需要修改Django项目settings.py文件，在INSTALLED_APPS中添加vote应用。
-
-完成模型迁移之后，我们可以直接使用Django提供的后台管理来添加学科和老师信息，这需要先注册模型类和模型管理类。
-
-```py
-from django.contrib import admin
-
-from poll2.forms import UserForm
-from poll2.models import Subject, Teacher
-
-
-class SubjectAdmin(admin.ModelAdmin):
-    list_display = ('no', 'name', 'create_date', 'is_hot')
-    ordering = ('no', )
-
-
-class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('no', 'name', 'detail', 'good_count', 'bad_count', 'subject')
-    ordering = ('subject', 'no')
-
-
-admin.site.register(Subject, SubjectAdmin)
-admin.site.register(Teacher, TeacherAdmin)
-```
-
-接下来，我们就可以修改views.py文件，通过编写视图函数先实现“学科介绍”页面。
-
-```py
-def show_subjects(request):
-    """查看所有学科"""
-    subjects = Subject.objects.all()
-    return render(request, 'subject.html', {'subjects': subjects})
-```
-
-至此，我们还需要一个模板页，模板的配置以及模板页中模板语言的用法在之前已经进行过简要的介绍，如果不熟悉可以看看下面的代码，相信这并不是一件困难的事情。
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>所有学科信息</title>
-    <style>/* 此处略去了层叠样式表的选择器 */</style>
-</head>
-<body>
-    <h1>所有学科</h1>
-    <hr>
-    {% for subject in subjects %}
-    <div>
-        <h3>
-            <a href="/teachers/?sno={{ subject.no }}">{{ subject.name }}</a>
-            {% if subject.is_hot %}
-            <img src="/static/images/hot.png" width="32" alt="">
-            {% endif %}
-        </h3>
-        <p>{{ subject.intro }}</p>
-    </div>
-    {% endfor %}
-</body>
-</html>
-```
-
-在上面的模板中，我们为每个学科添加了一个超链接，点击超链接可以查看该学科的讲师信息，为此需要再编写一个视图函数来处理查看指定学科老师信息。
-
-```py
-def show_teachers(request):
-    """显示指定学科的老师"""
-    try:
-        sno = int(request.GET['sno'])
-        subject = Subject.objects.get(no=sno)
-        teachers = subject.teacher_set.all()
-        return render(request, 'teachers.html', {'subject': subject, 'teachers': teachers})
-    except (KeyError, ValueError, Subject.DoesNotExist):
-        return redirect('/')
-```
-
-显示老师信息的模板页。
-
-```html
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>老师</title>
-    <style>/* 此处略去了层叠样式表的选择器 */</style>
-</head>
-<body>
-    <h1>{{ subject.name }}学科老师信息</h1>
-    <hr>
-    {% if teachers %}
-    {% for teacher in teachers %}
-    <div>
-        <div>
-            <img src="{% static teacher.photo %}" alt="">
-        </div>
-        <div>
-            <h3>{{ teacher.name }}</h3>
-            <p>{{ teacher.detail }}</p>
-            <p class="comment">
-                <a href="">好评</a>
-                (<span>{{ teacher.good_count }}</span>)
-                <a href="">差评</a>
-                (<span>{{ teacher.bad_count }}</span>)
-            </p>
-        </div>
-    </div>
-    {% endfor %}
-    {% else %}
-    <h3>暂时没有该学科的老师信息</h3>
-    {% endif %}
-    <p>
-        <a href="/">返回首页</a>
-    </p>
-</body>
-</html>
-```
-
-## 加载静态资源
-
-在上面的模板页面中，我们使用了 `<img>` 标签来加载老师的照片，其中使用了引用静态资源的模板指令 `{% static %}`，要使用该指令，首先要使用 `{% load static %}` 指令来加载静态资源，我们将这段代码放在了页码开始的位置。在上面的项目中，我们将静态资源置于名为static的文件夹中，在该文件夹下又创建了三个文件夹：css、js和images，分别用来保存外部层叠样式表、外部JavaScript文件和图片资源。为了能够找到保存静态资源的文件夹，我们还需要修改Django项目的配置文件settings.py，如下所示：
-
-```py
-# 此处省略上面的代码
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
-STATIC_URL = '/static/'
-
-# 此处省略下面的代码
-```
-
-接下来修改urls.py文件，配置用户请求的URL和视图函数的对应关系。
-
-```py
-from django.contrib import admin
-from django.urls import path
-
-from vote import views
-
-urlpatterns = [
-    path('', views.show_subjects),
-    path('teachers/', views.show_teachers),
-    path('admin/', admin.site.urls),
-]
-```
-
-启动服务器运行项目，进入首页查看学科信息。
-
-![x](./Resource/show_subjects.png)
-
-点击学科查看老师信息。
-
-![x](./Resource/show_teachers.png)
-
-### Ajax请求
-
-接下来就可以实现“好评”和“差评”的功能了，很明显如果能够在不刷新页面的情况下实现这两个功能会带来更好的用户体验，因此我们考虑使用[Ajax](https://zh.wikipedia.org/wiki/AJAX)技术来实现“好评”和“差评”，Ajax技术我们在Web前端部分已经介绍过了，此处不再赘述。
-
-首先修改项目的urls.py文件，为“好评”和“差评”功能映射对应的URL。
-
-```py
-from django.contrib import admin
-from django.urls import path
-
-from vote import views
-
-urlpatterns = [
-    path('', views.show_subjects),
-    path('teachers/', views.show_teachers),
-    path('praise/', views.prise_or_criticize),
-    path('criticize/', views.prise_or_criticize),
-    path('admin/', admin.site.urls),
-]
-```
-
-设计视图函数praise_or_criticize来支持“好评”和“差评”功能，该视图函数通过Django封装的JsonResponse类将字典序列化成JSON字符串作为返回给浏览器的响应内容。
-
-```py
-def praise_or_criticize(request):
-    """好评"""
-    try:
-        tno = int(request.GET['tno'])
-        teacher = Teacher.objects.get(no=tno)
-        if request.path.startswith('/praise'):
-            teacher.good_count += 1
-        else:
-            teacher.bad_count += 1
-        teacher.save()
-        data = {'code': 200, 'hint': '操作成功'}
-    except (KeyError, ValueError, Teacher.DoseNotExist):
-        data = {'code': 404, 'hint': '操作失败'}
-    return JsonResponse(data)
-```
-
-修改显示老师信息的模板页，引入jQuery库来实现事件处理、Ajax请求和DOM操作。
-
-```html
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>老师</title>
-    <style>/* 此处略去了层叠样式表的选择器 */</style>
-</head>
-<body>
-    <h1>{{ subject.name }}学科老师信息</h1>
-    <hr>
-    {% if teachers %}
-    {% for teacher in teachers %}
-    <div class="teacher">
-        <div class="photo">
-            <img src="{% static teacher.photo %}" height="140" alt="">
-        </div>
-        <div class="info">
-            <h3>{{ teacher.name }}</h3>
-            <p>{{ teacher.detail }}</p>
-            <p class="comment">
-                <a href="/praise/?tno={{ teacher.no }}">好评</a>
-                (<span>{{ teacher.good_count }}</span>)
-                &nbsp;&nbsp;
-                <a href="/criticize/?tno={{ teacher.no }}">差评</a>
-                (<span>{{ teacher.bad_count }}</span>)
-            </p>
-        </div>
-    </div>
-    {% endfor %}
-    {% else %}
-    <h3>暂时没有该学科的老师信息</h3>
-    {% endif %}
-    <p>
-        <a href="/">返回首页</a>
-    </p>
-    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-    <script>
-        $(() => {
-            $('.comment>a').on('click', (evt) => {
-                evt.preventDefault()
-                let anchor = $(evt.target)
-                let url = anchor.attr('href')
-                $.getJSON(url, (json) => {
-                    if (json.code == 10001) {
-                        let span = anchor.next()
-                        span.text(parseInt(span.text()) + 1)
-                    } else {
-                        alert(json.hint)
-                    }
-                })
-            })
-        })
-    </script>
-</body>
-</html>
-```
-
-到此为止，这个投票项目的核心功能已然完成，在下面的章节中我们会要求用户必须登录才能投票，没有账号的用户可以通过注册功能注册一个账号。
-
-## 表单的应用
-
-我们继续来实现“用户注册”和“用户登录”的功能，并限制只有登录的用户才能为老师投票。Django框架中提供了对表单的封装，而且提供了多种不同的使用方式。
-
-首先添加用户模型。
-
-```py
-class User(models.Model):
-    """用户"""
-    no = models.AutoField(primary_key=True, verbose_name='编号')
-    username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
-    password = models.CharField(max_length=32, verbose_name='密码')
-    regdate = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
-
-    class Meta:
-        db_table = 'tb_user'
-        verbose_name_plural = '用户'
-```
-
-通过生成迁移和执行迁移操作，在数据库中创建对应的用户表。
-
-```sh
-(venv)$ python manage.py makemigrations vote
-...
-(venv)$ python manage.py migrate
-...
-```
-
-定制一个非常简单的注册模板页面。
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>用户注册</title>
-    <style>/* 此处省略层叠样式表选择器 */</style>
-</head>
-<body>
-    <h1>用户注册</h1>
-    <hr>
-    <p class="hint">{{ hint }}</p>
-    <form action="/register/" method="post">
-        {% csrf_token %}
-        <div class="input">
-            <label for="username">用户名：</label>
-            <input type="text" id="username" name="username">
-        </div>
-        <div class="input">
-            <label for="password">密码：</label>
-            <input type="password" id="password" name="password">
-        </div>
-        <div class="input">
-            <label for="repassword">确认密码：</label>
-            <input type="password" id="repassword" name="repassword">
-        </div>
-        <div class="input">
-            <input type="submit" value="注册">
-            <input type="reset" value="重置">
-        </div>
-    </form>
-    <a href="/login">返回登录</a>
-</body>
-</html>
-```
-
-注意，在上面的表单中，我们使用了模板指令 `{% csrf_token %}` 为表单添加一个隐藏域（type属性值为hidden的input标签），它的作用是在表单中生成一个随机令牌（token）来防范[跨站请求伪造](https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0)（通常简称为CSRF），这也是Django在提交表单时的硬性要求，除非我们设置了免除CSRF令牌。下图是一个关于CSRF简单生动的例子，它来自于[维基百科](https://zh.wikipedia.org/wiki/Wikipedia:%E9%A6%96%E9%A1%B5)。
-
-![x](./Resource/CSRF.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 用户在提交注册表单时，我们还需要对用户的输入进行验证，例如我们的网站要求用户名必须由字母、数字、下划线构成且长度在4-20个字符之间，密码的长度为8-20个字符，确认密码必须跟密码保持一致。这些验证操作首先可以通过浏览器中的JavaScript代码来完成，但是即便如此，在服务器端仍然要对用户输入再次进行验证来避免将无效的数据库交给数据库，因为用户可能会禁用浏览器的JavaScript功能，也有可能绕过浏览器的输入检查将注册数据提交给服务器，所以服务器端的用户输入检查仍然是必要的。
 
@@ -5551,8 +4635,6 @@ MIDDLEWARE = [
 至此，除了对用户投票数量加以限制的功能外，这个投票应用就算基本完成了，整个项目的完整代码请参考[https://github.com/jackfrued/django1902](https://github.com/jackfrued/django1902)，其中用户注册时使用的手机验证码功能请大家使用自己注册的短信平台替代它。如果需要投票应用完整的视频讲解，可以在首页扫码打赏后留言联系作者获取视频下载地址，谢谢大家的理解和支持。
 
 
-
-# Python语言进阶
 
 ## 数据结构和算法
 
