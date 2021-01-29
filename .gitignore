@@ -17,5 +17,6 @@
 **/__pycache__
 **/venv
 **/cameral_shara_1
+**/.ipynb_checkpoints
 /Private
 /Dotnet/Project/xamarin

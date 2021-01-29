@@ -2,43 +2,45 @@
 
 ## 目录
 
-1. 理论
+1. 简介
 
-   - [shell介绍](#shell介绍)
    - [编码格式转换](#编码格式转换)
-   - [常用命令](#常用命令)
-     - [if](#if)
    - [服务相关命令](#服务相关命令)
-
    - [端口相关命令](#端口相关命令)
    - [打开管理界面](#打开管理界面)
-
+   - [重定向符(>)](#重定向符(>))
 2. 实战
-
 3. 总结
-
 4. 升华
 
+**指令表：**
+
+| [if](#if)     |      |      |      |      |      |
+| ------------- | ---- | ---- | ---- | ---- | ---- |
+| [echo](#echo) |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
+|               |      |      |      |      |      |
 
 
-## 理论
 
+## 简介
 
-
-### shell介绍
+**shell介绍**
 
 cmd.exe的位置：
 
 - 32位：%SystemRoot%\System32
 - 64位：%SystemRoot%\System32（32位cmd.exe）| %SystemRoot%\SysWow64（64位cmd.exe）
 
-
-
-### 常用命令
-
 **内部命令：** 存在于命令shell内部，不包括单独可执行文件
 
-#### assoc
+### assoc
 
 - 作用：显示或修改当前的文件扩展关联
 
@@ -186,57 +188,57 @@ cmd.exe的位置：
 
 用法：3种
 
-1. `IF [NOT] ERRORLEVEL number command`
+**1、`IF [NOT] ERRORLEVEL number command`**
 
-   `IF ERRORLEVEL`这个句子必须放在某一个命令的后面，执行命令后由`IF ERRORLEVEL` 来判断命令的返回值。
+`IF ERRORLEVEL`这个句子必须放在某一个命令的后面，执行命令后由`IF ERRORLEVEL` 来判断命令的返回值。
 
-   Number的数字取值范围0~255，判断时值的排列顺序应该由大到小。返回的值大于等于指定的值时，条件成立。
+Number的数字取值范围0~255，判断时值的排列顺序应该由大到小。返回的值大于等于指定的值时，条件成立。
 
-   ```bash
-   @echo off
-   dir c:
-   rem 退出代码为>=1就跳至标题1处执行，>=0就跳至标题0处执行
-   IF ERRORLEVEL 1 goto 1
-   IF ERRORLEVEL 0 goto 0
-   Rem 上面的两行不可交换位置，否则失败了也显示成功。
-   :0
-   echo 命令执行成功！
-   Rem 程序执行完毕跳至标题exit处退出
-   goto exit
-   :1
-   echo 命令执行失败！
-   Rem 程序执行完毕跳至标题exit处退出
-   goto exit
-   :exit
-   pause
-   # 运行显示：命令执行成功！
-   ```
+```bash
+@echo off
+dir c:
+rem 退出代码为>=1就跳至标题1处执行，>=0就跳至标题0处执行
+IF ERRORLEVEL 1 goto 1
+IF ERRORLEVEL 0 goto 0
+Rem 上面的两行不可交换位置，否则失败了也显示成功。
+:0
+echo 命令执行成功！
+Rem 程序执行完毕跳至标题exit处退出
+goto exit
+:1
+echo 命令执行失败！
+Rem 程序执行完毕跳至标题exit处退出
+goto exit
+:exit
+pause
+# 运行显示：命令执行成功！
+```
 
-2. `IF [NOT] string1==string2 command`
+**2、`IF [NOT] string1==string2 command`**
 
-   string1 和 string2 都为字符的数据，英文内字符的大小写将看作不同，这个条件中的等于号必须是两个（绝对相等的意思），条件相等后即执行后面的 command
+string1 和 string2 都为字符的数据，英文内字符的大小写将看作不同，这个条件中的等于号必须是两个（绝对相等的意思），条件相等后即执行后面的 command
 
-   检测当前变量的值做出判断，为了防止字符串中含有空格，可用以下格式
+检测当前变量的值做出判断，为了防止字符串中含有空格，可用以下格式
 
-   `if [NOT] {string1}=={string2} command`
+`if [NOT] {string1}=={string2} command`
 
-   `if [NOT] [string1]==[string2] command`
+`if [NOT] [string1]==[string2] command`
 
-   `if [NOT] "string1"=="string2" command`
+`if [NOT] "string1"=="string2" command`
 
-   这种写法实际上将括号或引号当成字符串的一部分了，只要等号左右两边一致就行了，比如下面的写法就不行：
+这种写法实际上将括号或引号当成字符串的一部分了，只要等号左右两边一致就行了，比如下面的写法就不行：
 
-   `if {string1}==[string2] command`
+`if {string1}==[string2] command`
 
-3. `IF [NOT] EXIST filename command`
+**3、`IF [NOT] EXIST filename command`**
 
-   EXIST filename为文件或目录存在的意思
+EXIST filename为文件或目录存在的意思
 
-   ```bash
-   echo off
-   IF EXIST autoexec.bat echo 文件存在！
-   IF not EXIST autoexec.bat echo 文件不存在！
-   ```
+```bash
+echo off
+IF EXIST autoexec.bat echo 文件存在！
+IF not EXIST autoexec.bat echo 文件不存在！
+```
 
 #### for
 
@@ -1282,7 +1284,7 @@ copy %0 d:\wind.bat
 
 为什么这样呢？此时“注释内容”其实被当作变量，其值是空的，故只起注释作用，不过这种用法容易出现语法错误，一般不用。
 
-#### ***\*>\**** ***\*重定向符\****
+#### 重定向符(>)
 
 输出重定向命令
 
