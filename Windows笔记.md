@@ -1,4 +1,4 @@
-# CMD命令
+CMD命令
 
 ## 目录
 
@@ -10,6 +10,10 @@
    - [打开管理界面](#打开管理界面)
    - [重定向符(>)](#重定向符(>))
 2. 实战
+   - [远程桌面服务器端](#远程桌面服务器端)
+   - [开机启动项](#开机启动项)
+   - [网络代理](#网络代理)
+   - [路由器级联](#路由器级联)
 3. 总结
 4. 升华
 
@@ -3931,3 +3935,156 @@ dcomcnfg设置com组件权限
 c:windows\system32\compmgmt.msc 进入计算机管理窗口
 
 cmd中运行control userpasswords2，设置自动登录
+
+
+
+## 实战
+
+
+
+### 远程桌面服务器端
+
+![x](./Resources/windows001.png)
+
+1. 可以选择用户，一般选择管理员帐号，权限大
+
+2. 将windows防火墙关闭
+
+3. 启动远程桌面服务
+4. 此时远程桌面应该已经可以练成了，但是用于远程登录的账户必须有密码。如果要取消这个限制，可以设置组策略。gpedit.msc
+
+![x](./Resources/windows002.png)
+
+![x](./Resources/windows003.png)
+
+![x](./Resources/windows004.png)
+
+启用来宾账户
+
+启动服务：
+
+- UPnP Device Host：允许UPnP设备宿主在此计算机上。如果停止此服务，则所有宿主的UPnP设备都将停止工作，并且不能添加其他宿主设备。如果禁用此服务，则任何显式依赖于它的服务将都无法启动。
+
+- TCP/IP NetBIOS Helper：提供TCP/IP(NetBT)服务上的NetBIOS和网络上客户端的NetBIOS名称解析的支持，从而使用户能够共享文件、打印和登录到网络。如果此服务被停用，这些功能可能不可用。如果此服务被禁用，任何依赖它的服务将无法启动。
+
+- SSDP Discovery：当发现了使用SSDP协议的网络设备和服务，如UPnP设备，同时还报告了运行在本地计算机上使用的SSDP设备和服务。如果停止此服务，基于SSDP的设备将不会被发现。如果禁用此服务，任何依赖此服务的服务都无法正常启动。
+
+- Server：支持此计算机通过网络的文件、打印、和命名管道共享。如果服务停止，这些功能不可用。如果服务被禁用，任何直接依赖于此服务的服务将无法启动。
+
+- Network Location Awareness：当发现了使用SSDP协议的网络设备和服务，如UPnP设备，同时还报告了运行在本地计算机上使用的SSDP设备和服务。如果停止此服务，基于SSDP的设备将不会被发现。如果禁用此服务，任何依赖此服务的服务都无法正常启动。
+
+- Network Connections：管理“网络和拨号连接”文件夹中对象，在其中您可以查看局域网和远程连接。
+
+- DNS Client：DNS客户端服务(dnscache)缓存域名系统(DNS)名称并注册该计算机的完整计算机名称。如果该服务被停止，将继续解析DNS名称。然而，将不缓存DNS名称的查询结果，且不注册计算机名称。如果该服务被禁用，则任何明确依赖于它的服务都将无法启动。
+
+- Computer Browser：维护网络上计算机的更新列表，并将列表提供给计算机指定浏览。如果服务停止，列表不会被更新或维护。如果服务被禁用，任何直接依赖于此服务的服务将无法启动。
+
+
+
+### 开机启动项
+
+1. msconfig
+2. HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+
+
+
+### 网络代理
+
+笔记本：
+
+![x](./Resources/windows005.png)
+
+无线连接：自动
+
+本地连接：
+
+其中DNS服务器是我本地路由器的ip地址，子网掩码是默认的，ip地址任意
+
+![x](./Resources/windows006.png)
+
+接下来用网线连接台式机和笔记本
+
+台式机本地连接：
+
+其中DNS服务器设置为路由器IP，默认网关设置为笔记本IP
+
+![x](./Resources/windows007.png)
+
+确定后台式机就可以上网了。
+
+其它：
+
+电脑建立WiFi热点过程中需要开启网络连接共享，但由于未知原因，在设置Internet连接共享时，出现如下错误：
+
+![x](./Resources/windows010.png)
+
+解决：
+
+1. 开启window firewall服务
+
+2. 开启ICS服务
+
+   在“依存关系”中查看ICS服务启动需要首先启动哪些服务，逐个启动。
+
+   如果“Secure Socket Tunneling Protocol Service”服务无法开启，管理员运行`netsh winsock reset`
+
+
+
+### 路由器级联
+
+1、主路由器需要开启DHCP服务
+
+![x](./Resources/windows008.png)
+
+2、更改路由器后台管理IP和DHCP地址池中IP相同网段。（否则，以后登陆路由器时需要将电脑的IP手动改成静态且网关设为路由器IP才能登录路由器后台）
+
+3、主路由器重启
+
+4、从路由器不启用DHCP服务器，重启
+
+> 第一台路由器作主路由器，需要完成以下功能：连接外网、给其它电脑分配IP。所以第一台路由器的WAN口（路由器后面蓝色或黑色的接口，有WAN文字标识）插外面拉进来的网线。同时开启DHCP服务。
+>
+> 第二台路由器用网线插到路由器后面一排插口（即LAN口，一般是黄色，标注有1234的数字）中的任意一个，而不是那个单独的、黑色的WAN口。同时需要关闭DHCP网络；
+>
+> 其它第N台路由器都参照第二台的设置和连接方法，可以接到第二的LAN或第一台的LAN口都行；
+>
+> 电脑也插到路由器的黄色LAN口中的任意一个，并且插到任一台路由器都行，且不用作任何设置。
+
+![x](./Resources/windows009.png)
+
+
+
+查看PowerShell版本：Get-Host | Select-Object Version
+
+```vb
+Function IsExitAFile(filespec)
+        Dim fso
+        Set fso=CreateObject("Scripting.FileSystemObject")        
+        If fso.fileExists(filespec) Then         
+        IsExitAFile=True        
+        Else IsExitAFile=False        
+        End If
+End Function 
+
+Sub CreateAFile(filespec)
+        Dim fso
+        Set fso=CreateObject("Scripting.FileSystemObject")
+        fso.CreateTextFile(filespec)
+End Sub
+
+Sub DeleteAFile(filespec)
+        Dim fso
+        Set fso= CreateObject("Scripting.FileSystemObject")
+        fso.DeleteFile(filespec)
+End Sub
+
+Dim fso
+Set fso=CreateObject("Scripting.FileSystemObject")        
+If fso.folderExists("C:\\Program Files (x86)") Then         
+        msgbox "ok"
+Else 
+        msgbox "not ok"
+End If
+
+```
+

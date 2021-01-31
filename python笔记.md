@@ -4,7 +4,7 @@ Python
    - [Python历史](#Python历史)
    - [Python优缺点](#Python优缺点)
    - [蟒之禅（Python哲学）](#蟒之禅（Python哲学）)
-   - [闭包](#闭包)
+   - [闭包（装饰器函数）](#闭包)
    - [面向对象](#面向对象)
    - [字符串和正则](#字符串和正则)
    - [数据结构](#数据结构)
@@ -29,6 +29,31 @@ Python
 **参考**
 
 - [100天从新手到大师](https://github.com/jackfrued/Python-100-Days)
+
+
+
+pip常用国内镜像源：
+
+- 阿里云 http://mirrors.aliyun.com/pypi/simple/
+- 中国科技大学 https://pypi.mirrors.ustc.edu.cn/simple/
+- 豆瓣 http://pypi.douban.com/simple
+- 中国科学院 http://pypi.mirrors.opencas.cn/simple/
+- 清华大学 https://pypi.tuna.tsinghua.edu.cn/simple/
+
+```sh
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge 
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+# 安装pytorch还需要再添加如下channels：
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+
+# 设置搜索时显示通道地址
+conda config --set show_channel_urls yes
+```
 
 
 

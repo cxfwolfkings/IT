@@ -2,9 +2,19 @@
 
 
 
-1. 理论
+1. 简介
+   - [SQL](#SQL)
 2. 实战
    - [常用语句](#常用语句)
+     - [查询字段或值在哪个表中存在](#查询字段或值在哪个表中存在)
+     - [查看对象结构](#查看对象结构)
+     - [判断对象是否存在](#判断对象是否存在)
+     - [复制对象](#复制对象)
+     - [访问远程数据库](#访问远程数据库)
+     - [数据导入](#数据导入)
+     - [数据库转码](#数据库转码)
+     - [行列转换](#行列转换)
+     - [其它SQL](#其它SQL)
 3. 总结
 4. 升华
 
@@ -18,9 +28,53 @@
 
 
 
-## 常用语句
+## 简介
 
-### 1. 查询字段或值在哪个表中存在
+
+
+### SQL
+
+SQL 用于访问和处理数据库，全称是 `Structured Query Language`，是一种 ANSI（American National Standards Institute 美国国家标准化组织）标准的计算机语言。对大小写不敏感：`SELECT` 与 `select` 是相同的。
+
+SQL处理过程：
+
+![x](./Resources/db005.jpg)
+
+**SQL92标准**
+
+- 数据操作语句(Data Manipulation Language, DML) `select`, `insert`, `update`, `delete`
+
+- 数据定义语句(Data Definition Language, DDL) `create`, `drop`
+
+- 数据控制语句(Data Control Language, DCL) `grant`, `revoke`
+
+ **SQL99标准**
+
+| 类型        | 简介                                   | 命令举例                    |
+| ----------- | -------------------------------------- | --------------------------- |
+| SQL连接语句 | 开始和结束一个客户连接                 | connect,disconnect          |
+| SQL控制语句 | 控制一组SQL语句的执行                  | call,return                 |
+| SQL数据语句 | 直接对数据产生持续性作用               | select,insert,update,delete |
+| SQL诊断语句 | 提供诊断信息并抛出异常或错误           | get,diagnostic              |
+| SQL模式语句 | 对数据库模式及其内的对象产生持续性作用 | alter,create,drop           |
+| SQL会话语句 | 在一次会话中，控制缺省操作和其它操作   | set                         |
+| SQL事务语句 | 设置一个事务处理的开始和结束点         | commit,rollback             |
+
+SQL 程序以数据的逻辑集合来对数据进行操作。集合处理方式也称作**声明性处理(Declarative Processing)**。集合理论是俄国数学家**格奥尔格•康托(Georg Cantor)**的发明。
+
+![x](./Resources/db006.png)
+
+
+
+## 实战
+
+
+
+### 常用语句
+
+
+
+#### 查询字段或值在哪个表中存在
 
 ```sql
 -- 查询某个字段在数据库中的哪些表中存在
@@ -93,7 +147,9 @@ End
 GO
 ```
 
-### 2. 查看表结构
+
+
+#### 查看对象结构
 
 ```sql
 SELECT DATABASEPROPERTY('数据库名','isfulltextenabled')
@@ -110,6 +166,7 @@ FROM sys.tables AS t
 AND ep.minor_id = c.column_id 
 WHERE ep.class =1 
     AND t.name='TableName'
+
 -- 快速查看表结构（比较全面的）
 SELECT CASE WHEN col.colorder = 1 THEN obj.name
         ELSE ''
@@ -153,9 +210,71 @@ FROM dbo.syscolumns col
             AND epTwo.name = 'MS_Description'
 WHERE obj.name = '表名'--表名
 ORDER BY col.colorder;
+
+-- 获取当前数据库中的所有表
+select Name from sysobjects where xtype='u' and status>=0
+
+-- 查看与某一个表相关的视图、存储过程、函数
+select a.* from sysobjects a, syscomments b 
+where a.id = b.id and b.text like '%函数名%'
+
+-- 查看当前数据库中所有存储过程
+select name as 存储过程名称 from sysobjects where xtype='P'
+
+-- 查询用户创建的所有数据库
+select * from master..sysdatabases D where sid not in(select sid from master..syslogins where name='sa')
+select dbid, name AS DB_NAME from master..sysdatabases where sid <> 0x01
+
+-- 查看硬盘分区
+EXEC master..xp_fixeddrives
+
+-- 查看源码
+SELECT object_definition(object_id('sys.tables'));
+sp_helptext 'sys.tables'
+select * from sys.system_sql_modules where object_id = object_id('sys.tables')
+SELECT SYS.views.name AS 视图名,definition AS 视图定义 
+	FROM SYS.views JOIN SYS.sql_modules ON SYS.views.object_id=SYS.sql_modules.object_id
+	where SYS.views.name='hr_users_v'
+
+-- 查询列定义
+select * from syscolumns where id=object_id('V_StoreData')
+select * from information_schema.columns where table_name='V_StoreLevelData'
+select * from sys.system_sql_modules where object_id = object_id('sys.tables')
+
+-- 查询视图源码
+SELECT SYS.views.name AS 试图名,definition AS 试图定义 FROM SYS.views 
+  JOIN SYS.sql_modules ON SYS.views.object_id=SYS.sql_modules.object_id
+SELECT definition AS 试图定义 FROM SYS.views 
+  JOIN SYS.sql_modules ON SYS.views.object_id=SYS.sql_modules.object_id
+ where SYS.views.name='hr_users_v'
+
+-- 获取表名及表的触发器
+select (select b.name from sysobjects as b where b.id = a.parent_obj) 表名, a.name as 触发器 from sysobjects as a 
+ where a.xtype='TR' order by 表名
+/*
+xtype   char(2)   对象类型。可以是下列对象类型中的一种：     
+  C   =   CHECK   约束   
+  D   =   默认值或   DEFAULT   约束   
+  F   =   FOREIGN   KEY   约束   
+  L   =   日志   
+  FN   =   标量函数   
+  IF   =   内嵌表函数   
+  P   =   存储过程   
+  PK   =   PRIMARY   KEY   约束（类型是   K）   
+  RF   =   复制筛选存储过程   
+  S   =   系统表   
+  TF   =   表函数   
+  TR   =   触发器   
+  U   =   用户表   
+  UQ   =   UNIQUE   约束（类型是   K）   
+  V   =   视图   
+  X   =   扩展存储过程  
+*/
 ```
 
-### 3. 判断对象是否存在
+
+
+#### 判断对象是否存在
 
 ```sql
 --1.判断数据库是否存在
@@ -181,7 +300,9 @@ SELECT DATABASEPROPERTY('数据库名','isfulltextenabled')
 select * from sysfulltextcatalogs where name ='全文目录名称'
 ```
 
-### 4. 复制表
+
+
+#### 复制对象
 
 ```sql
 -- 说明：复制表结构（只复制结构，源表名：a 新表名：b）  
@@ -193,7 +314,9 @@ select * into b from a
 -- 新表将继承源表的列名称，数据类型，是否包含null值和关联的identity属性；但不能复制源表的约束条件，索引或触发器
 ```
 
-### 5. 访问远程数据库
+
+
+#### 访问远程数据库
 
 在T-SQL语句中访问远程数据库(openrowset/opendatasource/openquery)
 
@@ -339,7 +462,9 @@ delete openquery(ITSVA,'select name from TB.dbo.school where id=1')
 
 另外还可以连接到远程Analysis服务器做MDX查询，再用T-Sql做嵌套查询，可见T-SQL的远程查询非常强大。
 
-### 6. 数据导入
+
+
+#### 数据导入
 
 ```sql
 --启用Ad Hoc Distributed Queries：
@@ -363,7 +488,9 @@ exec sp_configure 'show advanced options',0
 reconfigure
 ```
 
-### 7. 数据库转码
+
+
+#### 数据库转码
 
 由于之前创建数据库忘记了设置Collocation，数据库中插入中文字符都是乱码，于是到DataBase的Options中修改Collocation，出现了The database could not be exclusively locked to perform the operation这个错误，无法修改字符集为Chinese_PRC_CI_AS。
 
@@ -377,73 +504,111 @@ reconfigure
 
 3. 执行SQL：`ALTER DATABASE db_database SET MULTI_USER -- 再修改为多用户模式`（如果修改失败，先重启SqlServer服务，再执行）
 
-### 8. 其它SQL
+
+
+#### 行列转换
+
+使用 `PIVOT`，`UNPIVOT` 快速实现行转列、列转行，可扩展性强
+
+**行转列**
+
+1、测试数据准备
+
+```sql
+CREATE TABLE [StudentScores]
+(
+  [UserName]     NVARCHAR(20),    -- 学生姓名
+  [Subject]     NVARCHAR(30),    -- 科目
+  [Score]      FLOAT,        -- 成绩
+)
+INSERT INTO [StudentScores] SELECT '张三', '语文', 80
+INSERT INTO [StudentScores] SELECT '张三', '数学', 90
+INSERT INTO [StudentScores] SELECT '张三', '英语', 70
+INSERT INTO [StudentScores] SELECT '张三', '生物', 85
+INSERT INTO [StudentScores] SELECT '李四', '语文', 80
+INSERT INTO [StudentScores] SELECT '李四', '数学', 92
+INSERT INTO [StudentScores] SELECT '李四', '英语', 76
+INSERT INTO [StudentScores] SELECT '李四', '生物', 88
+INSERT INTO [StudentScores] SELECT '码农', '语文', 60
+INSERT INTO [StudentScores] SELECT '码农', '数学', 82
+INSERT INTO [StudentScores] SELECT '码农', '英语', 96
+INSERT INTO [StudentScores] SELECT '码农', '生物', 78
+```
+
+2、行转列sql
+
+```sql
+SELECT * FROM [StudentScores] /*数据源*/
+AS P
+PIVOT
+(
+    SUM(Score/*行转列后 列的值*/) FOR
+    p.Subject/*需要行转列的列*/ IN ([语文],[数学],[英语],[生物]/*列的值*/)
+) AS T
+```
+
+**列转行**
+
+1、测试数据准备
+
+```sql
+CREATE TABLE ProgrectDetail
+(
+    ProgrectName         NVARCHAR(20), --工程名称
+    OverseaSupply        INT,          --海外供应商供给数量
+    NativeSupply         INT,          --国内供应商供给数量
+    SouthSupply          INT,          --南方供应商供给数量
+    NorthSupply          INT           --北方供应商供给数量
+)
+INSERT INTO ProgrectDetail
+SELECT 'A', 100, 200, 50, 50
+UNION ALL
+SELECT 'B', 200, 300, 150, 150
+UNION ALL
+SELECT 'C', 159, 400, 20, 320
+UNION ALL
+SELECT 'D', 250, 30, 15, 15
+```
+
+2、列转行的sql
+
+```sql
+SELECT P.ProgrectName, P.Supplier, P.SupplyNum
+FROM
+(
+    SELECT ProgrectName, OverseaSupply, NativeSupply,
+           SouthSupply, NorthSupply
+    FROM ProgrectDetail
+) T
+UNPIVOT
+(
+    SupplyNum FOR Supplier IN
+    (OverseaSupply, NativeSupply, SouthSupply, NorthSupply )
+) P
+```
+
+
+
+#### 其它SQL
 
 ```sql
 -- 重置主键（清空、归0）
 DBCC CHECKIDENT(project_document, RESEED, 0)
+
 -- 修改密码
 EXEC sp_password NULL,'123','sa'
--- 获取当前数据库中的所有表
-select Name from sysobjects where xtype='u' and status>=0
--- 查看与某一个表相关的视图、存储过程、函数
-select a.* from sysobjects a, syscomments b 
-where a.id = b.id and b.text like '%函数名%'
--- 查看当前数据库中所有存储过程
-select name as 存储过程名称 from sysobjects where xtype='P'
--- 查询用户创建的所有数据库
-select * from master..sysdatabases D where sid not in(select sid from master..syslogins where name='sa')
-select dbid, name AS DB_NAME from master..sysdatabases where sid <> 0x01
--- 查看硬盘分区
-EXEC master..xp_fixeddrives
+
 -- 修改表名
 SP_RENAME 'Customer','T_Customer';
+
 -- 修改列名
 SP_RENAME 'T_ProductGroup.ProductSeries','SystemSeries','column';
+
 -- 杀掉所有的事件探察器进程
 DECLARE hcforeach CURSOR GLOBAL FOR 
 	SELECT 'kill '+RTRIM(spid) FROM master.dbo.sysprocesses
 	WHERE program_name IN('SQL profiler',N'SQL 事件探查器')
 EXEC sp_msforeach_worker '?'
--- 查看源码
-SELECT object_definition(object_id('sys.tables'));
-sp_helptext 'sys.tables'
-select * from sys.system_sql_modules where object_id = object_id('sys.tables')
-SELECT SYS.views.name AS 视图名,definition AS 视图定义 
-	FROM SYS.views JOIN SYS.sql_modules ON SYS.views.object_id=SYS.sql_modules.object_id
-	where SYS.views.name='hr_users_v'
--- 查询列定义
-select * from syscolumns where id=object_id('V_StoreData')
-select * from information_schema.columns where table_name='V_StoreLevelData'
-select * from sys.system_sql_modules where object_id = object_id('sys.tables')
--- 查询视图源码
-SELECT SYS.views.name AS 试图名,definition AS 试图定义 FROM SYS.views 
-  JOIN SYS.sql_modules ON SYS.views.object_id=SYS.sql_modules.object_id
-SELECT definition AS 试图定义 FROM SYS.views 
-  JOIN SYS.sql_modules ON SYS.views.object_id=SYS.sql_modules.object_id
- where SYS.views.name='hr_users_v'
--- 获取表名及表的触发器
-select (select b.name from sysobjects as b where b.id = a.parent_obj) 表名, a.name as 触发器 from sysobjects as a 
- where a.xtype='TR' order by 表名
-/*
-xtype   char(2)   对象类型。可以是下列对象类型中的一种：     
-  C   =   CHECK   约束   
-  D   =   默认值或   DEFAULT   约束   
-  F   =   FOREIGN   KEY   约束   
-  L   =   日志   
-  FN   =   标量函数   
-  IF   =   内嵌表函数   
-  P   =   存储过程   
-  PK   =   PRIMARY   KEY   约束（类型是   K）   
-  RF   =   复制筛选存储过程   
-  S   =   系统表   
-  TF   =   表函数   
-  TR   =   触发器   
-  U   =   用户表   
-  UQ   =   UNIQUE   约束（类型是   K）   
-  V   =   视图   
-  X   =   扩展存储过程  
-*/
 ```
 
 

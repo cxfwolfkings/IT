@@ -4,7 +4,7 @@
 
 ## 目录
 
-1. 理论
+1. 简介
 
    - [数据类型](#数据类型)
 - [数据持久化](#数据持久化)
@@ -57,48 +57,79 @@
 
 
 
-## 理论
+## 简介
 
-官方网站：[https://redis.io/](https://redis.io/)
+- 官方网站：[https://redis.io/](https://redis.io/)
 
-Redis: Remote Dictionary Server，属于 NoSQL 数据库
+- Redis: Remote Dictionary Server，属于 NoSQL 数据库
 
-Redis是什么：
+- Redis是什么：
 
-Redis is an open source, BSD licensed, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
+  Redis is an open source, BSD licensed, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 
-Redis是开源，BSD许可，高级的key-value存储系统。可以用来存储字符串、哈希结构、链表、集合。因此，常用来提供数据结构服务。
+  Redis是开源，BSD许可，高级的key-value存储系统。可以用来存储字符串、哈希结构、链表、集合。因此，常用来提供数据结构服务。
 
-作者：来自意大利西西里岛的 Salvatore Sanfilippo，Github地址：[http://github.com/antirez](http://github.com/antirez)。
+- 作者：来自意大利西西里岛的 Salvatore Sanfilippo，Github地址：[http://github.com/antirez](http://github.com/antirez)。使用 ANSI C 语言编写，最新版本（4.0.10）代码规模7.6万行。
 
-使用 ANSI C 语言编写，最新版本（4.0.10）代码规模7.6万行。
+- 目前，在所有可实现分布式缓存的开源软件中，Redis 应用最为广泛，开源社区也最为活跃，开源客户端支持语言也最为丰富。
+- Redis作用：可用作 **数据库**、**高速缓存**、**锁** 和 **消息队列**。支持**字符串**、**哈希表**、**列表**、**集合**、**有序集合**、**位图**、**HyperLogLogs** 等数据类型。内置复制、Lua 脚本、老化逐出、事务以及不同级别磁盘持久化功能。Redis 还支持 Sentinel 和 Cluster（从3.0开始）等高可用集群方案
 
-目前，在所有可实现分布式缓存的开源软件中，Redis 应用最为广泛，开源社区也最为活跃，开源客户端支持语言也最为丰富。
+- Redis 作为缓存的常见业务场景有：
+  1. 缓存热点数据，减轻数据库负载；
+  2. 基于 List 结构显示最新的项目列表；
+  3. 基于 Sorted Set 来做排行榜，取 Top N；
+  4. 基于 Set 来做 uniq 操作，如页面访问者排重；
+  5. 基于 Hset 做单 Key 下多属性的项目，例如商品的基本信息、库存、价格等设置成多属性。
 
-可用作 **数据库**、**高速缓存**、**锁** 和 **消息队列**
+- Redis 特点
+  1. Redis 不仅仅支持简单的 key-value 类型的数据，同时还提供 list，set，zset，hash 等数据结构的存储。
+  2. Redis 支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
+  3. Redis 支持数据的备份，即 master-slave 模式的数据备份。
+  4. Redis 主进程是**单线程** 工作，因此，Redis 的所有操作都是原子性的。意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过 `MULTI` 和 `EXEC` 指令包起来。
+  5. 性能极高：Redis能读的速度是110000次/s，写的速度是81000次/s，此外，Key 和 Value 的大小限制均为 512M，这阈值相当可观。
+  6. 丰富的特性：Redis 还支持 publish/subscribe，通知，key 过期等等特性。
 
-支持**字符串**、**哈希表**、**列表**、**集合**、**有序集合**、**位图**、**HyperLogLogs** 等数据类型
 
-内置复制、Lua 脚本、老化逐出、事务以及不同级别磁盘持久化功能
 
-Redis 还支持 Sentinel 和 Cluster（从3.0开始）等高可用集群方案
+**什么是** **BSD** **协议？**
 
-Redis 作为缓存的常见业务场景有：
+BSD开源协议是一个给于使用者很大自由的协议。可以自由的使用，修改源代码，也可以将修改后的代码作为开源或者专有软件再发布。当你发布使用了BSD协议的代码，或者以BSD协议代码为基础做二次开发自己的产品时，需要满足三个条件：
 
-1. 缓存热点数据，减轻数据库负载；
-2. 基于 List 结构显示最新的项目列表；
-3. 基于 Sorted Set 来做排行榜，取 Top N；
-4. 基于 Set 来做 uniq 操作，如页面访问者排重；
-5. 基于 Hset 做单 Key 下多属性的项目，例如商品的基本信息、库存、价格等设置成多属性。
+1. 如果再发布的产品中包含源代码，则在源代码中必须带有原来代码中的BSD协议。
 
-Redis 特点
+2. 如果再发布的只是二进制类库/软件，则需要在类库/软件的文档和版权声明中包含原来代码中的BSD协议。
 
-- Redis 不仅仅支持简单的 key-value 类型的数据，同时还提供 list，set，zset，hash 等数据结构的存储。
-- Redis 支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
-- Redis 支持数据的备份，即 master-slave 模式的数据备份。
-- Redis 主进程是**单线程** 工作，因此，Redis 的所有操作都是原子性的。意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过 `MULTI` 和 `EXEC` 指令包起来。
-- 性能极高：Redis能读的速度是110000次/s，写的速度是81000次/s，此外，Key 和 Value 的大小限制均为 512M，这阈值相当可观。
-- 丰富的特性：Redis 还支持 publish/subscribe，通知，key 过期等等特性。
+3. 不可以用开源代码的作者/机构名字和原来产品的名字做市场推广。
+
+BSD代码鼓励代码共享，但需要尊重代码作者的著作权。BSD由于允许使用者修改和重新发布代码，也允许使用或在BSD代码上开发商业软件发布和销售，因此是对商业集成很友好的协议。
+
+很多的公司企业在选用开源产品的时候都首选BSD协议，因为可以完全控制这些第三方的代码，在必要的时候可以修改或者二次开发。
+
+更多协议参考：[各种开源协议介绍](https://www.runoob.com/w3cnote/open-source-license.html) 
+
+
+
+**什么是** **key value** **存储？**
+
+JAVA 中的 map 就是 key=>value 存储的。键=>值（key=>value）对，键唯一，对应一个值，值的形式多样。
+
+ 
+
+**什么是原子性，什么是原子性操作？**
+
+举个例子：
+
+A、想要从自己的帐户中转1000块钱到B的帐户里。那个从A开始转帐，到转帐结束的这一个过程，称之为一个事务。在这个事务里，要做如下操作：
+
+1. 从A的帐户中减去1000块钱。如果A的帐户原来有3000块钱，现在就变成2000块钱了。
+
+2. 在B的帐户里加1000块钱。如果B的帐户如果原来有2000块钱，现在则变成3000块钱了。
+
+如果在A的帐户已经减去了1000块钱的时候，忽然发生了意外，比如停电什么的，导致转帐事务意外终止了，而此时B的帐户里还没有增加1000块钱。那么，我们称这个操作失败了，要进行回滚。回滚就是回到事务开始之前的状态，也就是回到A的帐户还没减1000块的状态，B的帐户的原来的状态。此时A的帐户仍然有3000块，B的帐户仍然有2000块。
+
+我们把这种要么一起成功（A帐户成功减少1000，同时B帐户成功增加1000），要么一起失败（A帐户回到原来状态，B帐户也回到原来状态）的操作叫原子性操作。
+
+如果把一个事务可看作是一个程序，它要么完整的被执行，要么完全不执行。这种特性就叫原子性。
 
 
 
@@ -565,24 +596,32 @@ SETEX
 
 官方站点：redis.io 下载最新版或者最新stable版
 
-windows:
+**windows:**
 
 ```sh
-# 启动临时服务：
+# 启动临时服务（redis.windows.conf是默认配置，可以省略。输入之后，会显示图标界面）：
 redis-server.exe redis.windows.conf
-# 客户端调用：
+
+# 客户端调用（启一个 cmd 窗口，原来的不要关闭）：
+# 参数：
+#   -a: 输入密码
+#   --raw: 避免中文乱码
 redis-cli.exe -h 127.0.0.1 -p 6379
+
 # 安装服务：
 redis-server.exe --service-install redis.windows.conf --service-name redisserver1 --loglevel verbose
+
 # 启动服务：
 redis-server.exe  --service-start --service-name redisserver1
+
 # 停止服务：
 redis-server.exe  --service-stop --service-name redisserver1
+
 # 卸载服务：
 redis-server.exe  --service-uninstall --service-name redisserver1
 ```
 
-Linux:
+**Linux:**
 
 1、下载[安装包](https://redis.io/download)
 
@@ -611,17 +650,19 @@ make clean
 rm -rf redis-6.0.4
 ```
 
-**以后台进程的形式运行：**
+**其它配置：**
+
+1、以后台进程的形式运行：
 
 编辑conf配置文件，修改如下内容：`daemonize yes`
 
-**开启远程访问：**
+2、开启远程访问：
 
 修改redis.conf，注释掉 `bind 127.0.0.1` 可以使所有的 ip 访问 redis；若是想指定多个 ip 访问，但并不是全部的 ip 访问，可以 bind。
 
 在 redis3.2 之后，redis 增加了 protected-mode，在这个模式下，即使注释掉了 `bind 127.0.0.1`，再访问 redis 的时候还是报错，修改办法：`protected-mode no`
 
-**设置密码：**
+3、设置密码：
 
 把 `#requirepass foobared` 的 # 号去掉，并把 foobared 改为自己的密码即可
 

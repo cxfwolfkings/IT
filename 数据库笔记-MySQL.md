@@ -1,31 +1,46 @@
 # MySQL
 
-1. 理论
+1. 简介
    
    - [基础类型](#基础类型)
    - [索引](#索引)
    - [临时表](#临时表)
    - [缓存池](#缓存池)
    - [Explain详解](#Explain详解)
+   - [筛选](#筛选)
+   - [排序](#排序)
+   - [分页](#分页)
    - [table瘦身](#table瘦身)
    - [SQL&nbsp;Joins、统计、随机查询](#SQL&nbsp;Joins、统计、随机查询)
    
 2. 实战
    - [安装与配置](#安装与配置)
+
    - [常用命令语句](#常用命令语句)
      - [控制外键约束](#控制外键约束)
      - [控制安全模式](#控制安全模式)
+     
    - [常用SQL语句](#常用SQL语句)
-     - [表结构相关](#表结构相关)
-     - [字符串分割](#字符串分割)
-     - [索引相关](#索引相关)
+
+     - [系统配置语句](#系统配置语句)
+     - [对象查看语句](#对象查看语句)
+     - [对象操作语句](#对象操作语句)
+
+     - [字符串函数](#字符串函数)
      - [日期时间函数](#日期时间函数)
+     - [JSON函数](#JSON函数)
+     - [其它SQL](#其它SQL)
+
    - [Handler](#Handler)
+
    - [触发器](#触发器)
+
    - [事件调度器](#事件调度器)
+
    - [MySQL监控](#MySQL监控)
+
    - [死锁](#死锁)
-   
+
 3. 总结
 
    - 常见问题
@@ -48,44 +63,38 @@
 
 
 
+## 简介
 
-一款开源、免费的数据库软件。MySql官网: [https://www.mysql.com/](https://www.mysql.com/)
+- 一款开源、免费的数据库软件。MySql官网: [https://www.mysql.com/
+- MySQL不足（未验证）：
+  1. MyISAM格式的数据表只有数据表锁定，没有数据行锁定，可以使用InnoDB格式数据表绕过这个问题
+  2. MyISAM数据表不能热备份，即无需锁定数据表就可以在对数据表进行处理时同时对其进行备份。InnoDB可以，但是收费
+  3. 不支持自定义类型
+  4. 不能直接处理XML数据
+  5. 没有OLAP功能。支持OLAP的数据库系统通常称为数据仓库(data warehouse)
+  6. 从5.0版本开始支持的存储过程和触发器并不成熟
+  7. 从4.1版本开始支持的GIS也不成熟[](https://www.mysql.com/)
 
-**MySQL版本：**
+- **MySQL版本：**
+  1. Alpha：开发
+  2. Beta：基本完成
+  3. Gamma：更加稳定
+  4. Production 或 Generally Available(GA)：足够成熟和稳定
 
-- Alpha：开发
+- **MySQL许可证：**GPL(GNU Public License) 
 
-- Beta：基本完成
+- **SQL兼容性：**MySQL 支持 SQL，SQL 有许多种“方言”，可以通过调整 MySQL 服务器的配置开关 sql-mode 使它在行为上与 IBM DB2 和 Oracle 等多种数据库系统保持最大限度的兼容
 
-- Gamma：更加稳定
-
-- Production 或 Generally Available(GA)：足够成熟和稳定
-
-**MySQL许可证：**
-
-GPL(GNU Public License) 
-
-**SQL兼容性：**
-
-MySQL 支持 SQL，SQL 有许多种“方言”，可以通过调整 MySQL 服务器的配置开关 sql-mode 使它在行为上与 IBM DB2 和 Oracle 等多种数据库系统保持最大限度的兼容
-
-**MySQL数据文件：**
-
-Linux: `/var/lib/mysql`，Windows: `%MySQL%/data`
-
-- data/dbname/tablename.frm: 数据表结构定义
-- data/dbname/db.opt: 整个数据库的结构定义和设置
-- data/dbname/tablename.MYD: MyISAM数据表数据
-- data/dbname/tablename.MYI: MyISAM数据表索引
-- innodb_file_per_table: InnoDB存储方式（各自一个文件，统一的表空间）
-- data/dbname/tablename.idb: InnoDB数据表数据、索引默认存储
-- data/ibdata1,-2,-3: 表空间和撤销日志
-- data/ib_logfile0,-1,-2: InnoDB日志数据
-- data/dbname/tablename.TRG: 触发器
-
-
-
-## 理论
+- **MySQL数据文件：**Linux: `/var/lib/mysql`，Windows: `%MySQL%/data`
+  - data/dbname/tablename.frm: 数据表结构定义
+  - data/dbname/db.opt: 整个数据库的结构定义和设置
+  - data/dbname/tablename.MYD: MyISAM数据表数据
+  - data/dbname/tablename.MYI: MyISAM数据表索引
+  - innodb_file_per_table: InnoDB存储方式（各自一个文件，统一的表空间）
+  - data/dbname/tablename.idb: InnoDB数据表数据、索引默认存储
+  - data/ibdata1,-2,-3: 表空间和撤销日志
+  - data/ib_logfile0,-1,-2: InnoDB日志数据
+  - data/dbname/tablename.TRG: 触发器
 
 
 
@@ -503,6 +512,28 @@ expain出来的信息有10列：
 
 
 
+### 筛选
+
+WHERE、HAVING同时出现时，MySQL优先执行WHERE字句，HAVING对WHERE结果做进一步筛选。HAVING字句不容易优化，但是可以在GROUP BY查询中用作数学统计(SUM, MAX, MIN …)
+
+MySQL不允许在WHERE后面使用假名
+
+### 分页
+
+`LAST_INSERT_ID()` 函数返回 MySql 为上一条 `INSERT` 命令生成的 `AUTO_INCREMENT` 值。
+
+它只对本次连接有效，所以不存在并发问题，但是它与表无关，只要有 INSERT 操作，`AUTO_INCREMENT` 就有可能改变。
+
+如果 INSERT 使用单条语句插入多条新纪录的语法，它获取的是第一条数据的id。
+
+
+
+### 排序
+
+排序规则：列->表->库->列字符集默认排序
+
+
+
 ## table瘦身
 
 **空洞**：
@@ -634,13 +665,13 @@ ALTER USER USER() IDENTIFIED BY '新密码';
 
 **6. 问题解决**
 
-**6.1 服务名无效**  
+6.1 **服务名无效**
 
 原因：没有注册 mysql 到服务中。  
 
 解决：在命令行中输入`mysqld --install`，出现 `Service successfully install` 代表安装成功
 
-**6.2 cmd中能登录，Navicat中不能登录**  
+6.2 **cmd中能登录，Navicat中不能登录**
 
 错误提示：
 
@@ -691,8 +722,6 @@ mysql> exit;
 
 
 
-
-
 ## 常用命令语句
 
 
@@ -729,40 +758,18 @@ set sql_safe_updates=0; --安全模式关闭状态
 
 
 
-## 常用SQL语句
+### 常用SQL语句
 
 
 
-#### 查看系统配置
+#### 系统配置语句
 
 ```sql
 -- 安全模式
 show variables like 'sql_safe_updates';
 set sql_safe_updates=1; --安全模式打开状态
 set sql_safe_updates=0; --安全模式关闭状态
-```
 
-
-
-#### 查看结构描述
-
-```sql
-show databases;
-desc tableName; --查看表结构
-show tables from dbName;
-show columns from tableName; --查看表中的列
-show index from tableName; --查询索引
-show create proc[edure] procName; --查看创建存储过程信息
-show procedure status;
-show function status;
-show profiles
-```
-
-
-
-#### 数据库引擎相关
-
-```sql
 -- 改变数据表的类型（MyISAM、InnoDB）：
 ALTER TABLE tbName ENGINE = tpName;
 show engines;
@@ -773,11 +780,34 @@ show create table table_name;
 -- 如果tbname没有指定，会转换所有数据表
 -- mysql数据库中的表类型都是`MyISAM`，保存着内部管理信息，千万不能转换！
 mysql_convert_table_format [opt] –type=InnoDB dbname [tbname]
+
+SHOW CHARACTER SET -- 查看一个给定字符集的默认排序方式
+SHOW COLLATION -- 查看所有字符集
+-- 临时改变排序方式
+SELECT LoginName FROM t_user ORDER BY LoginName COLLATE utf8_unicode_ci
+-- 永久改变排序方式
+ALTER TABLE t_user MODIFY LoginName VARCHAR(20)
+  CHARACTER SET utf8 COLLATE utf8_unicode_ci
+-- 临时改变字符集及排序方式（无法用索引，转换慢，查询慢）
+SELECT LoginName FROM t_user
+  ORDER BY CONVERT(LoginName USING latin1) COLLATE latin1_swedish_ci
 ```
 
 
 
-#### 表结构相关
+#### 对象查看语句
+
+```sql
+show databases;
+desc tableName; -- 查看表结构
+show tables from dbName;
+show columns from tableName; -- 查看表中的列
+show index from tableName; -- 查询索引
+show create proc[edure] procName; -- 查看创建存储过程信息
+show procedure status;
+show function status;
+show profiles
+```
 
 https://dev.mysql.com/doc/relnotes/connector-j/8.0/en/news-8-0-19.html
 
@@ -785,30 +815,9 @@ MySQL Server 8.0.17 deprecated the display width for the TINYINT, SMALLINT, MEDI
 
 ***从8.0.17版本开始，TINYINT, SMALLINT, MEDIUMINT, INT, and BIGINT类型的显示宽度将失效。***
 
-```sql
--- 增加一个数据列：
-ALTER TABLE tblname ADD newcolumn coltype coloptions [FIRST|AFTER existingcolumn]
--- 修改一个数据列：
-ALTER TABLE tblname CHANGE oldcolumn newcolumn coltype coloptions
--- 删除一个数据列：
-ALTER TABLE tblname DROP column
-
--- 1. 复制表结构及其数据：
-create table table_name_new as select * from table_name_old
--- 2. 只复制表结构：
-create table table_name_new as select * from table_name_old where 1=2;
--- 或者：
-create table table_name_new like table_name_old
--- 3. 只复制表数据：
--- 如果两个表结构一样：
-insert into table_name_new select * from table_name_old
--- 如果两个表结构不一样：
-insert into table_name_new(column1,column2...) select column1,column2... from table_name_old
-```
 
 
-
-#### 索引相关
+#### 对象操作语句
 
 ```sql
 -- 查看现有索引：
@@ -839,6 +848,37 @@ CREATE UNIQUE INDEX index_name ON table_name (column_list)
 ALTER TABLE tblname  DROP PRIMARY KEY
 ALTER TABLE tblname  DROP INDEX indexname
 ALTER TABLE tblname  DROP FOREIGN KEY indexname
+
+-- 增加一个数据列：
+ALTER TABLE tblname ADD newcolumn coltype coloptions [FIRST|AFTER existingcolumn]
+-- 修改一个数据列：
+ALTER TABLE tblname CHANGE oldcolumn newcolumn coltype coloptions
+-- 删除一个数据列：
+ALTER TABLE tblname DROP column
+
+-- 1. 复制表结构及其数据：
+create table table_name_new as select * from table_name_old
+-- 2. 只复制表结构：
+create table table_name_new as select * from table_name_old where 1=2;
+-- 或者：
+create table table_name_new like table_name_old
+-- 3. 只复制表数据：
+--   3.1 如果两个表结构一样：
+insert into table_name_new select * from table_name_old
+--   3.2 如果两个表结构不一样：
+insert into table_name_new(column1,column2...) select column1,column2... from table_name_old
+
+-- 改变全体文本数据列上的字符集：
+ALTER TABLE tblname CONVERT TO CHARACTER SET charsetname
+
+/*
+改变数据表的类型（MyISAM、InnoDB）：
+  1. 如果 `MyISAM` 数据表包含全文索引或地理数据，转换不能成功（`InnoDB` 不支持这些功能）。
+  2. 如果对大量数据表进行转换，unix/Linux下的 `mysql_convert_table_format` 脚本很值得选用（如果tbname没有指定，会转换所有数据表）
+  3. mysql数据库中的表类型都是`MyISAM`，保存着内部管理信息，千万不能转换！
+*/
+ALTER TABLE tblname ENGINE typename
+mysql_convert_table_format [opt] –type=InnoDB dbname [tbname]
 ```
 
 
@@ -923,6 +963,38 @@ select convert_tz('2008-08-08 12:00:00', '+08:00', '+00:00'); -- 2008-08-08 04:0
 
 
 
+#### 统计函数
+
+**concat()**
+
+- 功能：将多个字符串连接成一个字符串。
+
+- 语法：`concat(str1, str2,...)`
+
+返回结果为连接参数产生的字符串，如果有任何一个参数为null，则返回值为null。
+
+**concat_ws()**
+
+- 功能：和concat() 一样，将多个字符串连接成一个字符串，但是可以一次性指定分隔符（concat_ws就是concat with separator）
+
+- 语法：`concat_ws(separator, str1, str2, ...)`
+
+  第一个参数指定分隔符。需要注意的是分隔符不能为null，如果为null，则返回结果为null
+
+ **group_concat()**
+
+- 功能：将group by产生的同一个分组中的值连接起来，返回一个字符串结果
+
+- 语法：`group_concat([distinct] 要连接的字段 [order by 排序字段 asc/desc] [separator '分隔符'])`
+
+  通过使用distinct可以排除重复值；如果希望对结果中的值进行排序，可以使用order by子句；separator是一个字符串值，缺省为一个逗号。
+
+ **WITH ROLLUP**
+
+- 功能：加在 GROUP BY … 语句之后，增加统计记录
+
+
+
 #### JSON函数
 
 ```sql
@@ -968,9 +1040,34 @@ update t set js = json_set('{"a":1,"s":"abc"}','$.a',456,'$.b','bbb') where id =
 
 
 
-
+#### 其它SQL
 
 ```sql
+-- 编辑排序清单里的数据记录
+-- 语法：`UPDATE…ORDER BY…LIMIT`
+-- 示例：
+UPDATE tablename SET mydata = 0 ORDER BY name LIMIT 10;
+
+-- 更新关联数据表里的数据记录
+-- 示例：
+UPDATE table1,table2 SET table1.columnA = table2.columnB
+WHERE table1.keyID = table2.keyID;
+
+-- 删除排序清单里的数据记录
+-- 语法：`DELTE…ORDER BY…LIMIT`
+-- 示例：
+DELETE FROM table ORDER BY column LIMIT 1;
+
+-- 删除关联数据表里的数据记录
+DELETE t1,t2 FROM t1,t2,t3 WHERE condition1 AND condition2 …;
+-- DELETE命令只从FROM关键字前的table中删除数据。
+-- 数据表之间的关联关系也可以用JOIN操作符来建立。
+-- 如果要删除的数据列上有外键约束，可以有如下解决方法：
+-- 1.暂时关闭外键约束检查机制
+SET foreign_key_check = 0 -- 关闭
+SET foreign_key_check = 1 -- 开启
+-- 2. 定义外键约束时加上ON DELETE CASCADE选项，级联删除。但是有可能删除掉其它数据表里仍需使用的数据。
+-- 有时候，彻底抛弃外键或使用MyISAM数据表（不支持数据一致性规则）
 
 
 -- 分页
