@@ -20,33 +20,43 @@
    
 2. [参考](#参考)
 
-   
 
-- 简单的说 Node.js 就是运行在服务端的 JavaScript。
-- Node.js 是一个基于Chrome JavaScript 运行时建立的一个平台。
-- Node.js是一个事件驱动I/O服务端JavaScript环境，基于Google的V8引擎，V8引擎执行Javascript的速度非常快，性能非常好。
 
-在 Node.js 出现之前，前端开发领域有很多事情我们是做不到的，比如：
+## 简介
 
-- JS 代码的合并、压缩、混淆
-- CSS 预处理
-- 前端自动化测试
+简单的说 Node.js 就是运行在服务端的 JavaScript。Node.js 是一个基于Chrome JavaScript 运行时建立的一个平台。Node.js是一个事件驱动I/O服务端JavaScript环境，基于Google的V8引擎，V8引擎执行Javascript的速度非常快，性能非常好。
 
-而这一切在 Node.js 出现之后都得到了很好的解决。
-
-- 对 JS 代码的预处理经历了 Grunt、Gulp 的短暂辉煌之后，终于在 Webpack 这里形成了事实标准的局面。
-- CSS 的预处理也从 LESS 发展到了 SASS 等。
-- 自动化测试一直是前端开发中的一个巨大痛点，由于前端在运行时严重依赖浏览器环境，导致我们一直无法像测试后端代码那样可以去编写测试用例。在有了 Node.js 之后，我们终于有了 Karma + Jasmine 这样的单元测试组合，也有了基于 WebDriverJS 这样的可以和浏览器进行通讯的集成测试神器。
+在 Node.js 出现之前，前端开发领域有很多事情我们是做不到的，比如：JS 代码的合并、压缩、混淆， CSS 预处理，前端自动化测试。而这一切在 Node.js 出现之后都得到了很好的解决，对 JS 代码的预处理经历了 Grunt、Gulp 的短暂辉煌之后，终于在 Webpack 这里形成了事实标准的局面；CSS 的预处理也从 LESS 发展到了 SASS 等；自动化测试一直是前端开发中的一个巨大痛点，由于前端在运行时严重依赖浏览器环境，导致我们一直无法像测试后端代码那样可以去编写测试用例。在有了 Node.js 之后，我们终于有了 Karma + Jasmine 这样的单元测试组合，也有了基于 WebDriverJS 这样的可以和浏览器进行通讯的集成测试神器。
 
 就前端开发目前整体的状态来说，无论你使用什么框架，Node.js、Webpack、SASS、Karma + Jasmine、WebDriverJS 这个组合是无论如何绕不过去的。
 
-## 安装
+Node.js特点：
 
-### windows
+1. 每个Node.js进程**只有一个主线程**在执行程序代码。
+2. 当用户的网络请求或者其它的异步操作到来时，Node.js都会把它放到“事件队列”之中，并**不会立即执行它**，代码就不会被阻塞，主线程继续往下走，直到主线程代码执行完毕。
+3. 当主线程代码执行完毕完成后，通过事件循环机制，从“事件队列”的开头取出一个事件，从线程池中分配一个线程去执行这个事件，接下来继续取出第二个事件，再从线程池中分配一个线程去执行，一直执行到事件队列的尾部。期间主线程不断的检查事件队列中是否有未执行的事件，直到事件队列中所有事件都执行完，此后每当有新的事件加入到事件队列中，都会通知主线程按顺序取出交代码循环处理。当有事件执行完毕后，会通知主线程，主线程执行回调，线程归还给线程池。
+
+我们所看到的Node.js单线程只是一个js主线程，本质上的异步操作还是由线程池完成的，Node.js将所有的阻塞操作都交给了内部的线程池去实现，本身只负责不断的往返调度，并没有进行真正的I/O操作，从而实现异步非阻塞I/O，这便是Node.js单线程和事件驱动的精髓之处了。
+
+Node.js官方是说不需要锁，但是不需要锁，不代表可以乱来，**不需要锁的是代码function，而不是资源！**这点要分清楚。
+
+参考：
+
+- https://blog.csdn.net/xllily_11/article/details/84303153
+
+
+
+## 实战
+
+
+
+### 安装
+
+**windows**
 
 直接使用安装程序
 
-### Linux
+**Linux**
 
 1、使用已编译好的包
 
@@ -73,7 +83,9 @@ nvm 介绍：[使用 nvm 管理不同版本的 node 与 npm](https://www.runoob.
 - Linux: [https://github.com/creationix/nvm](https://github.com/creationix/nvm)
 - Windows: [https://github.com/coreybutler/nvm-windows](https://github.com/coreybutler/nvm-windows)
 
-## 常用命令
+
+
+### 常用命令
 
 ```sh
 # 使用版本
