@@ -817,7 +817,7 @@ vscode 自定义配置参考：
 
 ## vs2019使用.NETCore3.0
 
-![x](./Resource/8.png)
+![x](./Resources/tool0007.png)
 
 
 
@@ -1906,8 +1906,8 @@ Markdown是一个好用的编辑器，它是一种纯文本格式的标记语言
 
 1、添加线程组
 
-![x](./Resource/添加线程组.png)
-![x](./Resource/配置线程组.png)
+![x](./Resources/添加线程组.png)
+![x](./Resources/配置线程组.png)
 
 线程组参数详解：
 
