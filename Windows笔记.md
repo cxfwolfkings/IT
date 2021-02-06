@@ -14,6 +14,8 @@ CMD命令
    - [开机启动项](#开机启动项)
    - [网络代理](#网络代理)
    - [路由器级联](#路由器级联)
+   - [将exe应用封装成windows服务](#将exe应用封装成windows服务)
+   - [将bat命令封装成windows服务](#将bat命令封装成windows服务)
 3. 总结
 4. 升华
 
@@ -4086,5 +4088,26 @@ Else
         msgbox "not ok"
 End If
 
+```
+
+
+
+### 将exe应用封装成windows服务
+
+准备工具：[NSSM](https://nssm.cc/usage) 或 srvany，NSSM更简单易用
+
+帮助命令：`nssm /?`
+
+
+
+### 将bat命令封装成windows服务
+
+以管理员运行cmd，**注意：**powershell不行！！！
+
+```powershell
+' 加入服务 (等号后面的空格必须)
+sc create service_name binPath= 路径 start= auto
+' 删除服务:
+sc delete service_name
 ```
 

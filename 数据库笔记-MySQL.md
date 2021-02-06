@@ -633,25 +633,21 @@ character-set-server=utf8
 default-storage-engine=INNODB
 # 默认使用 "mysql_native_password" 插件认证
 default_authentication_plugin=mysql_native_password
-[client]
-# 设置mysql客户端连接服务端时默认使用的端口
-port=3306
-default-character-set=utf8
 ```
 
 >my.ini 文件格式必须是 `ANSI` 格式，否则会报错：`Found option without preceding group in config file`
 
 **3. 初始化数据库**
 
-以 **管理员** 的身份打开cmd命令窗口，输入 `mysqld --initialize --console` 命令初始化 mysql 的 data 数据目录，初始化完毕后，会在解压目录下生成一个data文件夹，cmd窗口中会有随机生成的密码：
+以 **管理员** 的身份打开cmd命令窗口，输入 `mysqld --initialize --console --defaults-file="D:\Arms\mysql-master\my.ini"` 命令初始化 mysql 的 data 数据目录，初始化完毕后，会在解压目录下生成一个data文件夹，cmd窗口中会有随机生成的密码：
 
 ![x](./Resources/mysql_install.png)
 
-生成密码：XkJ-VegEY3cY
+生成密码：ybstblNN:9vz
 
 **4. 安装服务** 
 
-- 注册服务：`mysqld --install mysql-master --defaults-file="D:\Arms\mysql-8.0.19-winx64\my.ini"`
+- 注册服务：`mysqld --install mysql-master --defaults-file="D:\Arms\mysql-master\my.ini"`
 - 启动服务：`net start mysql-master`
 - 登录：`mysql -u root -p`
 
@@ -718,6 +714,45 @@ mysql> flush privileges;
 
 # 退出命令行
 mysql> exit;
+```
+
+主从复制：
+
+```sql
+-- 主库创建复制专用用户
+CREATE USER 'copyMan'@'%' IDENTIFIED BY '123';
+-- 授予复制权限
+GRANT REPLICATION SLAVE ON *.* TO 'copyMan'@'%';
+-- 查询主节点的BinLog坐标
+SHOW MASTER STATUS;
+-- 为从节点指定复制主节点
+change master to master_host='X.X.X.X',master_user='copyMan',master_password='123',master_log_file='mysql-bin.000003',master_log_pos=156;
+-- 启动
+START SLAVE;
+-- 验证
+SHOW SLAVE STATUS;
+```
+
+错误：【MySQL】Got fatal error 1236，仔细看了一下。是提示**max_allowed_packet 大小。**
+
+原因：首先max_allowed_packet控制着主从复制过程中，一个语句产生的二进制binlog event大小，它的值必须是1024的倍数 。出现此类错误的常见原因是：
+
+1. 该参数在主备库的配置大小不一样，主库的配置值大于从库的配置值。 从主库传递到备库的binlog event大小超过了主库或者备库的max_allowed_packet大小。
+2. 主库有大量数据写入时，比如在主库上执行 laod data，insert into .... select 语句，产生大事务。
+   当主库向从库传递一个比从库的max_allowed_packet 大的packet ，从库接收该packet失败，并报 “log event entry exceeded max_allowed_packet“。
+
+解决方法1：
+
+1. `set global max_allowed_packet =1*1024*1024*1024;`
+2. `stop slave;`
+3. `start slave;`
+
+如：登录mysql
+
+```sql
+stop slave; -- 必须先停止才能执行下个命令
+change master to master_log_file='mysql-bin.000004', master_log_pos=215987;
+start slave;
 ```
 
 
