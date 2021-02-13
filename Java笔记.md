@@ -2551,3 +2551,14 @@ signingConfigs {
 2、[Gradle构建最佳实践]( http://www.figotan.org/2016/04/01/gradle-on-android-best-practise/)
 
 这篇文章主要从使用者的角度介绍了Gradle在使用过程中的最佳实践，同样非常精彩。
+
+
+
+参考：
+
+- [Edison Xu](http://edisonxu.com/)
+- [直到世界尽头](http://www.525.life/)
+- [Arch Linux](https://wiki.archlinux.org/index.php/Main_page_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+- [Shadowsocks](https://wiki.archlinux.org/index.php/Shadowsocks_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+- [Privoxy](https://wiki.archlinux.org/index.php/Privoxy_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+
