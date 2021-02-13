@@ -29,6 +29,8 @@ Python
 **参考**
 
 - [100天从新手到大师](https://github.com/jackfrued/Python-100-Days)
+- [Django框架全面讲解](https://www.cnblogs.com/LiCheng-/p/6920900.html)
+- [用VScode代码调试Python](https://www.cnblogs.com/it-tsz/p/9022456.html)
 
 
 
