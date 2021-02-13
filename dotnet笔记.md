@@ -17240,7 +17240,7 @@ public class SettingContext : DbContext
 <	小于	&lt;	&#60;
 
 >		大于	&gt;	&#62;
->		
+>				
 >	&	&符号	&amp;	&#38;
 >	"	双引号	&quot;	&#34;
 >	©	版权	&copy;	&#169;
@@ -17611,4 +17611,13 @@ ASP.NET配置系统的功能仅应用于ASP.NET资源。例如，Forms身份验�
 // WPF关闭程序
 Application.Current.Shutdown();
 ```
+
+
+
+### 参考：
+
+- https://www.cnblogs.com/savorboard/
+- https://www.cnblogs.com/tianma3798/
+- https://mp.weixin.qq.com/s?__biz=MjM5NjMzMzE2MA==&mid=2451732971&idx=1&sn=2ebf2180f9b0a8abdd67aa644b40203d&chksm=b13c0aec864b83fafa72f4d1bc15bc06773931ee52a8aaa731197f8011a7f8f0c1dae72a98e0&scene=21#wechat_redirect
+- https://mp.weixin.qq.com/s?__biz=MjM5NjMzMzE2MA==&mid=2451733282&idx=1&sn=aa060ffbbbf23340c93a778ac0736ad3&chksm=b13c0825864b8133c33ea34c6288adb47ea0c2f185a4bc3ff6f96326f8175875423c1f30f94f&scene=21#wechat_redirect
 
