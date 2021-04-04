@@ -20,3 +20,9 @@
 **/.ipynb_checkpoints
 /Private
 /Dotnet/Project/xamarin
+**.xlsx
+**.docx
+**.pptx
+**.xls
+**.doc
+**.ppt
